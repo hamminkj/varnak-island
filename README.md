@@ -10,7 +10,7 @@ No external models, plugins or asset downloads are required.
 
 ## Controls
 Phone: hold and drag in the bottom-left region to move. Swipe the right side to look. Approach a resident or collectible and tap Interact. Dialogue pauses movement. Scroll long panels vertically.
-Desktop: WASD or arrow keys; hold the right mouse button and drag to look; E to interact. Escape closes panels.
+Desktop: W/S walk, A/D sidestep, left/right arrows turn; click and drag (or hold the right mouse button and drag) to look; walk close to an object or person, then click it or press E to interact. Escape closes panels.
 The island is designed for portrait orientation, with a 480 x 854 reference layout. North is negative Z, along the light-colored main path. Signs say bei (north).
 
 ## Included

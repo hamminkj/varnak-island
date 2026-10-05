@@ -14,6 +14,9 @@ var move_finger: int = -1
 var look_finger: int = -1
 var joy_origin: Vector2
 var mouse_look: bool = false
+var left_down: bool = false
+var left_drag: float = 0.0
+var hint_time: float = 0.0
 var entities: Array = []
 var inventory: Array = []
 var discovered: Array = []
@@ -289,7 +292,7 @@ func close_panel():
 func show_intro():
 	clear_panel("TuJuJu Studios\nVarnak Island")
 	text_line("Your friend Neri is somewhere on this island. Learn Varnak through objects, requests and clues to find them.")
-	text_line("Portrait controls: drag the lower left to walk; swipe the right side to look. Approach an object or person and tap Interact.\n\nDesktop: WASD or arrow keys, right-drag to look, E to interact.\n\nNorth is along the main path. Notebook meanings are optional hints. Progress saves automatically.")
+	text_line("Portrait controls: drag the lower left to walk; swipe the right side to look. Approach an object or person and tap Interact.\n\nDesktop: W/S walk, A/D sidestep, left/right arrows turn, drag with the mouse to look around. Walk up to an object or person, then click it or press E.\n\nNorth is along the main path. Notebook meanings are optional hints. Progress saves automatically.")
 	button("Explore",close_panel,content)
 
 func learn(word: String):
@@ -315,8 +318,10 @@ func _physics_process(delta):
 	var axis = joy
 	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP): axis.y -= 1
 	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): axis.y += 1
-	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): axis.x -= 1
-	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT): axis.x += 1
+	if Input.is_physical_key_pressed(KEY_A): axis.x -= 1
+	if Input.is_physical_key_pressed(KEY_D): axis.x += 1
+	if Input.is_physical_key_pressed(KEY_LEFT) or Input.is_physical_key_pressed(KEY_Q): player.rotation.y += 1.9 * delta
+	if Input.is_physical_key_pressed(KEY_RIGHT): player.rotation.y -= 1.9 * delta
 	axis = axis.limit_length()
 	var direction = player.basis * Vector3(axis.x,0,axis.y)
 	player.velocity.x = direction.x * 4
@@ -337,7 +342,10 @@ func _physics_process(delta):
 			target = e
 		if e["kind"] == "npc":
 			node.rotation.y = sin(clock * 0.35 + float(entities.find(e))) * 0.12
-	prompt.text = target.get("word", "")
+	hint_time -= delta
+	if hint_time > 0.0: pass
+	elif target.is_empty(): prompt.text = ""
+	else: prompt.text = str(target.get("word", "")) + "\n(click it, press E, or tap Interact)"
 	interact_button.disabled = target.is_empty()
 
 func _unhandled_input(event):
@@ -363,7 +371,39 @@ func _unhandled_input(event):
 		if event.index == look_finger: look(event.relative)
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		mouse_look = event.pressed
-	if event is InputEventMouseMotion and mouse_look: look(event.relative)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			left_down = true
+			left_drag = 0.0
+		else:
+			if left_down and left_drag < 8.0: click_pick(event.position)
+			left_down = false
+	if event is InputEventMouseMotion:
+		if mouse_look: look(event.relative)
+		elif left_down:
+			left_drag += event.relative.length()
+			if left_drag >= 8.0: look(event.relative)
+
+func click_pick(pos: Vector2):
+	var best_e = {}
+	var best_d = 70.0
+	for e in entities:
+		var node = e["node"] as Node3D
+		if not node.visible: continue
+		var p = node.global_position + Vector3(0,0.9,0)
+		if camera.is_position_behind(p): continue
+		var d = camera.unproject_position(p).distance_to(pos)
+		if d < best_d:
+			best_d = d
+			best_e = e
+	if best_e.is_empty(): return
+	var node2 = best_e["node"] as Node3D
+	if player.position.distance_to(node2.position) <= 3.4:
+		target = best_e
+		interact()
+	else:
+		prompt.text = "Too far away. Walk closer, then click again."
+		hint_time = 2.5
 
 func look(amount: Vector2):
 	player.rotation.y -= amount.x * 0.004
