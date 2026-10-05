@@ -32,8 +32,8 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates
           SRC=$(find / -type f -name web_nothreads_release.zip 2>/dev/null | head -1)
           echo "::warning::DIAG src=[$SRC] web=$(find / -name 'web_*.zip' 2>/dev/null | head -6 | tr '\n' ' ') tpl=$(find / -type d -name 'export_templates' 2>/dev/null | tr '\n' ' ') ver=$GODOT_VERSION home=$HOME"
-          [ -n "$SRC" ] && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/ 2>/dev/null || { mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/; }
-          ls ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable | head
+          [ -n "$SRC" ] && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/4.5.1.stable/ 2>/dev/null || { mkdir -p ~/.local/share/godot/export_templates/4.5.1.stable && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/4.5.1.stable/; }
+          ls ~/.local/share/godot/export_templates/4.5.1.stable | head
           mkdir -p build/web
           godot --headless --import > import.log 2>&1 || true
           if ! godot --headless --export-release "Web" build/web/index.html > export.log 2>&1; then
