@@ -1,8 +1,9 @@
 name: Deploy to GitHub Pages
 
+# The site is currently served from the committed build in docs/ (Settings, Pages,
+# Deploy from a branch). This workflow is a manual alternative: run it from the
+# Actions tab after switching the Pages source to GitHub Actions.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

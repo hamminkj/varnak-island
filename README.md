@@ -36,6 +36,16 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 6. Continue north to Neri at the cove.
 Exploration is open. Finding Neri early acknowledges the discovery while leaving the clue objective available.
 
+## Playing in a browser
+The game is published at https://hamminkj.github.io/varnak-island/ from the committed
+build in docs/. To update it after changing the game, re-export and commit:
+
+    godot --headless --export-release "Web" docs/index.html
+
+Godot needs the matching web export templates installed. The export preset has thread
+support switched off, which GitHub Pages requires because it cannot send the headers
+that threaded builds need.
+
 ## Phone deployment
 This ZIP is a source project, not an APK or iPhone app.
 For Android, install Godot export templates matching your editor version, configure its Android SDK/JDK export environment, add an Android export preset, and export a debug APK to install on your device. Consult the current official instructions:
@@ -67,7 +77,9 @@ main.gd: world construction, movement, input, UI, quests, interactions and persi
 art.gd: procedural models (characters, houses, boat, bridge, animals, items) and the water and ground shaders.
 data.gd: Varnak sentences, door puzzles, word workshop data and glosses.
 VARNAK_CONTENT.md: every form added in the expansion, with its source in the handoff document.
-export_presets.cfg and .github/workflows/deploy-pages.yml: web export and GitHub Pages deployment.
+export_presets.cfg: web export preset (single-threaded, required by GitHub Pages).
+docs/: the exported web build that GitHub Pages serves.
+.github/workflows/deploy-pages.yml: optional workflow that exports and deploys from GitHub Actions.
 main.tscn: entry scene.
 project.godot: portrait display and rendering configuration.
 smoke_test.gd: automated quest and persistence checks.
