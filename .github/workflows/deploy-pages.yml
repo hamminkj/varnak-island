@@ -14,34 +14,61 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  GODOT_VERSION: 4.5.1
+
 jobs:
   export-and-deploy:
     runs-on: ubuntu-latest
-    container:
-      image: barichello/godot-ci:4.5.1
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Export web build
-        shell: bash
+      - name: Cache Godot editor and web export templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot-bin
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-web-v1
+
+      - name: Download Godot and web export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
         run: |
-          set -o pipefail
-          mkdir -p ~/.local/share/godot/export_templates
-          SRC=$(find / -type f -name web_nothreads_release.zip 2>/dev/null | head -1)
-          echo "::warning::DIAG src=[$SRC] web=$(find / -name 'web_*.zip' 2>/dev/null | head -6 | tr '\n' ' ') tpl=$(find / -type d -name 'export_templates' 2>/dev/null | tr '\n' ' ') ver=$GODOT_VERSION home=$HOME"
-          [ -n "$SRC" ] && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/4.5.1.stable/ 2>/dev/null || { mkdir -p ~/.local/share/godot/export_templates/4.5.1.stable && cp -r "$(dirname "$SRC")/." ~/.local/share/godot/export_templates/4.5.1.stable/; }
-          ls ~/.local/share/godot/export_templates/4.5.1.stable | head
+          set -euo pipefail
+          BASE="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          mkdir -p ~/godot-bin "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          curl -sSL -o /tmp/godot.zip "$BASE/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q -o /tmp/godot.zip -d ~/godot-bin
+          mv ~/godot-bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot-bin/godot
+          chmod +x ~/godot-bin/godot
+          # The full template pack is large; keep only the web templates we export with.
+          curl -sSL -o /tmp/templates.tpz "$BASE/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q -o -j /tmp/templates.tpz \
+            'templates/web_nothreads_release.zip' \
+            'templates/web_nothreads_debug.zip' \
+            'templates/version.txt' \
+            -d "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
+          rm -f /tmp/godot.zip /tmp/templates.tpz
+
+      - name: Export web build
+        run: |
+          set -euo pipefail
+          ls "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
           mkdir -p build/web
-          godot --headless --import > import.log 2>&1 || true
-          if ! godot --headless --export-release "Web" build/web/index.html > export.log 2>&1; then
-            echo "::error::EXPORT FAILED: $(grep -iE 'error|fail|missing|invalid' export.log | head -8 | tr '\n' ' ') || TAIL: $(tail -8 export.log | tr '\n' ' ')"
+          ~/godot-bin/godot --headless --import 2>&1 | tail -5 || true
+          if ! ~/godot-bin/godot --headless --export-release "Web" build/web/index.html > export.log 2>&1; then
+            echo "::error::Export failed: $(grep -iE 'error|fail|missing|invalid' export.log | head -8 | tr '\n' ' ') || tail: $(tail -8 export.log | tr '\n' ' ')"
             exit 1
           fi
-          ls -la build/web
+          test -s build/web/index.html
+          test -s build/web/index.wasm
+          test -s build/web/index.pck
           touch build/web/.nojekyll
+          ls -la build/web
 
       - uses: actions/upload-pages-artifact@v3
         with:
