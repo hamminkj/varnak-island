@@ -25,16 +25,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install export templates
-        run: |
-          mkdir -p ~/.local/share/godot/export_templates
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable || true
-
       - name: Export web build
+        shell: bash
         run: |
+          set -o pipefail
+          mkdir -p ~/.local/share/godot/export_templates
+          T=/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          D=$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          if [ "$T" != "$D" ] && [ -d "$T" ]; then mv "$T" "$D"; fi
+          ls ~/.local/share/godot/export_templates/ || true
           mkdir -p build/web
-          godot --headless --verbose --import || true
-          godot --headless --verbose --export-release "Web" build/web/index.html
+          godot --headless --import > import.log 2>&1 || true
+          if ! godot --headless --export-release "Web" build/web/index.html > export.log 2>&1; then
+            echo "::error::EXPORT FAILED: $(grep -iE 'error|fail|missing|invalid' export.log | head -8 | tr '\n' ' ') || TAIL: $(tail -8 export.log | tr '\n' ' ')"
+            exit 1
+          fi
+          ls -la build/web
           touch build/web/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
