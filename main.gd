@@ -726,9 +726,9 @@ func close_panel():
 func show_intro():
 	clear_panel("TuJuJu Studios\nVarnak Island")
 	text_line("Your friend Neri is somewhere on this island. Learn Varnak through objects, requests and clues to find them.")
+	button("Explore",close_panel,content)
 	text_line("Portrait controls: drag the lower left to walk; swipe the right side to look. Approach an object or person and tap Interact.\n\nDesktop: W/S walk, A/D sidestep, left/right arrows turn, drag with the mouse to look around. Walk up to an object or person, then click it or press E.\n\nNorth is along the main path. Notebook meanings are optional hints. Progress saves automatically.")
 	text_line("Things to try: talk to everyone and ask follow-up questions, knock on the doors, count the piles, try fishing, and build new words in the notebook workshop.")
-	button("Explore",close_panel,content)
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
