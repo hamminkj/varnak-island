@@ -1323,20 +1323,14 @@ func close_panel():
 	lesson = ""
 
 func show_intro():
-	clear_panel("TuJuJu Studios\nVarnak Island")
+	clear_panel("Varnak Island")
 	var by = text_line("by je hammink", 18)
 	by.add_theme_color_override("font_color", Color("6b4a2e"))
-	text_line("Your friend Neri is somewhere on this island. Learn Varnak through objects, requests and clues to find them.")
+	text_line("Varnak Island is a game about how languages work. Everyone here speaks Varnak, an invented language, so you figure it out from gestures, objects and clues, then use it yourself. Along the way you notice patterns, guess meanings and build sentences, and the villagers are silly about all of it.")
+	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
-	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up have a faint column of light above them. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
-	text_line("Phone: drag the joystick in the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
-	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal. The More button has games, difficulty settings and Reset progress.")
-	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
-	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
-	text_line("In the Notebook, try the Verb builder and the Games to put Varnak together yourself.")
-	text_line("Everyone has feelings, and they show them. Choose Chat with someone to compliment, tease, joke or give a gift in Varnak. Watch their portrait: people faint, fume, blush, cry tiny rain clouds or fall over laughing. Make friends to learn their secrets.")
-	text_line("When someone teaches you a new word, a green box offers quick optional practice: use the word in a new form, or build a new sentence with it. Glowing purple ning-guro berries and blue sao-dau mushrooms grow around the island. Eat one, or give it to someone, and poems come out.")
-	text_line("The villagers love to gossip. Ask people \"Any gossip?\", notice how they know (-da saw it, -shi apparently, -nu people say), then make up your own rumors and watch them spread. Keep an eye out for strange things, too.")
+	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact.")
+	text_line("Tap the quest box to fold it. The More button has games, difficulty and Reset progress.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
@@ -5657,7 +5651,7 @@ func show_sounds():
 func show_credits():
 	clear_panel("Credits")
 	text_line("Varnak Island", 24)
-	text_line("A TuJuJu Studios game by je hammink.")
+	text_line("A game by je hammink.")
 	text_line("Created and directed by je hammink: concept, Varnak language design, learning design and playtesting.")
 	text_line("Built in Godot 4 with Claude, an AI model by Anthropic, as a coding assistant.", 17)
 	text_line("Every model, effect and piece of island nonsense is built from simple shapes in code. No outside assets are used.", 16)

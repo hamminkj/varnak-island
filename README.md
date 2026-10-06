@@ -1,5 +1,5 @@
 # Varnak Island
-A TuJuJu Studios portrait 3D exploration game by je hammink, built in Godot 4.
+A portrait 3D exploration game by je hammink, built in Godot 4.
 
 ## Open and play
 1. Extract the entire ZIP to a normal folder.
@@ -123,4 +123,4 @@ project.godot: portrait display and rendering configuration.
 smoke_test.gd: automated quest and persistence checks.
 
 ## Credits
-Varnak Island is a TuJuJu Studios game by je hammink (concept, Varnak language design, learning design and playtesting), built in Godot 4 with Claude as a coding assistant.
+Varnak Island is a game by je hammink (concept, Varnak language design, learning design and playtesting), built in Godot 4 with Claude as a coding assistant.
