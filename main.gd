@@ -1310,9 +1310,11 @@ func close_panel():
 
 func show_intro():
 	clear_panel("TuJuJu Studios\nVarnak Island")
+	var by = text_line("by je hammink", 18)
+	by.add_theme_color_override("font_color", Color("6b4a2e"))
 	text_line("Your friend Neri is somewhere on this island. Learn Varnak through objects, requests and clues to find them.")
 	button("Explore",close_panel,content)
-	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
+	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up have a faint column of light above them. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
 	text_line("Phone: drag the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
 	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal. The More button has games, difficulty settings and Reset progress.")
 	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
@@ -3565,6 +3567,7 @@ func show_more():
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button("Games and activities", show_games, content)
 	button("How to play", show_intro, content)
+	button("Credits", show_credits, content)
 	button("Fold the quest box" if not hud_small else "Unfold the quest box", func():
 		hud_small = not hud_small
 		layout_hud()
@@ -5433,3 +5436,13 @@ func show_poems():
 			show_poem_lines(lines)
 			button("Poem book", show_poems, content), content)
 	button("Notebook", show_notebook, content)
+
+func show_credits():
+	clear_panel("Credits")
+	text_line("Varnak Island", 24)
+	text_line("A TuJuJu Studios game by je hammink.")
+	text_line("Created and directed by je hammink: concept, Varnak language design, learning design and playtesting.")
+	text_line("Built in Godot 4 with Claude, an AI model by Anthropic, as a coding assistant.", 17)
+	text_line("Every model, effect and piece of island nonsense is built from simple shapes in code. No outside assets are used.", 16)
+	button("Back", show_more, content)
+	button("Return", close_panel, content)

@@ -606,12 +606,13 @@ const BEAM_SHADER = """
 shader_type spatial;
 render_mode unshaded, blend_add, cull_disabled, shadows_disabled, depth_draw_never;
 uniform vec4 color : source_color = vec4(1.0, 0.82, 0.38, 1.0);
+uniform float strength = 0.5;
 varying float yy;
 void vertex() { yy = VERTEX.y; }
 void fragment() {
 	float a = 1.0 - smoothstep(-1.9, 1.9, yy);
 	ALBEDO = color.rgb;
-	ALPHA = a * 0.5 * (0.8 + 0.2 * sin(TIME * 3.0));
+	ALPHA = a * strength * (0.8 + 0.2 * sin(TIME * 3.0));
 }
 """
 
@@ -625,16 +626,17 @@ static func beacon(parent: Node3D) -> Node3D:
 	m.shader = sh
 	var mi = MeshInstance3D.new()
 	var cm = CylinderMesh.new()
-	cm.top_radius = 0.1
-	cm.bottom_radius = 0.22
-	cm.height = 3.8
+	cm.top_radius = 0.03
+	cm.bottom_radius = 0.1
+	cm.height = 2.2
 	cm.radial_segments = 10
 	cm.rings = 1
 	cm.cap_top = false
 	cm.cap_bottom = false
 	mi.mesh = cm
 	mi.material_override = m
-	mi.position.y = 1.9
+	mi.position.y = 1.1
+	m.set_shader_parameter("strength", 0.2)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	b.add_child(mi)
 	var ring = MeshInstance3D.new()
@@ -648,7 +650,7 @@ static func beacon(parent: Node3D) -> Node3D:
 	var rmat = StandardMaterial3D.new()
 	rmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	rmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	rmat.albedo_color = Color(1.0, 0.86, 0.45, 0.35)
+	rmat.albedo_color = Color(1.0, 0.86, 0.45, 0.18)
 	ring.material_override = rmat
 	ring.position.y = 0.03
 	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

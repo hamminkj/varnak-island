@@ -1,5 +1,5 @@
 # Varnak Island
-A TuJuJu Studios portrait 3D exploration prototype built in Godot 4.
+A TuJuJu Studios portrait 3D exploration game by je hammink, built in Godot 4.
 
 ## Open and play
 1. Extract the entire ZIP to a normal folder.
@@ -9,7 +9,7 @@ A TuJuJu Studios portrait 3D exploration prototype built in Godot 4.
 No external models, plugins or asset downloads are required.
 
 ## Controls
-Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks a side quest.
+Tap or click any person, animal or object to walk to it and interact. Things you can pick up have a faint column of light above them. A yellow ! marks the next step of the story; a blue ! marks a side quest.
 Phone: hold and drag in the bottom-left region to move (push farther to run). Swipe the right side to look. Near something, the Interact button names the action (Talk, Pick up, Look). Dialogue pauses movement. Scroll long panels vertically.
 Desktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn; click and drag (or hold the right mouse button and drag) to look; click a person or object, or walk up and press E. Escape closes panels.
 Quest box: tap it to fold it into a small chip; tap again to open it.
@@ -118,3 +118,6 @@ docs/: the exported web build that GitHub Pages serves.
 main.tscn: entry scene.
 project.godot: portrait display and rendering configuration.
 smoke_test.gd: automated quest and persistence checks.
+
+## Credits
+Varnak Island is a TuJuJu Studios game by je hammink (concept, Varnak language design, learning design and playtesting), built in Godot 4 with Claude as a coding assistant.
