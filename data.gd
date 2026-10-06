@@ -42,7 +42,17 @@ const WORDS = {
 	"-ur": "usually, as a habit (habitual)", "-fu": "future tense", "-ng": "begins to (inceptive)",
 	"-tir": "cause to, make (causative)", "u-": "more (comparative, before the root)",
 	"puka-rav": "read books (puka + rav: the noun is incorporated into the verb)",
-	"mora-ni aruma": "beyond the river (mora-ni aru-ma: on the river's far side)"
+	"mora-ni aruma": "beyond the river (mora-ni aru-ma: on the river's far side)",
+	# third expansion
+	"riya": "sun", "yue": "moon", "sao": "star", "yar": "day", "salma": "dawn", "monar": "morning", "wanar": "evening",
+	"sa": "he, she, it (independent pronoun)", "hai-sao": "sea star (hai + sao)", "-ve": "ordinal ending (yan-ve: first)",
+	"yanve": "first", "velve": "second", "murve": "third", "kesve": "fourth", "panve": "fifth", "lukve": "sixth", "setve": "seventh", "barve": "eighth",
+	"gin": "money, coins", "har": "thank (root)", "maki": "no", "dor": "land", "sendor": "the small island (sen dor: small land)",
+	"gan": "room", "shan": "rear, behind (after -ni)", "men": "front (after -ni)", "dal": "side (after -ni)", "pai": "paper",
+	"tal": "arrive (root)", "shora": "old", "nava": "young / new",
+	"ansu": "with me (an + su)", "na-": "I (subject prefix)", "ta-": "you (subject prefix)", "i-": "he, she, it (subject prefix)",
+	"ri-": "they (subject prefix)", "k-": "I (agent prefix, before the patient prefix)", "t-": "you (agent prefix)",
+	"kin": "we (including you)"
 }
 
 # Glosses that replace earlier ones because the document gives a second meaning.
@@ -222,7 +232,44 @@ const SENTENCES = {
 		"words": ["mora", "kor", "-o"], "wrong": ["Do not cross the river!", "The river is crossing."]},
 	"log_short": {"v": "Murak-gira i-dun.", "parts": "murak-gira  i-dun\ntree-bridge  3S-be.short", "en": "The log bridge is short.",
 		"gesture": "Three logs span the water. You could cross in a few steps.",
-		"words": ["murak", "gira", "dun"], "wrong": ["The log bridge is long.", "The log bridge is broken."]}
+		"words": ["murak", "gira", "dun"], "wrong": ["The log bridge is long.", "The log bridge is broken."]},
+	# ---- third expansion ----
+	"big_fish": {"v": "Var tari haima i-esh-da.", "parts": "var  tari  hai-ma  i-esh-da\nbig  fish  sea-LOC  3S-be.located-DIR", "en": "A big fish is in the sea (I saw it).",
+		"gesture": "A huge grey back rises out of the waves, then a tail slaps the water.",
+		"words": ["var", "tari", "hai", "-ma"], "wrong": ["A small fish is in the river.", "The boat is in the sea."]},
+	"dog_with_me": {"v": "Gor ansu i-nang-im-da.", "parts": "gor  an-su  i-nang-im-da\ndog  1SG-COM  3S-walk-IPFV-DIR", "en": "The dog is walking with me.",
+		"gesture": "The dog trots at your heels, tail wagging.",
+		"words": ["gor", "ansu", "-su", "nang"], "wrong": ["The dog is walking to me.", "My dog is sleeping."]},
+	"thank_you": {"v": "K-ta-har-da.", "parts": "k-ta-har-da\n1A-2P-thank-DIR", "en": "I thank you.",
+		"gesture": "Someone takes your hand in both of theirs and bows.",
+		"words": ["har", "k-"], "wrong": ["You thank me.", "Thank them!"]},
+	"ruins_old": {"v": "Ki dom i-shora.", "parts": "ki  dom  i-shora\nthis  house  3S-be.old", "en": "This house is old.",
+		"gesture": "Moss covers the broken columns. Oku pats one fondly.",
+		"words": ["ki", "dom", "shora"], "wrong": ["This house is new.", "This house is big."]},
+	"room_behind": {"v": "Var wak-ni shanma gan i-esh-nu.", "parts": "var  wak-ni  shan-ma  gan  i-esh-nu\nbig  water-GEN  rear-LOC  room  3S-be.located-REP", "en": "They say there is a room behind the big water.",
+		"gesture": "Oku leans in and whispers, glancing toward the north-east hills.",
+		"words": ["var", "wak", "-ni", "shan", "gan", "-nu"], "wrong": ["There is a big room in the water.", "I saw a room behind the house."]},
+	"falls": {"v": "Wak hala i-lum-im-da.", "parts": "wak  hala  i-lum-im-da\nwater  fast  3S-go-IPFV-DIR", "en": "The water is going fast.",
+		"gesture": "The waterfall roars down into the pool. Behind the spray, something is dark.",
+		"words": ["wak", "hala", "lum", "-im"], "wrong": ["The water is cold.", "The water is not moving."]},
+	"cave_glow": {"v": "Sek-ir ri-ling-da.", "parts": "sek-ir  ri-ling-da\nstone-PL  3PL.S-be.bright-DIR", "en": "The stones are shining.",
+		"gesture": "Behind the waterfall is a hidden room. Blue crystals glow in the walls.",
+		"words": ["sek", "-ir", "ri-", "ling"], "wrong": ["The stones are dark.", "The stone is heavy."]},
+	"treasure_map": {"v": "Gin murak-ni shanma i-esh-da.", "parts": "gin  murak-ni  shan-ma  i-esh-da\nmoney  tree-GEN  rear-LOC  3S-be.located-DIR", "en": "The money is behind the tree.",
+		"gesture": "An old pai (paper) shows a small island, one tree, and a cross on the far side of the tree from the dock.",
+		"words": ["gin", "murak", "-ni", "shan", "-ma"], "wrong": ["The money is in front of the tree.", "The money is beside the stone."]},
+	"islet_small": {"v": "Ki dor i-sen.", "parts": "ki  dor  i-sen\nthis  land  3S-be.small", "en": "This land is small.",
+		"gesture": "The whole island fits between a few palm trees. Its name, Sendor, means small land.",
+		"words": ["ki", "dor", "sen", "sendor"], "wrong": ["This land is big.", "That boat is small."]},
+	"tamu_ferry": {"v": "An sena-li sendor-ru na-kel-ur-da.", "parts": "an  sena-li  sendor-ru  na-kel-ur-da\n1SG  boat-INS  small.island-ALL  1S-travel-HAB-DIR", "en": "I usually travel to the small island by boat.",
+		"gesture": "Tamu pats the boat, points out to sea and paddles the air.",
+		"words": ["sena", "-li", "sendor", "-ru", "kel", "-ur"], "wrong": ["I swam to the small island.", "The boat is going to the village."]},
+	"gav_mail": {"v": "Anke polu-ru kel-ir k-ri-tar-ur-da.", "parts": "an-ke  polu-ru  kel-ir  k-ri-tar-ur-da\n1SG-ERG  everyone-DAT  bag-PL  1A-3PL.P-bring-HAB-DIR", "en": "I usually bring bags to everyone.",
+		"gesture": "Gav shrugs a bulging satchel and waves at the whole island.",
+		"words": ["polu", "-ru", "kel", "-ir", "tar", "-ur"], "wrong": ["Everyone brings bags to me.", "I lost a bag yesterday."]},
+	"night_sky": {"v": "Yeshma sao-ir ri-ling-da.", "parts": "yesh-ma  sao-ir  ri-ling-da\nnight-LOC  star-PL  3PL.S-be.bright-DIR", "en": "At night the stars shine.",
+		"gesture": "Pomo points up at the sky full of stars.",
+		"words": ["yesh", "sao", "-ir", "ling"], "wrong": ["In the day the sun shines.", "The stars are falling."]}
 }
 
 # Door puzzles, one per house. situation is a gesture; options are Varnak commands.
@@ -311,3 +358,62 @@ const PAIN = {"gesture": "Ila presses both hands to her temples and winces.",
 	"why": "Anni dau-ma tong i-esh-da: pain is located in my head. dau is head, ten is foot, mal is hand."}
 
 const SUMMARY_NOTE = "Forms marked (doc) appear in the handoff document; others are composed from its rules."
+
+
+# Oku's riddles. Each clue is a short Varnak description; the answer is a noun.
+const RIDDLES = [
+	{"q": "Yarma henma i-esh-da. I-ret.", "en": "In the day it is in the sky. It is hot.", "options": ["riya", "yue", "sao"], "correct": 0,
+		"why": "riya, the sun. yar-ma means in the day, hen-ma in the sky."},
+	{"q": "Yeshma henma i-esh-da. I-var.", "en": "At night it is in the sky. It is big.", "options": ["sao", "yue", "riya"], "correct": 1,
+		"why": "yue, the moon. Stars are out at night too, but they are small."},
+	{"q": "Yeshma henma ri-esh-da. Ri-sen.", "en": "At night they are in the sky. They are small.", "options": ["yue", "par", "sao"], "correct": 2,
+		"why": "sao, stars. The prefix ri- means they: there are many of them."},
+	{"q": "Wakma i-esh-da. Ma-i-nang-ki-da.", "en": "It is in the water. It does not walk.", "options": ["gor", "tari", "mar"], "correct": 1,
+		"why": "tari, a fish. ma- ... -ki wraps the verb to say not."},
+	{"q": "I-gao. Par-ir sa-ma ri-esh-ur-da.", "en": "It is tall. Birds are usually in it.", "options": ["murak", "dom", "sena"], "correct": 0,
+		"why": "murak, a tree. sa-ma means in it: pronouns take case endings too."}
+]
+
+# Parcels for Gav's deliveries: parcel id -> resident.
+const PARCELS = {"parcel_ketu": "ketu", "parcel_yalo": "yalo", "parcel_oku": "oku"}
+
+# Treasure mounds on the small island. The map says the money is behind the tree.
+const MOUNDS = {
+	"mound_front": {"v": "Murak-ni menma.", "en": "in front of the tree", "right": false},
+	"mound_behind": {"v": "Murak-ni shanma.", "en": "behind the tree", "right": true},
+	"mound_side": {"v": "Sek-ni dalma.", "en": "beside the rock", "right": false}
+}
+
+const ORDINALS = ["yanve", "velve", "murve", "kesve", "panve", "lukve", "setve", "barve"]
+
+# Verb builder: choose one piece per slot. Forms are intransitive, so only the S prefix is used.
+const VERB_SLOTS = [
+	["Not?", ["", "ma-"]], ["Who", ["na-", "ta-", "i-", "ri-"]], ["Action", ["lum", "pav", "sul", "sum", "tal", "nang"]],
+	["Aspect", ["", "-im", "-ak", "-ur"]], ["Tense", ["", "-pa", "-fu"]], ["Evidence", ["", "-da", "-shi", "-nu"]]
+]
+const VERBS = [
+	["I go.", "na-lum"], ["I went.", "na-lum-pa"], ["You will go.", "ta-lum-fu"], ["He or she is running.", "i-pav-im"],
+	["They usually swim.", "ri-sum-ur"], ["I am sleeping.", "na-sul-im"], ["She arrived (I saw it).", "i-tal-pa-da"],
+	["They apparently arrived.", "ri-tal-pa-shi"], ["You reportedly arrived.", "ta-tal-pa-nu"], ["I am not going (I know it).", "ma-na-lum-ki-da"],
+	["They will not run.", "ma-ri-pav-fu-ki"], ["He or she has arrived.", "i-tal-ak"], ["You are walking.", "ta-nang-im"],
+	["I usually walk.", "na-nang-ur"], ["They will sleep.", "ri-sul-fu"]
+]
+
+# Sentence builder: tiles in neutral order, plus decoys with the wrong ending.
+const TILES = [
+	{"en": "I caught the fish.", "tiles": ["Anke", "tari", "k-i-nuk-ak-pa-da."], "decoys": ["An"], "tip": "The one who acts on something takes -ke: anke."},
+	{"en": "The traveler arrived at the village.", "tiles": ["Kelar", "tekaru", "i-tal-ak-pa-da."], "decoys": ["Kelarke", "tekama"], "tip": "Arriving acts on nothing, so the traveler takes no -ke. To the village is teka-ru."},
+	{"en": "Tor built the bridge.", "tiles": ["Torke", "gira", "i-varn-ak-pa-da."], "decoys": ["Tor"], "tip": "Building acts on the bridge, so Tor takes -ke."},
+	{"en": "A book is on the table.", "tiles": ["Puka", "tabma", "i-esh-da."], "decoys": ["tabru"], "tip": "On or at is -ma; -ru means to."},
+	{"en": "The dog is walking with me.", "tiles": ["Gor", "ansu", "i-nang-im-da."], "decoys": ["anni"], "tip": "With me is an-su; an-ni means my."},
+	{"en": "Mira is cooking the food.", "tiles": ["Mirake", "yamat", "i-dar-im-da."], "decoys": ["Mira"], "tip": "Mira acts on the food, so Mira takes -ke."},
+	{"en": "The hill is taller than the tree.", "tiles": ["Sang", "murak-ta", "i-u-gao."], "decoys": ["murak-ma"], "tip": "The thing you compare with takes -ta (from)."},
+	{"en": "The child is sleeping in the bed.", "tiles": ["Sanu", "sulumma", "i-sul-im-da."], "decoys": ["sulumru"], "tip": "In the bed is sulum-ma."},
+	{"en": "Please give me three fish.", "tiles": ["Mur", "tari", "t-na-ven-o-ye."], "decoys": ["Tarike"], "tip": "The number comes before the noun, and the command ends in -o-ye."},
+	{"en": "My bag.", "tiles": ["Anni", "kel"], "decoys": ["An"], "tip": "The owner comes first and takes -ni."},
+	{"en": "The water is in the container.", "tiles": ["Wak", "korma", "i-esh-da."], "decoys": ["korta"], "tip": "In is -ma; -ta means from."},
+	{"en": "At night the stars shine.", "tiles": ["Yeshma", "sao-ir", "ri-ling-da."], "decoys": ["i-ling-da."], "tip": "Many stars are they, so the verb takes ri-."}
+]
+
+# Times of day, announced as they change.
+const TIMES = {"salma": "dawn", "monar": "morning", "yar": "day", "wanar": "evening", "yesh": "night"}

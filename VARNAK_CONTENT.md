@@ -138,6 +138,11 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 6. Compounds I made with the modifier-first rule: fardom (fire-house, lighthouse) and murak-gira (log bridge). Both are new words, not in the document.
 7. dar is both ten and cook, and mar is both horse and full, in the document. The game uses both senses and the notebook gloss mentions the second meaning.
 
+8. Ordinals: the document gives yanve and velve. I extended the -ve ending to murve, kesve, panve, lukve, setve and barve for the sea stars.
+9. Sendor (sen dor, small land) is a place name I made with the modifier-first rule.
+10. sa-ma (in it) in Oku's tree riddle puts a case ending on the pronoun sa, which section 20 allows; please check it reads naturally.
+11. Gav's Anke polu-ru kel-ir k-ri-tar-ur-da uses k-ri- (I act on them) for the plural parcels, modeled on k-ri-pal (I see them).
+
 ## Second expansion (bigger island)
 
 | Form | Meaning | Source | Rule used |
@@ -186,3 +191,31 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 | Luk tari. Set panak. Bar guro. Gov sek. Dar fal. | Six fish, seven loaves, eight fruit, nine stones, ten flowers. | Composed | Numbers from 31.1 before the noun |
 
 New notebook words in the second expansion come from the document's vocabulary lists (31.1 to 31.8) and grammar sections: kur, senak, sang, hai, panak, cha, yok, far, sulum, yesh, sair, sanu, senar, ravar, dau, mal, ten, tong, nam, dong, sai, aru, luk, set, bar, gov, rav, mai, mai-ai, tar, sum, ser, ning, nang, sul, ret, len, ling, dam, seng, dun, ho, ki, e, polu, hamur, -ur, -fu, -ng, -tir, u-, puka-rav and mora-ni aruma. fardom and wak-kor are compounds (fardom is composed, wak-kor is in section 30.3).
+
+
+## Third expansion
+
+| Form | Meaning | Source | Rule used |
+|---|---|---|---|
+| Var tari haima i-esh-da. | A big fish is in the sea. | Composed | Modifier before noun (var teka pattern), locative, esh |
+| Gor ansu i-nang-im-da. | The dog is walking with me. | Composed | Comitative -su on the pronoun an |
+| K-ta-har-da. | I thank you. | Composed | 1A-2P like k-i-pal; har is thank |
+| K-ta-pal-da! / T-na-pal-da! | I see you! / You see me! | Composed | k-ta-, t-na- (section 21.2) |
+| Ma-ta-pal-o-ki! | Don't look! | Composed | Prohibitive like ma-ta-lum-o-ki! |
+| Ki dom i-shora. | This house is old. | Composed | Demonstrative ki, stative shora |
+| Var wak-ni shanma gan i-esh-nu. | They say there is a room behind the big water. | Composed | Postposition shan with genitive (25.3), hearsay -nu |
+| Wak hala i-lum-im-da. | The water is going fast. | Composed | Adverb before verb (25.2) |
+| Sek-ir ri-ling-da. | The stones are shining. | Composed | Plural subject with ri- |
+| Gin murak-ni shanma i-esh-da. | The money is behind the tree. | Composed | Postposition shan (25.3) |
+| Murak-ni menma. / Sek-ni dalma. | In front of the tree. / Beside the rock. | Composed | men and dal from the relational noun table (25.3) |
+| Ki dor i-sen. | This land is small. | Composed | Stative |
+| An sena-li sendor-ru na-kel-ur-da. | I usually travel to the small island by boat. | Composed | Instrumental -li, allative -ru, habitual |
+| Sendor-ru t-na-tar-o-ye. | Please take me to Sendor. | Composed | t-na-tar-o-ye like t-na-ven-o-ye |
+| Anke polu-ru kel-ir k-ri-tar-ur-da. | I usually bring bags to everyone. | Composed | See question 11 |
+| Yeshma sao-ir ri-ling-da. | At night the stars shine. | Composed | Locative on yesh, plural |
+| Yan panak t-na-ven-o-ye. / Vel gin. | Please give me one bread. / Two coins. | Composed | Numeral before noun |
+| Tari yan, gin yan. | One fish, one coin. | Composed | Numeral after noun here, as a short trade phrase; please check |
+| Maki. | No. | Doc | Section 21.6 |
+| Riddles: Yarma henma i-esh-da. I-ret. / Yeshma henma i-esh-da. I-var. / Yeshma henma ri-esh-da. Ri-sen. / Wakma i-esh-da. Ma-i-nang-ki-da. / I-gao. Par-ir sa-ma ri-esh-ur-da. | sun, moon, stars, fish, tree | Composed | Locatives, statives, plural ri-, negation, habitual |
+| Salma, monar, yar, wanar, yesh | dawn, morning, day, evening, night | Doc | Section 31.4 |
+| Verb builder forms, such as na-lum-pa, ri-tal-pa-shi, ma-na-lum-ki-da | | Composed | Template in section 21.1; ma-na-lum-ki-da and i-tal-ak are in the document |

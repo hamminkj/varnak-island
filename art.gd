@@ -112,7 +112,7 @@ void fragment() {
 const GROUND_SHADER = """
 shader_type spatial;
 render_mode specular_disabled;
-uniform vec4 segs[16];
+uniform vec4 segs[24];
 uniform int seg_count = 0;
 varying vec3 wp;
 varying vec3 mask;
@@ -146,7 +146,7 @@ void fragment() {
 	col = mix(col, rock, smoothstep(0.3, 0.7, mask.g + (vnoise(p * 1.2) - 0.5) * 0.4));
 	float pathd = abs(p.x + (vnoise(vec2(p.y * 0.15, 3.0)) - 0.5) * 0.9);
 	if (p.y < -49.0 || p.y > 44.0) pathd = 99.0;
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 24; i++) {
 		if (i >= seg_count) break;
 		pathd = min(pathd, seg_d(p, segs[i]) + (vnoise(p * 0.4 + float(i)) - 0.5) * 0.7);
 	}
@@ -178,10 +178,10 @@ static func ground_material(paths: Array = []) -> ShaderMaterial:
 	var m = ShaderMaterial.new()
 	m.shader = sh
 	var arr = PackedVector4Array()
-	for i in range(16):
+	for i in range(24):
 		arr.append(paths[i] if i < paths.size() else Vector4.ZERO)
 	m.set_shader_parameter("segs", arr)
-	m.set_shader_parameter("seg_count", mini(paths.size(), 16))
+	m.set_shader_parameter("seg_count", mini(paths.size(), 24))
 	return m
 
 static func plane(parent: Node3D, pos: Vector3, size: Vector2, material: Material) -> MeshInstance3D:
@@ -903,3 +903,236 @@ static func umbrella(parent: Node3D, pos: Vector3, color: Color) -> void:
 	cyl(parent, pos + Vector3(0, 1.2, 0), 0.04, 0.04, 2.4, Color("f4ead0"), Vector3.ZERO, 6)
 	cyl(parent, pos + Vector3(0, 2.4, 0), 0.0, 1.5, 0.5, color, Vector3.ZERO, 10)
 	box(parent, pos + Vector3(0.8, 0.12, 0.6), Vector3(0.9, 0.04, 1.8), Color("f2e6c8"), Vector3(0, 25, 0))
+
+# ---------- third expansion: surprises and new places ----------
+
+static func unshaded(color: Color, alpha: bool = false) -> StandardMaterial3D:
+	var m = StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = color
+	m.disable_fog = true
+	if alpha: m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	return m
+
+static func ruins(parent: Node3D, pos: Vector3) -> Array:
+	var r = Node3D.new()
+	r.position = pos
+	parent.add_child(r)
+	var stone = Color("b8ad98")
+	box(r, Vector3(0, 0.03, 0), Vector3(11, 0.06, 11), Color("a59a86"))
+	var cols: Array = []
+	var heights = [3.4, 1.2, 3.4, 2.1, 3.4, 0.7, 3.4, 2.6]
+	for i in range(8):
+		var a = i * TAU / 8.0
+		var p = Vector3(cos(a) * 4.3, 0, sin(a) * 4.3)
+		var h: float = heights[i]
+		cyl(r, p + Vector3(0, 0.15, 0), 0.55, 0.6, 0.3, stone.darkened(0.1), Vector3.ZERO, 10)
+		cyl(r, p + Vector3(0, 0.3 + h * 0.5, 0), 0.36, 0.4, h, stone.lerp(Color("cfc4ae"), float(i % 3) / 3.0), Vector3.ZERO, 10)
+		if h > 3.0: box(r, p + Vector3(0, 0.3 + h + 0.12, 0), Vector3(0.95, 0.24, 0.95), stone)
+		cols.append(pos + p)
+	box(r, Vector3(cos(0.0) * 4.3, 3.95, sin(TAU / 8.0) * 2.15), Vector3(0.7, 0.35, 3.6), stone, Vector3(0, -22.5, 0))
+	cyl(r, Vector3(-2.0, 0.42, 6.6), 0.38, 0.38, 3.2, stone.darkened(0.05), Vector3(0, 30, 90), 10)
+	# a great stone face, half buried
+	sph(r, Vector3(1.2, 0.7, -1.4), 1.0, Color("a39a88"), Vector3(1, 1.2, 0.9), 12)
+	box(r, Vector3(1.2, 0.95, -0.55), Vector3(0.9, 0.12, 0.1), Color("6f675a"))
+	sph(r, Vector3(0.85, 1.15, -0.55), 0.1, Color("4a443c"), Vector3.ONE, 6)
+	sph(r, Vector3(1.55, 1.15, -0.55), 0.1, Color("4a443c"), Vector3.ONE, 6)
+	box(r, Vector3(1.2, 0.55, -0.52), Vector3(0.5, 0.08, 0.08), Color("6f675a"))
+	return cols
+
+const FALLS_SHADER = """
+shader_type spatial;
+render_mode unshaded, cull_disabled, shadows_disabled;
+void fragment() {
+	float x = UV.x;
+	float s = fract(UV.y * 2.5 - TIME * 1.4 + sin(x * 37.0) * 0.21 + sin(x * 11.0) * 0.4);
+	float streak = smoothstep(0.55, 1.0, s) * (0.6 + 0.4 * sin(x * 63.0 + TIME));
+	vec3 col = mix(vec3(0.42, 0.74, 0.86), vec3(0.95, 0.98, 1.0), streak);
+	col = mix(col, vec3(1.0), smoothstep(0.85, 1.0, UV.y) * 0.6);
+	ALBEDO = col;
+	ALPHA = 0.82 - 0.25 * smoothstep(0.0, 0.5, abs(x - 0.5) * 2.0 - 0.5);
+}
+"""
+
+static func waterfall(parent: Node3D, pos: Vector3, width: float, height: float) -> Node3D:
+	var w = Node3D.new()
+	w.position = pos
+	parent.add_child(w)
+	var sh = Shader.new()
+	sh.code = FALLS_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = sh
+	var mi = MeshInstance3D.new()
+	var qm = QuadMesh.new()
+	qm.size = Vector2(width, height)
+	mi.mesh = qm
+	mi.material_override = m
+	mi.position = Vector3(0, height * 0.5, 0)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	w.add_child(mi)
+	var foam = sph(w, Vector3(0, 0.0, 0.4), 1.0, Color(1, 1, 1), Vector3(1.4, 0.25, 0.9), 10)
+	foam.material_override = unshaded(Color(1, 1, 1, 0.75), true)
+	w.set_meta("foam", foam)
+	return w
+
+static func cave_mouth(parent: Node3D, pos: Vector3) -> void:
+	var c = sph(parent, pos, 1.0, Color("120f0c"), Vector3(1.3, 1.25, 0.5), 12)
+	c.material_override = unshaded(Color("100c0a"))
+	for i in range(5):
+		var a = -0.9 + i * 0.45
+		var g = sph(parent, pos + Vector3(sin(a) * 0.8, 0.3 + cos(a * 2.0) * 0.4, 0.1), 0.12, Color("7fe0ff"), Vector3(0.6, 1.4, 0.6), 6)
+		g.material_override = unshaded(Color("8fe9ff"))
+
+static func palm(parent: Node3D, pos: Vector3, lean: float) -> void:
+	var t = Node3D.new()
+	t.position = pos
+	t.rotation_degrees = Vector3(0, lean * 57.0, 0)
+	parent.add_child(t)
+	for i in range(6):
+		var y = 0.4 + i * 0.7
+		cyl(t, Vector3(i * i * 0.025, y, 0), 0.16, 0.2, 0.75, Color("8a6a46").lerp(Color("a07c54"), float(i % 2)), Vector3(0, 0, -4.0 - i * 1.5), 8)
+	var top = Vector3(0.9, 4.4, 0)
+	for k in range(7):
+		var a = k * TAU / 7.0
+		var leaf = box(t, top + Vector3(cos(a) * 0.9, -0.25, sin(a) * 0.9), Vector3(1.9, 0.05, 0.5), Color("3d8a48").lerp(Color("6aa84f"), float(k % 3) / 3.0))
+		leaf.rotation = Vector3(0, -a, -0.45)
+	for k in range(3):
+		sph(t, top + Vector3(cos(k * 2.1) * 0.25, -0.35, sin(k * 2.1) * 0.25), 0.16, Color("6b4f36"), Vector3.ONE, 7)
+
+static func sea_star(color: Color) -> Node3D:
+	var n = Node3D.new()
+	for i in range(5):
+		var a = i * TAU / 5.0
+		var arm = box(n, Vector3(cos(a) * 0.12, 0.05, sin(a) * 0.12), Vector3(0.24, 0.05, 0.09), color)
+		arm.rotation.y = -a
+	sph(n, Vector3(0, 0.06, 0), 0.08, color.lightened(0.15), Vector3(1, 0.5, 1), 7)
+	return n
+
+static func chest(parent: Node3D, pos: Vector3) -> Node3D:
+	var c = Node3D.new()
+	c.position = pos
+	parent.add_child(c)
+	box(c, Vector3(0, 0.25, 0), Vector3(0.9, 0.5, 0.6), Color("7d5a3c"))
+	box(c, Vector3(0, 0.25, 0), Vector3(0.94, 0.08, 0.64), Color("d4a537"))
+	var lid = Node3D.new()
+	lid.position = Vector3(0, 0.5, -0.3)
+	c.add_child(lid)
+	box(lid, Vector3(0, 0.1, 0.3), Vector3(0.92, 0.2, 0.62), Color("8f6a43"))
+	for i in range(7):
+		sph(c, Vector3(-0.3 + i * 0.1, 0.48, (i % 2) * 0.1 - 0.05), 0.07, Color("ffd34d"), Vector3(1, 0.3, 1), 8, 0.6)
+	c.set_meta("lid", lid)
+	return c
+
+static func mound(parent: Node3D, pos: Vector3) -> Node3D:
+	var m = Node3D.new()
+	m.position = pos
+	parent.add_child(m)
+	sph(m, Vector3(0, 0.0, 0), 0.7, Color("d9c08a"), Vector3(1, 0.35, 1), 10)
+	box(m, Vector3(0.45, 0.35, 0.2), Vector3(0.06, 0.7, 0.06), Color("6d4a33"), Vector3(0, 0, 20))
+	return m
+
+static func whale() -> Node3D:
+	var w = Node3D.new()
+	var body = Node3D.new()
+	w.add_child(body)
+	var skin = Color("2f4a66")
+	sph(body, Vector3(0, 0, 1.2), 1.0, skin, Vector3(1.6, 1.45, 3.2), 14)
+	sph(body, Vector3(0, -0.05, -2.0), 1.0, skin, Vector3(1.05, 0.95, 2.8), 12)
+	sph(body, Vector3(0, -0.55, 1.6), 1.0, Color("dfe8ee"), Vector3(1.2, 0.85, 2.6), 12)
+	sph(body, Vector3(-0.95, 0.25, 3.3), 0.13, Color("0d1116"), Vector3.ONE, 6)
+	sph(body, Vector3(0.95, 0.25, 3.3), 0.13, Color("0d1116"), Vector3.ONE, 6)
+	box(body, Vector3(-2.2, -0.6, 1.6), Vector3(3.0, 0.12, 0.75), Color("e6edf2"), Vector3(0, 25, 28))
+	box(body, Vector3(2.2, -0.6, 1.6), Vector3(3.0, 0.12, 0.75), Color("e6edf2"), Vector3(0, -25, -28))
+	prism(body, Vector3(0, 0.95, -1.6), Vector3(0.12, 0.5, 0.9), skin.darkened(0.1), Vector3(0, 90, 0))
+	cyl(body, Vector3(0, 0.0, -4.4), 0.25, 0.6, 1.6, skin, Vector3(90, 0, 0), 10)
+	var fl = box(body, Vector3(-1.1, 0.0, -5.4), Vector3(2.2, 0.1, 1.0), skin.darkened(0.15), Vector3(0, 28, 0))
+	var fr = box(body, Vector3(1.1, 0.0, -5.4), Vector3(2.2, 0.1, 1.0), skin.darkened(0.15), Vector3(0, -28, 0))
+	w.set_meta("body", body)
+	return w
+
+const RAINBOW_SHADER = """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, shadows_disabled, depth_draw_never;
+uniform float strength = 0.0;
+vec3 hue(float h) { return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }
+void fragment() {
+	vec2 p = UV - vec2(0.5, 1.0);
+	p.x *= 2.0;
+	float r = length(p);
+	float band = (r - 0.78) / 0.12;
+	if (band < 0.0 || band > 1.0) discard;
+	float edge = sin(band * 3.14159);
+	ALBEDO = hue(band * 0.8);
+	ALPHA = edge * 0.45 * strength;
+}
+"""
+
+static func rainbow(parent: Node3D) -> MeshInstance3D:
+	var sh = Shader.new()
+	sh.code = RAINBOW_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = sh
+	var mi = MeshInstance3D.new()
+	var qm = QuadMesh.new()
+	qm.size = Vector2(240, 120)
+	mi.mesh = qm
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.visible = false
+	parent.add_child(mi)
+	return mi
+
+static func burst(parent: Node3D, amount: int, size: float) -> CPUParticles3D:
+	var p = CPUParticles3D.new()
+	p.amount = amount
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.lifetime = 1.8
+	p.emitting = false
+	p.direction = Vector3.UP
+	p.spread = 180.0
+	p.initial_velocity_min = 6.0
+	p.initial_velocity_max = 9.0
+	p.gravity = Vector3(0, -3.0, 0)
+	p.damping_min = 1.5
+	p.damping_max = 2.5
+	p.scale_amount_min = 0.6
+	p.scale_amount_max = 1.0
+	var mesh = SphereMesh.new()
+	mesh.radius = size
+	mesh.height = size * 2.0
+	mesh.radial_segments = 6
+	mesh.rings = 3
+	p.mesh = mesh
+	var mat = unshaded(Color.WHITE, true)
+	mat.vertex_color_use_as_albedo = true
+	p.material_override = mat
+	var g = Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	p.color_ramp = g
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(p)
+	return p
+
+static func rain(parent: Node3D) -> CPUParticles3D:
+	var p = CPUParticles3D.new()
+	p.amount = 900
+	p.lifetime = 1.1
+	p.emitting = false
+	p.local_coords = false
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	p.emission_box_extents = Vector3(22, 0.5, 22)
+	p.direction = Vector3(0.1, -1, 0)
+	p.spread = 3.0
+	p.initial_velocity_min = 17.0
+	p.initial_velocity_max = 21.0
+	p.gravity = Vector3(0, -9.8, 0)
+	var mesh = BoxMesh.new()
+	mesh.size = Vector3(0.025, 0.55, 0.025)
+	p.mesh = mesh
+	p.material_override = unshaded(Color(0.82, 0.9, 1.0, 0.55), true)
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	p.position = Vector3(0, 14, 0)
+	parent.add_child(p)
+	return p

@@ -12,13 +12,18 @@ No external models, plugins or asset downloads are required.
 Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks a side quest.
 Phone: hold and drag in the bottom-left region to move (push farther to run). Swipe the right side to look. Near something, the Interact button names the action (Talk, Pick up, Look). Dialogue pauses movement. Scroll long panels vertically.
 Desktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn; click and drag (or hold the right mouse button and drag) to look; click a person or object, or walk up and press E. Escape closes panels.
+Quest box: tap it to fold it into a small chip; tap again to open it.
 Map: a drawn island map with every quest giver and loose item, the quest list, and travel back to places already visited.
 The island is designed for portrait orientation, with a 480 x 854 reference layout. North is negative Z, along the light-colored main path. Signs say bei (north).
 
 ## Included
 - A real island: shaped coastline and beaches, a harbor inlet, a river from a hot spring to the east coast, and a west hill with a lookout.
 - The original areas (harbor, village, forest, river crossing, northern cove, farm and paddock) plus a market and school to the west, the hill, a hot spring, stepping stones, a healer's garden, an orchard, a lighthouse, an east lagoon, a log bridge and a stone circle.
-- Sixteen named residents and three villagers; six main-story quests and six side quests.
+- Old ruins on a south-west peninsula, a waterfall with a hidden room in the north-east, and Sendor, a small island reached by Tamu's boat.
+- Nineteen named residents and three villagers; six main-story quests, eleven side quests and one secret.
+- Day and night (an eight-minute cycle with dawn, morning, day, evening and night announced in Varnak), stars, a moon, fireflies, shooting stars, rain showers with rainbows, a whale that breaches offshore, and fireworks at night once Neri is found.
+- A dog that follows you once you share bread with it, a coin economy (sell fish, earn gin, buy panak), and eight hidden sea stars that teach ordinal numbers.
+- Production practice: a Verb builder (choose person, action, aspect, tense, evidence and negation) and a Sentence builder (arrange word tiles, with decoys that have the wrong case ending).
 - Eight collectible objects, four animals (bird, fish, dog, horse) and about thirty things to examine.
 - Varnak vocabulary, possession, movement, requests and evidential clues, extended with case suffixes, ergative marking, imperatives, negation, questions and noun incorporation from the Varnak handoff document.
 - Four house doors, each a small puzzle in commands: open, please open, do not open, close.
@@ -47,6 +52,12 @@ Side quests, in any order:
 - Healer (Vira, east of the village): say where Ila hurts, then bring yok and cha.
 - Lighthouse (Yalo, east coast): bring the far (torch) from Neri's campfire, then understand Fardom t-i-ling-tir-o!
 - Lagoon (Desh, east lagoon): follow four drum-game commands.
+- Riddles (Oku, old ruins): five riddles about the sun, moon, stars, fish and trees. The reward is a whispered secret.
+- Mail (Gav, harbor): deliver parcels labeled Ketu-ru, Yalo-ru and Oku-ru, then return to Gav for five coins.
+- Hide and seek (Ola, school): find Rin and Ola and shout K-ta-pal-da! (I see you!).
+- Sea stars: find eight hai-sao on the beaches; each one names its ordinal (yanve, velve, murve...).
+- Dog: sell fish to Ketu or earn coins, buy panak, and share it with the village dog.
+- Secret: behind the waterfall is a hidden room with an old map. Ask Tamu for a ride to Sendor (Sendor-ru t-na-tar-o-ye) and dig where the map says: murak-ni shanma, behind the tree.
 
 ## Playing in a browser
 The game is published at https://hamminkj.github.io/varnak-island/ from the committed
@@ -79,13 +90,13 @@ Residents' names are identifiers rather than vocabulary lessons.
 This is a playable blockout, with simple models and short encounters. It does not yet include recorded Varnak speech, animated gestures, a broad dialogue generator, advanced sentence building, or a simulated ecology. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Tor repairs it. Click-to-walk heads straight for its target and stops with a hint if something is in the way. Deep water cannot be entered; the river is crossed by the bridge, the stepping stones or the log bridge.
 
 ## Verification
-Imported and launched headlessly with Godot 4.5.1. The included smoke_test.gd checks all twelve quest completions (with wrong answers first where it matters), the quest marks, click picking of a person and items, click-to-walk with real physics, that every person, item and object stands on land reachable from the harbor, map travel, incorrect/correct evidence answers, inventory consumption, save/load and UI panel generation. It also checks that every sentence card, door, counting pile, fishing step, workshop and practice screen works, that every Varnak form used has a notebook gloss, and that every interactable can be used.
+Imported and launched headlessly with Godot 4.5.1. The included smoke_test.gd checks all eighteen quest completions, the folding quest box, the shop, parcels, hide and seek, the treasure dig, the ferry ride both ways, every Sentence builder and Verb builder answer, the day cycle, rain and the whale; earlier checks cover (with wrong answers first where it matters), the quest marks, click picking of a person and items, click-to-walk with real physics, that every person, item and object stands on land reachable from the harbor, map travel, incorrect/correct evidence answers, inventory consumption, save/load and UI panel generation. It also checks that every sentence card, door, counting pile, fishing step, workshop and practice screen works, that every Varnak form used has a notebook gloss, and that every interactable can be used.
 Run it with:
 godot --headless --path . --script res://smoke_test.gd
 The test writes a clean starting save after completion. Graphics were checked in software-rendered screenshots; phone controls and real-device performance have not been tested.
 
 ## Project structure
-main.gd: world construction, movement, input and picking, UI and map, quests, interactions and persistence.
+main.gd: world construction, day and night, weather, the whale and the ferry,, movement, input and picking, UI and map, quests, interactions and persistence.
 terrain.gd: island height function (coast, river, hill, spring, lagoon) and the ground mesh.
 art.gd: procedural models (characters, houses, boat, bridge, animals, items) and the water and ground shaders.
 data.gd: Varnak sentences, door puzzles, word workshop data and glosses.

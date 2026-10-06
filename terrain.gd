@@ -6,13 +6,19 @@ extends RefCounted
 const X0 = -100.0
 const X1 = 100.0
 const Z0 = -90.0
-const Z1 = 70.0
+const Z1 = 100.0
 const STEP = 2.0
 const HILL = Vector3(-60.0, 9.0, -38.0)   # x, peak height, z
 const HILL_R = 19.0
 const POND = Vector2(-44.0, -22.0)
 const LAGOON = Vector2(81.0, 22.0)
 const LAGOON_R = 12.0
+const RIDGE = Vector3(66.0, 8.0, -44.0)   # x, peak height, z (north-east ridge with the waterfall)
+const RIDGE_R = 12.0
+const FALLS_POOL = Vector2(64.0, -32.4)
+const ISLET = Vector2(50.0, 82.0)
+# Extra land beyond the main oval: south-west peninsula (ruins) and north-east headland (ridge).
+const LOBES = [Vector3(-62.0, 40.0, 16.0), Vector3(66.0, -48.0, 14.0)]
 # The river runs from the hot spring east to the sea.
 const RIVER = [Vector2(-44, -22), Vector2(-30, -23), Vector2(0, -23), Vector2(30, -23), Vector2(55, -27), Vector2(75, -31), Vector2(98, -35)]
 
@@ -25,6 +31,9 @@ static func coast(x: float, z: float) -> float:
 	var az = 50.0 if z < 0.0 else 47.0
 	var d = pow(pow(absf(x) / ax, 4.0) + pow(absf(z) / az, 4.0), 0.25)
 	var s = (1.0 - d) * 50.0 + wobble(x, z) * 2.5
+	for l in LOBES:
+		s = maxf(s, l.z - Vector2(x, z).distance_to(Vector2(l.x, l.y)) + wobble(z, x) * 1.5)
+	s = maxf(s, 12.0 - Vector2(x, z).distance_to(ISLET) + wobble(x * 2.0, z) * 0.8)
 	# harbor inlet: open water south of the dock head
 	if absf(x) < 15.0 and z > 31.0:
 		var e = minf(z - 33.0, 15.0 - absf(x))
@@ -64,8 +73,14 @@ static func height(x: float, z: float) -> float:
 	if hd < HILL_R: h += HILL.y * 0.5 * (1.0 + cos(PI * hd / HILL_R))
 	var rd = river_dist(x, z)
 	if rd < 3.4: h = minf(h, lerpf(-1.1, 0.0, smoothstep(1.7, 3.4, rd)))
+	var rgd = Vector2(x - RIDGE.x, z - RIDGE.z).length()
+	if rgd < RIDGE_R: h += RIDGE.y * 0.5 * (1.0 + cos(PI * rgd / RIDGE_R))
+	var id = Vector2(x, z).distance_to(ISLET)
+	if id < 7.0 and h > -0.2: h += 0.6 * (1.0 - id / 7.0)
 	var pd = Vector2(x, z).distance_to(POND)
 	if pd < 5.5: h = minf(h, lerpf(-0.9, 0.0, smoothstep(3.0, 5.5, pd)))
+	var fd = Vector2(x, z).distance_to(FALLS_POOL)
+	if fd < 3.4: h = minf(h, lerpf(-1.0, 0.0, smoothstep(1.4, 3.4, fd)))
 	return h
 
 # Deep water the player cannot walk into.

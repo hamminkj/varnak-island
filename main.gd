@@ -11,12 +11,18 @@ const PATHS = [
 	Vector4(-2, 18, -38, 15), Vector4(-48, 4, -47, -3), Vector4(-44, -5, -31, -17), Vector4(-30, -17, -30, -29),
 	Vector4(-30, -29, -46, -33), Vector4(-46, -33, -59, -37), Vector4(2, -10, 44, -10), Vector4(44, -10, 52, -7),
 	Vector4(52, -7, 73, -7), Vector4(50, -7, 46, 14), Vector4(46, 14, 62, 20), Vector4(44, -10, 52, -19),
-	Vector4(52, -19, 52, -33), Vector4(52, -33, 34, -40), Vector4(34, -40, 7, -36)
+	Vector4(52, -19, 52, -33), Vector4(52, -33, 34, -40), Vector4(34, -40, 7, -36),
+	Vector4(-50, 20, -60, 33), Vector4(52, -33, 61, -33.5)
 ]
+const DAY_LEN = 480.0
+const FERRY_HARBOR = Vector3(1.8, 0, 44.6)
+const FERRY_ISLET = Vector3(49.8, 0, 66.0)
+const STARS = [Vector3(-14, 0, -46), Vector3(-30, 0, -45), Vector3(66, 0, 31), Vector3(55, 0, 86), Vector3(-30, 0, 41), Vector3(30, 0, 40), Vector3(-76, 0, -6), Vector3(-71, 0, 47)]
+const HIDE_SPOTS = {"rin": Vector3(-50.5, 0, -13.4), "ola": Vector3(-42.4, 0, 19.9)}
 const MAP_X0 = -90.0
 const MAP_X1 = 90.0
 const MAP_Z0 = -56.0
-const MAP_Z1 = 52.0
+const MAP_Z1 = 94.0
 
 var player: CharacterBody3D
 var camera: Camera3D
@@ -76,6 +82,51 @@ var steam: Array = []
 var blocked: Array = []
 var avoid: Array = []
 var map_tex: ImageTexture
+var top_row: HBoxContainer
+var status_small: Label
+var cloud_mat: StandardMaterial3D
+var hud_small: bool = false
+var last_objective: String = ""
+var gin: int = 0
+var env: Environment
+var psm: ProceduralSkyMaterial
+var sun: DirectionalLight3D
+var day_t: float = 0.12
+var night: float = 0.0
+var time_word: String = ""
+var stars_mat: StandardMaterial3D
+var stars_node: Node3D
+var moon: MeshInstance3D
+var fireflies: Array = []
+var shooting: MeshInstance3D
+var shoot_t: float = -1.0
+var shoot_cd: float = 15.0
+var shoot_from: Vector3
+var shoot_dir: Vector3
+var fireworks: Array = []
+var firework_cd: float = 2.0
+var rain_fx: CPUParticles3D
+var rain_amt: float = 0.0
+var raining: float = 0.0
+var weather_cd: float = 170.0
+var rainbow_mi: MeshInstance3D
+var rainbow_t: float = 0.0
+var whale_node: Node3D
+var whale_t: float = -1.0
+var whale_cd: float = 75.0
+var whale_pos: Vector3
+var whale_dir: Vector3
+var whale_seen: bool = false
+var splash: CPUParticles3D
+var riding: bool = false
+var ride_t: float = 0.0
+var ride_path: Array = []
+var ride_dest: Vector3
+var ride_whale: bool = false
+var ferry_node: Node3D
+var falls_node: Node3D
+var chest_node: Node3D
+var hiding: Dictionary = {}
 var words = {
 	"wak":"water", "guro":"fruit", "kor":"container", "kel":"bag", "murak":"tree / wood",
 	"sek":"stone", "lin":"rope", "tari":"fish", "par":"bird", "dom":"house", "teka":"village",
@@ -102,8 +153,15 @@ var side_quests = [
 	["lookout","pomo","Climb the west hill and answer Pomo's direction questions."],
 	["healer","vira","Help Vira the healer, east of the village. Her patient needs yok and cha."],
 	["lighthouse","yalo","The lighthouse is dark. Bring far (fire) from Neri's campfire to Yalo."],
-	["lagoon","desh","Play Desh's drum game at the east lagoon."]
+	["lagoon","desh","Play Desh's drum game at the east lagoon."],
+	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
+	["mail","gav","Gav at the harbor needs parcels delivered. Read the labels!"],
+	["hide","ola","Rin and Ola at the school want to play hide and seek."],
+	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
+	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
+	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
+var secret_quests = ["treasure"]
 # skin, hair, hair style, accent
 var looks = {
 	"ena": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
@@ -124,7 +182,10 @@ var looks = {
 	"desh": [Color("7a4a32"), Color("1d1d1d"), 4, Color("2a9d8f")],
 	"sair1": [Color("e3b98f"), Color("4a3020"), 1, Color("a78bda")],
 	"sair2": [Color("a87650"), Color("1d1d1d"), 0, Color("e9c46a")],
-	"sair3": [Color("d9a679"), Color("5a4030"), 3, Color("4f7ca8")]
+	"sair3": [Color("d9a679"), Color("5a4030"), 3, Color("4f7ca8")],
+	"oku": [Color("c68e66"), Color("e6e1d6"), 0, Color("8f5a48")],
+	"gav": [Color("e3b98f"), Color("8a3a1a"), 3, Color("2a6f97")],
+	"tamu": [Color("8d5a3b"), Color("1d1d1d"), 1, Color("e9c46a")]
 }
 var names = {"sair1": "sair", "sair2": "sair", "sair3": "sair"}
 var house_centers = [Vector3(-9,0,12), Vector3(10,0,7), Vector3(-11,0,1), Vector3(12,0,-4)]
@@ -138,7 +199,10 @@ var regions = [
 	["healer", "Vira's garden", Vector2(51, -4), 9.0, Vector3(48, 0, -8)],
 	["orchard", "The orchard", Vector2(45, 22), 10.0, Vector3(46, 0, 14)],
 	["lagoon", "hai: the east lagoon", Vector2(69, 21), 11.0, Vector3(63, 0, 20)],
-	["lighthouse", "fardom: the lighthouse", Vector2(75, -7), 9.0, Vector3(70, 0, -7)]
+	["lighthouse", "fardom: the lighthouse", Vector2(75, -7), 9.0, Vector3(70, 0, -7)],
+	["ruins", "The old ruins", Vector2(-62, 40), 11.0, Vector3(-58, 0, 32)],
+	["falls", "The waterfall", Vector2(63, -34), 7.0, Vector3(60, 0, -33.5)],
+	["islet", "Sendor: the small island", Vector2(50, 80), 13.0, Vector3(48, 0, 71)]
 ]
 var central = {
 	"harbor": ["The harbor", Vector3(0, 0, 33)], "village": ["teka: the village", Vector3(0, 0, 16)],
@@ -203,6 +267,11 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 			if word == "tari":
 				pr = 0.9
 				ph = 1.6
+		"star":
+			node = Art.sea_star(color)
+			label_y = 0.45
+			pr = 0.7
+			ph = 0.6
 		_:
 			node = Node3D.new()
 	if pick != Vector2.ZERO:
@@ -214,7 +283,7 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 	var label_text = id.capitalize() if kind == "npc" else word
 	if names.has(id): label_text = names[id]
 	var label = Art.label3(node, label_text, Vector3(0, label_y / node.scale.y, 0), 38 if kind == "npc" else 34)
-	label.visibility_range_end = 34.0 if kind == "npc" else (40.0 if kind == "item" else 16.0)
+	label.visibility_range_end = 34.0 if kind == "npc" else (40.0 if kind == "item" else (7.0 if kind == "star" else 16.0))
 	var e = {"id":id,"kind":kind,"word":word,"node":node,"home":pos,"gy":pos.y,"pr":pr,"ph":ph}
 	if kind == "item": Art.beacon(node).scale = Vector3.ONE / node.scale.x
 	if kind == "npc": e["mark"] = Art.quest_mark(node, 2.75)
@@ -229,18 +298,20 @@ func build_world():
 	build_river()
 	build_cove()
 	build_places()
+	build_places3()
 	build_entities()
 	build_forest()
 	build_scatter()
 	build_sky_life()
 	build_player()
+	build_night_and_weather()
 
 func build_environment():
 	var we = WorldEnvironment.new()
-	var env = Environment.new()
+	env = Environment.new()
 	env.background_mode = Environment.BG_SKY
 	var sky = Sky.new()
-	var psm = ProceduralSkyMaterial.new()
+	psm = ProceduralSkyMaterial.new()
 	psm.sky_top_color = Color("3f86d0")
 	psm.sky_horizon_color = Color("bfe4f2")
 	psm.ground_horizon_color = Color("bfe4f2")
@@ -263,7 +334,7 @@ func build_environment():
 	env.fog_sky_affect = 0.25
 	we.environment = env
 	add_child(we)
-	var sun = DirectionalLight3D.new()
+	sun = DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-42, -32, 0)
 	sun.light_energy = 0.9
 	sun.light_color = Color("fff0d8")
@@ -405,7 +476,7 @@ func build_village():
 		solid(Vector3(c.x, 1.6, c.z), Vector3(5, 3.2, 5))
 		block(c.x, c.z, 4.0)
 	for z in [28,15,-8,-19,-32]:
-		Art.signpost(self, Vector3(3,0,z), "bei\n↑")
+		Art.signpost(self, Vector3(3,0,z), "bei-ru")
 	Art.signpost(self, Vector3(-3.2,0,21.5), "teka-ma")
 	Art.signpost(self, Vector3(-6,0,-18), "mora-ven")
 	for p in [Vector3(-2.8,0,22), Vector3(2.8,0,8), Vector3(-2.8,0,-2), Vector3(2.8,0,-14)]:
@@ -650,7 +721,7 @@ func grass_ok(x: float, z: float) -> bool:
 	return true
 
 func build_sky_life():
-	var cloud_mat = StandardMaterial3D.new()
+	cloud_mat = StandardMaterial3D.new()
 	cloud_mat.albedo_color = Color(1, 1, 1, 0.93)
 	cloud_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	cloud_mat.disable_fog = true
@@ -763,7 +834,7 @@ func build_entities():
 	add_animal(entity("dog2","observe","gor",Vector3(-50,0,8.5),Color("c08a54")), "dog", 5.0, 1.7)
 	add_animal(entity("bird2","observe","par",Vector3(-55,0,-43),Color("ead8a4")), "bird", 2.2, 1.0)
 	add_animal(entity("bird3","observe","par",Vector3(63.5,0,28.5),Color("ead8a4")), "bird", 2.0, 1.0)
-	add_animal(entity("fish2","observe","tari",Vector3(2.8,0,43.6),Color("7bb9c7")), "fish", 0.0, 0.0)
+	add_animal(entity("fish2","observe","tari",Vector3(-3.4,0,43.8),Color("7bb9c7")), "fish", 0.0, 0.0)
 	add_animal(entity("fish3","observe","tari",Vector3(71.0,0,18.0),Color("7bb9c7")), "fish", 0.0, 0.0)
 	entity("well","object","wak-kor",Vector3(-50,0,12),Color.WHITE,2.8,Vector2(1.3,2.4))
 	entity("stall","object","kur",Vector3(-45.5,0,6.0),Color.WHITE,3.1,Vector2(1.6,2.8))
@@ -793,6 +864,30 @@ func build_entities():
 	entity("sign_east","object","dong",Vector3(6.5,0,-12.5),Color.WHITE,2.3,Vector2(0.9,2.0))
 	entity("sign_light","object","fardom",Vector3(60,0,-9.5),Color.WHITE,2.3,Vector2(0.9,2.0))
 	entity("sign_lagoon","object","hai",Vector3(49.5,0,8),Color.WHITE,2.3,Vector2(0.9,2.0))
+	# ---- third expansion ----
+	entity("oku","npc","Oku",Vector3(-59.6,0,35.8),Color("6b4f36"))
+	entity("gav","npc","Gav",Vector3(5.4,0,34.4),Color("2a6f97"))
+	var tm = entity("tamu","npc","Tamu",Vector3(-2.4,0,41.0),Color("c0392b"))
+	(tm["node"] as Node3D).position.y = 0.11
+	tm["home"].y = 0.11
+	entity("ruins","object","dom",Vector3(-60.8,0,38.6),Color.WHITE,2.2,Vector2(1.4,1.8))
+	entity("falls","object","wak",Vector3(61.8,0,-35.0),Color.WHITE,2.6,Vector2(1.4,2.4))
+	entity("cave","object","gan",Vector3(64.0,0,-36.3),Color.WHITE,2.6,Vector2(1.5,2.4))
+	entity("islet_small","object","dor",Vector3(49.6,0,75.2),Color.WHITE,2.3,Vector2(0.9,2.0))
+	var fe = entity("ferry","object","sena",FERRY_HARBOR,Color.WHITE,2.0,Vector2(1.8,1.8))
+	ferry_node.get_parent().remove_child(ferry_node)
+	(fe["node"] as Node3D).add_child(ferry_node)
+	ferry_node.position = Vector3.ZERO
+	for i in range(STARS.size()):
+		var sp: Vector3 = STARS[i]
+		entity("star" + str(i + 1), "star", "hai-sao", sp, Color("f28c4a").lerp(Color("e8789a"), float(i % 3) / 3.0))
+	for id in Data.MOUNDS.keys():
+		var mp = {"mound_front": Vector3(50.7,0,82.4), "mound_behind": Vector3(51.4,0,87.6), "mound_side": Vector3(43.4,0,84.6)}[id]
+		var me = entity(id, "object", "dor", mp, Color.WHITE, 1.1, Vector2(1.0, 0.8))
+		Art.mound(me["node"], Vector3.ZERO)
+	chest_node = Art.chest(self, Vector3(51.4, gy(51.4, 87.6), 87.6))
+	chest_node.rotation_degrees.y = 180
+	chest_node.hide()
 
 func add_animal(e: Dictionary, kind: String, radius: float, speed: float):
 	animals.append({"e": e, "kind": kind, "radius": radius, "speed": speed, "tp": e["home"], "wait": 0.0 if kind != "fish" else randf_range(1.0, 3.0)})
@@ -895,6 +990,14 @@ func refresh_world():
 	Art.set_bridge(bridge_info, completed.has("bridge"))
 	(table_node.get_meta("feast") as Node3D).visible = completed.has("meal")
 	Art.set_lighthouse(lighthouse_node, completed.has("lighthouse"))
+	for id in Data.MOUNDS.keys():
+		var me = entity_by_id(id)
+		if not me.is_empty(): (me["node"] as Node3D).visible = inventory.has("map") and not completed.has("treasure")
+	if chest_node:
+		chest_node.visible = completed.has("treasure")
+		(chest_node.get_meta("lid") as Node3D).rotation_degrees.x = -110.0 if completed.has("treasure") else 0.0
+	for a in animals:
+		if a["e"]["id"] == "dog": a["follow"] = completed.has("dog")
 	update_marks()
 
 # Yellow marks the next step of the main story; blue marks side quests not yet done.
@@ -921,7 +1024,7 @@ func update_marks():
 		var id: String = e["id"]
 		var side = false
 		for s in side_quests:
-			if s[1] == id and not completed.has(s[0]): side = true
+			if s[1] == id and not completed.has(s[0]) and quest_open(s[0]): side = true
 		m.visible = main_people.has(id) or side
 		m.modulate = Color(1.0, 0.84, 0.25) if main_people.has(id) else Color(0.55, 0.85, 1.0)
 
@@ -999,14 +1102,25 @@ func build_ui():
 	status.add_theme_stylebox_override("normal", chip_style())
 	status.add_theme_color_override("font_color", Color("fff6df"))
 	status.add_theme_font_size_override("font_size", 17)
-	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	status.mouse_filter = Control.MOUSE_FILTER_STOP
+	status.gui_input.connect(_on_status_input)
 	ui.add_child(status)
-	var top = HBoxContainer.new()
-	top.position = Vector2(14,124)
-	ui.add_child(top)
-	button("Notebook",show_notebook,top)
-	button("Bag",show_inventory,top)
-	button("Map",show_map,top)
+	status_small = Label.new()
+	status_small.position = Vector2(14,30)
+	status_small.size = Vector2(150,40)
+	status_small.add_theme_stylebox_override("normal", chip_style(0.7))
+	status_small.add_theme_color_override("font_color", Color("fff6df"))
+	status_small.add_theme_font_size_override("font_size", 17)
+	status_small.mouse_filter = Control.MOUSE_FILTER_STOP
+	status_small.gui_input.connect(_on_status_input)
+	status_small.hide()
+	ui.add_child(status_small)
+	top_row = HBoxContainer.new()
+	top_row.position = Vector2(14,124)
+	ui.add_child(top_row)
+	button("Notebook",show_notebook,top_row)
+	button("Bag",show_inventory,top_row)
+	button("Map",show_map,top_row)
 	prompt = Label.new()
 	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	prompt.position = Vector2(-160,40)
@@ -1126,7 +1240,9 @@ func show_intro():
 	button("Explore",close_panel,content)
 	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
 	text_line("Phone: drag the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
-	text_line("The island is big: a market and school to the west, a hill with a lookout, a healer, a lighthouse and a lagoon to the east. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
+	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal.")
+	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
+	text_line("In the Notebook, try the Verb builder and the Sentence builder to put Varnak together yourself.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
@@ -1143,8 +1259,22 @@ func objective() -> String:
 	for q in quests:
 		if not completed.has(q[0]): return q[1]
 	for s in side_quests:
-		if not completed.has(s[0]): return s[2]
+		if not completed.has(s[0]) and quest_open(s[0]): return quest_text(s)
 	return "Every quest is done. Keep exploring and practicing Varnak."
+
+func quest_open(id: String) -> bool:
+	if id == "treasure": return inventory.has("map")
+	return true
+
+func quest_text(s: Array) -> String:
+	if s[0] == "seastars": return s[2] + " (" + str(stars_found()) + " of " + str(STARS.size()) + ")"
+	return s[2]
+
+func stars_found() -> int:
+	var n = 0
+	for i in range(STARS.size()):
+		if solved.has("star" + str(i + 1)): n += 1
+	return n
 
 func quests_done() -> int:
 	var n = 0
@@ -1241,6 +1371,11 @@ func _process(delta):
 	animate_animals(delta)
 	animate_items()
 	update_marker()
+	update_sky(delta)
+	update_weather(delta)
+	update_whale(delta)
+	update_ride(delta)
+	update_night_life(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -1292,6 +1427,9 @@ func animate_animals(delta: float):
 					a["wait"] = randf_range(2.5, 5.5)
 					node.position.y = -0.45
 			_:
+				if a.get("follow", false):
+					follow_player(a, delta)
+					continue
 				var moving = false
 				a["wait"] -= delta
 				var to: Vector3 = a["tp"] - node.position
@@ -1346,7 +1484,11 @@ func _physics_process(delta):
 	if save_clock > 8:
 		save_game()
 		save_clock = 0
-	status.text = objective() + "\nQuests done: " + str(quests_done()) + " of " + str(quests.size() + side_quests.size()) + ". Map lists them all."
+	update_status()
+	if riding:
+		prompt.visible = false
+		interact_button.disabled = true
+		return
 	if panel.visible: return
 	var axis = joy
 	var manual = joy != Vector2.ZERO
@@ -1383,7 +1525,12 @@ func _physics_process(delta):
 			walk_check -= delta
 			if walk_check <= 0.0:
 				if walk_last - d.length() < 0.6:
+					var stuck_on = walk_to
 					walk_to = {}
+					if d.length() <= REACH + maxf(float(stuck_on["pr"]) - 0.8, 0.0):
+						target = stuck_on
+						interact()
+						return
 					hint("Something is in the way. Walk around it, then click again.")
 				walk_last = d.length()
 				walk_check = 0.8
@@ -1445,7 +1592,7 @@ func hint(text: String):
 func verb(e: Dictionary) -> String:
 	match e["kind"]:
 		"npc": return "talk"
-		"item": return "pick up"
+		"item", "star": return "pick up"
 		"observe": return "watch"
 	return "look"
 
@@ -1586,6 +1733,7 @@ func interact():
 				close_panel(),content)
 			button("Return",close_panel,content)
 		"observe": observe(e)
+		"star": collect_star(e)
 		_: examine(e)
 
 func examine(e: Dictionary):
@@ -1622,10 +1770,30 @@ func examine(e: Dictionary):
 		"fardom": sentence_card("lighthouse_bright" if completed.has("lighthouse") else "lighthouse_dark")
 		"sea": sentence_card("sea_cold")
 		"logbridge": sentence_card("log_short")
+		"ruins": sentence_card("ruins_old")
+		"falls": sentence_card("falls")
+		"cave": cave_panel()
+		"ferry": ride_puzzle(player.position.z < 60.0)
+		"mound_front", "mound_behind", "mound_side": mound_panel(id)
 		_: message(e["word"], "You look closely, but there is nothing more to learn here yet.")
 
 func observe(e: Dictionary):
 	learn(e["word"])
+	if e["id"] == "dog" and not completed.has("dog"):
+		clear_panel("gor")
+		text_line("The dog sniffs at your bag hopefully and wags its tail.")
+		if inventory.has("bread"):
+			button("Share the panak", func():
+				consume(["bread"])
+				complete("dog")
+				for a in animals:
+					if a["e"]["id"] == "dog": a["follow"] = true
+				sentence_card("dog_with_me"), content)
+		else:
+			text_line("It looks hungry. Ketu at the market sells panak (bread).")
+		button("Watch the dog", func(): sentence_card("dog_runs"), content)
+		button("Return", close_panel, content)
+		return
 	match e["word"]:
 		"par": sentence_card("bird_sky")
 		"gor": sentence_card("dog_runs")
@@ -1880,6 +2048,7 @@ func add_topics(id: String):
 		"pomo":
 			topic("Ask about the hill", "hill_taller", id)
 			topic("Ask about the summit", "summit_highest", id)
+			topic("Ask about the night sky", "night_sky", id)
 		"vira": topic("Ask about the sleeping child", "child_sleeps", id)
 		"ila":
 			if completed.has("healer"): topic("Ask how Ila feels", "ila_happy", id)
@@ -1893,6 +2062,13 @@ func add_topics(id: String):
 		"desh":
 			topic("Ask Desh about swimming", "desh_swims", id)
 			topic("Ask about the sea", "sea_cold", id)
+		"oku":
+			topic("Ask about the ruins", "ruins_old", id)
+			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
+		"gav": topic("Ask Gav about his work", "gav_mail", id)
+		"tamu":
+			topic("Ask Tamu about the boat", "tamu_ferry", id)
+			topic("Ask about the small island", "islet_small", id)
 
 func topic(label: String, sid: String, npc: String):
 	button(label, func(): sentence_card(sid, talk.bind(npc)), content)
@@ -1964,6 +2140,7 @@ func talk(id: String):
 					text_line("“Teka i-var,” Neri says, sweeping an arm across the island. There are more people to meet: open the Map to see who still needs help.")
 				else:
 					text_line("Neri has heard about everything you did. “Polu,” Neri laughs. Everyone. You helped everyone on the island.")
+				button("Tell Neri about your adventure", tile_puzzle.bind(-1, talk.bind("neri")), content)
 				button("Practice evidence again",show_evidence,content)
 			else:
 				text_line("You found Neri by exploring. To understand the journey, compare Tor's, Lira's and Oren's accounts, then return.")
@@ -1974,7 +2151,16 @@ func talk(id: String):
 			for w in ["kur", "tari", "mur", "-ye", "tnaveno"]: learn(w)
 			clear_panel("Ketu at the market")
 			if completed.has("market"):
-				text_line("Ketu waves you over. Your fish are drying on the rack: “Tari i-ho!” (The fish are good!)")
+				learn("gin")
+				text_line("Ketu waves you over. Your fish are drying on the rack: “Tari i-ho!” (The fish are good!)\n\nKetu buys fish (one gin each) and sells panak. You have " + str(gin) + " gin and " + str(fish_caught) + " fish.")
+				if fish_caught > 0:
+					button("Sell a fish: tari yan, gin yan", func():
+						fish_caught -= 1
+						gin += 1
+						toast("Tari yan, gin yan. (+1 gin)")
+						save_game()
+						talk("ketu"), content)
+				button("Buy panak (bread)", buy_bread, content)
 			else:
 				text_line("Ketu holds up three fingers, then mimes a fish wriggling.\n\n“Mur tari t-na-ven-o-ye.”\n\nYou have " + str(fish_caught) + " fish.")
 				button("Give mur tari (3 fish)", func():
@@ -2006,6 +2192,11 @@ func talk(id: String):
 			else:
 				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. She waves you toward a bench.")
 				button("Start the lesson", school_quiz.bind(0), content)
+		"rin", "ola":
+			if hiding.get(id, false):
+				found_puzzle(id)
+				return
+	match id:
 		"rin":
 			clear_panel("Rin")
 			text_line("Rin looks up from a book and waves. “Puka!” Rin says, holding it up.")
@@ -2013,6 +2204,8 @@ func talk(id: String):
 		"ola":
 			clear_panel("Ola")
 			text_line("Ola studies you with great curiosity.")
+			if not completed.has("hide"):
+				button("Play hide and seek", start_hide, content)
 		"pomo":
 			for w in ["sang", "bei", "nam", "dong", "sai"]: learn(w)
 			clear_panel("Pomo at the lookout")
@@ -2056,6 +2249,46 @@ func talk(id: String):
 				button("Offer far (fire)", func():
 					if inventory.has("torch"): light_puzzle()
 					else: message("Yalo shakes his head", "No far yet. Neri keeps a campfire at the northern cove; a torch there would do. It glows, so you can spot it."), content)
+		"oku":
+			clear_panel("Oku at the old ruins")
+			learn("shora")
+			if completed.has("riddles"):
+				text_line("Oku smiles among the old stones. “Ho!” Then Oku whispers again about the big water in the north-east.")
+				button("Hear the riddles again", riddle_quiz.bind(0), content)
+			else:
+				text_line("Oku sits among the broken columns. “Ki dom i-shora,” Oku says, patting a stone. Then Oku taps your notebook: “Han? Han?” Oku loves riddles.")
+				button("Hear a riddle", riddle_quiz.bind(0), content)
+		"gav":
+			clear_panel("Gav the mail carrier")
+			for w in ["kel", "-ru", "tar"]: learn(w)
+			if completed.has("mail"):
+				text_line("Gav tips his cap. “K-ta-har-da!” You were a great help.")
+			elif not solved.has("mail_start"):
+				text_line("Gav's satchel is overflowing. “Anke polu-ru kel-ir k-ri-tar-ur-da,” he sighs. He holds out three parcels, each with a label.")
+				button("Take the parcels", func():
+					solved.append("mail_start")
+					for p in Data.PARCELS.keys(): inventory.append(p)
+					save_game()
+					message("Three parcels", "The labels say:\nKetu-ru\nYalo-ru\nOku-ru\n\nThe ending -ru means to. Find each person and choose Give a parcel. Ketu is at the market, Yalo at the lighthouse, Oku at the old ruins in the south-west."), content)
+			else:
+				var left: Array = []
+				for p in Data.PARCELS.keys():
+					if inventory.has(p): left.append(item_word(p))
+				if left.is_empty():
+					complete("mail")
+					gin += 5
+					learn("gin")
+					learn("har")
+					text_line("Gav beams. “K-ta-har-da!” He presses pan gin, five coins, into your hand.")
+				else:
+					text_line("Parcels still to deliver:\n" + "\n".join(left))
+		"tamu":
+			clear_panel("Tamu the boatman")
+			learn("sena")
+			text_line("Tamu leans on the oar and nods toward the sea. Far out, a small island with one tree.")
+			if inventory.has("map") and not completed.has("treasure"):
+				text_line("Tamu glances at your old map and raises his eyebrows.")
+			button("Ask for a ride", ride_puzzle.bind(player.position.z < 60.0), content)
 		"desh":
 			for w in ["hai", "-o"]: learn(w)
 			clear_panel("Desh at the lagoon")
@@ -2069,6 +2302,10 @@ func talk(id: String):
 				var order = Data.DESH.duplicate()
 				order.shuffle()
 				button("Play Desh's game", desh_round.bind(0, order), content)
+	for p in Data.PARCELS.keys():
+		if inventory.has(p) and id != "gav":
+			button("Give a parcel", give_parcel.bind(id), content)
+			break
 	add_topics(id)
 	button("Return to island",close_panel,content)
 
@@ -2109,6 +2346,9 @@ func consume(items: Array):
 
 func item_word(id: String) -> String:
 	if id == "tea": return "cha"
+	if id == "bread": return "panak"
+	if id == "map": return "pai (an old map)"
+	if Data.PARCELS.has(id): return "kel: " + str(Data.PARCELS[id]).capitalize() + "-ru"
 	for e in entities:
 		if e["id"] == id: return e["word"]
 	return id
@@ -2131,7 +2371,7 @@ func short_gloss(word: String) -> String:
 
 func show_notebook():
 	clear_panel("Field notebook")
-	text_line("Collected forms. Tap a word to reveal its meaning and parts.  Words: " + str(discovered.size()) + "   Phrases: " + str(phrases.size()))
+	text_line("Collected forms. Tap a word to reveal its meaning and parts. [ok] marks forms you have mastered.  Words: " + str(discovered.size()) + "   Phrases: " + str(phrases.size()))
 	var row = HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	content.add_child(row)
@@ -2139,9 +2379,15 @@ func show_notebook():
 	var b2 = button("Workshop", show_workshop, row)
 	var b3 = button("Practice", show_practice, row)
 	for b in [b1, b2, b3]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var row2 = HBoxContainer.new()
+	row2.add_theme_constant_override("separation", 8)
+	content.add_child(row2)
+	var b4 = button("Verb builder", show_verb_builder.bind(-1), row2)
+	var b5 = button("Sentence builder", tile_puzzle.bind(-1, Callable()), row2)
+	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
-		button(word + ("  ✓" if mastered.has("w:" + word) else ""),reveal_word.bind(word),content)
+		button(word + ("  [ok]" if mastered.has("w:" + word) else ""),reveal_word.bind(word),content)
 	button("Return",close_panel,content)
 
 func reveal_word(word: String):
@@ -2166,7 +2412,7 @@ func show_phrasebook():
 	else: text_line("Tap a phrase to see it again.")
 	for sid in phrases:
 		if Data.SENTENCES.has(sid):
-			button(Data.SENTENCES[sid]["v"] + ("  ✓" if mastered.has("s:" + sid) else ""), func(): sentence_card(sid, show_phrasebook), content)
+			button(Data.SENTENCES[sid]["v"] + ("  [ok]" if mastered.has("s:" + sid) else ""), func(): sentence_card(sid, show_phrasebook), content)
 	button("Notebook",show_notebook,content)
 	button("Return to island",close_panel,content)
 
@@ -2257,6 +2503,10 @@ func show_inventory():
 	if inventory.is_empty() and fish_caught == 0: text_line("Your bag is empty.")
 	for id in inventory: text_line(item_word(id))
 	if fish_caught > 0: text_line("tari × " + str(fish_caught))
+	if gin > 0: text_line("gin × " + str(gin) + "  (coins)")
+	var n = stars_found()
+	if n > 0: text_line("hai-sao × " + str(n) + "  (sea stars)")
+	if inventory.has("map"): button("Read the old map", func(): sentence_card("treasure_map", show_inventory), content)
 	button("Return",close_panel,content)
 
 func map_point(x: float, z: float, rect: Rect2) -> Vector2:
@@ -2287,7 +2537,7 @@ func make_map_texture() -> ImageTexture:
 func map_view() -> Control:
 	if map_tex == null: map_tex = make_map_texture()
 	var holder = Control.new()
-	holder.custom_minimum_size = Vector2(0, 252)
+	holder.custom_minimum_size = Vector2(0, 340)
 	holder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var tr = TextureRect.new()
 	tr.texture = map_tex
@@ -2311,7 +2561,7 @@ func draw_map_overlay(ov: Control):
 	ov.draw_rect(rect, Color("5b3d28"), false, 2.0)
 	var font = ThemeDB.fallback_font
 	var labels = [["teka", 0, 8], ["kur", -50, 4], ["senak", -48, -14], ["sang", -60, -47], ["harbor", 0, 46], ["mora", 22, -18],
-		["fardom", 72, -15], ["hai", 72, 32], ["cove", 0, -48], ["stones", 32, -50], ["orchard", 45, 30]]
+		["fardom", 72, -15], ["hai", 72, 32], ["cove", 0, -48], ["ruins", -62, 50], ["falls", 64, -27], ["Sendor", 50, 93], ["stones", 32, -50], ["orchard", 45, 30]]
 	for l in labels:
 		var p = map_point(l[1], l[2], rect)
 		ov.draw_string_outline(font, p + Vector2(-40, 4), l[0], HORIZONTAL_ALIGNMENT_CENTER, 80, 12, 4, Color(1, 1, 1, 0.85))
@@ -2347,12 +2597,15 @@ func show_map():
 	text_line("Quests", 22)
 	var reached = false
 	for q in quests:
-		if completed.has(q[0]): text_line("✓ " + q[1], 17)
+		if completed.has(q[0]): text_line("Done: " + q[1], 17)
 		elif not reached:
-			text_line("➜ " + q[1], 17)
+			text_line("Now: " + q[1], 17)
 			reached = true
 	for sq in side_quests:
-		text_line(("✓ " if completed.has(sq[0]) else "• ") + sq[2], 17)
+		if completed.has(sq[0]): text_line("Done: " + sq[2], 17)
+		elif quest_open(sq[0]): text_line("• " + quest_text(sq), 17)
+		else: text_line("• ??? Something on this island is still a secret.", 17)
+	text_line("It is " + time_word + " (" + Data.TIMES.get(time_word, "") + "). Coins: " + str(gin) + " gin.", 17)
 	text_line("Travel", 22)
 	var any = false
 	for id in visited:
@@ -2387,6 +2640,8 @@ func confirm_reset():
 		solved.clear()
 		visited.clear()
 		fish_caught = 0
+		gin = 0
+		hiding.clear()
 		for e in entities: e["node"].show()
 		player.position = Vector3(0,0.1,36)
 		player.rotation = Vector3.ZERO
@@ -2397,8 +2652,11 @@ func confirm_reset():
 
 func save_game():
 	var file = FileAccess.open(SAVE,FileAccess.WRITE)
+	var keep = player.position
+	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"day":day_t,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+	player.position = keep
 
 func load_game():
 	if not FileAccess.file_exists(SAVE): return
@@ -2413,9 +2671,13 @@ func load_game():
 	solved = data.get("solved",[])
 	visited = data.get("visited",[])
 	fish_caught = int(data.get("fish",0))
+	gin = int(data.get("gin", 0))
+	day_t = float(data.get("day", 0.12))
+	hud_small = bool(data.get("hud_small", false))
+	whale_seen = bool(data.get("whale", false))
 	var p = data.get("position",[0,0.1,36])
 	player.position = Vector3(p[0],p[1],p[2])
-	if T.deep(player.position.x, player.position.z) and player.position.y < 0.0: player.position = Vector3(0, 0.1, 36)
+	if T.deep(player.position.x, player.position.z) and not near_dock(player.position): player.position = Vector3(0, 0.1, 36)
 	player.position.y = maxf(player.position.y, T.height(player.position.x, player.position.z) + 0.05)
 	last_safe = player.position
 	player.rotation.y = data.get("yaw",0)
@@ -2427,9 +2689,634 @@ func load_game():
 	if completed.has("healer"): used.append("herb")
 	if completed.has("lighthouse"): used.append("torch")
 	for e in entities:
-		if inventory.has(e["id"]) or used.has(e["id"]): e["node"].hide()
-		elif e["kind"] == "item": e["node"].show()
+		if inventory.has(e["id"]) or used.has(e["id"]) or (e["kind"] == "star" and solved.has(e["id"])): e["node"].hide()
+		elif e["kind"] == "item" or e["kind"] == "star": e["node"].show()
+	if player.position.z > 60.0: (ferry_node.get_parent() as Node3D).position = Vector3(FERRY_ISLET.x, -0.08, FERRY_ISLET.z)
+	if ui: layout_hud()
 	refresh_world()
 
 func _notification(what):
 	if what == NOTIFICATION_APPLICATION_PAUSED and is_instance_valid(player): save_game()
+
+# ------------------------------------------------------------ third expansion: places
+
+func build_places3():
+	# ---- south-west ruins ----
+	for c in Art.ruins(self, Vector3(-62, 0, 40)):
+		solid(Vector3(c.x, 1.5, c.z), Vector3(0.8, 3.0, 0.8))
+	solid(Vector3(-60.8, 0.8, 38.6), Vector3(2.0, 1.6, 1.8))
+	block(-62, 40, 5.2)
+	# ---- north-east waterfall and hidden room ----
+	var fz = -35.7
+	var top = T.height(64, -37.2)
+	falls_node = Art.waterfall(self, Vector3(64, -0.12, fz), 2.6, top + 0.5)
+	Art.cave_mouth(self, Vector3(64, 0.75, -36.25))
+	for i in range(6):
+		var a = PI + i * PI / 5.0
+		var p = Vector3(64 + cos(a) * 3.6, 0, -32.4 + sin(a) * 3.6)
+		Art.sph(self, Vector3(p.x, T.height(p.x, p.z) + 0.05, p.z), 0.5, Color("8d9394"), Vector3(1.3, 0.6, 1), 7)
+	# ---- Sendor, the small island ----
+	var plank_t: Array = []
+	var plank_c: Array = []
+	for i in range(16):
+		plank_t.append(Transform3D(Basis.IDENTITY, Vector3(48, 0.07, 66.3 + i * 0.5)))
+		plank_c.append(Color("a77b4f").lerp(Color("8f6a43"), float(i % 4) / 4.0))
+	var pm = BoxMesh.new()
+	pm.size = Vector3(2.6, 0.08, 0.485)
+	Art.scatter(self, pm, plank_t, plank_c, false)
+	for i in range(4):
+		for sx in [-1.25, 1.25]:
+			Art.cyl(self, Vector3(48 + sx, -0.6, 66.6 + i * 2.4), 0.09, 0.11, 2.8, Color("5b3d28"), Vector3.ZERO, 7)
+	solid(Vector3(48, 0.04, 70.0), Vector3(2.6, 0.08, 8.0))
+	var palm_y = T.height(51, 85)
+	Art.palm(self, Vector3(51, palm_y, 85), 0.3)
+	solid(Vector3(51, palm_y + 1.5, 85), Vector3(0.5, 3.0, 0.5))
+	Art.sph(self, Vector3(45, T.height(45, 84) + 0.4, 84), 1.0, Color("8d9394"), Vector3(1.4, 1.0, 1.2), 10)
+	solid(Vector3(45, 0.6, 84), Vector3(2.4, 1.2, 2.0))
+	block(45, 84, 1.6)
+	block(51, 85, 0.8)
+	Art.signpost(self, Vector3(49.6, T.height(49.6, 75.2), 75.2), "Sendor", 180)
+	Art.crate(self, Vector3(46.4, T.height(46.4, 76), 76), 0.6, Color("b58a52"), 25)
+	ferry_node = Art.boat(self, FERRY_HARBOR)
+	ferry_node.scale = Vector3(0.75, 0.75, 0.75)
+	# more sea birds and beach things
+	Art.umbrella(self, Vector3(53.5, T.height(53.5, 81), 81), Color("2a9d8f"))
+
+func build_night_and_weather():
+	# stars on a dome that follows the player
+	stars_node = Node3D.new()
+	add_child(stars_node)
+	var rs = RandomNumberGenerator.new()
+	rs.seed = 777
+	var st: Array = []
+	var sc: Array = []
+	for i in range(420):
+		var a = rs.randf() * TAU
+		var el = asin(rs.randf_range(0.08, 1.0))
+		var d = Vector3(cos(a) * cos(el), sin(el), sin(a) * cos(el))
+		var s = rs.randf_range(0.6, 1.6)
+		st.append(Transform3D(Basis.from_scale(Vector3(s, s, s)), d * 380.0))
+		sc.append(Color(1, 1, 1))
+	var mm = Art.scatter(stars_node, Art.sphere_mesh(0.9, 4), st, sc, false)
+	stars_mat = Art.unshaded(Color(1, 1, 0.92, 0.0), true)
+	mm.material_override = stars_mat
+	moon = MeshInstance3D.new()
+	moon.mesh = Art.sphere_mesh(14.0, 16)
+	moon.material_override = Art.unshaded(Color("f4f1dc"))
+	moon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	stars_node.add_child(moon)
+	moon.position = Vector3(-0.55, 0.6, -0.58).normalized() * 360.0
+	shooting = MeshInstance3D.new()
+	var sm = BoxMesh.new()
+	sm.size = Vector3(0.6, 0.6, 26.0)
+	shooting.mesh = sm
+	shooting.material_override = Art.unshaded(Color(1, 1, 0.9, 0.85), true)
+	shooting.visible = false
+	add_child(shooting)
+	var fm = Art.unshaded(Color("ffe680"))
+	for i in range(46):
+		var f = MeshInstance3D.new()
+		f.mesh = Art.sphere_mesh(0.06, 5)
+		f.material_override = fm
+		f.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		f.visible = false
+		add_child(f)
+		var c = [Vector2(0, -14), Vector2(12, -24), Vector2(-14, -12), Vector2(45, 22), Vector2(-44, -18), Vector2(64, -32)][i % 6] + Vector2(rs.randf_range(-6, 6), rs.randf_range(-6, 6))
+		fireflies.append({"node": f, "c": Vector3(c.x, T.height(c.x, c.y), c.y), "p": rs.randf() * 20.0})
+	for i in range(3):
+		fireworks.append(Art.burst(self, 70, 0.12))
+	splash = Art.burst(self, 50, 0.22)
+	splash.direction = Vector3.UP
+	splash.spread = 35.0
+	splash.gravity = Vector3(0, -12, 0)
+	splash.initial_velocity_min = 5.0
+	splash.initial_velocity_max = 8.0
+	whale_node = Art.whale()
+	whale_node.visible = false
+	add_child(whale_node)
+	rain_fx = Art.rain(player)
+	rainbow_mi = Art.rainbow(self)
+
+# ------------------------------------------------------------ third expansion: time, weather, surprises
+
+func time_phase(t: float) -> String:
+	if t < 0.06 or t >= 0.94: return "salma"
+	if t < 0.25: return "monar"
+	if t < 0.58: return "yar"
+	if t < 0.68: return "wanar"
+	return "yesh"
+
+func update_sky(delta: float):
+	day_t = fmod(day_t + delta / DAY_LEN, 1.0)
+	var t2 = day_t + (1.0 if day_t < 0.1 else 0.0)
+	night = smoothstep(0.58, 0.7, t2) * (1.0 - smoothstep(0.92, 1.06, t2))
+	var warm = maxf(maxf(1.0 - absf(t2 - 0.63) / 0.07, 1.0 - absf(t2 - 1.0) / 0.07), 0.0)
+	var u = clampf((day_t + 0.03) / 0.7, 0.0, 1.0)
+	if day_t > 0.9: u = 0.0
+	var el = 5.0 + sin(u * PI) * 55.0
+	if night > 0.5: el = 48.0
+	sun.rotation_degrees = Vector3(-el, -32.0 - (u - 0.5) * 120.0 if night <= 0.5 else 150.0, 0)
+	sun.light_energy = lerpf(0.9, 0.24, night) * lerpf(1.0, 0.62, rain_amt)
+	sun.light_color = Color("fff0d8").lerp(Color("ffb27a"), warm * 0.8).lerp(Color("a8bcff"), night)
+	sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY if night > 0.5 else DirectionalLight3D.SKY_MODE_LIGHT_AND_SKY
+	psm.sky_top_color = Color("3f86d0").lerp(Color("7c8ca0"), rain_amt * 0.6).lerp(Color("0b1433"), night)
+	var hz = Color("bfe4f2").lerp(Color("f2b27a"), warm * 0.75).lerp(Color("aab4bf"), rain_amt * 0.5).lerp(Color("1d2c4c"), night)
+	psm.sky_horizon_color = hz
+	psm.ground_horizon_color = hz
+	psm.ground_bottom_color = Color("86b9c9").lerp(Color("0d1a30"), night)
+	env.ambient_light_energy = lerpf(0.55, 0.34, night)
+	env.tonemap_exposure = lerpf(0.82, 1.05, night)
+	env.fog_light_color = Color("c9e7f0").lerp(Color("f0c8a0"), warm * 0.5).lerp(Color("aab4bf"), rain_amt * 0.4).lerp(Color("1c2a44"), night)
+	stars_mat.albedo_color.a = clampf(night * 1.2 - 0.1, 0.0, 1.0) * (1.0 - rain_amt)
+	stars_node.position = player.position
+	cloud_mat.albedo_color = Color(1, 1, 1, 0.93).lerp(Color(0.62, 0.66, 0.72, 0.95), rain_amt).lerp(Color(0.2, 0.25, 0.38, 0.85), night)
+	moon.visible = night > 0.15
+	var w = time_phase(day_t)
+	if w != time_word:
+		if time_word != "":
+			learn(w)
+			toast(w.capitalize() + ": " + Data.TIMES[w])
+		time_word = w
+
+func update_night_life(delta: float):
+	for f in fireflies:
+		var n = f["node"] as Node3D
+		n.visible = night > 0.45
+		if not n.visible: continue
+		var t = clock * 0.5 + f["p"]
+		var c: Vector3 = f["c"]
+		n.position = c + Vector3(sin(t * 1.3) * 2.5, 0.8 + sin(t * 2.1) * 0.5, cos(t * 0.9) * 2.5)
+		n.scale = Vector3.ONE * (0.6 + 0.6 * absf(sin(t * 3.0 + f["p"])))
+	if falls_node:
+		var foam = falls_node.get_meta("foam") as Node3D
+		foam.scale = Vector3(1.4, 0.25, 0.9) * (1.0 + sin(clock * 6.0) * 0.06)
+	# shooting stars
+	if night > 0.8 and rain_amt < 0.2:
+		shoot_cd -= delta
+		if shoot_cd <= 0.0 and shoot_t < 0.0:
+			shoot_t = 0.0
+			shoot_cd = randf_range(10.0, 25.0)
+			var a = randf() * TAU
+			shoot_from = player.position + Vector3(cos(a) * 180.0, randf_range(110.0, 160.0), sin(a) * 180.0)
+			shoot_dir = Vector3(-sin(a), -0.35, cos(a)).normalized()
+	if shoot_t >= 0.0:
+		shoot_t += delta
+		shooting.visible = shoot_t < 1.2
+		shooting.position = shoot_from + shoot_dir * shoot_t * 140.0
+		shooting.look_at(shooting.position + shoot_dir, Vector3.UP)
+		if shoot_t > 1.2: shoot_t = -1.0
+	# fireworks once Neri has been found
+	if completed.has("cove") and night > 0.7:
+		firework_cd -= delta
+		if firework_cd <= 0.0:
+			firework_cd = randf_range(1.6, 3.4)
+			var fw: CPUParticles3D = fireworks[randi() % fireworks.size()]
+			fw.position = Vector3(randf_range(-14, 14), randf_range(24, 32), randf_range(0, 22))
+			fw.color = [Color("ff5d5d"), Color("ffd34d"), Color("6de0ff"), Color("b38bff"), Color("7dff8a"), Color("ff8ad8")][randi() % 6]
+			fw.restart()
+
+func update_weather(delta: float):
+	if raining > 0.0:
+		raining -= delta
+		rain_amt = minf(rain_amt + delta * 0.4, 1.0)
+		if raining <= 0.0:
+			rain_fx.emitting = false
+			weather_cd = randf_range(220.0, 340.0)
+			if night < 0.3:
+				rainbow_t = 50.0
+				var f = sun.global_transform.basis.z
+				var d = Vector3(-f.x, 0, -f.z).normalized()
+				rainbow_mi.position = player.position + d * 150.0
+				rainbow_mi.position.y = 0.0
+				rainbow_mi.look_at(Vector3(player.position.x, 0.0, player.position.z), Vector3.UP)
+				rainbow_mi.position.y = 60.0
+				rainbow_mi.visible = true
+				toast("Hen-ma! Look at the sky.")
+	else:
+		rain_amt = maxf(rain_amt - delta * 0.3, 0.0)
+		weather_cd -= delta
+		if weather_cd <= 0.0:
+			if randf() < 0.6: start_rain()
+			else: weather_cd = randf_range(120.0, 200.0)
+	if rainbow_t > 0.0:
+		rainbow_t -= delta
+		var s = clampf(minf(50.0 - rainbow_t, rainbow_t) / 6.0, 0.0, 1.0)
+		(rainbow_mi.material_override as ShaderMaterial).set_shader_parameter("strength", s)
+		if rainbow_t <= 0.0: rainbow_mi.visible = false
+
+func start_rain():
+	raining = randf_range(30.0, 45.0)
+	rain_fx.emitting = true
+	learn("ser")
+	learn("-ng")
+	if not phrases.has("rain_starts"): phrases.append("rain_starts")
+	toast("I-ser-ng! It is beginning to rain.")
+
+func try_whale(force: bool = false) -> bool:
+	var fwd = -player.global_transform.basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized()
+	var best = Vector3.ZERO
+	var best_score = -9.0
+	for i in range(16):
+		var a = i * TAU / 16.0
+		var d = Vector3(cos(a), 0, sin(a))
+		var p = player.position + d * (30.0 if force else 44.0)
+		if T.height(p.x, p.z) > -2.0: continue
+		var sc = d.dot(fwd)
+		if sc > best_score:
+			best_score = sc
+			best = p
+	if best_score < -1.5: return false
+	whale_pos = Vector3(best.x, 0, best.z)
+	var to = (whale_pos - player.position).normalized()
+	whale_dir = Vector3(-to.z, 0, to.x)
+	whale_t = 0.0
+	whale_node.visible = true
+	return true
+
+func update_whale(delta: float):
+	if whale_t < 0.0:
+		if panel.visible: return
+		whale_cd -= delta
+		if whale_cd <= 0.0:
+			whale_cd = randf_range(120.0, 210.0)
+			if T.coast(player.position.x, player.position.z) < 22.0 or riding: try_whale()
+		return
+	whale_t += delta
+	var u = whale_t / 5.0
+	if u >= 1.0:
+		whale_t = -1.0
+		whale_node.visible = false
+		return
+	var prev_y = whale_node.position.y
+	whale_node.position = whale_pos + whale_dir * (u - 0.5) * 12.0 + Vector3(0, sin(u * PI) * 6.5 - 4.6, 0)
+	whale_node.rotation = Vector3(0, atan2(whale_dir.x, whale_dir.z), 0)
+	(whale_node.get_meta("body") as Node3D).rotation.x = -cos(u * PI) * 1.05
+	(whale_node.get_meta("body") as Node3D).rotation.z = sin(u * PI) * 0.5
+	if (prev_y < -0.1 and whale_node.position.y >= -0.1) or (prev_y > -0.1 and whale_node.position.y <= -0.1):
+		splash.position = Vector3(whale_node.position.x, 0.0, whale_node.position.z)
+		splash.color = Color(0.92, 0.97, 1.0)
+		splash.restart()
+	if u > 0.35 and not whale_seen:
+		whale_seen = true
+		learn("var")
+		learn("tari")
+		if not phrases.has("big_fish"): phrases.append("big_fish")
+		toast("Var tari! A big fish! (in your phrasebook)")
+	elif u > 0.35 and u < 0.37:
+		toast("Var tari!")
+
+# ---- the ferry to Sendor ----
+
+func ride_puzzle(to_islet: bool):
+	learn("sendor")
+	learn("tar")
+	learn("-ru")
+	var place = "Sendor" if to_islet else "Teka"
+	var opts = [place + "-ru t-na-tar-o-ye.", place + "-ta t-na-tar-o-ye.", place + "-ma t-na-tar-o-ye."]
+	choice_puzzle("Tamu's boat", ("Tamu points out to sea, toward a small island with one tree.\n\nAsk Tamu to take you to Sendor." if to_islet else "Tamu waits by the boat, ready to row home.\n\nAsk Tamu to take you back to the village."), opts, 0, func(): master("q:ride"),
+		opts[0] + " means Please take me to " + ("Sendor." if to_islet else "the village.") + " The ending -ru means to; -ta would mean from and -ma in.",
+		"Which ending means to? -ru is to, -ta is from, -ma is in.", Callable(),
+		func(): button("Set off!", start_ride.bind(to_islet), content))
+
+func start_ride(to_islet: bool):
+	close_panel()
+	riding = true
+	ride_t = 0.0
+	walk_to = {}
+	target = {}
+	hover = {}
+	ride_path = [FERRY_HARBOR, Vector3(12, 0, 55), Vector3(31, 0, 62.5), FERRY_ISLET]
+	if not to_islet: ride_path.reverse()
+	ride_dest = Vector3(48, 0.15, 70.5) if to_islet else Vector3(0.5, 0.15, 41.2)
+	ride_whale = not whale_seen
+	toast("Sena-li! By boat!")
+
+func path_point(path: Array, t: float) -> Vector3:
+	var segs = path.size() - 1
+	var f = clampf(t, 0.0, 1.0) * segs
+	var i = mini(int(f), segs - 1)
+	return (path[i] as Vector3).lerp(path[i + 1], f - i)
+
+func update_ride(delta: float):
+	var fe = ferry_node.get_parent() as Node3D
+	ferry_node.position.y = 0.04 + sin(clock * 1.3 + 2.0) * 0.04
+	ferry_node.rotation.z = sin(clock * 1.1) * 0.03
+	if not riding: return
+	ride_t += delta / 10.0
+	var e = smoothstep(0.0, 1.0, ride_t)
+	var p = path_point(ride_path, e)
+	var ahead = path_point(ride_path, minf(e + 0.02, 1.0))
+	fe.position = Vector3(p.x, -0.08, p.z)
+	if ahead.distance_to(p) > 0.01: fe.rotation.y = lerp_angle(fe.rotation.y, atan2(ahead.x - p.x, ahead.z - p.z), minf(delta * 3.0, 1.0))
+	player.position = Vector3(p.x, 0.45, p.z)
+	player.velocity = Vector3.ZERO
+	if ride_whale and ride_t > 0.4:
+		ride_whale = false
+		try_whale(true)
+	if ride_t >= 1.0:
+		riding = false
+		player.position = ride_dest
+		last_safe = ride_dest
+		fe.position = Vector3(ride_path[-1].x, -0.08, ride_path[-1].z)
+		for a in animals:
+			if a.get("follow", false): (a["e"]["node"] as Node3D).position = ride_dest + Vector3(1.0, 0, -1.0)
+		save_game()
+
+# ---- the quest box folds away when tapped ----
+
+func _on_status_input(ev: InputEvent):
+	var tapped = (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT) or (ev is InputEventScreenTouch and ev.pressed)
+	if tapped:
+		hud_small = not hud_small
+		layout_hud()
+		save_game()
+		status.accept_event()
+
+func layout_hud():
+	update_status()
+	status.visible = not hud_small
+	status_small.visible = hud_small
+	top_row.position = Vector2(174, 30) if hud_small else Vector2(14, 124)
+
+func update_status():
+	var obj = objective()
+	var total = quests.size() + side_quests.size()
+	status_small.text = "Quests " + str(quests_done()) + "/" + str(total)
+	status.text = obj + "\nDone: " + str(quests_done()) + " of " + str(total) + ".  Tap this box to fold it."
+	if hud_small and obj != last_objective and last_objective != "": toast("New goal! Tap Quests to read it.")
+	last_objective = obj
+
+# ---- third expansion: quests and mini-games ----
+
+func buy_bread():
+	for w in ["yan", "panak", "gin", "vel"]: learn(w)
+	choice_puzzle("Buying bread", "Ketu waits for your request. How do you ask politely for one loaf?",
+		["Yan panak t-na-ven-o-ye.", "Panak yan-ru t-na-ven-o-ye.", "Yan panak k-i-mai-pa-da."], 0, func(): master("q:buy"),
+		"Yan panak t-na-ven-o-ye: please give me one bread. Ketu answers: “Vel gin.” Two coins.",
+		"The number comes before the noun, and a polite request ends in -o-ye. k-i-mai-pa-da would mean I bought it.", talk.bind("ketu"),
+		func():
+			button("Pay vel gin (2 coins)", func():
+				if gin >= 2:
+					gin -= 2
+					inventory.append("bread")
+					save_game()
+					message("Panak!", "Ketu wraps a warm loaf for you. You have " + str(gin) + " gin left. The village dog would love some.")
+				else:
+					message("Not enough gin", "You have " + str(gin) + " gin. Sell fish to Ketu (one gin each), or help Gav deliver parcels."), content))
+
+func give_parcel(id: String):
+	learn("-ru")
+	clear_panel("Which parcel?")
+	text_line("Read the labels. The ending -ru means to.")
+	for p in Data.PARCELS.keys():
+		if not inventory.has(p): continue
+		var who: String = Data.PARCELS[p]
+		button(item_word(p), func():
+			if who == id:
+				consume([p])
+				solved.append("mail_" + id)
+				learn("har")
+				if not phrases.has("thank_you"): phrases.append("thank_you")
+				save_game()
+				message("“K-ta-har-da!”", id.capitalize() + " takes the parcel and bows. K-ta-har-da means I thank you: k- is I acting, ta- is you receiving." + ("\n\nAll parcels delivered. Go back to Gav at the harbor." if not has_any_parcel() else ""))
+			else:
+				learn("maki")
+				message("“Maki.”", "Maki means no. This label says " + who.capitalize() + "-ru: to " + who.capitalize() + "."), content)
+	button("Return", talk.bind(id), content)
+
+func has_any_parcel() -> bool:
+	for p in Data.PARCELS.keys():
+		if inventory.has(p): return true
+	return false
+
+func entity_by_id(id: String) -> Dictionary:
+	for e in entities:
+		if e["id"] == id: return e
+	return {}
+
+func start_hide():
+	learn("pal")
+	for kid in ["rin", "ola"]:
+		var e = entity_by_id(kid)
+		var spot: Vector3 = HIDE_SPOTS[kid]
+		(e["node"] as Node3D).position = Vector3(spot.x, gy(spot.x, spot.z), spot.z)
+		hiding[kid] = true
+	message("Ma-ta-pal-o-ki!", "Ola covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Rin and Ola are gone. One hid near the school, one near the market. Find them!")
+
+func found_puzzle(id: String):
+	choice_puzzle("Found you!", id.capitalize() + " is crouching out of sight, giggling. What do you shout?",
+		["K-ta-pal-da!", "T-na-pal-da!", "Ma-k-ta-pal-ki-da!"], 0, func():
+			hiding[id] = false
+			var e = entity_by_id(id)
+			(e["node"] as Node3D).position = e["home"]
+			if not hiding.get("rin", false) and not hiding.get("ola", false):
+				complete("hide"),
+		"K-ta-pal-da: I see you! k- is I acting and ta- is you being seen. T-na-pal-da would mean you see me, and ma- ... -ki says not.",
+		"Who sees whom? k- is I as the one acting, ta- is you receiving. ma- ... -ki means not.")
+
+func riddle_quiz(i: int):
+	var r: Dictionary = Data.RIDDLES[i]
+	for w in r["options"]: learn(w)
+	for w in ["yar", "hen", "yesh", "sa"]: learn(w)
+	choice_puzzle("Oku's riddle: " + str(i + 1) + " of 5", "Oku chants:\n\n“" + r["q"] + " Han?”\n\nWhat is it?", r["options"], r["correct"], func():
+		master("q:riddle" + str(i))
+		if i == 4:
+			complete("riddles")
+			if not phrases.has("room_behind"): phrases.append("room_behind"),
+		r["why"] + " (" + r["en"] + ")", "Read the clues one at a time. hen-ma is in the sky, wak-ma in the water, yesh-ma at night, yar-ma in the day.", talk.bind("oku"),
+		func():
+			if i < 4: button("Next riddle", riddle_quiz.bind(i + 1), content)
+			else:
+				for w in ["shan", "gan", "-nu"]: learn(w)
+				text_line("Oku leans close and whispers a secret: “Var wak-ni shanma gan i-esh-nu.” They say there is a room behind the big water. Oku glances toward the north-east hills."))
+
+func cave_panel():
+	clear_panel("gan: a hidden room")
+	learn("gan")
+	text_line("You squeeze behind the falling water. Inside is a small room, and blue crystals glow in the walls.")
+	button("What do you see?", func(): sentence_card("cave_glow", cave_panel), content)
+	if not inventory.has("map") and not completed.has("treasure"):
+		button("Search behind the crystals", func():
+			inventory.append("map")
+			learn("pai")
+			if not phrases.has("treasure_map"): phrases.append("treasure_map")
+			refresh_world()
+			save_game()
+			sentence_card("treasure_map", close_panel), content)
+	button("Shout into the room", func():
+		var w = discovered[discovered.size() - 1] if not discovered.is_empty() else "ho"
+		message("Echo!", "You shout “" + w + "!”\n\n“" + w + "... " + w + "... " + w + "...” the room answers."), content)
+	button("Return", close_panel, content)
+
+func mound_panel(id: String):
+	var md: Dictionary = Data.MOUNDS[id]
+	for w in ["murak", "sek", "-ni", "men", "shan", "dal"]: learn(w)
+	clear_panel("A sandy mound")
+	text_line("A little stick marks a mound of sand. Where is this spot?\n\n“" + md["v"] + "”\n\nThe map says: Gin murak-ni shanma i-esh-da.")
+	button("Dig here", func():
+		if md["right"]: dig_treasure()
+		else: message("Only sand", "Nothing here. This spot is " + md["v"] + " (" + md["en"] + "). The map says murak-ni shanma: behind the tree, on the far side from the dock."), content)
+	button("Read the map again", func(): sentence_card("treasure_map", mound_panel.bind(id)), content)
+	button("Return", close_panel, content)
+
+func dig_treasure():
+	consume(["map"])
+	gin += 10
+	complete("treasure")
+	refresh_world()
+	var fw: CPUParticles3D = fireworks[0]
+	fw.position = chest_node.global_position + Vector3(0, 1.0, 0)
+	fw.color = Color("ffd34d")
+	fw.restart()
+	message("Dar gin!", "Your shovel hits wood. A chest! Inside are dar gin: ten coins, and a note in Neri's handwriting: “Ho! Ti kelar i-ho.” Good, you are a good traveler.")
+
+func collect_star(e: Dictionary):
+	(e["node"] as Node3D).hide()
+	if not solved.has(e["id"]): solved.append(e["id"])
+	var n = stars_found()
+	var ords = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth"]
+	var o: String = Data.ORDINALS[n - 1]
+	learn("hai-sao")
+	learn("-ve")
+	learn(o)
+	toast(o.capitalize() + " hai-sao! (the " + ords[n - 1] + " sea star)")
+	if n >= STARS.size():
+		complete("seastars")
+		message("Barve hai-sao!", "The eighth sea star! You found them all. The ending -ve makes order words: yan-ve first, vel-ve second, bar-ve eighth.")
+	save_game()
+
+# ---- production practice: sentence tiles and the verb builder ----
+
+func tile_puzzle(i: int = -1, back: Callable = Callable()):
+	if i < 0: i = randi() % Data.TILES.size()
+	var tp: Dictionary = Data.TILES[i]
+	if not back.is_valid(): back = show_notebook
+	clear_panel("Sentence builder")
+	text_line("Build this sentence in Varnak:\n“" + tp["en"] + "”")
+	var built: Array = []
+	var shown = text_line("…", 24)
+	var flow = HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 8)
+	flow.add_theme_constant_override("v_separation", 8)
+	content.add_child(flow)
+	var pool: Array = tp["tiles"].duplicate()
+	pool.append_array(tp["decoys"])
+	pool.shuffle()
+	var used: Array = []
+	var feedback = text_line("", 19)
+	for w in pool:
+		var b = Button.new()
+		b.text = w
+		b.custom_minimum_size = Vector2(70, 50)
+		flow.add_child(b)
+		b.pressed.connect(func():
+			built.append(w)
+			used.append(b)
+			b.disabled = true
+			shown.text = " ".join(built))
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	content.add_child(row)
+	var undo = button("Undo", func():
+		if built.is_empty(): return
+		built.pop_back()
+		(used.pop_back() as Button).disabled = false
+		shown.text = " ".join(built) if not built.is_empty() else "…", row)
+	var check = button("Check", func():
+		if built == tp["tiles"]:
+			feedback.text = "Correct! " + " ".join(tp["tiles"])
+			feedback.add_theme_color_override("font_color", Color("2f6b2f"))
+			master("t:" + str(i))
+		else:
+			feedback.text = "Not quite. " + tp["tip"] + " The usual order is: the one acting, the thing acted on, places, then the verb."
+			feedback.add_theme_color_override("font_color", Color("8a2f1f")), row)
+	undo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.move_child(feedback, content.get_child_count() - 1)
+	button("Another sentence", tile_puzzle.bind(-1, back), content)
+	button("Back", back, content)
+
+func verb_form(choice: Dictionary) -> String:
+	var parts: Array = []
+	var neg = choice.get(0, "") == "ma-"
+	if neg: parts.append("ma")
+	parts.append(str(choice.get(1, "na-")).trim_suffix("-"))
+	parts.append(choice.get(2, "lum"))
+	for k in [3, 4]:
+		if choice.get(k, "") != "": parts.append(str(choice[k]).trim_prefix("-"))
+	if neg: parts.append("ki")
+	if choice.get(5, "") != "": parts.append(str(choice[5]).trim_prefix("-"))
+	return "-".join(parts)
+
+func show_verb_builder(i: int = -1):
+	if i < 0: i = randi() % Data.VERBS.size()
+	var ch: Array = Data.VERBS[i]
+	for w in ["na-", "ta-", "i-", "ri-", "lum", "pav", "sul", "sum", "tal", "nang"]: learn(w)
+	clear_panel("Verb builder")
+	text_line("Build one Varnak verb that means:\n“" + ch[0] + "”")
+	text_line("lum go · pav run · sul sleep · sum swim · tal arrive · nang walk\n-im in progress · -ak completed · -ur usually · -pa past · -fu future · -da seen · -shi apparently · -nu reportedly · ma- ... -ki not", 15)
+	var choice: Dictionary = {}
+	var preview = text_line("", 28)
+	for si in range(Data.VERB_SLOTS.size()):
+		var slot: Array = Data.VERB_SLOTS[si]
+		text_line(slot[0], 16)
+		var flow = HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 6)
+		flow.add_theme_constant_override("v_separation", 6)
+		content.add_child(flow)
+		var group = ButtonGroup.new()
+		var first: Button = null
+		for opt in slot[1]:
+			var b = Button.new()
+			b.toggle_mode = true
+			b.button_group = group
+			b.text = opt if opt != "" else "none"
+			b.custom_minimum_size = Vector2(58, 46)
+			flow.add_child(b)
+			b.toggled.connect(func(on):
+				if on:
+					choice[si] = opt
+					preview.text = verb_form(choice))
+			if first == null: first = b
+		first.button_pressed = true
+	var feedback = text_line("", 19)
+	button("Check", func():
+		if verb_form(choice) == ch[1]:
+			feedback.text = "Correct! " + ch[1]
+			feedback.add_theme_color_override("font_color", Color("2f6b2f"))
+			master("vb:" + str(i))
+		else:
+			feedback.text = "Not quite. Look at each slot: who acts, which action, when, and how you know it."
+			feedback.add_theme_color_override("font_color", Color("8a2f1f")), content)
+	button("Show me", func(): feedback.text = "The answer is " + ch[1] + ".", content)
+	button("Another verb", show_verb_builder.bind(-1), content)
+	button("Notebook", show_notebook, content)
+
+func follow_player(a: Dictionary, delta: float):
+	var node = a["e"]["node"] as Node3D
+	var fwd = -player.global_transform.basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized()
+	var side = Vector3(-fwd.z, 0, fwd.x)
+	var tp = player.position - fwd * 1.8 + side * 0.9
+	if riding: tp = node.position
+	var to = tp - node.position
+	to.y = 0.0
+	if to.length() > 30.0:
+		node.position = tp
+		to = Vector3.ZERO
+	var moving = to.length() > 0.5
+	if moving:
+		node.position += to.normalized() * minf(to.length(), (1.5 + to.length() * 1.6) * delta * 1.0)
+		node.rotation.y = lerp_angle(node.rotation.y, atan2(to.x, to.z), minf(delta * 8.0, 1.0))
+	var ground = gy(node.position.x, node.position.z)
+	if T.deep(node.position.x, node.position.z) and not riding: ground = maxf(ground, 0.05)
+	node.position.y = ground + (absf(sin(clock * 12.0)) * 0.06 if moving else 0.0)
+	(node.get_meta("tail") as Node3D).rotation.y = sin(clock * 16.0) * 0.7
+
+func near_dock(p: Vector3) -> bool:
+	if absf(p.x) < 4.2 and p.z > 29.5 and p.z < 42.5: return true
+	if absf(p.x - 48.0) < 1.5 and p.z > 65.8 and p.z < 74.2: return true
+	return false
