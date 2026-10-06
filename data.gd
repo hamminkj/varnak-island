@@ -52,7 +52,14 @@ const WORDS = {
 	"tal": "arrive (root)", "shora": "old", "nava": "young / new",
 	"ansu": "with me (an + su)", "na-": "I (subject prefix)", "ta-": "you (subject prefix)", "i-": "he, she, it (subject prefix)",
 	"ri-": "they (subject prefix)", "k-": "I (agent prefix, before the patient prefix)", "t-": "you (agent prefix)",
-	"kin": "we (including you)"
+	"kin": "we (including you)",
+	# fifth expansion: gossip and nonsense
+	"mel": "speak, talk (root)", "dap": "answer (root)", "zen": "know (root); also true", "mong": "forget (root)",
+	"kar": "come (root)", "wai": "bad", "dan": "but", "haku": "why", "hal-ta": "from whom? (hal + ta)", "ket": "chair",
+	"yir": "clothing", "par": "bird (as a verb root, par means fear)",
+	"yam": "eat (root); also salt and voice", "tovu": "story",
+	"sela": "alone", "cha-kor": "teapot (cha + kor)", "-ai": "antipassive: doing something in general (pal-ai: look around)",
+	"ha": "ha (a laugh)", "sir": "look for, search (root)"
 }
 
 # Glosses that replace earlier ones because the document gives a second meaning.
@@ -60,7 +67,9 @@ const GLOSS_UPDATES = {
 	"dar": "cook (root); also the number ten",
 	"mar": "horse (as a stative root, mar means full)",
 	"kor": "container (as a verb root, kor means cross)",
-	"an": "I (independent pronoun); as a verb root, an means be"
+	"an": "I (independent pronoun); as a verb root, an means be",
+	"gao": "tall / high (as a verb root, gao means tell)",
+	"tar": "bring (root); also top (after -ni)"
 }
 
 # Nouns for the word workshop: root -> [singular, plural]
@@ -269,8 +278,90 @@ const SENTENCES = {
 		"words": ["polu", "-ru", "kel", "-ir", "tar", "-ur"], "wrong": ["Everyone brings bags to me.", "I lost a bag yesterday."]},
 	"night_sky": {"v": "Yeshma sao-ir ri-ling-da.", "parts": "yesh-ma  sao-ir  ri-ling-da\nnight-LOC  star-PL  3PL.S-be.bright-DIR", "en": "At night the stars shine.",
 		"gesture": "Pomo points up at the sky full of stars.",
-		"words": ["yesh", "sao", "-ir", "ling"], "wrong": ["In the day the sun shines.", "The stars are falling."]}
+		"words": ["yesh", "sao", "-ir", "ling"], "wrong": ["In the day the sun shines.", "The stars are falling."]},
+	# ---- fifth expansion: strange things and silly events ----
+	"odd_fish": {"v": "Tari wak-korma i-esh-da!", "parts": "tari  wak-kor-ma  i-esh-da\nfish  well-LOC  3S-be.located-DIR", "en": "A fish is in the well!",
+		"gesture": "A fish pokes its head out of the well and stares at you. Nobody knows how it got there.",
+		"words": ["tari", "wak-kor", "-ma"], "wrong": ["A fish is in the river.", "The well is full of fruit."]},
+	"odd_chair": {"v": "Ket dom-ni tarma i-esh-da!", "parts": "ket  dom-ni  tar-ma  i-esh-da\nchair  house-GEN  top-LOC  3S-be.located-DIR", "en": "A chair is on top of the house!",
+		"gesture": "A chair sits on the roof, facing the sea, as if someone likes the view.",
+		"words": ["ket", "dom", "-ni", "tar", "-ma"], "wrong": ["A chair is in the house.", "A chair is behind the house."]},
+	"odd_clothes": {"v": "Ketu-ni yir murakma i-esh-da!", "parts": "Ketu-ni  yir  murak-ma  i-esh-da\nKetu-GEN  clothing  tree-LOC  3S-be.located-DIR", "en": "Ketu's clothes are in the tree!",
+		"gesture": "A bright shirt with Ketu's market stripes flaps from a high branch.",
+		"words": ["yir", "-ni", "murak", "-ma"], "wrong": ["Ketu is in the tree.", "The tree is wearing a hat."]},
+	"odd_book": {"v": "Puka haima i-esh-da!", "parts": "puka  hai-ma  i-esh-da\nbook  sea-LOC  3S-be.located-DIR", "en": "A book is in the sea!",
+		"gesture": "A book bobs on the waves. The title says Suri-ni puka: Suri's book.",
+		"words": ["puka", "hai", "-ma"], "wrong": ["A book is on the table.", "A fish is reading a book."]},
+	"odd_bed": {"v": "Sulum morama i-esh-da!", "parts": "sulum  mora-ma  i-esh-da\nbed  river-LOC  3S-be.located-DIR", "en": "A bed is in the river!",
+		"gesture": "A bed floats slowly down the river. There is still a pillow on it.",
+		"words": ["sulum", "mora", "-ma"], "wrong": ["A boat is in the river.", "Someone is sleeping in the river."]},
+	"odd_fruit": {"v": "Var guro rukma i-esh-da!", "parts": "var  guro  ruk-ma  i-esh-da\nbig  fruit  path-LOC  3S-be.located-DIR", "en": "A giant fruit is on the path!",
+		"gesture": "A fruit as big as a cart blocks half the road. It smells wonderful.",
+		"words": ["var", "guro", "ruk", "-ma"], "wrong": ["A small fruit is in the basket.", "A cart is on the path."]},
+	"odd_teapot": {"v": "Cha-kor girama i-esh-da!", "parts": "cha-kor  gira-ma  i-esh-da\ntea-container  bridge-LOC  3S-be.located-DIR", "en": "A teapot is on the bridge!",
+		"gesture": "A teapot balances on the bridge rail, still steaming.",
+		"words": ["cha-kor", "gira", "-ma"], "wrong": ["A teapot is under the bridge.", "The bridge is hot."]},
+	"fish_rain": {"v": "Tari-ir hen-ta ri-kar-im-da!", "parts": "tari-ir  hen-ta  ri-kar-im-da\nfish-PL  sky-ABL  3PL.S-come-IPFV-DIR", "en": "Fish are coming from the sky!",
+		"gesture": "It is raining... fish. They flop on the grass and everyone stares.",
+		"words": ["tari", "-ir", "hen", "-ta", "kar"], "wrong": ["Birds are coming from the sea.", "It is raining on the fish."]},
+	"rolling_fruit": {"v": "Var guro hala i-pav-im-da!", "parts": "var  guro  hala  i-pav-im-da\nbig  fruit  fast  3S-run-IPFV-DIR", "en": "A giant fruit is running fast!",
+		"gesture": "A giant fruit rolls down the main path. Everyone jumps out of the way.",
+		"words": ["var", "guro", "hala", "pav"], "wrong": ["A small fruit is sleeping.", "The fruit is not moving."]}
 }
+
+# Village gossip. by: who tells it, about: who it is about, ev: how the teller knows.
+# reply: what the person it is about says when you ask them.
+const GOSSIP = [
+	{"id": "oren_horse", "by": "lira", "about": "oren", "ev": "nu", "v": "Oren mar-ru i-mel-ur-nu.", "en": "People say Oren usually talks to his horse.",
+		"gesture": "Lira leans close and whispers behind her hand.",
+		"reply": {"v": "Maki! Mar anru i-mel-ur-da.", "en": "No! The horse usually talks to ME.", "gesture": "Oren folds his arms, offended on the horse's behalf."}},
+	{"id": "tor_bridge", "by": "mira", "about": "tor", "ev": "shi", "v": "Tor girama i-sul-ur-shi.", "en": "Apparently Tor usually sleeps on the bridge.",
+		"gesture": "Mira points to a pillow and a blanket left on the bridge planks.",
+		"reply": {"v": "Gira i-sava-da! An girama na-sul-ur-da.", "en": "The bridge is safe! Yes, I sleep on the bridge.", "gesture": "Tor pats the planks proudly."}},
+	{"id": "mira_food", "by": "ketu", "about": "mira", "ev": "da", "v": "Mira-ni yamat i-len-ur-da.", "en": "Mira's food is usually cold. I know it firsthand.",
+		"gesture": "Ketu shivers dramatically and rubs his belly.",
+		"reply": {"v": "Maki! Yamat i-nav! ...Yamat i-len-shi.", "en": "No! The food is warm! ...Apparently the food is cold.", "gesture": "Mira tastes the soup, frowns, and quietly puts the lid back on."}},
+	{"id": "ketu_fish", "by": "tor", "about": "ketu", "ev": "nu", "v": "Ketu tari-ir-su i-mel-ur-nu.", "en": "They say Ketu talks with the fish.",
+		"gesture": "Tor glances toward the market and taps his ear.",
+		"reply": {"v": "Tari-ir i-ho! Ri-dap-ur-da.", "en": "The fish are good! They answer.", "gesture": "Ketu holds up a fish to his ear and nods seriously."}},
+	{"id": "yalo_night", "by": "oren", "about": "yalo", "ev": "nu", "v": "Yalo yesh-ta i-par-ur-nu.", "en": "People say Yalo is afraid of the night.",
+		"gesture": "Oren grins. A lighthouse keeper afraid of the dark!",
+		"reply": {"v": "Maki! Fardom i-ling-da!", "en": "No! The lighthouse is bright!", "gesture": "Yalo glances nervously at the sunset and turns the lamp up a little more."}},
+	{"id": "desh_sea", "by": "suri", "about": "desh", "ev": "da", "v": "Desh haima i-ning-ur-da.", "en": "Desh usually sings in the sea. I have seen it.",
+		"gesture": "Suri covers her ears and laughs.",
+		"reply": {"v": "Tari-ir ri-seng-ur-da!", "en": "The fish are happy when I do!", "gesture": "Desh plays a triumphant drum roll."}},
+	{"id": "pomo_sleep", "by": "desh", "about": "pomo", "ev": "shi", "v": "Pomo sang-ma i-sul-ur-shi.", "en": "Apparently Pomo usually sleeps on the hill.",
+		"gesture": "Desh imitates loud snoring drifting down from the lookout.",
+		"reply": {"v": "Maki! An na-pal-ai-ur-da!", "en": "No! I look around all the time!", "gesture": "Pomo yawns enormously in the middle of saying it."}},
+	{"id": "oku_stones", "by": "gav", "about": "oku", "ev": "nu", "v": "Oku sek-ir-su i-mel-ur-nu.", "en": "They say Oku talks with the stones.",
+		"gesture": "Gav makes a spooky face and wiggles his fingers.",
+		"reply": {"v": "Sek-ir ri-zen-da.", "en": "The stones know.", "gesture": "Oku smiles mysteriously. Somewhere, a stone seems to nod."}},
+	{"id": "gav_food", "by": "vira", "about": "gav", "ev": "shi", "v": "Gavke kel-ir-ma yamat i-yam-ur-shi.", "en": "Apparently Gav eats the food in the bags.",
+		"gesture": "Vira points at crumbs all over Gav's satchel.",
+		"reply": {"v": "Maki! ...Yamat i-nav-pa.", "en": "No! ...The food was warm.", "gesture": "Gav wipes his mouth very quickly."}},
+	{"id": "sanu_bag", "by": "ena", "about": "sanu", "ev": "da", "v": "Sanuke kel i-mong-ur-da.", "en": "Sanu always forgets the bag. I know it.",
+		"gesture": "Ena rolls her eyes toward the forest path.",
+		"reply": {"v": "Han kel?", "en": "What bag?", "gesture": "Sanu looks around, genuinely puzzled."}},
+	{"id": "ola_fruit", "by": "rin", "about": "ola", "ev": "shi", "v": "Olake polu-ni guro i-nuk-ur-shi.", "en": "Apparently Ola takes everyone's fruit.",
+		"gesture": "Rin points at Ola's very sticky fingers.",
+		"reply": {"v": "Maki! ...Guro i-ho.", "en": "No! ...Fruit is good.", "gesture": "Ola hides something round behind her back."}},
+	{"id": "vira_medicine", "by": "ila", "about": "vira", "ev": "da", "v": "Vira-ni yok i-wai-da.", "en": "Vira's medicine tastes bad. I know firsthand.",
+		"gesture": "Ila sticks out her tongue and shudders.",
+		"reply": {"v": "Yok i-wai, dan Ila i-seng-da!", "en": "The medicine is bad, but Ila is happy!", "gesture": "Vira shrugs, completely unbothered."}},
+	{"id": "lira_story", "by": "pomo", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
+		"gesture": "Pomo points down the hill at the village and mimes a chattering mouth.",
+		"reply": {"v": "Ho! Ki tovu i-ho!", "en": "Ha! This story is good!", "gesture": "Lira is already telling someone else."}}
+]
+
+# Rumor composer: pieces for open-ended sentences.
+const RUMOR_PLACES = [["", "", ""], ["tekama", "in the village", ""], ["haima", "in the sea", ""], ["kurma", "at the market", ""], ["sang-ma", "on the hill", ""],
+	["wak-korma", "in the well", "silly"], ["sulumma", "in bed", ""], ["girama", "on the bridge", ""], ["murakma", "in a tree", "silly"], ["fardomma", "in the lighthouse", ""], ["guro-ma", "inside a fruit", "silly"]]
+# root: [base, -ing, past, he/she form]
+const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["swim", "swimming", "swam", "swims"], "ning": ["sing", "singing", "sang", "sings"],
+	"pav": ["run", "running", "ran", "runs"], "nang": ["walk", "walking", "walked", "walks"], "mel": ["talk", "talking", "talked", "talks"],
+	"tal": ["arrive", "arriving", "arrived", "arrives"], "sir": ["search", "searching", "searched", "searches"]}
+const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Vira", "Yalo", "Desh", "Oku", "Gav", "Tamu", "Neri", "Gor", "Mar", "Par"]
+const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird"}
 
 # Door puzzles, one per house. situation is a gesture; options are Varnak commands.
 const DOORS = {

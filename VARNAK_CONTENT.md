@@ -239,3 +239,16 @@ New sentence-builder items (unlocked by level):
 Market rush orders are built from numbers and goods, for example Mur guro e vel panak t-na-ven-o-ye (please give me three fruit and two breads). Speech bubbles reuse phrases already listed above, plus An na-seng-da (I am happy, composed) for Ila and Sendor-ru? (to Sendor?) for Tamu.
 
 Decoy tiles at higher levels are made automatically by swapping endings (-ke added or removed, -ma to -ru, -ru to -ta, -da to -nu, i- to ri-). They are deliberately wrong and never shown as correct.
+
+
+## Fifth expansion: gossip, nonsense and rumors
+
+Gossip (all composed): Oren mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Yalo yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Pomo sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olake polu-ni guro i-nuk-ur-shi; Vira-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
+
+Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Ila i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
+
+Strange things: Tari wak-korma i-esh-da; Ket dom-ni tarma i-esh-da (tar: top, section 25.3); Ketu-ni yir murakma i-esh-da; Puka haima i-esh-da; Sulum morama i-esh-da; Var guro rukma i-esh-da; Cha-kor girama i-esh-da (cha-kor: teapot, a compound I made). Events: Tari-ir hen-ta ri-kar-im-da (fish are coming from the sky); Var guro hala i-pav-im-da (a giant fruit is running fast; pav for rolling is a joke).
+
+Rumor composer: Subject + place with -ma + adverb (hala, sela) + verb. The verb is (ma-) + na-/i- + root (sul, sum, ning, pav, nang, mel, tal, sir) + -im/-pa/-ur/-fu + (-ki) + -da/-shi/-nu, following section 21.1. Reactions: T-i-pal-pa-ha?! (You saw it?), Haku? (Why?), Hal-ta? (From whom? hal with the ablative: please check), and Halke ki tovu i-gao-pa-ha?! (Who told this story?). Retold rumors swap the evidential to -nu.
+
+Things to check: 12. par as fear and yam as eat are homonyms in the document (bird, salt and voice); the gossip uses them on purpose. 13. Places like guro-ma (inside a fruit) and fardomma (in the lighthouse) are plain concatenations.

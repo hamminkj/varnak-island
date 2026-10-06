@@ -165,9 +165,20 @@ var side_quests = [
 	["hide","ola","Rin and Ola at the school want to play hide and seek."],
 	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
 	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
+	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
+	["strange","","Something odd is going on. Find seven strange things around the island."],
+	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
+var rumors: Array = []
+var rumor_count: int = 0
+var guro_node: Node3D
+var guro_t: float = -1.0
+var guro_cd: float = 140.0
+var fish_rain_t: float = -1.0
+var fish_fx: CPUParticles3D
+var odd_nodes: Dictionary = {}
 # skin, hair, hair style, accent
 var looks = {
 	"ena": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
@@ -308,6 +319,7 @@ func build_world():
 	build_cove()
 	build_places()
 	build_places3()
+	build_places5()
 	build_entities()
 	build_forest()
 	build_scatter()
@@ -883,6 +895,17 @@ func build_entities():
 	entity("falls","object","wak",Vector3(61.8,0,-35.0),Color.WHITE,2.6,Vector2(1.4,2.4))
 	entity("cave","object","gan",Vector3(64.0,0,-36.3),Color.WHITE,2.6,Vector2(1.5,2.4))
 	entity("islet_small","object","dor",Vector3(49.6,0,75.2),Color.WHITE,2.3,Vector2(0.9,2.0))
+	# ---- fifth expansion: strange things and a parrot ----
+	entity("odd_fish","object","tari",Vector3(-50.4,0,12.9),Color.WHITE,1.9,Vector2(0.8,1.6))
+	entity("odd_chair","object","ket",Vector3(10,0,7),Color.WHITE,6.0,Vector2(1.6,6.0))
+	entity("odd_clothes","object","yir",Vector3(40.9,0,27.9),Color.WHITE,3.6,Vector2(1.2,3.4))
+	entity("odd_book","object","puka",Vector3(70.4,0,26.6),Color.WHITE,0.9,Vector2(1.0,0.8))
+	entity("odd_bed","object","sulum",Vector3(20,0,-23.2),Color.WHITE,1.6,Vector2(1.6,1.2))
+	entity("odd_fruit","object","guro",Vector3(26,0,-13.4),Color.WHITE,3.4,Vector2(1.7,2.8))
+	entity("odd_teapot","object","cha-kor",Vector3(1.55,0,-21.4),Color.WHITE,1.7,Vector2(0.8,1.5))
+	var parrot = entity("parrot","observe","par",Vector3(-41.5,0,7.5),Color("e76f51"))
+	(parrot["node"] as Node3D).scale = Vector3.ONE * 1.5
+	add_animal(parrot, "bird", 0.0, 0.0)
 	var fe = entity("ferry","object","sena",FERRY_HARBOR,Color.WHITE,2.0,Vector2(1.8,1.8))
 	ferry_node.get_parent().remove_child(ferry_node)
 	(fe["node"] as Node3D).add_child(ferry_node)
@@ -1151,7 +1174,7 @@ func build_ui():
 	ui.add_child(cross)
 	toast_label = Label.new()
 	toast_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	toast_label.position = Vector2(-170,186)
+	toast_label.position = Vector2(-170,180)
 	toast_label.size = Vector2(340,40)
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_label.add_theme_stylebox_override("normal", chip_style(0.78))
@@ -1178,7 +1201,7 @@ func build_ui():
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.offset_left = 18
 	panel.offset_right = -18
-	panel.offset_top = 196
+	panel.offset_top = 226
 	panel.offset_bottom = -35
 	ui.add_child(panel)
 	var margin = MarginContainer.new()
@@ -1215,7 +1238,7 @@ func toast(text: String):
 	if toast_label == null: return
 	toast_label.text = text
 	toast_label.modulate.a = 1.0
-	toast_label.position.y = (get_viewport().get_visible_rect().size.y - 92.0) if panel.visible else 186.0
+	toast_label.position.y = 180.0
 	toast_time = 2.6
 
 func clear_panel(title: String, keep_game: bool = false):
@@ -1258,7 +1281,8 @@ func show_intro():
 	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal. The More button has games, difficulty settings and Reset progress.")
 	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
 	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
-	text_line("In the Notebook, try the Verb builder and the Sentence builder to put Varnak together yourself.")
+	text_line("In the Notebook, try the Verb builder and the Games to put Varnak together yourself.")
+	text_line("The villagers love to gossip. Ask people \"Any gossip?\", notice how they know (-da saw it, -shi apparently, -nu people say), then make up your own rumors and watch them spread. Keep an eye out for strange things, too.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
@@ -1394,6 +1418,7 @@ func _process(delta):
 	update_night_life(delta)
 	update_bubbles()
 	update_minigame(delta)
+	update_silly(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -1761,6 +1786,13 @@ func examine(e: Dictionary):
 		sentence_card("sign_north")
 		return
 	if Data.SENTENCES.has(id):
+		if id.begins_with("odd_") and not solved.has("odd:" + id):
+			solved.append("odd:" + id)
+			var found = 0
+			for k in Data.SENTENCES.keys():
+				if k.begins_with("odd_") and solved.has("odd:" + k): found += 1
+			toast("Strange thing " + str(found) + " of 7!")
+			if found >= 7: complete("strange")
 		sentence_card(id)
 		return
 	if Data.COUNTS.has(id):
@@ -1786,6 +1818,7 @@ func examine(e: Dictionary):
 		"fardom": sentence_card("lighthouse_bright" if completed.has("lighthouse") else "lighthouse_dark")
 		"sea": sentence_card("sea_cold")
 		"logbridge": sentence_card("log_short")
+		"parrot": parrot_panel()
 		"ruins": sentence_card("ruins_old")
 		"falls": sentence_card("falls")
 		"cave": cave_panel()
@@ -1795,6 +1828,9 @@ func examine(e: Dictionary):
 
 func observe(e: Dictionary):
 	learn(e["word"])
+	if e["id"] == "parrot":
+		parrot_panel()
+		return
 	if e["id"] == "dog" and not completed.has("dog"):
 		clear_panel("gor")
 		text_line("The dog sniffs at your bag hopefully and wags its tail.")
@@ -2166,10 +2202,12 @@ func talk(id: String):
 			button("Ask about Neri",func(): account("tor","italpada","Tor points to their eyes, then the river crossing. Tor personally saw Neri arrive."),content)
 		"lira":
 			account("lira","italpanu","Lira gestures to someone in the distance. Another resident told Lira about Neri's arrival.")
+			gossip_buttons(id)
 			add_topics(id)
 			return
 		"oren":
 			account("oren","italpashi","Oren points to fresh footprints in the sand. Oren inferred that Neri arrived.")
+			gossip_buttons(id)
 			add_topics(id)
 			return
 		"neri":
@@ -2343,6 +2381,7 @@ func talk(id: String):
 				var order = Data.DESH.duplicate()
 				order.shuffle()
 				button("Play Desh's game", desh_round.bind(0, order), content)
+	gossip_buttons(id)
 	if level() >= 2 and Data.CHALLENGES.has(id):
 		button("Say it yourself" + ("  [ok]" if mastered.has("c:" + id) else ""), challenge.bind(id), content)
 	for p in Data.PARCELS.keys():
@@ -2704,6 +2743,8 @@ func confirm_reset():
 		fish_caught = 0
 		gin = 0
 		best_speed = 0
+		rumors.clear()
+		rumor_count = 0
 		hiding.clear()
 		last_level = 1
 		for e in entities: e["node"].show()
@@ -2719,7 +2760,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 
 func load_game():
@@ -2740,6 +2781,8 @@ func load_game():
 	hud_small = bool(data.get("hud_small", false))
 	whale_seen = bool(data.get("whale", false))
 	diff_bias = int(data.get("bias", 0))
+	rumors = data.get("rumors", [])
+	rumor_count = int(data.get("rumor_count", 0))
 	best_speed = int(data.get("best_speed", 0))
 	var p = data.get("position",[0,0.1,36])
 	player.position = Vector3(p[0],p[1],p[2])
@@ -2973,6 +3016,7 @@ func update_weather(delta: float):
 func start_rain():
 	raining = randf_range(30.0, 45.0)
 	rain_fx.emitting = true
+	if randf() < 0.35: fish_rain_t = 12.0
 	learn("ser")
 	learn("-ng")
 	if not phrases.has("rain_starts"): phrases.append("rain_starts")
@@ -3437,6 +3481,7 @@ func show_more():
 	button("Return", close_panel, content)
 
 func greeting(id: String) -> String:
+	if guro_t >= 0.0: return "Var guro!"
 	match id:
 		"ena": return "Anni kel."
 		"mira": return "Yamat i-nav."
@@ -4121,4 +4166,380 @@ func show_games():
 		var d = text_line(g[3], 15)
 		d.add_theme_color_override("font_color", Color("6b4a2e"))
 	text_line("Fishing: tap a jumping fish at the river, the dock or the lagoon.", 16)
+	button("Return", close_panel, content)
+
+# ------------------------------------------------------------ fifth expansion: nonsense, gossip and rumors
+
+func build_places5():
+	# a fish living in the market well
+	var f = Art.animal("tari")
+	f.position = Vector3(-50.3, 0.55, 12.6)
+	f.rotation_degrees = Vector3(-70, 160, 0)
+	f.scale = Vector3.ONE * 1.3
+	add_child(f)
+	odd_nodes["odd_fish"] = f
+	# a chair on a roof
+	var c = Node3D.new()
+	c.position = Vector3(10, 4.62, 7.2)
+	c.rotation_degrees.y = 180
+	add_child(c)
+	Art.box(c, Vector3(0, 0.45, 0), Vector3(0.55, 0.08, 0.55), Color("b0814f"))
+	Art.box(c, Vector3(0, 0.8, -0.25), Vector3(0.55, 0.65, 0.07), Color("b0814f"))
+	for lx in [-0.23, 0.23]:
+		for lz in [-0.23, 0.23]:
+			Art.box(c, Vector3(lx, 0.22, lz), Vector3(0.06, 0.45, 0.06), Color("8a6a46"))
+	# Ketu's striped shirt up a tree
+	var s = Node3D.new()
+	s.position = Vector3(40.9, 2.5, 27.9)
+	s.rotation_degrees = Vector3(0, 30, 12)
+	add_child(s)
+	for i in range(4):
+		Art.box(s, Vector3(0, 0.3 - i * 0.16, 0), Vector3(0.7, 0.16, 0.08), Color("e76f51") if i % 2 == 0 else Color("f4ead0"))
+	Art.box(s, Vector3(-0.45, 0.32, 0), Vector3(0.3, 0.16, 0.08), Color("e76f51"))
+	Art.box(s, Vector3(0.45, 0.32, 0), Vector3(0.3, 0.16, 0.08), Color("e76f51"))
+	odd_nodes["odd_clothes"] = s
+	# Suri's book floating in the lagoon
+	var b = Node3D.new()
+	b.position = Vector3(70.4, -0.06, 26.6)
+	add_child(b)
+	Art.box(b, Vector3(0, 0.04, 0), Vector3(0.5, 0.08, 0.36), Color("2a6f97"))
+	Art.box(b, Vector3(0, 0.085, 0), Vector3(0.46, 0.02, 0.32), Color("f2e8d0"))
+	odd_nodes["odd_book"] = b
+	# a bed floating down the river
+	var bed = Art.bed(self, Vector3(20, -0.32, -23.2), 90)
+	odd_nodes["odd_bed"] = bed
+	# a giant fruit by the east road
+	var gf = Art.sph(self, Vector3(26, 1.35, -13.4), 1.45, Color("e07a4f"), Vector3(1, 0.95, 1), 16)
+	Art.box(self, Vector3(26.2, 2.85, -13.4), Vector3(0.2, 0.5, 0.2), Color("6b4f36"), Vector3(0, 0, 12))
+	Art.box(self, Vector3(26.6, 2.9, -13.4), Vector3(0.7, 0.06, 0.35), Color("4f8b3c"), Vector3(0, 20, -20))
+	solid(Vector3(26, 1.3, -13.4), Vector3(2.4, 2.6, 2.4))
+	block(26, -13.4, 1.6)
+	# a steaming teapot on the bridge rail
+	var tp = Node3D.new()
+	tp.position = Vector3(1.5, 1.0, -21.4)
+	add_child(tp)
+	Art.sph(tp, Vector3(0, 0.12, 0), 0.15, Color("2a9d8f"), Vector3(1, 0.85, 1), 10)
+	Art.cyl(tp, Vector3(0.17, 0.14, 0), 0.02, 0.035, 0.18, Color("2a9d8f"), Vector3(0, 0, -55), 6)
+	Art.sph(tp, Vector3(0, 0.27, 0), 0.04, Color("e9c46a"), Vector3.ONE, 6)
+	odd_nodes["odd_teapot"] = tp
+	# the rolling giant fruit (an event)
+	guro_node = Node3D.new()
+	add_child(guro_node)
+	Art.sph(guro_node, Vector3.ZERO, 0.95, Color("dc8060"), Vector3.ONE, 14)
+	Art.box(guro_node, Vector3(0, 0.95, 0), Vector3(0.14, 0.35, 0.14), Color("6b4f36"))
+	Art.sph(guro_node, Vector3(0.5, 0.5, 0.5), 0.18, Color("f0a070"), Vector3.ONE, 6)
+	guro_node.visible = false
+	# fish falling from the sky (rare rain)
+	fish_fx = CPUParticles3D.new()
+	fish_fx.amount = 40
+	fish_fx.lifetime = 1.8
+	fish_fx.emitting = false
+	fish_fx.local_coords = false
+	fish_fx.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	fish_fx.emission_box_extents = Vector3(12, 0.5, 12)
+	fish_fx.direction = Vector3(0, -1, 0)
+	fish_fx.initial_velocity_min = 4.0
+	fish_fx.initial_velocity_max = 7.0
+	fish_fx.angular_velocity_min = -300.0
+	fish_fx.angular_velocity_max = 300.0
+	fish_fx.gravity = Vector3(0, -9.8, 0)
+	var fm = SphereMesh.new()
+	fm.radius = 0.12
+	fm.height = 0.5
+	fm.radial_segments = 6
+	fm.rings = 3
+	fish_fx.mesh = fm
+	fish_fx.material_override = Art.mat(Color("9fc4d4"), 0.3)
+	fish_fx.position = Vector3(0, 12, 0)
+
+func update_silly(delta: float):
+	if fish_fx.get_parent() == null and player: player.add_child(fish_fx)
+	if odd_nodes.has("odd_bed"):
+		var bed = odd_nodes["odd_bed"] as Node3D
+		bed.position.y = -0.32 + sin(clock * 1.2) * 0.05
+		bed.rotation_degrees.z = sin(clock * 0.9) * 3.0
+	if odd_nodes.has("odd_book"): (odd_nodes["odd_book"] as Node3D).position.y = -0.06 + sin(clock * 1.7) * 0.03
+	if odd_nodes.has("odd_fish"): (odd_nodes["odd_fish"] as Node3D).rotation_degrees.z = sin(clock * 2.0) * 12.0
+	# fish rain
+	if fish_rain_t > 0.0:
+		if not fish_fx.emitting:
+			fish_fx.emitting = true
+			learn("kar")
+			if not phrases.has("fish_rain"): phrases.append("fish_rain")
+			toast("Tari-ir hen-ta ri-kar-im-da! It is raining fish!")
+		fish_rain_t -= delta
+		if fish_rain_t <= 0.0:
+			fish_fx.emitting = false
+			fish_caught += 3
+			toast("You picked up three fish that fell from the sky. (+3 tari)")
+			save_game()
+	# the runaway fruit
+	if guro_t < 0.0:
+		if panel.visible or riding or night > 0.5: return
+		guro_cd -= delta
+		if guro_cd <= 0.0:
+			guro_cd = randf_range(160.0, 280.0)
+			if absf(player.position.x) < 22.0 and player.position.z > -8.0 and player.position.z < 34.0:
+				guro_t = 0.0
+				guro_node.visible = true
+				learn("var")
+				learn("guro")
+				if not phrases.has("rolling_fruit"): phrases.append("rolling_fruit")
+				toast("Var guro hala i-pav-im-da! A giant fruit is rolling!")
+		return
+	guro_t += delta
+	var u = guro_t / 11.0
+	if u >= 1.0:
+		guro_t = -1.0
+		guro_node.visible = false
+		return
+	var z = lerpf(-7.0, 31.0, u)
+	guro_node.position = Vector3(0.6 + sin(u * 9.0) * 0.6, 0.95 + absf(sin(u * 30.0)) * 0.25, z)
+	guro_node.rotation.x += delta * 7.0
+
+# ---- gossip ----
+
+func gossip_by(id: String) -> Array:
+	var out: Array = []
+	for g in Data.GOSSIP:
+		if g["by"] == id: out.append(g)
+	return out
+
+func gossip_count(prefix: String) -> int:
+	var n = 0
+	for g in Data.GOSSIP:
+		if solved.has(prefix + g["id"]): n += 1
+	return n
+
+func check_gossip_quest():
+	if gossip_count("gh:") >= 6 and gossip_count("gc:") >= 3 and not completed.has("gossip"):
+		complete("gossip")
+		toast("Gossip quest complete! Everyone talks about everyone.")
+
+func gossip_buttons(id: String):
+	for g in gossip_by(id):
+		button("Any gossip?" + ("  [ok]" if solved.has("gh:" + g["id"]) else ""), gossip_card.bind(g, 0), content)
+	for g in Data.GOSSIP:
+		if g["about"] == id and solved.has("gh:" + g["id"]):
+			button("Ask about what " + str(g["by"]).capitalize() + " said" + ("  [ok]" if solved.has("gc:" + g["id"]) else ""), gossip_reply.bind(g), content)
+	if gossip_count("gh:") >= 1 and not names.has(id) and id != "ila" and id != "rin":
+		button("Tell some gossip", rumor_composer.bind(id), content)
+	if not rumors.is_empty():
+		button("What's the news?", news.bind(id), content)
+
+func gossip_card(g: Dictionary, step: int):
+	var by = str(g["by"]).capitalize()
+	for w in ["mel", "-nu", "-shi", "-da", "-ur"]: learn(w)
+	if step == 0:
+		var opts: Array = [g["en"]]
+		var others = Data.GOSSIP.duplicate()
+		others.shuffle()
+		for o in others:
+			if o["id"] != g["id"] and opts.size() < (3 if level() < 2 else 4): opts.append(o["en"])
+		clear_panel("Gossip from " + by)
+		varnak_banner(g["v"])
+		text_line(g["gesture"], 18)
+		ask("What is " + by + " saying?", opts, 0, Callable(), "", "Look at the names and the verb root. The endings tell you how " + by + " knows.", talk.bind(g["by"]),
+			func(): button("Next: how does " + by + " know?", gossip_card.bind(g, 1), content))
+	else:
+		var ev: String = g["ev"]
+		var answer = {"da": by + " saw it or knows it firsthand (-da)", "shi": by + " is guessing from clues (-shi)", "nu": "Someone told " + by + " (-nu)"}
+		choice_puzzle("How does " + by + " know?", "“" + g["v"] + "”\n\nLook at the very last ending of the verb.", [answer[ev], answer["da" if ev != "da" else "shi"], answer["nu" if ev != "nu" else "shi"]], 0, func():
+			if not solved.has("gh:" + g["id"]):
+				solved.append("gh:" + g["id"])
+				master("gh:" + g["id"])
+				check_gossip_quest()
+				save_game(),
+			"-da means seen or known firsthand, -shi means guessed from evidence, -nu means heard from someone else. Gossip is great for evidentials!",
+			"Find the last ending: -da (I saw it), -shi (apparently), -nu (people say).", talk.bind(g["by"]),
+			func(): text_line("Now go and ask " + str(g["about"]).capitalize() + " about it..."))
+
+func gossip_reply(g: Dictionary):
+	var r: Dictionary = g["reply"]
+	learn("maki")
+	clear_panel(str(g["about"]).capitalize() + " hears the gossip")
+	text_line("You repeat what " + str(g["by"]).capitalize() + " said: “" + g["v"] + "”")
+	varnak_banner(r["v"])
+	text_line(r["gesture"], 18)
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = r["en"], content)
+	if not solved.has("gc:" + g["id"]):
+		solved.append("gc:" + g["id"])
+		master("gc:" + g["id"])
+		check_gossip_quest()
+		save_game()
+	button("Back", talk.bind(g["about"]), content)
+
+# ---- rumors: open-ended sentences that spread around the village ----
+
+func rumor_parts(rc: Dictionary) -> Dictionary:
+	var who: String = rc["who"]
+	var tense: String = rc["tense"]
+	var verb: Array = []
+	if rc["neg"]: verb.append("ma")
+	verb.append("na" if who == "An" else "i")
+	verb.append(rc["verb"])
+	verb.append({"now": "im", "past": "pa", "usual": "ur", "will": "fu"}[tense])
+	if rc["neg"]: verb.append("ki")
+	var words: Array = [who]
+	if rc["place"] != "": words.append(rc["place"])
+	if rc["adv"] != "": words.append(rc["adv"])
+	var vtext = "-".join(verb)
+	var v_core = " ".join(words) + " " + vtext
+	return {"v": v_core + "-" + rc["ev"] + ".", "nu": v_core + "-nu."}
+
+func rumor_en(rc: Dictionary) -> String:
+	var who: String = rc["who"]
+	var i_form = who == "An"
+	var subj: String = Data.RUMOR_WHO_EN.get(who, who)
+	var f: Array = Data.RUMOR_VERBS[rc["verb"]]
+	var neg: bool = rc["neg"]
+	var s = subj
+	match rc["tense"]:
+		"now": s += (" am" if i_form else " is") + (" not " if neg else " ") + f[1]
+		"past": s += (" did not " + f[0]) if neg else (" " + f[2])
+		"usual":
+			if neg: s += (" do not usually " if i_form else " does not usually ") + f[0]
+			else: s += " usually " + (f[0] if i_form else f[3])
+		"will": s += (" will not " if neg else " will ") + f[0]
+	for pl in Data.RUMOR_PLACES:
+		if pl[0] == rc["place"] and pl[0] != "": s += " " + pl[1]
+	if rc["adv"] == "hala": s += " fast"
+	elif rc["adv"] == "sela": s += " alone"
+	s += {"da": " (I saw it!)", "shi": " (apparently)", "nu": " (people say)"}[rc["ev"]]
+	return s
+
+func rumor_composer(listener: String):
+	var rc = {"who": "Tor", "place": "haima", "adv": "", "verb": "ning", "tense": "usual", "neg": false, "ev": "nu"}
+	for w in ["mel", "sela", "hala", "-nu", "-shi", "-da"]: learn(w)
+	clear_panel("Tell " + listener.capitalize() + " some gossip")
+	text_line("Make up any rumor you like. Choose the pieces; the Varnak and its meaning update as you go.", 17)
+	var banner = varnak_banner("", 26)
+	var en_l = text_line("", 18)
+	en_l.add_theme_color_override("font_color", Color("6b4a2e"))
+	var refresh = func():
+		(banner.get_child(0) as Label).text = rumor_parts(rc)["v"]
+		en_l.text = rumor_en(rc)
+	var rows = [
+		["Who", "who", Data.RUMOR_WHO, Data.RUMOR_WHO],
+		["Where", "place", Data.RUMOR_PLACES.map(func(p): return p[0]), Data.RUMOR_PLACES.map(func(p): return p[0] if p[0] != "" else "(nowhere)")],
+		["How", "adv", ["", "hala", "sela"], ["(plain)", "hala (fast)", "sela (alone)"]],
+		["Doing what", "verb", Data.RUMOR_VERBS.keys(), Data.RUMOR_VERBS.keys().map(func(k): return k + " (" + Data.RUMOR_VERBS[k][0] + ")")],
+		["When", "tense", ["now", "past", "usual", "will"], ["-im now", "-pa past", "-ur usually", "-fu will"]],
+		["Not?", "neg", [false, true], ["(yes)", "ma- ... -ki (not)"]],
+		["How do you know?", "ev", ["da", "shi", "nu"], ["-da I saw it", "-shi apparently", "-nu people say"]]
+	]
+	for row in rows:
+		text_line(row[0], 16)
+		var flow = HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 6)
+		flow.add_theme_constant_override("v_separation", 6)
+		content.add_child(flow)
+		var group = ButtonGroup.new()
+		for k in range(row[2].size()):
+			var val = row[2][k]
+			var b = Button.new()
+			b.toggle_mode = true
+			b.button_group = group
+			b.text = row[3][k]
+			b.custom_minimum_size = Vector2(48, 44)
+			b.add_theme_font_size_override("font_size", 17)
+			flow.add_child(b)
+			if rc[row[1]] == val: b.button_pressed = true
+			b.toggled.connect(func(on):
+				if on:
+					rc[row[1]] = val
+					refresh.call())
+	refresh.call()
+	button("Whisper it to " + listener.capitalize(), func(): rumor_react(listener, rc.duplicate()), content)
+	button("Back", talk.bind(listener), content)
+
+func rumor_react(listener: String, rc: Dictionary):
+	var parts = rumor_parts(rc)
+	var en = rumor_en(rc)
+	var who: String = rc["who"]
+	var silly = false
+	for pl in Data.RUMOR_PLACES:
+		if pl[0] == rc["place"] and pl[2] == "silly": silly = true
+	clear_panel(listener.capitalize() + " listens")
+	text_line("You whisper: “" + parts["v"] + "”")
+	text_line(en, 17)
+	var line = ""
+	var gesture = ""
+	if who.to_lower() == listener:
+		var deny: Array = ["ma", "na", rc["verb"], {"now": "im", "past": "pa", "usual": "ur", "will": "fu"}[rc["tense"]], "ki", "da"]
+		line = "Maki! Maki! " + ("-".join(deny)).capitalize().substr(0, 1) + "-".join(deny).substr(1) + "!"
+		gesture = listener.capitalize() + " turns bright red. It is about them! (They say: No! I do not!)"
+	elif rc["ev"] == "da":
+		line = "T-i-pal-pa-ha?!"
+		gesture = listener.capitalize() + "'s eyes go wide: You saw it yourself?!"
+	elif rc["ev"] == "shi":
+		line = "Haku?"
+		gesture = listener.capitalize() + " squints: Why do you think so?"
+	else:
+		line = "Hal-ta?"
+		gesture = listener.capitalize() + " leans in: Who told you? (hal-ta: from whom?)"
+	if who == "An": gesture += " Also, you are gossiping about yourself."
+	if silly: gesture += " Then " + listener.capitalize() + " laughs so hard they have to sit down. “Ha! Ha!”"
+	varnak_banner(line)
+	text_line(gesture, 18)
+	for w in ["haku", "maki", "pal", "-ha"]: learn(w)
+	rumors.append({"who": who, "v": parts["nu"], "en": en.replace(" (I saw it!)", "").replace(" (apparently)", "").replace(" (people say)", "") + " (people say)", "teller": listener})
+	if rumors.size() > 12: rumors.pop_front()
+	rumor_count += 1
+	master("r:" + parts["v"])
+	save_game()
+	text_line("Now the rumor will spread. Ask other people: What's the news?", 16)
+	button("Start another rumor", rumor_composer.bind(listener), content)
+	button("Back", talk.bind(listener), content)
+
+func news(id: String):
+	var pick = {}
+	for i in range(rumors.size() - 1, -1, -1):
+		var r: Dictionary = rumors[i]
+		if r["teller"] != id:
+			pick = r
+			break
+	clear_panel("What's the news?")
+	if pick.is_empty():
+		text_line(id.capitalize() + " shrugs. They have not heard anything new. Tell your gossip to someone else first.")
+		button("Back", talk.bind(id), content)
+		return
+	learn("-nu")
+	if str(pick["who"]).to_lower() == id:
+		varnak_banner("Halke ki tovu i-gao-pa-ha?!")
+		text_line(id.capitalize() + " has heard a rumor about themselves: “" + pick["v"] + "” and is furious. Who told this story?! (halke: who, acting; gao: tell; -ha: a question)", 18)
+	else:
+		text_line(id.capitalize() + " leans in close and whispers:")
+		varnak_banner(pick["v"])
+		text_line(pick["en"], 17)
+		text_line("Your rumor came back with -nu: now it is only something people say.", 16)
+	if rumor_count >= 3 and not completed.has("rumor"): complete("rumor")
+	button("Back", talk.bind(id), content)
+
+# ---- a parrot that repeats anything ----
+
+func parrot_panel():
+	clear_panel("par: a parrot")
+	text_line("A big red parrot on a crate tilts its head at you. Type something in Varnak and it will say it back.")
+	var input = LineEdit.new()
+	input.placeholder_text = "Type Varnak here"
+	input.custom_minimum_size.y = 54
+	content.add_child(input)
+	var out = text_line("", 20)
+	button("Say it to the parrot", func():
+		var t = input.text.strip_edges()
+		if t == "":
+			out.text = "The parrot waits."
+			return
+		var known: Array = []
+		for w in t.to_lower().replace(".", "").replace("!", "").replace("?", "").split(" "):
+			if words.has(w) and discovered.has(w): known.append(w + " = " + short_gloss(w))
+		var gossip = Data.GOSSIP[randi() % Data.GOSSIP.size()]["v"]
+		var lines = ["Kraa! " + t + " " + t + "!"]
+		if not known.is_empty(): lines.append("(You recognize: " + ", ".join(known) + ")")
+		if randf() < 0.5: lines.append("Kraa! " + gossip + " Kraa!  (The parrot has been listening to the village gossip.)")
+		else: lines.append("Kraa! Par i-ho! Par i-ho!  (Parrot is good!)")
+		out.text = "\n".join(lines)
+		master("p:parrot"), content)
 	button("Return", close_panel, content)

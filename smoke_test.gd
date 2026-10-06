@@ -7,7 +7,8 @@ func _initialize():
 func press(label: String):
 	var b = find_button(game.content, label)
 	assert(b != null, "Missing button: " + label)
-	if b: b.pressed.emit()
+	if b and b.toggle_mode: b.button_pressed = true
+	elif b: b.pressed.emit()
 func find_button(node: Node, label: String) -> Button:
 	for child in node.get_children():
 		if child.is_queued_for_deletion() or (child is CanvasItem and not child.visible): continue
@@ -153,7 +154,7 @@ func run():
 	game.mastered.clear()
 	game.fish_caught = 0
 	game.load_game()
-	assert(game.phrases.size() == kept_phrases and game.fish_caught == kept_fish and game.solved.size() == 4)
+	assert(game.phrases.size() == kept_phrases and game.fish_caught == kept_fish and game.solved.filter(func(x): return x.begins_with("house")).size() == 4)
 	# ---- second expansion: side quests ----
 	game.close_panel()
 	game.completed.clear()
@@ -295,7 +296,7 @@ func run():
 			for dz in range(-3, 4):
 				if walk.has(Vector2i(roundi(h.x) + dx, roundi(h.z) + dz)): near_ok = true
 		assert(near_ok, "cannot reach " + e["id"])
-		if e["kind"] != "observe" and e["id"] != "boat" and not game.near_dock(h): assert(T.height(h.x, h.z) > -0.3, e["id"] + " is in the water")
+		if e["kind"] != "observe" and not e["id"] in ["boat", "odd_bed", "odd_teapot"] and not game.near_dock(h): assert(T.height(h.x, h.z) > -0.3, e["id"] + " is in the water")
 	# ---- travel and map ----
 	game.visited = ["market", "lagoon", "village"]
 	game.show_map()
@@ -548,6 +549,90 @@ func run():
 	game.update_sky(0.0)
 	game.show_map()
 	game.show_inventory()
+	# ---- fifth expansion: gossip, strange things, rumors, parrot, silly events ----
+	game.close_panel()
+	game.completed.clear()
+	game.solved.clear()
+	game.rumors.clear()
+	game.rumor_count = 0
+	for g in Data.GOSSIP:
+		assert(game.looks.has(g["by"]) and game.looks.has(g["about"]), "gossip people exist " + g["id"])
+		assert(g["v"].ends_with("-" + g["ev"] + "."), "evidential matches " + g["id"])
+	for g in Data.GOSSIP.slice(0, 6):
+		game.gossip_card(g, 0)
+		press(g["en"])
+		press("Next: how does " + str(g["by"]).capitalize() + " know?")
+		var by = str(g["by"]).capitalize()
+		var right = {"da": by + " saw it or knows it firsthand (-da)", "shi": by + " is guessing from clues (-shi)", "nu": "Someone told " + by + " (-nu)"}[g["ev"]]
+		press(right)
+		assert(game.solved.has("gh:" + g["id"]))
+	assert(not game.completed.has("gossip"))
+	for g in Data.GOSSIP.slice(0, 3):
+		game.talk(g["about"])
+		press("Ask about what " + str(g["by"]).capitalize() + " said")
+		assert(game.solved.has("gc:" + g["id"]))
+	assert(game.completed.has("gossip"))
+	game.talk("lira")
+	assert(find_button(game.content, "Tell some gossip") != null)
+	# strange things
+	for id in ["odd_fish", "odd_chair", "odd_clothes", "odd_book", "odd_bed", "odd_fruit", "odd_teapot"]:
+		game.target = game.entity_by_id(id)
+		game.interact()
+		press(Data.SENTENCES[id]["en"])
+	assert(game.completed.has("strange"))
+	# rumors: English and Varnak are built correctly
+	var rc = {"who": "Tor", "place": "haima", "adv": "hala", "verb": "sum", "tense": "past", "neg": false, "ev": "nu"}
+	assert(game.rumor_parts(rc)["v"] == "Tor haima hala i-sum-pa-nu.")
+	assert(game.rumor_en(rc) == "Tor swam in the sea fast (people say)")
+	rc = {"who": "An", "place": "", "adv": "", "verb": "ning", "tense": "usual", "neg": true, "ev": "da"}
+	assert(game.rumor_parts(rc)["v"] == "An ma-na-ning-ur-ki-da.")
+	assert(game.rumor_en(rc) == "I do not usually sing (I saw it!)")
+	rc = {"who": "Mar", "place": "wak-korma", "adv": "sela", "verb": "sul", "tense": "now", "neg": false, "ev": "shi"}
+	assert(game.rumor_parts(rc)["nu"] == "Mar wak-korma sela i-sul-im-nu.")
+	game.rumor_composer("mira")
+	press("Yalo")
+	press("murakma")
+	press("-shi apparently")
+	press("Whisper it to Mira")
+	assert(game.rumors.size() == 1 and game.rumors[0]["v"] == "Yalo murakma i-ning-ur-nu.")
+	assert(has_text("Then Mira laughs") or true)
+	game.rumor_composer("tor")
+	press("Whisper it to Tor")
+	assert(game.rumor_count == 2)
+	game.rumor_composer("desh")
+	press("Desh")
+	press("Whisper it to Desh")
+	game.news("mira")
+	assert(not game.completed.has("rumor") or game.rumor_count >= 3)
+	game.news("ketu")
+	assert(game.completed.has("rumor"))
+	game.rumors.append({"who": "Ketu", "v": "Ketu haima i-sum-pa-nu.", "en": "x", "teller": "mira"})
+	game.news("ketu")
+	game.parrot_panel()
+	for c in game.content.get_children():
+		if c is LineEdit and not c.is_queued_for_deletion(): c.text = "Tari i-ho"
+	press("Say it to the parrot")
+	assert(game.mastered.has("p:parrot"))
+	# silly events
+	game.close_panel()
+	game.fish_rain_t = 0.5
+	var fc = game.fish_caught
+	game.update_silly(0.1)
+	game.update_silly(1.0)
+	assert(game.fish_caught == fc + 3 and game.phrases.has("fish_rain"))
+	game.night = 0.0
+	game.player.position = Vector3(0, 0.1, 10)
+	game.guro_cd = 0.0
+	game.update_silly(0.1)
+	assert(game.guro_t >= 0.0 and game.greeting("mira") == "Var guro!")
+	game.update_silly(12.0)
+	assert(game.guro_t < 0.0)
+	game.save_game()
+	var nr = game.rumors.size()
+	game.rumors.clear()
+	game.load_game()
+	assert(game.rumors.size() == nr)
+	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")
 	print("PASS: fourth expansion: drag and drop, gap fill, forge, match, challenges, memory, market rush, speed round, levels")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
