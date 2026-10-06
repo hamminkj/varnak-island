@@ -3613,6 +3613,7 @@ func show_more():
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button("Games and activities", show_games, content)
 	button("How to play", show_intro, content)
+	button("About the Varnak language", show_varnak, content)
 	button("Credits", show_credits, content)
 	button("Fold the quest box" if not hud_small else "Unfold the quest box", func():
 		hud_small = not hud_small
@@ -5647,6 +5648,38 @@ func show_sounds():
 	button("Play: What's that sound?", sound_game.bind(true), content)
 	button("Word play", show_loans, content)
 	button("Notebook", show_notebook, content)
+
+func show_varnak():
+	clear_panel("About Varnak")
+	text_line("Varnak is an invented language built to work the way many real languages do. This page lists its main features. The game uses a simplified version, and the doubling and sound words were added for the game.", 17)
+	var secs = [
+		["Sounds and spelling", "Five vowels (a e i o u), and the letter y sounds like the y in yes. Words end only in m, n, ng, l, r, s, k or t, so borrowed words get respelled: brouhaha becomes buruhaha.", []],
+		["Words are built from pieces", "Varnak glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
+		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is he, she or it, ri- is they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
+		["Time and aspect", "Endings after the verb show when and how: -pa past, -fu future, -im happening now, -ur usually, -ak finished.", ["“I-nang-pa.” walked.   “I-nang-fu.” will walk.   “I-nang-im.” is walking.   “I-nang-ur.” usually walks."]],
+		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Varnak gossip.", ["“Tor kurma i-tal-pa-da.” I saw Tor arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
+		["Who did what to whom", "Varnak marks the doer of an action on another thing with -ke. This is called ergative marking. Someone who just goes, sleeps or is, takes no ending.", ["“Sanu i-lum-pa-da.” The child went.   “Mirake puka i-rav-pa-da.” Mira read the book."]],
+		["Case endings", "Short endings on nouns do the work of English words like to, in, from and with: -ni of, -ru to, -ma in or at, -ta from, -su together with, -li by means of.", ["“Tekama” in the village.   “Moraru” to the river.   “Tisu” with you."]],
+		["Many and ordinal", "-ir makes a plural. A number comes before its noun, and -ve makes ordinal numbers.", ["“Tari-ir” fish (many).   “Mur tari” three fish.   “Bar-ve hai-sao” the eighth sea star."]],
+		["No and please", "Not is wrapped around the verb: ma- before it and -ki after it. A command ends in -o, and -ye makes it polite.", ["“Ma-na-lum-ki-da.” I am not going.   “Ta-lum-o-ye.” Please go.   “Ma-ta-pav-o-ki!” Do not run!"]],
+		["Questions", "-ha makes a yes or no question. Question words stay where the answer would go.", ["“Ta-lum-fu-ha?” Will you go?   “Ti hama ta-esh-ha?” Where are you?"]],
+		["Describing words are verbs", "Words like big or warm act like verbs, so they take the same prefixes. Before a noun, they stay bare.", ["“Teka i-var.” The village is big.   “Var teka.” a big village."]],
+		["Nouns inside verbs", "A noun can move inside the verb, making a single word for the whole activity.", ["“Tari-nuk” fish-catch, go fishing.   “Wak-ta” water-drink."]],
+		["Compounds and calques", "Joining two words makes a new one, sometimes by translating another language piece by piece (a calque).", ["“Hai-sao” sea-star.   “Far-par” fire-bird, firefly.   “Ret-gor” hot-dog."]],
+		["Doubling", "Repeating a word makes it stronger or repeats the action. This is a game addition.", ["“Var-var” huge.   “Pav-pav” run around and around.   “Guro-guro” fruit of all kinds."]],
+		["Borrowed words and sound words", "Varnak borrows from other languages (choni, kawai, habibi, puts, pororo from Guarani) and respells them with its own sounds.", []]
+	]
+	for sec in secs:
+		var h = text_line(sec[0], 21)
+		h.add_theme_color_override("font_color", Color("7a1f3d"))
+		text_line(sec[1], 17)
+		for ex in sec[2]:
+			var e = text_line(ex, 18)
+			e.add_theme_color_override("font_color", Color("3b2a1a"))
+	button("Word play: borrowings, calques, false friends, doubling", show_loans, content)
+	button("Verb builder", show_verb_builder.bind(-1), content)
+	button("Back", show_more, content)
+	button("Return", close_panel, content)
 
 func show_credits():
 	clear_panel("Credits")

@@ -840,6 +840,8 @@ func run():
 		var ln = game.poem_line(0, prng)
 		assert(ln[0].ends_with("."))
 	assert(game.ui.find_child("MovePad", true, false) != null)
+	game.show_varnak()
+	assert(has_any("Evidentials") and has_any("Doubling") and has_any("Ma-k-i-pal-pa-ki-da"))
 	print("PASS: word play: habibi and putz, calques, false friends game, doubling, Guarani sound words, move pad icon")
 	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
