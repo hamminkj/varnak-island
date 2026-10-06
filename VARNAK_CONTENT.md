@@ -132,4 +132,57 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 
 1. Proper names with -ke (Mirake, Torke). I treated names like ordinary nouns.
 2. sign_river uses Mora-ven (as far as the river). If you prefer a different board text, it is one line in data.gd.
-3. Sanu is both a resident's name in the original game and the word for child in the document. I left the character as is and did not teach sanu as a vocabulary word, to avoid confusion.
+3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Vira's sleeping child) and the notebook notes that it is also a name.
+4. mai-ai (sell) is listed as a verb in the vocabulary, but -ai is also the antipassive suffix. I treated mai-ai as an ordinary transitive root in Ketuke panak i-mai-ai-ur-da. If sell should be read as antipassive, the agent would not take -ke.
+5. Ho! (Good!) is used on its own as an exclamation by Suri, Pomo and Desh, and Tari i-ho (The fish are good) by Ketu. The document only lists ho as a stative root.
+6. Compounds I made with the modifier-first rule: fardom (fire-house, lighthouse) and murak-gira (log bridge). Both are new words, not in the document.
+7. dar is both ten and cook, and mar is both horse and full, in the document. The game uses both senses and the notebook gloss mentions the second meaning.
+
+## Second expansion (bigger island)
+
+| Form | Meaning | Source | Rule used |
+|---|---|---|---|
+| Ketuke panak i-mai-ai-ur-da. | Ketu usually sells bread. | Composed | Ergative -ke, 3P agreement, habitual -ur (section 21.3); see question 4 |
+| Anke panak k-i-mai-fu. | I will buy bread. | Composed | 1A-3P, future -fu (21.4); evidential omitted, as allowed in casual speech (21.5) |
+| Cha i-ret. | The tea is hot. | Composed | Stative with 3S prefix (24) |
+| Wak-kor i-mar-da. | The well is full. | Composed | Compound wak-kor (30.3, doc), stative mar full |
+| Ravarir ri-puka-rav-im-da. | The students are reading. | Composed | Plural -ir, incorporation puka-rav (23, doc), 3PL S prefix ri- |
+| An senar na-an-da. | I am a teacher. | Composed | Copula pattern An kelar na-an-da (24) |
+| An ravar na-an-da. | I am a student. | Composed | Same pattern |
+| Ti kelar ta-an-ha? | Are you a traveler? | Composed | Copula with 2S ta-, -ha replaces the evidential (26.1) |
+| An kelar na-an-da. | I am a traveler. | Doc | Section 24 |
+| Sang murak-ta i-u-gao. | The hill is taller than the tree. | Composed | Comparative: ablative standard, u- on the stative (29) |
+| Ki sang polu-ta i-u-gao. | This hill is the highest of all. | Composed | Superlative polu-ta (29) |
+| Wak i-ret. | The water is hot. | Composed | Stative (24) |
+| Hai i-len. | The sea is cold. | Composed | Stative (24) |
+| An haima na-sum-ur-da. | I usually swim in the sea. | Composed | Locative -ma, 1S na-, habitual -ur |
+| Sanu sulumma i-sul-im-da. | The child is sleeping in the bed. | Composed | Pattern of Sanu tekama i-sul-im-da (25.1) |
+| Fardom i-dam-da. / Fardom i-ling-da. | The lighthouse is dark / bright. | Composed | Stative with -da; fardom is question 6 |
+| Far ma-i-esh-ki-da. | There is no fire. | Composed | Negation circumfix around esh, -ki before -da (21.6) |
+| Yeshma fardom i-ling-ur-da. | At night the lighthouse usually shines. | Composed | Locative on yesh, habitual -ur |
+| I-ser-ng. | It is beginning to rain. | Doc | Section 21.3 |
+| Ila i-seng-da. | Ila is happy. | Composed | Stative seng (happy) |
+| Kur-ru. Senak-ru. Sang-ru. Dong-ru. Fardom-ru. Hai-ru. | To the market, school, hill, east, lighthouse, sea. | Composed | Allative -ru, like Bei-ru |
+| Mora-ni aruma. | Beyond the river. | Doc | Section 25.3 |
+| Mora t-i-kor-o! | Cross the river! | Composed | Imperative 2A-3P (21.7) with kor (cross) |
+| Murak-gira i-dun. | The log bridge is short. | Composed | Compound (question 6), stative dun |
+
+## Second expansion: quests
+
+| Form | Meaning | Source | Rule used |
+|---|---|---|---|
+| Mur tari t-na-ven-o-ye. | Please give me three fish. | Composed | Numeral before noun (19.7), t-na-ven-o (21.7, doc), polite -ye |
+| Halke puka i-rav-im-ha? | Who is reading the book? | Composed | Doc has Halke puka i-rav-pa-ha? (26.2); progressive -im instead of past |
+| Puka hama i-esh-ha? | Where is the book? | Composed | Question word in place, esh, -ha |
+| Tike han t-i-rav-im-ha? | What are you reading? | Composed | Doc has Tike han t-i-nuk-pa-ha? (26.2) |
+| Hamur ravar i-esh-ha? / Vel ravar i-esh-da. | How many students are there? / There are two students. | Composed | hamur and numerals precede the noun (19.7) |
+| Fardom hama i-esh-ha? / Dongma i-esh-da. | Where is the lighthouse? / In the east. | Composed | Locative -ma on direction words dong, nam, sai, bei |
+| Anni dauma tong i-esh-da. | I have pain in my head (pain is located in my head). | Composed | Genitive possessor, locative -ma, esh |
+| Yok e cha t-na-ven-o-ye. | Please give me medicine and tea. | Composed | Coordination with e (27.1), t-na-ven-o, -ye |
+| Far t-na-tar-o-ye. | Please bring me fire. | Composed | Same pattern with tar (bring) |
+| Fardom t-i-ling-tir-o! | Make the lighthouse bright! | Composed | Causative -tir (22.1, 30.2) on ling (bright) |
+| Ta-sum-o! Ta-pav-o! Ta-ning-o! Ta-nang-o! Ta-sul-o! | Swim! Run! Sing! Walk! Sleep! | Composed | 2S imperative, like ta-lum-o! (21.7) |
+| Ma-ta-pav-o-ki! | Do not run! | Composed | Like ma-ta-lum-o-ki! (21.7) |
+| Luk tari. Set panak. Bar guro. Gov sek. Dar fal. | Six fish, seven loaves, eight fruit, nine stones, ten flowers. | Composed | Numbers from 31.1 before the noun |
+
+New notebook words in the second expansion come from the document's vocabulary lists (31.1 to 31.8) and grammar sections: kur, senak, sang, hai, panak, cha, yok, far, sulum, yesh, sair, sanu, senar, ravar, dau, mal, ten, tong, nam, dong, sai, aru, luk, set, bar, gov, rav, mai, mai-ai, tar, sum, ser, ning, nang, sul, ret, len, ling, dam, seng, dun, ho, ki, e, polu, hamur, -ur, -fu, -ng, -tir, u-, puka-rav and mora-ni aruma. fardom and wak-kor are compounds (fardom is composed, wak-kor is in section 30.3).

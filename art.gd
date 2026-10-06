@@ -112,7 +112,10 @@ void fragment() {
 const GROUND_SHADER = """
 shader_type spatial;
 render_mode specular_disabled;
+uniform vec4 segs[16];
+uniform int seg_count = 0;
 varying vec3 wp;
+varying vec3 mask;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p) {
 	vec2 i = floor(p);
@@ -120,30 +123,40 @@ float vnoise(vec2 p) {
 	f = f * f * (3.0 - 2.0 * f);
 	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
 }
+float seg_d(vec2 p, vec4 s) {
+	vec2 pa = p - s.xy;
+	vec2 ba = s.zw - s.xy;
+	float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+	return length(pa - ba * h);
+}
 void vertex() {
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	mask = COLOR.rgb;
 }
 void fragment() {
 	vec2 p = wp.xz;
 	float n = vnoise(p * 0.3) * 0.55 + vnoise(p * 1.4) * 0.3 + vnoise(p * 6.0) * 0.15;
 	vec3 grass = mix(vec3(0.22, 0.42, 0.18), vec3(0.40, 0.60, 0.24), n);
 	grass = mix(grass, vec3(0.52, 0.60, 0.22), smoothstep(0.62, 0.9, vnoise(p * 0.7)) * 0.45);
+	grass = mix(grass, vec3(0.30, 0.45, 0.20), smoothstep(1.0, 6.0, wp.y) * 0.5);
 	vec3 sand = mix(vec3(0.82, 0.72, 0.50), vec3(0.74, 0.63, 0.42), vnoise(p * 2.2));
-	float dx = 29.0 - abs(p.x);
-	float dz = min(25.5 - p.y, p.y + 39.5);
-	float gmask = smoothstep(-0.6, 2.2, min(dx, dz) + (vnoise(p * 0.9) - 0.5) * 2.4);
-	vec3 col = mix(sand, grass, gmask);
-	float pathd = abs(p.x + (vnoise(vec2(p.y * 0.15, 3.0)) - 0.5) * 0.9) + (vnoise(p * 1.7) - 0.5) * 0.5;
+	float smask = smoothstep(0.25, 0.75, mask.r + (vnoise(p * 0.9) - 0.5) * 0.5);
+	vec3 col = mix(grass, sand, smask);
+	vec3 rock = mix(vec3(0.46, 0.46, 0.42), vec3(0.60, 0.58, 0.52), vnoise(p * 1.8));
+	col = mix(col, rock, smoothstep(0.3, 0.7, mask.g + (vnoise(p * 1.2) - 0.5) * 0.4));
+	float pathd = abs(p.x + (vnoise(vec2(p.y * 0.15, 3.0)) - 0.5) * 0.9);
+	if (p.y < -49.0 || p.y > 44.0) pathd = 99.0;
+	for (int i = 0; i < 16; i++) {
+		if (i >= seg_count) break;
+		pathd = min(pathd, seg_d(p, segs[i]) + (vnoise(p * 0.4 + float(i)) - 0.5) * 0.7);
+	}
+	pathd += (vnoise(p * 1.7) - 0.5) * 0.5;
 	float path = 1.0 - smoothstep(1.6, 2.5, pathd);
 	vec3 pathc = mix(vec3(0.72, 0.58, 0.36), vec3(0.62, 0.48, 0.30), vnoise(p * 3.5));
 	pathc = mix(pathc, vec3(0.50, 0.46, 0.40), step(0.965, hash(floor(p * 16.0))) * 0.55);
-	col = mix(col, pathc, path * 0.95);
-	float edge = min(38.0 - abs(p.x), 47.0 - abs(p.y));
-	col = mix(col, col * vec3(0.78, 0.74, 0.68), 1.0 - smoothstep(0.0, 2.0, edge));
-	float river = 1.0 - smoothstep(2.0, 3.2, abs(p.y + 23.0));
-	col = mix(col, vec3(0.50, 0.46, 0.36), river * 0.85);
-	float inlet = (1.0 - smoothstep(14.0, 16.0, abs(p.x))) * smoothstep(33.0, 35.0, p.y);
-	col = mix(col, vec3(0.58, 0.52, 0.38), inlet * 0.9);
+	col = mix(col, pathc, path * 0.95 * (1.0 - smask * 0.6));
+	float wet = smoothstep(0.02, -0.25, wp.y);
+	col = mix(col, vec3(0.52, 0.47, 0.34) * (1.0 - smoothstep(-0.2, -2.0, wp.y) * 0.45), wet);
 	ALBEDO = col;
 	ROUGHNESS = 1.0;
 }
@@ -159,11 +172,16 @@ static func water_material(deep: Color = Color(0.07, 0.38, 0.52), shallow: Color
 	m.set_shader_parameter("alpha", alpha)
 	return m
 
-static func ground_material() -> ShaderMaterial:
+static func ground_material(paths: Array = []) -> ShaderMaterial:
 	var sh = Shader.new()
 	sh.code = GROUND_SHADER
 	var m = ShaderMaterial.new()
 	m.shader = sh
+	var arr = PackedVector4Array()
+	for i in range(16):
+		arr.append(paths[i] if i < paths.size() else Vector4.ZERO)
+	m.set_shader_parameter("segs", arr)
+	m.set_shader_parameter("seg_count", mini(paths.size(), 16))
 	return m
 
 static func plane(parent: Node3D, pos: Vector3, size: Vector2, material: Material) -> MeshInstance3D:
@@ -314,6 +332,17 @@ static func item_model(id: String, color: Color) -> Node3D:
 			torus(n, Vector3(0, 0.07, 0), 0.05, 0.26, color, Vector3.ZERO)
 			torus(n, Vector3(0, 0.15, 0), 0.05, 0.22, color.darkened(0.08), Vector3.ZERO)
 			torus(n, Vector3(0, 0.23, 0), 0.05, 0.18, color.lightened(0.05), Vector3.ZERO)
+		"herb":
+			for i in range(5):
+				var a = i * TAU / 5.0
+				cyl(n, Vector3(cos(a) * 0.08, 0.2, sin(a) * 0.08), 0.012, 0.018, 0.4, Color("4f8b3c"), Vector3(cos(a) * 18.0, 0, sin(a) * 18.0), 5)
+				sph(n, Vector3(cos(a) * 0.16, 0.38, sin(a) * 0.16), 0.09, color.lerp(Color("9bd06a"), float(i) / 5.0), Vector3(1.4, 0.5, 1.0), 7)
+			box(n, Vector3(0, 0.14, 0), Vector3(0.16, 0.04, 0.16), Color("c9a46d"))
+		"torch":
+			cyl(n, Vector3(0, 0.3, 0), 0.04, 0.05, 0.6, Color("6d4a33"), Vector3.ZERO, 7)
+			cyl(n, Vector3(0, 0.62, 0), 0.08, 0.06, 0.1, Color("3b2d25"), Vector3.ZERO, 8)
+			cyl(n, Vector3(0, 0.78, 0), 0.0, 0.09, 0.26, Color("ff8a2a"), Vector3.ZERO, 7, 2.2)
+			sph(n, Vector3(0, 0.72, 0), 0.07, Color("ffd27a"), Vector3.ONE, 6, 2.5)
 		_:
 			sph(n, Vector3(0, 0.3, 0), 0.24, color, Vector3.ONE, 10)
 	return n
@@ -570,3 +599,307 @@ static func signpost(parent: Node3D, pos: Vector3, text: String, face_yaw: float
 	box(s, Vector3(0, 1.55, 0.07), Vector3(1.15, 0.6, 0.08), Color("b8935f"))
 	box(s, Vector3(0, 1.55, 0.05), Vector3(1.25, 0.7, 0.05), Color("6d4a33"))
 	label3(s, text, Vector3(0, 1.57, 0.2), 38)
+
+# ---------- expansion: markers ----------
+
+const BEAM_SHADER = """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, shadows_disabled, depth_draw_never;
+uniform vec4 color : source_color = vec4(1.0, 0.82, 0.38, 1.0);
+varying float yy;
+void vertex() { yy = VERTEX.y; }
+void fragment() {
+	float a = 1.0 - smoothstep(-1.9, 1.9, yy);
+	ALBEDO = color.rgb;
+	ALPHA = a * 0.5 * (0.8 + 0.2 * sin(TIME * 3.0));
+}
+"""
+
+# A soft column of light so loose items can be spotted from a distance.
+static func beacon(parent: Node3D) -> Node3D:
+	var b = Node3D.new()
+	parent.add_child(b)
+	var sh = Shader.new()
+	sh.code = BEAM_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = sh
+	var mi = MeshInstance3D.new()
+	var cm = CylinderMesh.new()
+	cm.top_radius = 0.1
+	cm.bottom_radius = 0.22
+	cm.height = 3.8
+	cm.radial_segments = 10
+	cm.rings = 1
+	cm.cap_top = false
+	cm.cap_bottom = false
+	mi.mesh = cm
+	mi.material_override = m
+	mi.position.y = 1.9
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	b.add_child(mi)
+	var ring = MeshInstance3D.new()
+	var rm = CylinderMesh.new()
+	rm.top_radius = 0.55
+	rm.bottom_radius = 0.55
+	rm.height = 0.01
+	rm.radial_segments = 20
+	rm.rings = 1
+	ring.mesh = rm
+	var rmat = StandardMaterial3D.new()
+	rmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	rmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	rmat.albedo_color = Color(1.0, 0.86, 0.45, 0.35)
+	ring.material_override = rmat
+	ring.position.y = 0.03
+	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	b.add_child(ring)
+	return b
+
+static func quest_mark(parent: Node3D, y: float) -> Label3D:
+	var l = Label3D.new()
+	l.text = "!"
+	l.font_size = 120
+	l.pixel_size = 0.009
+	l.outline_size = 22
+	l.outline_modulate = Color(0.25, 0.12, 0.02, 0.95)
+	l.modulate = Color(1.0, 0.84, 0.25)
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.position = Vector3(0, y, 0)
+	l.visibility_range_end = 80.0
+	parent.add_child(l)
+	return l
+
+# ---------- expansion: places ----------
+
+static func stall(parent: Node3D, pos: Vector3, yaw: float, awning: Color, goods: String) -> Node3D:
+	var s = Node3D.new()
+	s.position = pos
+	s.rotation_degrees.y = yaw
+	parent.add_child(s)
+	var wood = Color("8a6a46")
+	box(s, Vector3(0, 0.5, 0), Vector3(2.6, 1.0, 1.0), Color("a77b4f"))
+	box(s, Vector3(0, 1.03, 0), Vector3(2.8, 0.06, 1.15), Color("c9a46d"))
+	for sx in [-1.3, 1.3]:
+		cyl(s, Vector3(sx, 1.3, 0.55), 0.05, 0.06, 2.6, wood, Vector3.ZERO, 6)
+		cyl(s, Vector3(sx, 1.45, -0.55), 0.05, 0.06, 2.9, wood, Vector3.ZERO, 6)
+	for i in range(6):
+		var c = awning if i % 2 == 0 else Color("f4ead0")
+		var st = box(s, Vector3(-1.2 + i * 0.48, 2.72, 0.05), Vector3(0.48, 0.05, 1.8), c, Vector3(-12, 0, 0))
+		st.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	match goods:
+		"fruit":
+			for i in range(9):
+				sph(s, Vector3(-1.0 + (i % 5) * 0.22 + (0.1 if i >= 5 else 0.0), 1.15 + (0.15 if i >= 5 else 0.0), -0.1 + (i % 2) * 0.15), 0.1, [Color("dc8060"), Color("e9c46a"), Color("c0392b")][i % 3], Vector3.ONE, 7)
+			cyl(s, Vector3(0.7, 1.18, 0), 0.3, 0.22, 0.2, Color("b58a52"), Vector3.ZERO, 10)
+		"fish":
+			for i in range(4):
+				sph(s, Vector3(-0.9 + i * 0.5, 1.12, 0.1), 0.09, Color("9fb8c4"), Vector3(1, 0.7, 2.6), 7)
+		"bread":
+			for i in range(5):
+				sph(s, Vector3(-1.0 + i * 0.45, 1.13, 0.05), 0.12, Color("c98a45"), Vector3(1.5, 0.75, 1), 8)
+		"pots":
+			for i in range(4):
+				cyl(s, Vector3(-0.9 + i * 0.6, 1.25, 0), 0.12, 0.18, 0.4, [Color("b5654a"), Color("d3b08a"), Color("6b7f9c"), Color("8f5a48")][i], Vector3.ZERO, 10)
+		"cloth":
+			for i in range(4):
+				box(s, Vector3(-0.9 + i * 0.6, 1.12, 0), Vector3(0.5, 0.12, 0.7), [Color("e76f51"), Color("2a9d8f"), Color("e9c46a"), Color("a78bda")][i])
+	return s
+
+static func well(parent: Node3D, pos: Vector3) -> Node3D:
+	var w = Node3D.new()
+	w.position = pos
+	parent.add_child(w)
+	cyl(w, Vector3(0, 0.4, 0), 0.85, 0.9, 0.8, Color("9a9185"), Vector3.ZERO, 14)
+	cyl(w, Vector3(0, 0.79, 0), 0.7, 0.7, 0.04, Color("2f7f96"), Vector3.ZERO, 14)
+	for sx in [-0.8, 0.8]:
+		box(w, Vector3(sx, 1.3, 0), Vector3(0.12, 1.8, 0.12), Color("6d4a33"))
+	prism(w, Vector3(0, 2.35, 0), Vector3(1.4, 0.6, 2.1), Color("8f5a48"), Vector3(0, 90, 0))
+	cyl(w, Vector3(0, 1.9, 0), 0.06, 0.06, 1.5, Color("5b3d28"), Vector3(0, 0, 90), 6)
+	cyl(w, Vector3(0.2, 1.3, 0), 0.14, 0.12, 0.25, Color("a77b4f"), Vector3.ZERO, 8)
+	return w
+
+static func school(parent: Node3D, pos: Vector3, yaw: float) -> Node3D:
+	var s = Node3D.new()
+	s.position = pos
+	s.rotation_degrees.y = yaw
+	parent.add_child(s)
+	var wall = Color("e8d9b5")
+	box(s, Vector3(0, 0.15, 0), Vector3(9.4, 0.3, 5.6), Color("9a9185"))
+	box(s, Vector3(0, 1.75, 0), Vector3(9.0, 3.2, 5.0), wall)
+	prism(s, Vector3(0, 4.15, 0), Vector3(6.0, 1.9, 9.8), Color("4f7ca8"), Vector3(0, 90, 0))
+	prism(s, Vector3(0, 3.95, 0), Vector3(5.0, 1.6, 9.0), wall.lightened(0.05), Vector3(0, 90, 0))
+	box(s, Vector3(0, 1.4, 2.52), Vector3(1.4, 2.2, 0.08), Color("6d4a33"))
+	for wx in [-3.0, -1.6, 1.6, 3.0]:
+		box(s, Vector3(wx, 2.0, 2.52), Vector3(0.9, 1.0, 0.08), Color("f4ead0"))
+		box(s, Vector3(wx, 2.0, 2.55), Vector3(0.72, 0.82, 0.06), Color("f6dc8c"), Vector3.ZERO, 0.4, 0.6)
+	# chalkboard outside the door
+	var board = Node3D.new()
+	board.position = Vector3(3.2, 0, 4.2)
+	board.rotation_degrees.y = -20
+	s.add_child(board)
+	for sx in [-0.8, 0.8]:
+		cyl(board, Vector3(sx, 0.8, 0), 0.04, 0.05, 1.6, Color("6d4a33"), Vector3.ZERO, 6)
+	box(board, Vector3(0, 1.2, 0.03), Vector3(1.7, 1.0, 0.06), Color("2f4a3a"))
+	box(board, Vector3(0, 1.2, 0.0), Vector3(1.85, 1.15, 0.04), Color("8a6a46"))
+	label3(board, "han?  hal?\nhama?  hamur?", Vector3(0, 1.22, 0.08), 26).billboard = BaseMaterial3D.BILLBOARD_DISABLED
+	# bell
+	cyl(s, Vector3(-4.0, 1.4, 3.6), 0.05, 0.06, 2.8, Color("6d4a33"), Vector3.ZERO, 6)
+	box(s, Vector3(-4.0, 2.8, 3.6), Vector3(0.7, 0.08, 0.1), Color("6d4a33"))
+	cyl(s, Vector3(-4.0, 2.55, 3.6), 0.06, 0.16, 0.3, Color("d4a537"), Vector3.ZERO, 10)
+	for i in range(2):
+		box(s, Vector3(-1.5 + i * 3.0, 0.45, 4.6), Vector3(1.6, 0.1, 0.45), Color("a77b4f"))
+		for lx in [-0.65, 0.65]:
+			box(s, Vector3(-1.5 + i * 3.0 + lx, 0.22, 4.6), Vector3(0.08, 0.44, 0.35), Color("8a6a46"))
+	return s
+
+static func hut(parent: Node3D, pos: Vector3, yaw: float) -> Node3D:
+	var h = Node3D.new()
+	h.position = pos
+	h.rotation_degrees.y = yaw
+	parent.add_child(h)
+	cyl(h, Vector3(0, 1.3, 0), 2.4, 2.5, 2.6, Color("d9c29a"), Vector3.ZERO, 18)
+	cyl(h, Vector3(0, 3.6, 0), 0.0, 3.2, 2.2, Color("b8964e"), Vector3.ZERO, 18)
+	cyl(h, Vector3(0, 2.62, 0), 3.15, 3.2, 0.12, Color("9c7a3c"), Vector3.ZERO, 18)
+	box(h, Vector3(0, 1.0, 2.42), Vector3(1.0, 2.0, 0.12), Color("5a3c26"))
+	for i in range(3):
+		var a = deg_to_rad(-40.0 + i * 40.0)
+		var p = Vector3(sin(a) * 2.5, 2.2, cos(a) * 2.5)
+		cyl(h, p + Vector3(0.6 if i == 0 else (-0.6 if i == 2 else 0.9), 0, 0), 0.08, 0.04, 0.4, Color("6a9a4a"), Vector3.ZERO, 6)
+	sph(h, Vector3(-1.3, 2.0, 2.15), 0.13, Color("ffd27a"), Vector3.ONE, 8, 1.4)
+	return h
+
+static func bed(parent: Node3D, pos: Vector3, yaw: float) -> Node3D:
+	var b = Node3D.new()
+	b.position = pos
+	b.rotation_degrees.y = yaw
+	parent.add_child(b)
+	box(b, Vector3(0, 0.25, 0), Vector3(1.0, 0.3, 2.0), Color("8a6a46"))
+	box(b, Vector3(0, 0.45, 0), Vector3(0.92, 0.12, 1.9), Color("f2e8d0"))
+	box(b, Vector3(0, 0.53, 0.25), Vector3(0.94, 0.08, 1.2), Color("2a9d8f"))
+	box(b, Vector3(0, 0.56, -0.7), Vector3(0.6, 0.12, 0.35), Color("f4ead0"))
+	box(b, Vector3(0, 0.55, -1.0), Vector3(1.0, 0.7, 0.08), Color("6d4a33"))
+	return b
+
+static func lighthouse(parent: Node3D, pos: Vector3) -> Node3D:
+	var l = Node3D.new()
+	l.position = pos
+	parent.add_child(l)
+	cyl(l, Vector3(0, 0.5, 0), 2.6, 2.8, 1.0, Color("9a9185"), Vector3.ZERO, 18)
+	cyl(l, Vector3(0, 6.5, 0), 1.35, 2.0, 11.0, Color("f4f1e8"), Vector3.ZERO, 18)
+	for y in [3.0, 7.0, 10.6]:
+		var r = lerpf(1.95, 1.4, (y - 1.0) / 11.0)
+		cyl(l, Vector3(0, y, 0), r + 0.02, r + 0.05, 1.0, Color("c0392b"), Vector3.ZERO, 18)
+	box(l, Vector3(0, 1.9, 1.85), Vector3(0.9, 1.8, 0.3), Color("5a3c26"))
+	cyl(l, Vector3(0, 12.1, 0), 1.9, 1.9, 0.2, Color("3b2d25"), Vector3.ZERO, 18)
+	for i in range(12):
+		var a = i * TAU / 12.0
+		cyl(l, Vector3(cos(a) * 1.8, 12.5, sin(a) * 1.8), 0.03, 0.03, 0.7, Color("3b2d25"), Vector3.ZERO, 5)
+	torus(l, Vector3(0, 12.85, 0), 0.03, 1.8, Color("3b2d25"))
+	var lamp_mat = StandardMaterial3D.new()
+	lamp_mat.albedo_color = Color("6f7f86")
+	lamp_mat.roughness = 0.2
+	var lamp = MeshInstance3D.new()
+	var lm = CylinderMesh.new()
+	lm.top_radius = 1.0
+	lm.bottom_radius = 1.0
+	lm.height = 1.5
+	lm.radial_segments = 14
+	lamp.mesh = lm
+	lamp.material_override = lamp_mat
+	lamp.position = Vector3(0, 12.95, 0)
+	l.add_child(lamp)
+	cyl(l, Vector3(0, 14.2, 0), 0.0, 1.35, 1.1, Color("c0392b"), Vector3.ZERO, 14)
+	sph(l, Vector3(0, 14.8, 0), 0.15, Color("3b2d25"), Vector3.ONE, 6)
+	var beam = Node3D.new()
+	beam.position = Vector3(0, 12.95, 0)
+	l.add_child(beam)
+	var sh = Shader.new()
+	sh.code = BEAM_SHADER.replace("smoothstep(-1.9, 1.9, yy)", "smoothstep(-14.0, 14.0, -yy)").replace("0.5 *", "0.45 *")
+	var bm = ShaderMaterial.new()
+	bm.shader = sh
+	bm.set_shader_parameter("color", Color(1.0, 0.9, 0.55))
+	for side in [-1.0, 1.0]:
+		var cone = MeshInstance3D.new()
+		var c = CylinderMesh.new()
+		c.top_radius = 0.4
+		c.bottom_radius = 3.5
+		c.height = 28.0
+		c.radial_segments = 10
+		c.rings = 1
+		c.cap_top = false
+		c.cap_bottom = false
+		cone.mesh = c
+		cone.material_override = bm
+		cone.rotation_degrees = Vector3(0, 0, 90.0 * side)
+		cone.position = Vector3(side * 14.0, 0, 0)
+		cone.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		beam.add_child(cone)
+	beam.visible = false
+	l.set_meta("lamp", lamp_mat)
+	l.set_meta("beam", beam)
+	return l
+
+static func set_lighthouse(l: Node3D, lit: bool) -> void:
+	var m = l.get_meta("lamp") as StandardMaterial3D
+	m.albedo_color = Color("ffe9a8") if lit else Color("6f7f86")
+	m.emission_enabled = lit
+	m.emission = Color("ffd27a")
+	m.emission_energy_multiplier = 2.4
+	(l.get_meta("beam") as Node3D).visible = lit
+
+static func lookout(parent: Node3D, pos: Vector3) -> Node3D:
+	var p = Node3D.new()
+	p.position = pos
+	parent.add_child(p)
+	box(p, Vector3(0, 0.06, 0), Vector3(4.2, 0.12, 4.2), Color("a77b4f"))
+	for sx in [-2.0, 2.0]:
+		for sz in [-2.0, 2.0]:
+			cyl(p, Vector3(sx, 0.55, sz), 0.06, 0.07, 1.0, Color("6d4a33"), Vector3.ZERO, 6)
+	box(p, Vector3(0, 1.0, -2.0), Vector3(4.0, 0.08, 0.08), Color("7d5a3c"))
+	box(p, Vector3(-2.0, 1.0, 0), Vector3(0.08, 0.08, 4.0), Color("7d5a3c"))
+	box(p, Vector3(2.0, 1.0, 0), Vector3(0.08, 0.08, 4.0), Color("7d5a3c"))
+	cyl(p, Vector3(-1.6, 2.4, -1.6), 0.05, 0.06, 4.8, Color("6d4a33"), Vector3.ZERO, 6)
+	var flag = box(p, Vector3(-1.05, 4.4, -1.6), Vector3(1.0, 0.6, 0.03), Color("e76f51"))
+	p.set_meta("flag", flag)
+	# telescope on a tripod
+	for i in range(3):
+		var a = i * TAU / 3.0
+		cyl(p, Vector3(1.0 + cos(a) * 0.2, 0.6, -0.8 + sin(a) * 0.2), 0.02, 0.02, 1.1, Color("3b2d25"), Vector3(sin(a) * 12.0, 0, -cos(a) * 12.0), 4)
+	cyl(p, Vector3(1.0, 1.2, -0.8), 0.06, 0.09, 0.8, Color("d4a537"), Vector3(70, 30, 0), 8)
+	return p
+
+static func stepping_stones(parent: Node3D, a: Vector3, b: Vector3, n: int) -> Array:
+	var out: Array = []
+	for i in range(n):
+		var p = a.lerp(b, float(i) / float(n - 1))
+		cyl(parent, Vector3(p.x, -0.1, p.z), 0.62, 0.7, 0.42, Color("8d9394").lerp(Color("b4aea0"), float(i % 3) / 3.0), Vector3.ZERO, 10)
+		out.append(p)
+	return out
+
+static func log_bridge(parent: Node3D, a: Vector3, b: Vector3) -> void:
+	var d = b - a
+	var length = Vector2(d.x, d.z).length()
+	var yaw = atan2(d.x, d.z)
+	var mid = (a + b) * 0.5
+	for off in [-0.42, 0.0, 0.42]:
+		var side = Vector3(cos(yaw), 0, -sin(yaw)) * off
+		var lg = cyl(parent, mid + side + Vector3(0, -0.12, 0), 0.22, 0.24, length, Color("7d5a3c").lerp(Color("9c7a52"), absf(off)), Vector3(90, rad_to_deg(yaw), 0), 9)
+		lg.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	for off in [-0.85, 0.85]:
+		var side = Vector3(cos(yaw), 0, -sin(yaw)) * off
+		for t in [0.0, 0.5, 1.0]:
+			cyl(parent, a.lerp(b, t) + side + Vector3(0, 0.45, 0), 0.05, 0.06, 1.0, Color("6d4a33"), Vector3.ZERO, 6)
+		var rope = cyl(parent, mid + side + Vector3(0, 0.85, 0), 0.025, 0.025, length, Color("dfc990"), Vector3(90, rad_to_deg(yaw), 0), 5)
+		rope.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+static func drum(parent: Node3D, pos: Vector3) -> void:
+	cyl(parent, pos + Vector3(0, 0.35, 0), 0.32, 0.26, 0.7, Color("8f5a48"), Vector3.ZERO, 12)
+	cyl(parent, pos + Vector3(0, 0.71, 0), 0.33, 0.33, 0.03, Color("f2e6c8"), Vector3.ZERO, 12)
+	for i in range(6):
+		var a = i * TAU / 6.0
+		cyl(parent, pos + Vector3(cos(a) * 0.3, 0.38, sin(a) * 0.3), 0.012, 0.012, 0.66, Color("e9c46a"), Vector3(sin(a) * 6.0, 0, cos(a) * 6.0), 4)
+
+static func umbrella(parent: Node3D, pos: Vector3, color: Color) -> void:
+	cyl(parent, pos + Vector3(0, 1.2, 0), 0.04, 0.04, 2.4, Color("f4ead0"), Vector3.ZERO, 6)
+	cyl(parent, pos + Vector3(0, 2.4, 0), 0.0, 1.5, 0.5, color, Vector3.ZERO, 10)
+	box(parent, pos + Vector3(0.8, 0.12, 0.6), Vector3(0.9, 0.04, 1.8), Color("f2e6c8"), Vector3(0, 25, 0))

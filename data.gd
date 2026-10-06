@@ -26,7 +26,31 @@ const WORDS = {
 	"-ha": "question (yes/no, replaces the evidential)",
 	"-im": "in progress (progressive)", "-ak": "completed (perfective)",
 	"-pa": "past tense", "-da": "I know this directly (witnessed)",
-	"-shi": "apparently (inferred)", "-nu": "reportedly (hearsay)"
+	"-shi": "apparently (inferred)", "-nu": "reportedly (hearsay)",
+	# second expansion: places, people, body, directions, numbers 6 to 10
+	"kur": "market", "senak": "school", "sang": "mountain / hill", "hai": "sea", "panak": "bread",
+	"cha": "tea", "yok": "medicine (here, a healing herb)", "far": "fire", "fardom": "lighthouse (far + dom: fire-house)",
+	"wak-kor": "water container, a well (wak + kor)", "sulum": "bed", "yesh": "night",
+	"sair": "person", "sanu": "child (also a name: Sanu)", "senar": "teacher", "ravar": "student",
+	"dau": "head", "mal": "hand", "ten": "foot", "tong": "pain",
+	"nam": "south", "dong": "east", "sai": "west", "aru": "far side",
+	"luk": "six", "set": "seven", "bar": "eight", "gov": "nine",
+	"rav": "read (root)", "mai": "buy (root)", "mai-ai": "sell (root)", "tar": "bring (root)",
+	"sum": "swim (root)", "ser": "rain (root)", "ning": "sing (root); also song", "nang": "walk (root)", "sul": "sleep (root)",
+	"ret": "hot", "len": "cold", "ling": "bright", "dam": "dark", "seng": "happy", "dun": "short", "ho": "good",
+	"ki": "this", "e": "and", "polu": "all, everyone", "hamur": "how many",
+	"-ur": "usually, as a habit (habitual)", "-fu": "future tense", "-ng": "begins to (inceptive)",
+	"-tir": "cause to, make (causative)", "u-": "more (comparative, before the root)",
+	"puka-rav": "read books (puka + rav: the noun is incorporated into the verb)",
+	"mora-ni aruma": "beyond the river (mora-ni aru-ma: on the river's far side)"
+}
+
+# Glosses that replace earlier ones because the document gives a second meaning.
+const GLOSS_UPDATES = {
+	"dar": "cook (root); also the number ten",
+	"mar": "horse (as a stative root, mar means full)",
+	"kor": "container (as a verb root, kor means cross)",
+	"an": "I (independent pronoun); as a verb root, an means be"
 }
 
 # Nouns for the word workshop: root -> [singular, plural]
@@ -36,7 +60,11 @@ const NOUNS = {
 	"tab": ["table", "tables"], "kor": ["container", "containers"], "puka": ["book", "books"],
 	"guro": ["fruit", "fruit"], "wak": ["water", "waters"], "tari": ["fish", "fish"],
 	"par": ["bird", "birds"], "gor": ["dog", "dogs"], "mar": ["horse", "horses"],
-	"fal": ["flower", "flowers"], "mun": ["door", "doors"], "murak": ["tree", "trees"]
+	"fal": ["flower", "flowers"], "mun": ["door", "doors"], "murak": ["tree", "trees"],
+	"kur": ["market", "markets"], "senak": ["school", "schools"], "sang": ["hill", "hills"],
+	"hai": ["sea", "seas"], "panak": ["bread", "loaves"], "far": ["fire", "fires"],
+	"fardom": ["lighthouse", "lighthouses"], "sair": ["person", "people"], "ravar": ["student", "students"],
+	"sulum": ["bed", "beds"], "dau": ["head", "heads"], "mal": ["hand", "hands"], "ten": ["foot", "feet"]
 }
 
 # Workshop suffixes: suffix -> English frame. %s is the noun phrase.
@@ -109,7 +137,92 @@ const SENTENCES = {
 		"words": ["gira", "sava", "ma- -ki"], "wrong": ["The bridge is very safe.", "The bridge is not long."]},
 	"field_big": {"v": "Mara i-var.", "parts": "mara  i-var\nfield  3S-be.big", "en": "The field is big.",
 		"gesture": "Rows of green stretch away from you.",
-		"words": ["mara", "var"], "wrong": ["The field is small.", "The field is dry."]}
+		"words": ["mara", "var"], "wrong": ["The field is small.", "The field is dry."]},
+	# ---- second expansion ----
+	"ketu_sells": {"v": "Ketuke panak i-mai-ai-ur-da.", "parts": "Ketu-ke  panak  i-mai-ai-ur-da\nKetu-ERG  bread.ABS  3P-sell-HAB-DIR", "en": "Ketu usually sells bread.",
+		"gesture": "Ketu pats the loaves on the stall, then sweeps a hand across the market as if to say every day.",
+		"words": ["mai-ai", "panak", "-ur", "-ke"], "wrong": ["Ketu bought bread yesterday.", "Ketu is eating bread."]},
+	"buy_bread": {"v": "Anke panak k-i-mai-fu.", "parts": "an-ke  panak  k-i-mai-fu\n1SG-ERG  bread.ABS  1A-3P-buy-FUT", "en": "I will buy bread.",
+		"gesture": "The shopper jingles a few coins and nods toward the loaves.",
+		"words": ["an", "panak", "mai", "-fu"], "wrong": ["I bought bread.", "Give me bread!"]},
+	"tea_hot": {"v": "Cha i-ret.", "parts": "cha  i-ret\ntea  3S-be.hot", "en": "The tea is hot.",
+		"gesture": "Steam curls from the cup. The shopper blows on it and fans their mouth.",
+		"words": ["cha", "ret"], "wrong": ["The tea is cold.", "The tea is gone."]},
+	"well_full": {"v": "Wak-kor i-mar-da.", "parts": "wak-kor  i-mar-da\nwater-container  3S-be.full-DIR", "en": "The well is full (I can see it).",
+		"gesture": "Water brims right up to the stone rim.",
+		"words": ["wak-kor", "mar", "-da"], "wrong": ["The well is empty.", "The horse is drinking water."]},
+	"students_read": {"v": "Ravarir ri-puka-rav-im-da.", "parts": "ravar-ir  ri-puka-rav-im-da\nstudent-PL  3PL.S-book-read-IPFV-DIR", "en": "The students are reading.",
+		"gesture": "Two students bend over their books, lips moving.",
+		"words": ["ravar", "-ir", "puka-rav", "-im"], "wrong": ["The students are running.", "The teacher is reading."]},
+	"suri_teacher": {"v": "An senar na-an-da.", "parts": "an  senar  na-an-da\n1SG  teacher  1S-be-DIR", "en": "I am a teacher.",
+		"gesture": "Suri taps her own chest, then points at the chalkboard.",
+		"words": ["an", "senar"], "wrong": ["I am a student.", "You are a teacher."]},
+	"rin_student": {"v": "An ravar na-an-da.", "parts": "an  ravar  na-an-da\n1SG  student  1S-be-DIR", "en": "I am a student.",
+		"gesture": "Rin holds up a book and grins.",
+		"words": ["an", "ravar"], "wrong": ["I am a traveler.", "She is a student."]},
+	"hill_taller": {"v": "Sang murak-ta i-u-gao.", "parts": "sang  murak-ta  i-u-gao\nhill  tree-ABL  3S-COMP-tall", "en": "The hill is taller than the tree.",
+		"gesture": "Pomo holds one hand at tree height, then lifts the other far above it.",
+		"words": ["sang", "murak", "-ta", "u-", "gao"], "wrong": ["The tree is taller than the hill.", "The hill is as tall as the tree."]},
+	"summit_highest": {"v": "Ki sang polu-ta i-u-gao.", "parts": "ki  sang  polu-ta  i-u-gao\nthis  hill  all-ABL  3S-COMP-tall", "en": "This hill is the highest of all.",
+		"gesture": "A cairn marks the top. From here every roof on the island is below you.",
+		"words": ["ki", "sang", "polu", "u-", "gao"], "wrong": ["This hill is very small.", "That hill is higher."]},
+	"spring_hot": {"v": "Wak i-ret.", "parts": "wak  i-ret\nwater  3S-be.hot", "en": "The water is hot.",
+		"gesture": "Steam drifts off the pool. You dip a finger and pull it back fast.",
+		"words": ["wak", "ret"], "wrong": ["The water is cold.", "The water is deep."]},
+	"sea_cold": {"v": "Hai i-len.", "parts": "hai  i-len\nsea  3S-be.cold", "en": "The sea is cold.",
+		"gesture": "A swimmer wades out of the lagoon, shivering and hugging their arms.",
+		"words": ["hai", "len"], "wrong": ["The sea is warm.", "The sea is far away."]},
+	"desh_swims": {"v": "An haima na-sum-ur-da.", "parts": "an  hai-ma  na-sum-ur-da\n1SG  sea-LOC  1S-swim-HAB-DIR", "en": "I usually swim in the sea.",
+		"gesture": "Desh points at the lagoon, mimes swimming strokes, then counts off several days on his fingers.",
+		"words": ["hai", "-ma", "sum", "-ur"], "wrong": ["I swam in the river yesterday.", "Swim in the sea!"]},
+	"child_sleeps": {"v": "Sanu sulumma i-sul-im-da.", "parts": "sanu  sulum-ma  i-sul-im-da\nchild  bed-LOC  3S-sleep-IPFV-DIR", "en": "The child is sleeping in the bed.",
+		"gesture": "A small child is curled up under a blanket. Vira puts a finger to her lips.",
+		"words": ["sanu", "sulum", "-ma", "sul", "-im"], "wrong": ["The child is running to the bed.", "The child is not sleeping."]},
+	"lighthouse_dark": {"v": "Fardom i-dam-da.", "parts": "fardom  i-dam-da\nlighthouse  3S-be.dark-DIR", "en": "The lighthouse is dark (I can see it).",
+		"gesture": "The lamp room at the top is cold and grey.",
+		"words": ["fardom", "dam"], "wrong": ["The lighthouse is bright.", "The lighthouse is short."]},
+	"lighthouse_bright": {"v": "Fardom i-ling-da.", "parts": "fardom  i-ling-da\nlighthouse  3S-be.bright-DIR", "en": "The lighthouse is bright (I can see it).",
+		"gesture": "A golden beam sweeps across the water.",
+		"words": ["fardom", "ling"], "wrong": ["The lighthouse is dark.", "The lighthouse is broken."]},
+	"no_fire": {"v": "Far ma-i-esh-ki-da.", "parts": "far  ma-i-esh-ki-da\nfire  NEG-3S-exist-NEG-DIR", "en": "There is no fire (I can see it).",
+		"gesture": "Yalo points up at the dark lamp and turns his empty hands over.",
+		"words": ["far", "esh", "ma- -ki"], "wrong": ["The fire is hot.", "Bring the fire!"]},
+	"night_light": {"v": "Yeshma fardom i-ling-ur-da.", "parts": "yesh-ma  fardom  i-ling-ur-da\nnight-LOC  lighthouse  3S-be.bright-HAB-DIR", "en": "At night the lighthouse usually shines.",
+		"gesture": "Yalo closes his eyes as if sleeping, then opens his hands wide like a beam of light.",
+		"words": ["yesh", "fardom", "ling", "-ur"], "wrong": ["In the morning the lighthouse is dark.", "At night the lighthouse fell down."]},
+	"rain_starts": {"v": "I-ser-ng.", "parts": "i-ser-ng\n3S-rain-INCH", "en": "It is beginning to rain.",
+		"gesture": "The fisher holds a palm up to the clouds and squints.",
+		"words": ["-ng"], "wrong": ["It rained yesterday.", "The sun is shining."]},
+	"ila_happy": {"v": "Ila i-seng-da.", "parts": "Ila  i-seng-da\nIla  3S-be.happy-DIR", "en": "Ila is happy (I can see it).",
+		"gesture": "Ila sips the tea and smiles broadly.",
+		"words": ["seng"], "wrong": ["Ila is tired.", "Ila is sad."]},
+	"sign_market": {"v": "Kur-ru.", "parts": "kur-ru\nmarket-ALL", "en": "To the market.",
+		"gesture": "The arrow on the board points west down a wide path.",
+		"words": ["kur", "-ru"], "wrong": ["From the market.", "In the market."]},
+	"sign_school": {"v": "Senak-ru.", "parts": "senak-ru\nschool-ALL", "en": "To the school.",
+		"gesture": "The arrow points toward a long building with a blue roof.",
+		"words": ["senak", "-ru"], "wrong": ["From the school.", "The school is big."]},
+	"sign_hill": {"v": "Sang-ru.", "parts": "sang-ru\nhill-ALL", "en": "To the hill.",
+		"gesture": "The arrow points up a steep trail.",
+		"words": ["sang", "-ru"], "wrong": ["From the hill.", "As far as the hill."]},
+	"sign_east": {"v": "Dong-ru.", "parts": "dong-ru\neast-ALL", "en": "To the east.",
+		"gesture": "The arrow points down a long road toward the morning sun.",
+		"words": ["dong", "-ru"], "wrong": ["To the west.", "From the east."]},
+	"sign_light": {"v": "Fardom-ru.", "parts": "fardom-ru\nlighthouse-ALL", "en": "To the lighthouse.",
+		"gesture": "A tall striped tower is painted on the board.",
+		"words": ["fardom", "-ru"], "wrong": ["In the lighthouse.", "From the lighthouse."]},
+	"sign_lagoon": {"v": "Hai-ru.", "parts": "hai-ru\nsea-ALL", "en": "To the sea.",
+		"gesture": "Painted waves curl around the arrow.",
+		"words": ["hai", "-ru"], "wrong": ["From the sea.", "With the sea."]},
+	"sign_beyond": {"v": "Mora-ni aruma.", "parts": "mora-ni  aru-ma\nriver-GEN  far.side-LOC", "en": "Beyond the river.",
+		"gesture": "The board points across the water to the far bank and the hill.",
+		"words": ["mora-ni aruma", "-ni", "aru", "-ma"], "wrong": ["Beside the river.", "Behind the house."]},
+	"stones_cross": {"v": "Mora t-i-kor-o!", "parts": "mora  t-i-kor-o\nriver  2A-3P-cross-IMP", "en": "Cross the river!",
+		"gesture": "Flat stones lead across the water. Someone has painted a walking figure on the first one.",
+		"words": ["mora", "kor", "-o"], "wrong": ["Do not cross the river!", "The river is crossing."]},
+	"log_short": {"v": "Murak-gira i-dun.", "parts": "murak-gira  i-dun\ntree-bridge  3S-be.short", "en": "The log bridge is short.",
+		"gesture": "Three logs span the water. You could cross in a few steps.",
+		"words": ["murak", "gira", "dun"], "wrong": ["The log bridge is long.", "The log bridge is broken."]}
 }
 
 # Door puzzles, one per house. situation is a gesture; options are Varnak commands.
@@ -148,7 +261,53 @@ const WHERE = {
 const COUNTS = {
 	"cairn": {"noun": "sek", "n": 3, "numword": "mur", "en": "stones", "wrongs": ["vel", "pan"]},
 	"flowers": {"noun": "fal", "n": 4, "numword": "kes", "en": "flowers", "wrongs": ["yan", "mur"]},
-	"basket": {"noun": "guro", "n": 5, "numword": "pan", "en": "fruit", "wrongs": ["vel", "kes"]}
+	"basket": {"noun": "guro", "n": 5, "numword": "pan", "en": "fruit", "wrongs": ["vel", "kes"]},
+	"rack": {"noun": "tari", "n": 6, "numword": "luk", "en": "fish drying", "wrongs": ["set", "pan"]},
+	"loaves": {"noun": "panak", "n": 7, "numword": "set", "en": "loaves of bread", "wrongs": ["luk", "bar"]},
+	"orchard": {"noun": "guro", "n": 8, "numword": "bar", "en": "fruit on the tree", "wrongs": ["set", "gov"]},
+	"circle": {"noun": "sek", "n": 9, "numword": "gov", "en": "standing stones", "wrongs": ["bar", "dar"]},
+	"garden": {"noun": "fal", "n": 10, "numword": "dar", "en": "flowers", "wrongs": ["gov", "luk"]}
 }
+
+# Pomo's direction questions from the hilltop. Answers use the locative -ma on a direction word.
+const LOOKOUT = [
+	{"q": "Fardom hama i-esh-ha?", "en": "Where is the lighthouse?", "gesture": "Pomo points across the whole island toward the striped tower where the sun rises.",
+		"options": ["Dongma i-esh-da.", "Saima i-esh-da.", "Namma i-esh-da."], "correct": 0, "why": "dong is east, and dong-ma means in the east."},
+	{"q": "Kur hama i-esh-ha?", "en": "Where is the market?", "gesture": "Pomo points down the hill toward the stalls, away from the north.",
+		"options": ["Beima i-esh-da.", "Namma i-esh-da.", "Dongma i-esh-da."], "correct": 1, "why": "nam is south, the opposite of bei (north)."},
+	{"q": "Hai hama i-esh-ha?", "en": "Where is the sea?", "gesture": "Pomo turns you around to face the nearest water, where the sun sets.",
+		"options": ["Saima i-esh-da.", "Dongma i-esh-da.", "Beima i-esh-da."], "correct": 0, "why": "sai is west, where the sun sets."}
+]
+
+# Suri's lesson on question words. kind "meaning": pick the English meaning; "answer": answer in Varnak.
+const SCHOOL = [
+	{"q": "Halke puka i-rav-im-ha?", "gesture": "Suri points at Rin, who is reading, and raises her eyebrows.",
+		"options": ["Who is reading the book?", "Where is the book?", "How many books are there?"], "correct": 0,
+		"why": "hal means who. The question takes -ke because the reader acts on the book, and -ha replaces the evidential."},
+	{"q": "Puka hama i-esh-ha?", "gesture": "Suri hides a book behind her back and looks around, puzzled.",
+		"options": ["Who has the book?", "Where is the book?", "Is the book new?"], "correct": 1,
+		"why": "hama means where. esh is be located, as in Puka tabma i-esh-da."},
+	{"q": "Tike han t-i-rav-im-ha?", "gesture": "Suri points at the book in your hands and tilts her head.",
+		"options": ["Why are you reading?", "Who are you?", "What are you reading?"], "correct": 2,
+		"why": "han means what. Tike is you acting on something, and t-i- means you act on it."},
+	{"q": "Hamur ravar i-esh-ha?", "gesture": "Suri sweeps a hand toward her students and waits for you to count them.",
+		"options": ["Vel ravar i-esh-da.", "Mur ravar i-esh-da.", "Yan ravar i-esh-da."], "correct": 0,
+		"why": "hamur means how many. There are two students, Rin and Ola, so vel."}
+]
+
+# Desh's lagoon game: follow the command. Each entry: command, gloss, the matching action, decoys.
+const DESH = [
+	{"v": "Ta-sum-o!", "en": "Swim!", "act": "You wade in and swim a few strokes.", "words": ["sum", "-o"]},
+	{"v": "Ta-pav-o!", "en": "Run!", "act": "You run along the sand.", "words": ["pav", "-o"]},
+	{"v": "Ta-ning-o!", "en": "Sing!", "act": "You sing a few notes.", "words": ["ning", "-o"]},
+	{"v": "Ta-nang-o!", "en": "Walk!", "act": "You walk slowly along the shore.", "words": ["nang", "-o"]},
+	{"v": "Ta-sul-o!", "en": "Sleep!", "act": "You lie down on the sand and close your eyes.", "words": ["sul", "-o"]},
+	{"v": "Ma-ta-pav-o-ki!", "en": "Do not run!", "act": "You stand completely still.", "words": ["pav", "ma- -ki"]}
+]
+
+# Vira's patient. Ila mimes where it hurts; the player chooses what Ila would say.
+const PAIN = {"gesture": "Ila presses both hands to her temples and winces.",
+	"options": ["Anni dauma tong i-esh-da.", "Anni tenma tong i-esh-da.", "Anni malma tong i-esh-da."], "correct": 0,
+	"why": "Anni dau-ma tong i-esh-da: pain is located in my head. dau is head, ten is foot, mal is hand."}
 
 const SUMMARY_NOTE = "Forms marked (doc) appear in the handoff document; others are composed from its rules."

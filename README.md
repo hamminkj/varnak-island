@@ -9,18 +9,22 @@ A TuJuJu Studios portrait 3D exploration prototype built in Godot 4.
 No external models, plugins or asset downloads are required.
 
 ## Controls
-Phone: hold and drag in the bottom-left region to move. Swipe the right side to look. Approach a resident or collectible and tap Interact. Dialogue pauses movement. Scroll long panels vertically.
-Desktop: W/S walk, A/D sidestep, left/right arrows turn; click and drag (or hold the right mouse button and drag) to look; walk close to an object or person, then click it or press E to interact. Escape closes panels.
+Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks a side quest.
+Phone: hold and drag in the bottom-left region to move (push farther to run). Swipe the right side to look. Near something, the Interact button names the action (Talk, Pick up, Look). Dialogue pauses movement. Scroll long panels vertically.
+Desktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn; click and drag (or hold the right mouse button and drag) to look; click a person or object, or walk up and press E. Escape closes panels.
+Map: a drawn island map with every quest giver and loose item, the quest list, and travel back to places already visited.
 The island is designed for portrait orientation, with a 480 x 854 reference layout. North is negative Z, along the light-colored main path. Signs say bei (north).
 
 ## Included
-- Five contiguous areas: harbor, village, forest, river crossing and northern cove, plus a farm field and paddock east of the village.
-- Seven named residents and six connected quest objectives.
+- A real island: shaped coastline and beaches, a harbor inlet, a river from a hot spring to the east coast, and a west hill with a lookout.
+- The original areas (harbor, village, forest, river crossing, northern cove, farm and paddock) plus a market and school to the west, the hill, a hot spring, stepping stones, a healer's garden, an orchard, a lighthouse, an east lagoon, a log bridge and a stone circle.
+- Sixteen named residents and three villagers; six main-story quests and six side quests.
 - Eight collectible objects, four animals (bird, fish, dog, horse) and about thirty things to examine.
 - Varnak vocabulary, possession, movement, requests and evidential clues, extended with case suffixes, ergative marking, imperatives, negation, questions and noun incorporation from the Varnak handoff document.
 - Four house doors, each a small puzzle in commands: open, please open, do not open, close.
 - Follow-up questions for every resident, a phrasebook of collected sentences, a word workshop for case endings, and practice quizzes.
-- Counting piles with the Varnak number words, fishing with noun incorporation, signs that teach case endings.
+- Counting piles with the Varnak number words one to ten, fishing with noun incorporation (with three fishing spots), signs that teach case endings.
+- Side-quest language: question words (Suri), compass directions with -ma (Pomo), body words and pain (Vira), causative -tir (Yalo), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
 - A bridge that is visibly broken until Tor's repair, and a table that is laid after Mira's meal.
 - Notebook with editable meaning guesses, optional meaning reveals and mastery marks.
 - Inventory, island guide, automatic saving, manual restart confirmation.
@@ -35,6 +39,14 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 5. Ask Tor about Neri. Talk to Lira in the village and Oren north of the crossing. Compare accounts. Tor's italpada is witnessed; Oren's italpashi is inferred; Lira's italpanu is reported.
 6. Continue north to Neri at the cove.
 Exploration is open. Finding Neri early acknowledges the discovery while leaving the clue objective available.
+
+Side quests, in any order:
+- Market (Ketu, west): catch three fish (river by the bridge, end of the dock, or the lagoon) and give them to Ketu. Ketu gives you cha (tea).
+- School (Suri, north of the market): answer four questions built on hal, hama, han and hamur.
+- Lookout (Pomo, top of the west hill): answer three direction questions (dongma, namma, saima). The yok herb grows on the hill path.
+- Healer (Vira, east of the village): say where Ila hurts, then bring yok and cha.
+- Lighthouse (Yalo, east coast): bring the far (torch) from Neri's campfire, then understand Fardom t-i-ling-tir-o!
+- Lagoon (Desh, east lagoon): follow four drum-game commands.
 
 ## Playing in a browser
 The game is published at https://hamminkj.github.io/varnak-island/ from the committed
@@ -64,16 +76,17 @@ The arrival phrases use da, shi and nu for direct, inferred and reported evidenc
 Residents' names are identifiers rather than vocabulary lessons.
 
 ## Current limits
-This is a playable blockout, with simple models and short encounters. It does not yet include recorded Varnak speech, animated gestures, a broad dialogue generator, advanced sentence building, a simulated ecology, or a complete 50-root curriculum. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Tor repairs it. Walking time and six short quests are less than the previously proposed hour-long adventure.
+This is a playable blockout, with simple models and short encounters. It does not yet include recorded Varnak speech, animated gestures, a broad dialogue generator, advanced sentence building, or a simulated ecology. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Tor repairs it. Click-to-walk heads straight for its target and stops with a hint if something is in the way. Deep water cannot be entered; the river is crossed by the bridge, the stepping stones or the log bridge.
 
 ## Verification
-Imported and launched headlessly with Godot 4.5.1. The included smoke_test.gd checks all six quest completions, incorrect/correct evidence answers, inventory consumption, save/load and UI panel generation. It also checks that every sentence card, door, counting pile, fishing step, workshop and practice screen works, that every Varnak form used has a notebook gloss, and that every interactable can be used.
+Imported and launched headlessly with Godot 4.5.1. The included smoke_test.gd checks all twelve quest completions (with wrong answers first where it matters), the quest marks, click picking of a person and items, click-to-walk with real physics, that every person, item and object stands on land reachable from the harbor, map travel, incorrect/correct evidence answers, inventory consumption, save/load and UI panel generation. It also checks that every sentence card, door, counting pile, fishing step, workshop and practice screen works, that every Varnak form used has a notebook gloss, and that every interactable can be used.
 Run it with:
 godot --headless --path . --script res://smoke_test.gd
 The test writes a clean starting save after completion. Graphics were checked in software-rendered screenshots; phone controls and real-device performance have not been tested.
 
 ## Project structure
-main.gd: world construction, movement, input, UI, quests, interactions and persistence.
+main.gd: world construction, movement, input and picking, UI and map, quests, interactions and persistence.
+terrain.gd: island height function (coast, river, hill, spring, lagoon) and the ground mesh.
 art.gd: procedural models (characters, houses, boat, bridge, animals, items) and the water and ground shaders.
 data.gd: Varnak sentences, door puzzles, word workshop data and glosses.
 VARNAK_CONTENT.md: every form added in the expansion, with its source in the handoff document.

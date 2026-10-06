@@ -1,5 +1,6 @@
 extends SceneTree
 const Data = preload("res://data.gd")
+const T = preload("res://terrain.gd")
 var game
 func _initialize():
 	call_deferred("run")
@@ -145,6 +146,147 @@ func run():
 	game.fish_caught = 0
 	game.load_game()
 	assert(game.phrases.size() == kept_phrases and game.fish_caught == kept_fish and game.solved.size() == 4)
+	# ---- second expansion: side quests ----
+	game.close_panel()
+	game.completed.clear()
+	game.inventory.clear()
+	game.fish_caught = 1
+	game.talk("ketu")
+	press("Give mur tari (3 fish)")
+	assert(not game.completed.has("market"))
+	game.mastered.append("w:nuk")
+	game.fishing()
+	game.fishing()
+	assert(game.fish_caught == 3)
+	game.talk("ketu")
+	press("Give mur tari (3 fish)")
+	assert(game.completed.has("market") and game.inventory.has("tea") and game.fish_caught == 0)
+	for i in range(4):
+		game.school_quiz(i)
+		var q = Data.SCHOOL[i]
+		press(q["options"][(q["correct"] + 1) % 3])
+		assert(i < 3 or not game.completed.has("school"))
+		press(q["options"][q["correct"]])
+	assert(game.completed.has("school"))
+	for i in range(3):
+		game.lookout_quiz(i)
+		press(Data.LOOKOUT[i]["options"][Data.LOOKOUT[i]["correct"]])
+	assert(game.completed.has("lookout"))
+	game.talk("vira")
+	press("Listen to Ila")
+	press(Data.PAIN["options"][Data.PAIN["correct"]])
+	assert(game.solved.has("pain"))
+	game.talk("vira")
+	press("Offer yok and cha")
+	assert(not game.completed.has("healer"))
+	game.inventory.append("herb")
+	game.talk("vira")
+	press("Offer yok and cha")
+	assert(game.completed.has("healer") and not game.inventory.has("tea"))
+	game.talk("yalo")
+	press("Offer far (fire)")
+	assert(not game.completed.has("lighthouse"))
+	game.inventory.append("torch")
+	game.talk("yalo")
+	press("Offer far (fire)")
+	press("Make the lighthouse dark!")
+	assert(not game.completed.has("lighthouse") and game.inventory.has("torch"))
+	press("Make the lighthouse bright!")
+	assert(game.completed.has("lighthouse") and not game.inventory.has("torch"))
+	assert(game.lighthouse_node.get_meta("beam").visible)
+	for i in range(4):
+		game.desh_round(i, Data.DESH)
+		press(Data.DESH[i]["act"])
+	assert(game.completed.has("lagoon"))
+	game.identity_puzzle()
+	press("An kelar na-an-da.")
+	assert(game.mastered.has("q:ola"))
+	for id in ["ketu","suri","rin","ola","pomo","vira","ila","yalo","desh","neri"]:
+		game.talk(id)
+		assert(game.panel.visible)
+	for id in Data.COUNTS.keys():
+		game.count_puzzle(id)
+		press(Data.COUNTS[id]["numword"])
+		assert(game.mastered.has("w:" + Data.COUNTS[id]["numword"]))
+	# ---- quest marks follow progress ----
+	game.completed.clear()
+	game.update_marks()
+	var marks = {}
+	for e in game.entities:
+		if e.has("mark"): marks[e["id"]] = e["mark"].visible
+	assert(marks["ena"] and not marks["mira"] and marks["ketu"] and marks["desh"] and not marks["sair1"])
+	game.complete("market")
+	for e in game.entities:
+		if e["id"] == "ketu": assert(not e["mark"].visible)
+	# ---- picking: aim at a person, an item and a far object ----
+	game.close_panel()
+	game.player.position = Vector3(0, 0.1, 28)
+	game.player.rotation = Vector3.ZERO
+	game.camera.rotation = Vector3.ZERO
+	game.player.rotation.y = 0.0
+	await physics_frame
+	await process_frame
+	for want in ["ena", "own_bag", "water"]:
+		var ent = null
+		for e in game.entities:
+			if e["id"] == want: ent = e
+		ent["node"].show()
+		game.player.look_at(Vector3(ent["node"].global_position.x, game.player.position.y, ent["node"].global_position.z) * Vector3(1, 1, 1), Vector3.UP)
+		game.player.rotation.x = 0.0
+		game.camera.rotation.x = -0.25
+		await process_frame
+		var c = ent["node"].global_position + Vector3(0, float(ent["ph"]) * 0.5, 0)
+		var sp = game.camera.unproject_position(c)
+		var got = game.pick_at(sp)
+		assert(not got.is_empty() and got["id"] == want, "picked " + str(got.get("id", "nothing")) + " for " + want)
+		game.pick_at(sp + Vector2(14, 10))
+	var far_e = null
+	for e in game.entities:
+		if e["id"] == "mira": far_e = e
+	game.player.position = Vector3(0, 0.1, 24)
+	game.player.look_at(Vector3(far_e["node"].global_position.x, game.player.position.y, far_e["node"].global_position.z), Vector3.UP)
+	game.camera.rotation.x = 0.0
+	await process_frame
+	game.tap(game.camera.unproject_position(far_e["node"].global_position + Vector3(0, 1.0, 0)))
+	assert(not game.walk_to.is_empty() and game.walk_to["id"] == "mira")
+	for i in range(240):
+		await physics_frame
+		if game.panel.visible: break
+	assert(game.panel.visible, "auto-walk reached Mira")
+	game.close_panel()
+	# ---- terrain: everything stands on reachable land ----
+	var walk = {}
+	var q2 = [Vector2i(0, 34)]
+	walk[q2[0]] = true
+	var head = 0
+	while head < q2.size():
+		var c2 = q2[head]
+		head += 1
+		for d in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
+			var n = c2 + d
+			if walk.has(n) or abs(n.x) > 95 or n.y < -80 or n.y > 65: continue
+			var crossing = (abs(n.x) <= 1 and n.y > -27 and n.y < -19) or (n.x == -30 and n.y > -27 and n.y < -19) or (n.x == 52 and n.y > -33 and n.y < -20) or (abs(n.x) <= 3 and n.y >= 30 and n.y <= 42)
+			if T.deep(n.x, n.y) and not crossing: continue
+			if game.is_blocked(n.x, n.y, -0.6): continue
+			walk[n] = true
+			q2.append(n)
+	for e in game.entities:
+		var h: Vector3 = e["home"]
+		if e["word"] == "tari" and e["kind"] == "observe": continue
+		var near_ok = false
+		for dx in range(-3, 4):
+			for dz in range(-3, 4):
+				if walk.has(Vector2i(roundi(h.x) + dx, roundi(h.z) + dz)): near_ok = true
+		assert(near_ok, "cannot reach " + e["id"])
+		if e["kind"] != "observe" and e["id"] != "boat": assert(T.height(h.x, h.z) > -0.3, e["id"] + " is in the water")
+	# ---- travel and map ----
+	game.visited = ["market", "lagoon", "village"]
+	game.show_map()
+	game.travel("lagoon")
+	assert(game.player.position.distance_to(Vector3(63, game.player.position.y, 20)) < 1.0)
+	game.show_map()
+	assert(game.map_tex != null)
+	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
 	game.inventory.clear()
 	game.discovered.clear()
