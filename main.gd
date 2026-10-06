@@ -2869,7 +2869,7 @@ func load_game():
 	if not data is Dictionary: return
 	guesses = data.get("guesses",{})
 	inventory = data.get("inventory",[])
-	discovered = data.get("discovered",[])
+	discovered = data.get("discovered",[]).filter(func(w): return words.has(w))
 	completed = data.get("completed",[])
 	mastered = data.get("mastered",[])
 	phrases = data.get("phrases",[])
@@ -3610,7 +3610,7 @@ func greeting(id: String) -> String:
 		"suri": return "Ravarir ri-puka-rav-im-da."
 		"rin": return "An ravar na-an-da."
 		"ola": return "Ti kelar ta-an-ha?"
-		"pomo": return "Bei, nam, dong, sai... manyana."
+		"pomo": return "Bei, nam, dong, sai."
 		"vira": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Ila i-seng-da."
 		"ila": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
 		"yalo": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."

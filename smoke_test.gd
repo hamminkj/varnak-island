@@ -777,7 +777,7 @@ func run():
 	seed(3)
 	for k in range(12): game.tease("tor")
 	for g in Data.GOSSIP:
-		if g["id"] in ["tor_choni", "pomo_manyana", "desh_party"]:
+		if g["id"] in ["tor_choni", "oku_candy", "desh_party"]:
 			game.gossip_card(g, 0)
 			press(g["en"])
 	game.inventory.append("candy")

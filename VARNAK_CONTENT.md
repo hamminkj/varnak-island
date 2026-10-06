@@ -302,7 +302,6 @@ Varnak already borrows cha (tea) and kaf (coffee) in the document. The game adds
 | hutspa | nerve, cheek | Yiddish chutzpah |
 | kawai | cute (describing root: i-kawai) | Japanese kawaii |
 | kaput | broken (describing root: i-kaput) | German kaputt |
-| manyana | later | Spanish manana |
 | fiyesta | party | Spanish fiesta |
 | bombom | candy | French bonbon |
 | wala | ta-da! | French voila |
@@ -310,6 +309,6 @@ Varnak already borrows cha (tea) and kaf (coffee) in the document. The game adds
 | aloha | hello, goodbye | Hawaiian |
 | chau | bye | Italian ciao |
 
-Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Pomo manyana i-vun-ur-da, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Ho, ho... manyana / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Tamu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
+Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Tamu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
 
 Things to check: 17. Whether loans keep ch (as in cha) or should become sh. 18. Stress and long vowels in loans are not marked.
