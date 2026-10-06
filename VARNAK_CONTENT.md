@@ -312,3 +312,37 @@ Varnak already borrows cha (tea) and kaf (coffee) in the document. The game adds
 Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Tamu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
 
 Things to check: 17. Whether loans keep ch (as in cha) or should become sh. 18. Stress and long vowels in loans are not marked.
+
+
+## Word play: endearments, insults, calques, false friends, doubling
+
+Endearments: habibi (Arabic), shatsi (German Schatzi), monshu (French mon chou, my cabbage), bubala (Yiddish bubbeleh). Playful insults: puts (Yiddish putz), baka (Japanese), shlemil (Yiddish schlemiel). Each personality has its own: cheerful Habibi! / Baka!, dramatic Bubala! / Puts-puts!, giggly Shatsi! / Baka! Ha!, proud Monshu! / Shlemil!, grumpy Hmph. ...shatsi. / Puts!. The insults are only used between villagers in play, never about a group.
+
+New lines: Ti puts ta-an-da! (You are a putz!), Ti puts-puts ta-an-da!, An puts ma-na-an-ki-da! (I am not a putz!), Ti baka ta-an-da!, Ti shlemil ta-an-da!. Rumor denials end with the listener's insult.
+
+Calques: far-par (fire-bird, firefly), ret-gor (hot-dog), sao-tari (star-fish), hai-mar (sea-horse), sanu-mara (child-field, from German Kindergarten), dau-fong (head-wind, brainstorm), plus new root fong (wind). Sentences: Ki senak sanu-mara ma-i-an-ki-da!, Anni dauma dau-fong i-esh-im-da!, Gor ret-gor-ta i-par-ur-da.
+
+False friends: hen sky, ten foot, far fire, pal see, gin money, bar eight, set seven, men front, sum swim, mar horse, mal hand, dam dark.
+
+Doubling (reduplication): a doubled describing root is stronger (var-var huge, sen-sen tiny, ho-ho super good, len-len freezing, kawai-kawai so cute); a doubled verb root repeats (pav-pav run around and around; i-sum-sum-pa-nu swam and swam); a doubled noun means variety (guro-guro fruits of all kinds); puts-puts is a total putz. Forms: Dom i-var-var. Ta-pav-pav-o! Ki guro-guro i-ho-ho-da!
+
+## Sound words from Guarani
+
+Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeating the last syllable as the sound repeats. Varnak borrows a family of them, respelled (Guarani y becomes i, mb becomes b, nasal vowels are not marked):
+
+| Varnak | Meaning | Guarani source |
+|---|---|---|
+| pororo | pop, crackle | pororó, the sound of something bursting (also popcorn) |
+| piriri | sparkle, fizz | piriri, to sparkle or crackle |
+| chiriri | sizzle | chyryry, frying |
+| guarara | roar, big noise | guarara, noise |
+| kororo | snore | kororõ, to snore or roar |
+| tarara | toot | tarara, trumpet sound |
+| pururu | crunch | pururũ, crunch |
+| siri | trickle, flow | syry, to flow |
+| vava | sway | vava, to sway |
+| sununu | rumbling uproar | sununu, uprising or revolt |
+
+The paradigm in Varnak: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Desh i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
+
+Things to check: 19. Doubling is a game addition, not in the handoff document. 20. Whether sound words should be their own word class or ordinary verb roots (the game treats them as intransitive roots). 21. Whether the hyphen in doubled forms (var-var) is the right spelling.

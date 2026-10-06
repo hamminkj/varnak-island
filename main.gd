@@ -185,6 +185,9 @@ var friend: Dictionary = {}
 var mood: Dictionary = {}
 var chat_day: Dictionary = {}
 var day_count: int = 0
+var firefly_told: bool = false
+var ff_order: Array = []
+var ff_i: int = 0
 var mood_clock: float = 0.0
 var portrait_vp: SubViewport
 var portrait_cam: Camera3D
@@ -1217,15 +1220,25 @@ func build_ui():
 	toast_label.modulate.a = 0.0
 	toast_label.z_index = 5
 	ui.add_child(toast_label)
-	var move = Label.new()
-	move.text = "MOVE\nDrag here"
-	move.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
-	move.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
-	move.add_theme_constant_override("outline_size", 6)
+	# Move pad: a joystick icon instead of text (outer ring, centre knob, four arrows).
+	var move = Control.new()
+	move.name = "MovePad"
 	move.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	move.position = Vector2(30,-156)
-	move.size = Vector2(150,100)
+	move.position = Vector2(48, -166)
+	move.size = Vector2(116, 116)
 	move.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	move.draw.connect(func():
+		var c = Vector2(58, 58)
+		move.draw_circle(c, 56.0, Color(0, 0, 0, 0.16))
+		move.draw_arc(c, 54.0, 0.0, TAU, 48, Color(1, 1, 1, 0.75), 3.0, true)
+		move.draw_circle(c, 18.0, Color(1, 1, 1, 0.55))
+		move.draw_arc(c, 18.0, 0.0, TAU, 32, Color(0, 0, 0, 0.35), 2.0, true)
+		for k in range(4):
+			var d = Vector2.UP.rotated(k * PI / 2.0)
+			var side = d.orthogonal()
+			var tip = c + d * 46.0
+			var base = c + d * 32.0
+			move.draw_colored_polygon(PackedVector2Array([tip, base + side * 9.0, base - side * 9.0]), Color(1, 1, 1, 0.85)))
 	ui.add_child(move)
 	interact_button = button("Interact",interact,ui)
 	interact_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -1316,7 +1329,7 @@ func show_intro():
 	text_line("Your friend Neri is somewhere on this island. Learn Varnak through objects, requests and clues to find them.")
 	button("Explore",close_panel,content)
 	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up have a faint column of light above them. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
-	text_line("Phone: drag the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
+	text_line("Phone: drag the joystick in the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
 	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal. The More button has games, difficulty settings and Reset progress.")
 	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
 	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
@@ -2152,6 +2165,7 @@ func add_topics(id: String):
 			topic("Ask about the village", "village_big", id)
 			topic("Ask about the food", "food_warm", id)
 			topic("Ask what Mira is doing", "mira_cooks", id)
+			topic("Ask about that noise", "mira_sizzle", id)
 			if completed.has("meal"): topic("Ask about the water", "water_container", id)
 		"sanu": topic("Ask about the path", "path_safe", id)
 		"tor":
@@ -2170,12 +2184,16 @@ func add_topics(id: String):
 			if completed.has("evidence"):
 				button("Ask Neri for a story", neri_story, content)
 				button("Practice with Neri", show_practice, content)
+			topic("Ask about the campfire", "fire_pops", id)
 		"ketu":
 			topic("Ask what Ketu sells", "ketu_sells", id)
 			topic("Ask about the well", "well_full", id)
+			topic("Ask about the fruit", "fruit_variety", id)
+			if completed.has("market"): topic("Ask about the ret-gor", "hot_dog", id)
 		"suri":
 			topic("Ask who Suri is", "suri_teacher", id)
 			topic("Ask about the students", "students_read", id)
+			topic("Ask why Rin and Ola are giggling", "suri_kinder", id)
 		"rin":
 			topic("Ask who Rin is", "rin_student", id)
 			topic("Ask what they are doing", "students_read", id)
@@ -2196,10 +2214,12 @@ func add_topics(id: String):
 				topic("Ask what is wrong", "no_fire", id)
 		"desh":
 			topic("Ask about the party", "party_noise", id)
+			topic("Ask about the trumpet noise", "desh_toot", id)
 			topic("Ask Desh about swimming", "desh_swims", id)
 			topic("Ask about the sea", "sea_cold", id)
 		"oku":
 			topic("Ask about the ruins", "ruins_old", id)
+			topic("Ask why Oku's hair is a mess", "oku_brainstorm", id)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
 		"gav": topic("Ask Gav about his work", "gav_mail", id)
 		"tamu":
@@ -2309,6 +2329,15 @@ func talk(id: String):
 						save_game()
 						talk("ketu")
 					else: message("Not enough gin", "Candy costs one coin. Sell a fish to Ketu first."), content)
+				button("Buy ret-gor (hot dog): gin yan", func():
+					if gin >= 1:
+						gin -= 1
+						inventory.append("hotdog")
+						learn("ret-gor")
+						toast("Ret-gor! hot + dog. The village gor looks horrified. (-1 gin)")
+						save_game()
+						talk("ketu")
+					else: message("Not enough gin", "A hot dog costs one coin. Sell a fish to Ketu first."), content)
 				button("Buy cha (tea): gin yan", func():
 					if gin >= 1:
 						gin -= 1
@@ -2511,6 +2540,7 @@ func item_word(id: String) -> String:
 	if id == "tea": return "cha"
 	if id == "bread": return "panak"
 	if id == "candy": return "bombom"
+	if id == "hotdog": return "ret-gor"
 	if id == "map": return "pai (an old map)"
 	if Data.PARCELS.has(id): return "kel: " + str(Data.PARCELS[id]).capitalize() + "-ru"
 	for e in entities:
@@ -2550,7 +2580,7 @@ func show_notebook():
 	var b5 = button("Games", show_games, row2)
 	var b6 = button("Poems", show_poems, row2)
 	b6.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button("Borrowed words", show_loans, content)
+	button("Word play: borrowings, calques, false friends, doubling", show_loans, content)
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
@@ -3061,6 +3091,10 @@ func update_night_life(delta: float):
 		var n = f["node"] as Node3D
 		n.visible = night > 0.45
 		if not n.visible: continue
+		if not firefly_told and n.global_position.distance_to(player.position) < 9.0 and not panel.visible:
+			firefly_told = true
+			learn("far-par")
+			toast("Far-par-ir! Fireflies! (far fire + par bird: a calque)")
 		var t = clock * 0.5 + f["p"]
 		var c: Vector3 = f["c"]
 		n.position = c + Vector3(sin(t * 1.3) * 2.5, 0.8 + sin(t * 2.1) * 0.5, cos(t * 0.9) * 2.5)
@@ -3408,7 +3442,8 @@ func collect_star(e: Dictionary):
 	toast(o.capitalize() + " hai-sao! (the " + ords[n - 1] + " sea star)")
 	if n >= STARS.size():
 		complete("seastars")
-		message("Barve hai-sao!", "The eighth sea star! You found them all. The ending -ve makes order words: yan-ve first, vel-ve second, bar-ve eighth.")
+		message("Barve hai-sao!", "The eighth sea star! You found them all. The ending -ve makes order words: yan-ve first, vel-ve second, bar-ve eighth.\n\nYoung islanders call them sao-tari, star-fish. That is a calque: English starfish translated piece by piece.")
+		learn("sao-tari")
 	save_game()
 
 # ---- production practice: sentence tiles and the verb builder ----
@@ -3598,6 +3633,8 @@ func greeting(id: String) -> String:
 	var e = entity_by_id(id)
 	if e.has("say") and clock < float(e["say"][1]): return e["say"][0]
 	if mood.get(id, 0) <= -2: return "Hmph!"
+	if Data.PEOPLE.has(id) and int(friend.get(id, 0)) >= 8 and (day_count + id.length()) % 2 == 0:
+		return Data.ENDEAR[Data.PEOPLE[id]["trait"]]
 	match id:
 		"ena": return "Anni kel."
 		"mira": return "Yamat i-nav."
@@ -4274,7 +4311,9 @@ func show_games():
 		["Memory cards", memory_game.bind(show_games), n >= 4, "Find the pairs. Earn gin."],
 		["Speed round", speed_round, glossed_pool(6).size() >= 6, "60 seconds. How many can you get?"],
 		["Market rush", market_rush, completed.has("market"), "Serve Ketu's customers. Unlocks after Ketu's quest."],
-		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."]
+		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
+		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
+		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."]
 	]
 	for g in games:
 		var b = button(g[0] + ("" if g[2] else "  (locked)"), g[1], content)
@@ -4519,6 +4558,7 @@ func rumor_parts(rc: Dictionary) -> Dictionary:
 	if rc["neg"]: verb.append("ma")
 	verb.append("na" if who == "An" else "i")
 	verb.append(rc["verb"])
+	if rc.get("dbl", false): verb.append(rc["verb"])
 	verb.append({"now": "im", "past": "pa", "usual": "ur", "will": "fu"}[tense])
 	if rc["neg"]: verb.append("ki")
 	var words: Array = [who]
@@ -4542,6 +4582,7 @@ func rumor_en(rc: Dictionary) -> String:
 			if neg: s += (" do not usually " if i_form else " does not usually ") + f[0]
 			else: s += " usually " + (f[0] if i_form else f[3])
 		"will": s += (" will not " if neg else " will ") + f[0]
+	if rc.get("dbl", false): s += " again and again"
 	for pl in Data.RUMOR_PLACES:
 		if pl[0] == rc["place"] and pl[0] != "": s += " " + pl[1]
 	if rc["adv"] == "hala": s += " fast"
@@ -4550,7 +4591,7 @@ func rumor_en(rc: Dictionary) -> String:
 	return s
 
 func rumor_composer(listener: String):
-	var rc = {"who": "Tor", "place": "haima", "adv": "", "verb": "ning", "tense": "usual", "neg": false, "ev": "nu"}
+	var rc = {"who": "Tor", "place": "haima", "adv": "", "verb": "ning", "dbl": false, "tense": "usual", "neg": false, "ev": "nu"}
 	for w in ["mel", "sela", "hala", "-nu", "-shi", "-da"]: learn(w)
 	clear_panel("Tell " + listener.capitalize() + " some gossip")
 	text_line("Make up any rumor you like. Choose the pieces; the Varnak and its meaning update as you go.", 17)
@@ -4565,6 +4606,7 @@ func rumor_composer(listener: String):
 		["Where", "place", Data.RUMOR_PLACES.map(func(p): return p[0]), Data.RUMOR_PLACES.map(func(p): return p[0] if p[0] != "" else "(nowhere)")],
 		["How", "adv", ["", "hala", "sela"], ["(plain)", "hala (fast)", "sela (alone)"]],
 		["Doing what", "verb", Data.RUMOR_VERBS.keys(), Data.RUMOR_VERBS.keys().map(func(k): return k + " (" + Data.RUMOR_VERBS[k][0] + ")")],
+		["Again and again?", "dbl", [false, true], ["(once)", "doubled: ning-ning"]],
 		["When", "tense", ["now", "past", "usual", "will"], ["-im now", "-pa past", "-ur usually", "-fu will"]],
 		["Not?", "neg", [false, true], ["(yes)", "ma- ... -ki (not)"]],
 		["How do you know?", "ev", ["da", "shi", "nu"], ["-da I saw it", "-shi apparently", "-nu people say"]]
@@ -4607,8 +4649,12 @@ func rumor_react(listener: String, rc: Dictionary):
 	var line = ""
 	var gesture = ""
 	if who.to_lower() == listener:
-		var deny: Array = ["ma", "na", rc["verb"], {"now": "im", "past": "pa", "usual": "ur", "will": "fu"}[rc["tense"]], "ki", "da"]
-		line = "Maki! Maki! " + ("-".join(deny)).capitalize().substr(0, 1) + "-".join(deny).substr(1) + "!"
+		var deny: Array = ["ma", "na", rc["verb"] + ("-" + rc["verb"] if rc.get("dbl", false) else ""), {"now": "im", "past": "pa", "usual": "ur", "will": "fu"}[rc["tense"]], "ki", "da"]
+		var dj = "-".join(deny)
+		line = "Maki! Maki! " + dj.substr(0, 1).to_upper() + dj.substr(1) + "!"
+		if Data.PEOPLE.has(listener):
+			line += " " + Data.INSULT[Data.PEOPLE[listener]["trait"]]
+			learn("puts")
 		gesture = listener.capitalize() + " turns bright red. It is about them! (They say: No! I do not!)"
 	elif rc["ev"] == "da":
 		line = "T-i-pal-pa-ha?!"
@@ -4988,6 +5034,7 @@ func chat_menu(id: String):
 	text_line(id.capitalize() + " is " + {"cheerful": "cheerful", "dramatic": "very dramatic", "sleepy": "always sleepy", "proud": "rather proud", "giggly": "giggly", "grumpy": "grumpy"}[pp["trait"]] + ". What do you say?", 17)
 	button("Compliment", compliment.bind(id), content)
 	button("Tease", tease.bind(id), content)
+	button("Call them a putz (playfully)", putz.bind(id), content)
 	button("Tell a joke", joke_menu.bind(id), content)
 	button("Give a gift", gift_menu.bind(id), content)
 	button("Ask: Ti ta-seng-ha? (Are you happy?)", feel.bind(id), content)
@@ -5023,7 +5070,7 @@ func compliment(id: String):
 	add_portrait(id)
 	text_line("Choose what to say. (Think about what each one means!)", 17)
 	learn("kawai")
-	var opts = [["Ti-ni " + thing[0] + " i-ho!", "Your " + thing[1] + " is good!", "thing"], ["Ti ta-ho-da!", "You are good!", "you"], ["Ti-ni dau i-var!", "Your head is big!", "head"], ["Ti ta-kawai-da!", "You are cute! (kawai is borrowed)", "cute"]]
+	var opts = [["Ti-ni " + thing[0] + " i-ho!", "Your " + thing[1] + " is good!", "thing"], ["Ti ta-ho-da!", "You are good!", "you"], ["Ti-ni dau i-var!", "Your head is big!", "head"], ["Ti ta-kawai-da!", "You are cute! (kawai is borrowed)", "cute"], ["Habibi!", "Darling! (habibi is borrowed from Arabic)", "habibi"]]
 	opts.shuffle()
 	for o in opts:
 		button("“" + o[0] + "”", func(): do_compliment(id, o), content)
@@ -5043,6 +5090,17 @@ func do_compliment(id: String, o: Array):
 			react(id, o[0], o[1], rv, re, k, 2)
 		"you":
 			react(id, o[0], o[1], "Ti ta-ho-da!", "You are good too!", "happy", 1)
+		"habibi":
+			learn("habibi")
+			var ew = {"cheerful": "habibi", "dramatic": "bubala", "giggly": "shatsi", "proud": "monshu", "sleepy": "habibi", "grumpy": "shatsi"}[tt]
+			learn(ew)
+			match tt:
+				"dramatic": react(id, o[0], o[1], "Bubala!! Bubala!!", "Darling!! Darling!! (bubala is borrowed from Yiddish. They swoon.)", "faint", 2)
+				"proud": react(id, o[0], o[1], "Monshu! Ho, an na-kawai-da.", "My cabbage! Yes, I am cute. (monshu is French mon chou, my cabbage: a sweet name!)", "proud", 2)
+				"giggly": react(id, o[0], o[1], "Shatsi! Ha! Ha!", "Sweetie! Ha ha! (shatsi is German Schatzi, little treasure)", "laugh", 2)
+				"grumpy": react(id, o[0], o[1], "Hmph. ...shatsi.", "Hmph. ...sweetie. (Grumbles, but is secretly pleased.)", "embarrassed", 1)
+				"sleepy": react(id, o[0], o[1], "Habibi... zzz", "Darling... zzz", "sleepy", 1)
+				_: react(id, o[0], o[1], "Habibi! Habibi!", "Darling! Darling! (They hug you.)", "love", 2)
 		"cute":
 			match tt:
 				"proud": react(id, o[0], o[1], "I-zen-da. An na-kawai-da.", "True. I am cute.", "proud", 2)
@@ -5089,6 +5147,33 @@ func tease(id: String):
 		"sleepy": react(id, sv, se, "Han...? zzz", "What...? zzz", "sleepy", 0)
 		_: react(id, sv, se, "Haku?!", "Why?!", "shocked", -1)
 
+func putz(id: String):
+	var tt: String = Data.PEOPLE[id]["trait"]
+	learn("puts")
+	var sv = "Ti puts ta-an-da!"
+	var se = "You are a putz! (puts is borrowed from Yiddish putz: a fool. Playful, not polite!)"
+	match tt:
+		"grumpy":
+			learn("puts-puts")
+			react(id, sv, se, "Ti puts-puts ta-an-da!", "YOU are a total putz! (Doubling the word makes it stronger.)", "angry", -1)
+		"giggly":
+			learn("baka")
+			react(id, sv, se, "Baka! Ha! Ha! Ti baka ta-an-da!", "Silly! Ha ha! YOU are silly! (baka is borrowed from Japanese)", "laugh", 1)
+		"proud":
+			learn("shlemil")
+			react(id, sv, se, "An puts ma-na-an-ki-da! Ti shlemil ta-an-da!", "I am NOT a putz! You are a clumsy fool! (shlemil is Yiddish schlemiel)", "angry", -1)
+		"dramatic":
+			learn("puts-puts")
+			react(id, sv, se, "Puts-puts?! An?! ...Ho!", "A total putz?! Me?! ...(Faints onto the ground.)", "faint", -1)
+		"sleepy": react(id, sv, se, "...puts. zzz", "...putz yourself. zzz", "sleepy", 0)
+		_:
+			learn("baka")
+			if int(friend.get(id, 0)) >= 5:
+				learn("habibi")
+				react(id, sv, se, "Ha! Baka! ...Habibi.", "Ha! Silly! ...Darling. (Friends can tease like this.)", "laugh", 1)
+			else:
+				react(id, sv, se, "Han? ...Baka!", "What? ...You silly!", "confused", 0)
+
 func joke_menu(id: String):
 	clear_panel("Tell " + id.capitalize() + " a joke")
 	add_portrait(id)
@@ -5116,9 +5201,9 @@ func do_joke(id: String, j: Dictionary):
 func gift_menu(id: String):
 	clear_panel("Give " + id.capitalize() + " a gift")
 	add_portrait(id)
-	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(gin) + " gin. (Ketu sells panak, cha and bombom.)", 17)
-	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy")}
-	for g in ["tari", "panak", "cha", "bombom", "gin"]:
+	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(inventory.count("hotdog")) + " ret-gor, " + str(gin) + " gin. (Ketu sells panak, cha, bombom and ret-gor.)", 17)
+	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy"), "ret-gor": inventory.has("hotdog")}
+	for g in ["tari", "panak", "cha", "bombom", "ret-gor", "gin"]:
 		var b = button("“Ki " + g + " ti-ru!”  (This " + Data.GIFT_WORDS[g] + ", for you!)", give_gift.bind(id, g), content)
 		b.disabled = not have[g]
 	if berries > 0: button("“Ki ning-guro ti-ru!”  (A song-berry, for you!)", villager_poem.bind(id, "ning-guro"), content)
@@ -5131,6 +5216,7 @@ func give_gift(id: String, g: String):
 		"panak": inventory.erase("bread")
 		"cha": inventory.erase("tea")
 		"bombom": inventory.erase("candy")
+		"ret-gor": inventory.erase("hotdog")
 		"gin": gin -= 1
 	learn("ti-ru")
 	var pp: Dictionary = Data.PEOPLE[id]
@@ -5200,7 +5286,10 @@ func update_ambient(delta: float):
 	var tt: String = Data.PEOPLE[e["id"]]["trait"]
 	var pick = ["sneeze", "Ha-chu!"]
 	var r = randf()
-	if tt == "sleepy" and r < 0.6: pick = ["sleepy", "zzz..."]
+	if e["id"] == "desh" and r < 0.25: pick = ["laugh", "Tarara! Tarara!"]
+	elif e["id"] == "desh" and r < 0.5: pick = ["happy", "Kachaka! Kachaka! (dances)"]
+	elif e["id"] == "mira" and r < 0.5: pick = ["happy", "Chiriri... chiriri..."]
+	elif tt == "sleepy" and r < 0.6: pick = ["sleepy", "Kororo... kororo... zzz"]
 	elif tt == "giggly" and r < 0.6: pick = ["laugh", "Ha! Ha!"]
 	elif tt == "dramatic" and r < 0.5: pick = ["shocked", "Haku?!"]
 	elif tt == "grumpy" and r < 0.5: pick = ["angry", "Hmph!"]
@@ -5208,6 +5297,8 @@ func update_ambient(delta: float):
 	elif r < 0.5: pick = ["happy", "Ho! Ho!"]
 	emote(e["id"], pick[0], 2.6)
 	e["say"] = [pick[1], clock + 2.6]
+	for sw in ["tarara", "chiriri", "kororo", "kachaka"]:
+		if pick[1].to_lower().begins_with(sw): learn(sw)
 	if pick[0] == "sneeze":
 		for o in near:
 			if o != e:
@@ -5298,6 +5389,7 @@ func ext_items(w: String) -> Dictionary:
 		"st":
 			var adj: String = Data.EXT_STATIVES[w]
 			forms = [["The house is not " + adj, "Dom ma-i-" + w + "-ki.", ["Dom i-" + w + "-ki.", "Ma-dom i-" + w + "."], "Not: ma- ... -ki wraps the verb."],
+				["The house is very, very " + adj, "Dom i-" + w + "-" + w + ".", ["Dom i-" + w + ".", "Dom-dom i-" + w + "."], "Doubling a describing root makes it stronger: var-var, huge."],
 				["a " + adj + " house", w + " dom", ["dom " + w, "dom-" + w + "-ma"], "Describing words come right before the noun."],
 				["The boat is more " + adj + " than the house", "Sena dom-ta i-u-" + w + ".", ["Sena dom-ma i-u-" + w + ".", "Sena dom-ta i-" + w + "-u."], "Compare with -ta (from) and u- before the root."]]
 			builds = [{"en": "My food is " + adj + ".", "tiles": ["Anni", "yamat", "i-" + w + "."], "decoys": ["An", "i-" + w + "-ki."], "tip": "My is anni; is " + adj + " is i-" + w + "."},
@@ -5381,6 +5473,8 @@ func poem_line(t: int, rng: RandomNumberGenerator, force_noun: String = "") -> A
 			var ev = ["da", "shi", "nu"][rng.randi() % 3]
 			var pre = {"da": "", "shi": "Apparently ", "nu": "They say "}[ev]
 			var post = " (I saw it)" if ev == "da" else ""
+			if rng.randf() < 0.4:
+				return [cap(n) + " " + pl + "-ma i-" + s + "-" + s + "-" + ev + ".", cap(pre + ns[0] + " " + Data.POEM_PLACES[pl] + " is very, very " + adj + post + "."), "Doubling: i-" + s + "-" + s + " is extra " + adj + ". -" + ev + " tells how the poet knows."]
 			return [cap(n) + " " + pl + "-ma i-" + s + "-" + ev + ".", cap(pre + ns[0] + " " + Data.POEM_PLACES[pl] + " is " + adj + post + "."), "-" + ev + " tells how the poet knows."]
 		1:
 			return [cap(n) + "-ir " + n2 + "-su ri-" + v + "-ur-da.", cap(ns[1] + " usually " + fv[0] + " with " + ns2[0] + "."), "-ir makes many, so the verb takes ri- (they); -su means together with."]
@@ -5497,6 +5591,69 @@ func show_poems():
 			button("Poem book", show_poems, content), content)
 	button("Notebook", show_notebook, content)
 
+func false_friends(start: bool = true):
+	if start:
+		ff_order = Data.FALSE_FRIENDS.duplicate()
+		ff_order.shuffle()
+		ff_order = ff_order.slice(0, 8)
+		ff_i = 0
+	if ff_i >= ff_order.size():
+		clear_panel("False friends: done!")
+		text_line("You weren't fooled! False friends are words that look like words you know but mean something else. In Varnak, gin is money, hen is the sky, and ten is a foot.", 18)
+		gin += 2
+		toast("+2 gin")
+		save_game()
+		button("Play again", false_friends.bind(true), content)
+		button("Games", show_games, content)
+		return
+	var f: Array = ff_order[ff_i]
+	learn(f[0])
+	var opts: Array = [f[2]]
+	opts.append_array(f[3])
+	choice_puzzle("False friend " + str(ff_i + 1) + " of " + str(ff_order.size()), "This Varnak word looks like " + f[1] + ":\n\n" + f[0] + "\n\nWhat does it really mean in Varnak?", opts, 0, func():
+		master("ff:" + f[0])
+		ff_i += 1, f[0] + " means " + f[2] + ", not " + f[1] + "!", "Careful: it only looks like " + f[1] + ". Check the notebook.", show_games,
+		func(): button("Next false friend", false_friends.bind(false), content))
+
+func sound_game(start: bool = true):
+	if start:
+		ff_order = Data.SOUND_SCENES.duplicate()
+		ff_order.shuffle()
+		ff_order = ff_order.slice(0, 6)
+		ff_i = 0
+	if ff_i >= ff_order.size():
+		clear_panel("What's that sound? Done!")
+		text_line("Great ears! These sound words come from Guarani, a language of Paraguay that is full of them. Repeating the last syllable (po-ro-ro, ta-ra-ra) echoes a sound that repeats.", 18)
+		gin += 2
+		toast("+2 gin")
+		save_game()
+		button("Play again", sound_game.bind(true), content)
+		button("Sound words", show_sounds, content)
+		button("Games", show_games, content)
+		return
+	var f: Array = ff_order[ff_i]
+	var opts: Array = [f[0]]
+	opts.append_array(f[2])
+	for o in opts: learn(o)
+	choice_puzzle("What's that sound? " + str(ff_i + 1) + " of " + str(ff_order.size()), f[1] + "\n\nWhich sound word fits?", opts, 0, func():
+		master("snd:" + f[0])
+		ff_i += 1, f[0] + ": " + short_gloss(f[0]) + ".", "Listen again. Check the sound words page in the notebook.", show_games,
+		func(): button("Next sound", sound_game.bind(false), content))
+
+func show_sounds():
+	clear_panel("Sound words")
+	text_line("Varnak borrowed a family of sound words from Guarani, a language spoken by millions of people in Paraguay. Many repeat their last syllable, the way the sound itself repeats.", 17)
+	var h = text_line("How they work in Varnak:\n- the sound itself: pororo! (pop!)\n- as a verb: Far i-pororo-im-da. (The fire is popping.)\n- doubled, again and again: i-pororo-pororo-im-da (popping and popping)\n- in the past, people say: i-pororo-pa-nu (it popped, they say)", 17)
+	h.add_theme_color_override("font_color", Color("2f5a2f"))
+	for w in ["pororo", "piriri", "chiriri", "guarara", "kororo", "tarara", "pururu", "siri", "vava", "sununu"]:
+		var known = discovered.has(w)
+		var l = text_line((w + "  " + short_gloss(w) + "   i-" + w + "-im-da, " + w + "-" + w) if known else "???  (not heard yet)", 18)
+		if known: l.add_theme_color_override("font_color", Color("7a1f3d"))
+	text_line("Listen for them around the island: Mira's pan, Neri's campfire, Desh's parties, and anyone who naps.", 16)
+	button("Play: What's that sound?", sound_game.bind(true), content)
+	button("Word play", show_loans, content)
+	button("Notebook", show_notebook, content)
+
 func show_credits():
 	clear_panel("Credits")
 	text_line("Varnak Island", 24)
@@ -5508,8 +5665,8 @@ func show_credits():
 	button("Return", close_panel, content)
 
 func show_loans():
-	clear_panel("Borrowed words")
-	text_line("Varnak borrows words from other languages and respells them with Varnak sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
+	clear_panel("Word play")
+	text_line("Borrowed words. Varnak borrows words from other languages and respells them with Varnak sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
 	var any = false
 	for w in words.keys():
 		if str(words[w]).contains("borrow"):
@@ -5518,4 +5675,20 @@ func show_loans():
 			var l = text_line((w if known else "???") + "  " + (str(words[w]) if known else "(not found yet)"), 18)
 			if known: l.add_theme_color_override("font_color", Color("7a1f3d"))
 	if not any: text_line("None yet.")
+	var groups = [["calque", "Calques. A calque translates another language's word piece by piece: far-par (fire-bird) is a firefly, ret-gor (hot-dog) is a hot dog."],
+		["false friend", "False friends. These look like English words but mean something else. Don't be fooled!"],
+		["doubled", "Doubling. Say a word twice to make it stronger or to mean again and again: var big, var-var huge; pav run, pav-pav run around and around."]]
+	for g in groups:
+		var h = text_line(g[1], 17)
+		h.add_theme_color_override("font_color", Color("2f5a2f"))
+		var n = 0
+		for w in words.keys():
+			if str(words[w]).contains(g[0]):
+				n += 1
+				var known = discovered.has(w)
+				var l = text_line((w if known else "???") + "  " + (str(words[w]) if known else "(not found yet)"), 18)
+				if known: l.add_theme_color_override("font_color", Color("7a1f3d"))
+		if n == 0: text_line("None yet.")
+	button("Sound words from Guarani", show_sounds, content)
+	button("Play False friends", false_friends.bind(true), content)
 	button("Notebook", show_notebook, content)

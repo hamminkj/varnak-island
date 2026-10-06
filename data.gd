@@ -73,6 +73,32 @@ const WORDS = {
 	"bombom": "candy (borrowed from French bonbon)", "wala": "ta-da! (borrowed from French voila)", "pajama": "pajamas (borrowed through English from Hindi and Urdu)",
 	"kaput": "broken (borrowed from German kaputt; a describing root: i-kaput)", "aloha": "hello, goodbye (borrowed from Hawaiian)", "chau": "bye (borrowed from Italian ciao)",
 	"kaf": "coffee (an old borrowing, like cha)",
+	# borrowed terms of endearment and playful insults
+	"habibi": "darling, my dear (borrowed from Arabic habibi)", "shatsi": "sweetie (borrowed from German Schatzi, little treasure)",
+	"monshu": "sweetie (borrowed from French mon chou, literally my cabbage)", "bubala": "darling (borrowed from Yiddish bubbeleh)",
+	"puts": "a fool, a dope (borrowed from Yiddish putz; playful, not polite)", "baka": "silly fool (borrowed from Japanese baka)",
+	"shlemil": "a clumsy fool (borrowed from Yiddish schlemiel)",
+	# calques: words built by translating another language piece by piece
+	"far-par": "firefly (calque: far fire + par bird, built like English fire-fly)", "ret-gor": "hot dog, a sausage in bread (calque: ret hot + gor dog)",
+	"sao-tari": "starfish (calque: sao star + tari fish, from English starfish; hai-sao, sea star, is the older word)",
+	"hai-mar": "seahorse (calque: hai sea + mar horse)", "sanu-mara": "kindergarten (calque of German Kindergarten: sanu child + mara field)",
+	"dau-fong": "brainstorm (calque: dau head + fong wind)", "fong": "wind",
+	# reduplication: doubling makes a describing word stronger, a verb repeated, a noun varied
+	"var-var": "huge (var big, doubled)", "sen-sen": "tiny (sen small, doubled)", "ho-ho": "super good (ho good, doubled)",
+	"kawai-kawai": "so, so cute (doubled)", "len-len": "freezing (len cold, doubled)", "pav-pav": "run around and around (pav run, doubled)",
+	"guro-guro": "fruits of all kinds (guro fruit, doubled)", "puts-puts": "a total fool (doubled)",
+	# sound words borrowed from Guarani (repeating the last syllable echoes a repeating sound)
+	"pororo": "pop, crackle (borrowed from Guarani pororó, the sound of something bursting; popcorn is pororó too)",
+	"piriri": "sparkle, fizz (borrowed from Guarani piriri, to sparkle or crackle)",
+	"chiriri": "sizzle (borrowed from Guarani chyryry, the sound of frying)",
+	"guarara": "roar, a big noise (borrowed from Guarani guarara, noise)",
+	"kororo": "snore (borrowed from Guarani kororõ, to snore or roar)",
+	"tarara": "toot like a trumpet (borrowed from Guarani tarara, the sound of a trumpet)",
+	"pururu": "crunch (borrowed from Guarani pururũ, a crunching sound)",
+	"siri": "trickle, flow (borrowed from Guarani syry, to flow)",
+	"vava": "sway, wobble (borrowed from Guarani vava, to sway)",
+	"sununu": "a rumbling uproar (borrowed from Guarani sununu, an uprising or revolt)",
+	"kachaka": "bouncy dance music (borrowed from Paraguayan kachaka, a cumbia style named after a Colombian song)",
 	"-en": "who / that (relative clause ending: i-ning-im-en par, the bird that is singing)",
 	"-ka": "and then (same subject keeps going)", "shi (if)": "if (after the clause)"
 }
@@ -84,7 +110,12 @@ const GLOSS_UPDATES = {
 	"kor": "container (as a verb root, kor means cross)",
 	"an": "I (independent pronoun); as a verb root, an means be",
 	"gao": "tall / high (as a verb root, gao means tell)",
-	"tar": "bring (root); also top (after -ni)"
+	"tar": "bring (root); also top (after -ni)",
+	"hen": "sky (a false friend: not a chicken!)", "ten": "foot (a false friend: the number ten is dar)",
+	"far": "fire (a false friend: not far away)", "pal": "see (root; a false friend: not a pal)",
+	"gin": "money, coins (a false friend: not the drink)", "bar": "eight (a false friend: not a bar)",
+	"set": "seven (a false friend: not a set)", "men": "front (after -ni; a false friend: not men)",
+	"sum": "swim (root; a false friend: not a sum)"
 }
 
 # Nouns for the word workshop: root -> [singular, plural]
@@ -325,6 +356,27 @@ const SENTENCES = {
 	"odd_choni": {"v": "Gav-ni choni fardom-ni tarma i-esh-da!", "parts": "Gav-ni  choni  fardom-ni  tar-ma  i-esh-da\nGav-GEN  underwear  lighthouse-GEN  top-LOC  3S-be.located-DIR", "en": "Gav's underwear is on top of the lighthouse!",
 		"gesture": "A pair of spotted chonies flaps from the very top of the lighthouse like a flag. Choni is a word Varnak borrowed.",
 		"words": ["choni", "-ni", "fardom", "tar", "-ma"], "wrong": ["Gav is on top of the lighthouse.", "The lighthouse is wearing a hat."]},
+	"suri_kinder": {"v": "Ki senak sanu-mara ma-i-an-ki-da!", "parts": "ki  senak  sanu-mara  ma-i-an-ki-da\nthis  school  child-field  NEG-3S-be-NEG-DIR", "en": "This school is NOT a kindergarten!",
+		"gesture": "Suri says it to Rin and Ola, who are giggling under a bench. Sanu-mara is a calque of German Kindergarten: child-field.",
+		"words": ["senak", "sanu-mara", "ma- -ki"], "wrong": ["This school is a kindergarten!", "The children are in the field."]},
+	"oku_brainstorm": {"v": "Anni dauma dau-fong i-esh-im-da!", "parts": "anni  dau-ma  dau-fong  i-esh-im-da\nmy  head-LOC  head-wind  3S-exist-IPFV-DIR", "en": "There is a brainstorm in my head!",
+		"gesture": "Oku clutches their head as their hair blows about. Dau-fong, head-wind, is a calque of brainstorm.",
+		"words": ["dau", "dau-fong", "fong"], "wrong": ["There is wind on the hill.", "My head hurts."]},
+	"hot_dog": {"v": "Gor ret-gor-ta i-par-ur-da.", "parts": "gor  ret-gor-ta  i-par-ur-da\ndog  hot-dog-ABL  3S-fear-HAB-DIR", "en": "The dog is afraid of hot dogs.",
+		"gesture": "The village dog stares at the ret-gor in horror. Ret-gor, hot dog, is a calque: ret hot + gor dog.",
+		"words": ["ret-gor", "gor", "par"], "wrong": ["The dog is eating a hot dog.", "The dog is hot."]},
+	"fruit_variety": {"v": "Ki guro-guro i-ho-ho-da!", "parts": "ki  guro-guro  i-ho-ho-da\nthis  fruit~REDUP  3S-good~REDUP-DIR", "en": "These fruits of all kinds are super good!",
+		"gesture": "Ketu juggles three different fruits. Doubling a word changes it: guro-guro means all kinds of fruit, ho-ho means super good.",
+		"words": ["guro-guro", "ho-ho"], "wrong": ["This fruit is bad.", "Two fruits are good."]},
+	"mira_sizzle": {"v": "Yamat i-chiriri-im-da!", "parts": "yamat  i-chiriri-im-da\nfood  3S-sizzle-IPFV-DIR", "en": "The food is sizzling!",
+		"gesture": "Mira shakes a hot pan and makes a frying noise with her mouth. Chiriri is a sound word borrowed from Guarani chyryry.",
+		"words": ["yamat", "chiriri", "-im"], "wrong": ["The food is cold.", "The food is sleeping."]},
+	"fire_pops": {"v": "Far i-pororo-pororo-im-da!", "parts": "far  i-pororo-pororo-im-da\nfire  3S-pop~REDUP-IPFV-DIR", "en": "The fire is popping and popping!",
+		"gesture": "Neri jumps back from the campfire as sparks fly. Pororo is the Guarani sound of something bursting; doubled, it keeps going.",
+		"words": ["far", "pororo", "-im"], "wrong": ["The fire is out.", "The fire popped once."]},
+	"desh_toot": {"v": "Fiyesta-ma Desh i-tarara-tarara-pa-nu!", "parts": "fiyesta-ma  Desh  i-tarara-tarara-pa-nu\nparty-LOC  Desh  3S-toot~REDUP-PST-REP", "en": "They say Desh tooted and tooted like a trumpet at the party!",
+		"gesture": "Desh puffs out both cheeks and plays an imaginary trumpet. Tarara is the Guarani sound of a trumpet.",
+		"words": ["fiyesta", "tarara", "-nu"], "wrong": ["Desh slept at the party.", "Desh will play the drum."]},
 	"party_noise": {"v": "Fiyesta-ma buruhaha i-esh-pa-nu.", "parts": "fiyesta-ma  buruhaha  i-esh-pa-nu\nparty-LOC  uproar  3S-exist-PST-REP", "en": "They say there was an uproar at the party.",
 		"gesture": "Desh grins and mimes a crowd going wild. Fiyesta and buruhaha are both borrowed words.",
 		"words": ["fiyesta", "buruhaha", "-nu"], "wrong": ["The party was quiet.", "There will be a party tomorrow."]}
@@ -378,6 +430,9 @@ const GOSSIP = [
 	{"id": "desh_party", "by": "lira", "about": "desh", "ev": "nu", "v": "Desh-ni fiyesta-ma halabalu i-esh-pa-nu.", "en": "They say there was a hullabaloo at Desh's party.",
 		"gesture": "Lira covers her ears, then dances a little.",
 		"reply": {"v": "Ho! Fiyesta i-ho-pa-da! Wala!", "en": "Yes! The party was great! Ta-da!", "gesture": "Desh plays a drum roll and throws imaginary confetti."}},
+	{"id": "tor_habibi", "by": "oren", "about": "tor", "ev": "nu", "v": "Tor mar-ru habibi i-mel-ur-nu.", "en": "They say Tor calls the horse habibi (darling).",
+		"gesture": "Oren glares toward the bridge and pats his horse protectively.",
+		"reply": {"v": "Ho! Mar i-kawai-kawai-da!", "en": "Yes! The horse is so, so cute!", "gesture": "Tor clasps his hands and swoons a little."}},
 	{"id": "lira_story", "by": "pomo", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
 		"gesture": "Pomo points down the hill at the village and mimes a chattering mouth.",
 		"reply": {"v": "Ho! Ki tovu i-ho!", "en": "Ha! This story is good!", "gesture": "Lira is already telling someone else."}}
@@ -389,7 +444,8 @@ const RUMOR_PLACES = [["", "", ""], ["tekama", "in the village", ""], ["haima", 
 # root: [base, -ing, past, he/she form]
 const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["swim", "swimming", "swam", "swims"], "ning": ["sing", "singing", "sang", "sings"],
 	"pav": ["run", "running", "ran", "runs"], "nang": ["walk", "walking", "walked", "walks"], "mel": ["talk", "talking", "talked", "talks"],
-	"tal": ["arrive", "arriving", "arrived", "arrives"], "sir": ["search", "searching", "searched", "searches"]}
+	"tal": ["arrive", "arriving", "arrived", "arrives"], "sir": ["search", "searching", "searched", "searches"],
+	"kororo": ["snore", "snoring", "snored", "snores"], "tarara": ["toot like a trumpet", "tooting like a trumpet", "tooted like a trumpet", "toots like a trumpet"], "vava": ["wobble", "wobbling", "wobbled", "wobbles"]}
 const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Vira", "Yalo", "Desh", "Oku", "Gav", "Tamu", "Neri", "Gor", "Mar", "Par"]
 const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird"}
 
@@ -470,7 +526,8 @@ const DESH = [
 	{"v": "Ta-ning-o!", "en": "Sing!", "act": "You sing a few notes.", "words": ["ning", "-o"]},
 	{"v": "Ta-nang-o!", "en": "Walk!", "act": "You walk slowly along the shore.", "words": ["nang", "-o"]},
 	{"v": "Ta-sul-o!", "en": "Sleep!", "act": "You lie down on the sand and close your eyes.", "words": ["sul", "-o"]},
-	{"v": "Ma-ta-pav-o-ki!", "en": "Do not run!", "act": "You stand completely still.", "words": ["pav", "ma- -ki"]}
+	{"v": "Ma-ta-pav-o-ki!", "en": "Do not run!", "act": "You stand completely still.", "words": ["pav", "ma- -ki"]},
+	{"v": "Ta-pav-pav-o!", "en": "Run around and around!", "act": "You run around in circles until you are dizzy.", "words": ["pav-pav"]}
 ]
 
 # Vira's patient. Ila mimes where it hurts; the player chooses what Ila would say.
@@ -573,7 +630,7 @@ const PEOPLE = {
 		"secret": {"v": "Gira i-sava... shi.", "en": "The bridge is safe... apparently. (-shi: Tor is only guessing!)"}},
 	"lira": {"trait": "giggly", "thing": ["tovu", "story"], "likes": ["gin"], "hates": ["tari"],
 		"secret": {"v": "Anni tovu-ir ri-fau-da.", "en": "My stories are false."}},
-	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha", "bombom"],
+	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha", "bombom", "ret-gor"],
 		"secret": {"v": "An mar-ru na-ning-ur-da.", "en": "I sing to the horse."}},
 	"neri": {"trait": "cheerful", "thing": ["puka", "notebook"], "likes": ["tari", "panak", "cha", "gin"], "hates": [],
 		"secret": {"v": "An tari-ta na-par-ur-da.", "en": "I am afraid of fish."}},
@@ -593,11 +650,11 @@ const PEOPLE = {
 		"secret": {"v": "Anni dauma tong ma-i-esh-pa-ki-da.", "en": "There was no pain in my head. (She faked it!)"}},
 	"yalo": {"trait": "dramatic", "thing": ["fardom", "lighthouse"], "likes": ["cha"], "hates": ["tari"],
 		"secret": {"v": "An yesh-ta na-par-ur-da. I-zen-da.", "en": "I am afraid of the night. It's true."}},
-	"desh": {"trait": "giggly", "thing": ["ning", "song"], "likes": ["tari"], "hates": [],
+	"desh": {"trait": "giggly", "thing": ["ning", "song"], "likes": ["tari", "ret-gor"], "hates": [],
 		"secret": {"v": "Tari-ir ma-ri-seng-ur-ki-da.", "en": "The fish are not happy when I sing."}},
 	"oku": {"trait": "proud", "thing": ["sek-ir", "stones"], "likes": ["cha"], "hates": ["gin"],
 		"secret": {"v": "Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da.", "en": "The stones don't talk. I do."}},
-	"gav": {"trait": "cheerful", "thing": ["kel-ir", "bags"], "likes": ["panak", "bombom"], "hates": [],
+	"gav": {"trait": "cheerful", "thing": ["kel-ir", "bags"], "likes": ["panak", "bombom", "ret-gor"], "hates": [],
 		"secret": {"v": "Kel-ir-ma yamat i-ho-da.", "en": "The food in the bags is good."}},
 	"tamu": {"trait": "grumpy", "thing": ["sena", "boat"], "likes": ["tari"], "hates": ["panak"],
 		"secret": {"v": "An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.", "en": "I don't travel by boat. I swim."}}
@@ -614,15 +671,42 @@ const JOKES = [
 	{"v": "Gira i-pav-im-da!", "en": "The bridge is running!"},
 	{"v": "Mar-ni choni-ir ri-kawai-da!", "en": "The horse's chonies are cute!"},
 	{"v": "Gira i-kaput... wala! Gira i-sava-da!", "en": "The bridge is broken... ta-da! The bridge is safe!"},
-	{"v": "Yue pajama-ma i-sul-im-da!", "en": "The moon is sleeping in pajamas!"}
+	{"v": "Yue pajama-ma i-sul-im-da!", "en": "The moon is sleeping in pajamas!"},
+	{"v": "Dar ten!", "en": "Ten feet! (dar is ten and ten is foot. Confused yet?)"},
+	{"v": "Hai-mar ma-i-pav-ki-da! I-sum-ur-da.", "en": "The seahorse doesn't run! It swims."},
+	{"v": "Hen hen-ma i-esh-da!", "en": "The sky is in the sky! (hen means sky, not chicken)"},
+	{"v": "Gor i-pav-pav-im-da!", "en": "The dog is running around and around!"}
 ]
-const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin", "bombom": "candy"}
+const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin", "bombom": "candy", "ret-gor": "hot dog"}
+
+# False friends: Varnak words that look like English words.
+const FALSE_FRIENDS = [
+	["hen", "a chicken", "sky", ["chicken", "egg"]], ["ten", "the number 10", "foot", ["ten", "hand"]], ["far", "far away", "fire", ["far away", "near"]],
+	["pal", "a friend", "see", ["friend", "talk"]], ["gin", "a drink", "money", ["a drink", "water"]], ["bar", "a bar", "eight", ["a bar", "a door"]],
+	["set", "a set", "seven", ["a set", "a table"]], ["men", "men", "front", ["men", "people"]], ["sum", "a sum", "swim", ["add up", "summer"]],
+	["mar", "the sea (in Spanish!)", "horse", ["sea", "fish"]], ["mal", "bad (in Spanish!)", "hand", ["bad", "foot"]], ["dam", "a dam", "dark", ["a wall", "water"]]
+]
+
+# Sound words from Guarani: [word, scene, decoys]. Used by the "What's that sound?" game.
+const SOUND_SCENES = [
+	["pororo", "Corn kernels burst in a hot pot.", ["kororo", "siri"]], ["chiriri", "Fish fry in a pan of hot oil.", ["tarara", "vava"]],
+	["kororo", "Pomo is asleep under a tree, mouth wide open.", ["piriri", "pururu"]], ["tarara", "Desh blows into a big shell like a trumpet.", ["siri", "chiriri"]],
+	["pururu", "You bite into a very crispy panak.", ["guarara", "vava"]], ["siri", "Water trickles down a rock into the pond.", ["sununu", "pororo"]],
+	["vava", "A palm tree sways in the wind.", ["pururu", "tarara"]], ["piriri", "Sparks fizz and twinkle above the campfire.", ["kororo", "sununu"]],
+	["guarara", "The waterfall roars and crashes.", ["piriri", "chiriri"]], ["sununu", "The whole village shouts and stomps about a missing hot dog.", ["siri", "vava"]]
+]
+
+# Endearments and playful insults, by personality.
+const ENDEAR = {"cheerful": "Habibi!", "dramatic": "Bubala!", "giggly": "Shatsi!", "proud": "Monshu!", "sleepy": "Habibi... zzz", "grumpy": "Hmph. ...shatsi."}
+const INSULT = {"grumpy": "Puts!", "giggly": "Baka! Ha!", "proud": "Shlemil!", "dramatic": "Puts-puts!", "cheerful": "Baka!", "sleepy": "...puts. zzz"}
 
 
 # ---- quick practice for new words: word classes and English forms ----
 # Intransitive verbs: [base, past, -ing]
 const EXT_VERBS_I = {"lum": ["go", "went", "going"], "pav": ["run", "ran", "running"], "sul": ["sleep", "slept", "sleeping"], "sum": ["swim", "swam", "swimming"],
-	"ning": ["sing", "sang", "singing"], "nang": ["walk", "walked", "walking"], "tal": ["arrive", "arrived", "arriving"], "mel": ["talk", "talked", "talking"], "kar": ["come", "came", "coming"]}
+	"ning": ["sing", "sang", "singing"], "nang": ["walk", "walked", "walking"], "tal": ["arrive", "arrived", "arriving"], "mel": ["talk", "talked", "talking"], "kar": ["come", "came", "coming"],
+	"pororo": ["pop", "popped", "popping"], "chiriri": ["sizzle", "sizzled", "sizzling"], "kororo": ["snore", "snored", "snoring"], "tarara": ["toot", "tooted", "tooting"],
+	"piriri": ["sparkle", "sparkled", "sparkling"], "vava": ["sway", "swayed", "swaying"]}
 # Transitive verbs: [base, past]
 const EXT_VERBS_T = {"pal": ["see", "saw"], "nuk": ["take", "took"], "rav": ["read", "read"], "por": ["open", "opened"], "hep": ["close", "closed"],
 	"dar": ["cook", "cooked"], "varn": ["build", "built"], "sir": ["look for", "looked for"], "mai": ["buy", "bought"], "ven": ["give", "gave"], "tar": ["bring", "brought"]}

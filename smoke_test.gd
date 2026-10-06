@@ -787,6 +787,60 @@ func run():
 	game.show_loans()
 	assert(has_text("choni"))
 	print("PASS: borrowed words: kawai compliments, choni teases, loan gossip, bombom gifts, borrowed words page")
+	# ---- word play: endearments, insults, calques, false friends, doubling, Guarani sound words ----
+	for id in Data.PEOPLE.keys():
+		game.do_compliment(id, ["Habibi!", "Darling!", "habibi"])
+		game.putz(id)
+		assert(game.panel.visible)
+	assert(game.discovered.has("habibi") and game.discovered.has("puts"))
+	game.friend["desh"] = 9
+	game.day_count = 0
+	game.mood["desh"] = 0
+	game.entity_by_id("desh").erase("say")
+	game.guro_t = -1.0
+	assert(game.greeting("desh") == Data.ENDEAR["giggly"])
+	for sid in ["suri_kinder", "oku_brainstorm", "hot_dog", "fruit_variety", "mira_sizzle", "fire_pops", "desh_toot"]:
+		game.sentence_card(sid)
+		press(Data.SENTENCES[sid]["en"])
+	game.gin = 3
+	game.completed.append("market")
+	game.talk("ketu")
+	press("Buy ret-gor (hot dog): gin yan")
+	assert(game.inventory.has("hotdog"))
+	game.give_gift("desh", "ret-gor")
+	assert(not game.inventory.has("hotdog"))
+	for w in ["var", "len", "kawai"]:
+		var fs: Array = game.ext_items(w)["forms"]
+		assert(fs.any(func(f): return f[1] == "Dom i-" + w + "-" + w + "."))
+	var rcd = {"who": "Tor", "place": "", "adv": "", "verb": "sum", "dbl": true, "tense": "past", "neg": false, "ev": "nu"}
+	assert(game.rumor_parts(rcd)["v"] == "Tor i-sum-sum-pa-nu.")
+	assert(game.rumor_en(rcd).contains("again and again"))
+	rcd["who"] = "Oren"
+	game.rumor_react("oren", rcd)
+	assert(has_any("Puts!"))
+	game.false_friends(true)
+	for k in range(8):
+		var f: Array = game.ff_order[game.ff_i]
+		press(f[2])
+		press("Next false friend")
+	assert(has_any("weren't fooled"))
+	game.sound_game(true)
+	for k in range(6):
+		var f2: Array = game.ff_order[game.ff_i]
+		press(f2[0])
+		press("Next sound")
+	assert(has_any("Great ears"))
+	game.show_sounds()
+	assert(has_any("pororo"))
+	game.show_loans()
+	assert(has_any("Calques") and has_any("False friends") and has_any("Doubling"))
+	var prng = RandomNumberGenerator.new()
+	for k in range(40):
+		prng.seed = k
+		var ln = game.poem_line(0, prng)
+		assert(ln[0].ends_with("."))
+	assert(game.ui.find_child("MovePad", true, false) != null)
+	print("PASS: word play: habibi and putz, calques, false friends game, doubling, Guarani sound words, move pad icon")
 	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
 	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")
@@ -817,6 +871,14 @@ func tray_tile(w: String) -> Control:
 	for t in game.dd["tray"].get_children():
 		if t.get_meta("word") == w: return t
 	return null
+
+func has_any(t: String, n: Node = null) -> bool:
+	if n == null: n = game.content
+	for c in n.get_children():
+		if c.is_queued_for_deletion(): continue
+		if (c is Label or c is RichTextLabel) and c.text.contains(t): return true
+		if has_any(t, c): return true
+	return false
 
 func has_text(t: String) -> bool:
 	for c in game.content.get_children():
