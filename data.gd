@@ -412,8 +412,29 @@ const TILES = [
 	{"en": "Please give me three fish.", "tiles": ["Mur", "tari", "t-na-ven-o-ye."], "decoys": ["Tarike"], "tip": "The number comes before the noun, and the command ends in -o-ye."},
 	{"en": "My bag.", "tiles": ["Anni", "kel"], "decoys": ["An"], "tip": "The owner comes first and takes -ni."},
 	{"en": "The water is in the container.", "tiles": ["Wak", "korma", "i-esh-da."], "decoys": ["korta"], "tip": "In is -ma; -ta means from."},
-	{"en": "At night the stars shine.", "tiles": ["Yeshma", "sao-ir", "ri-ling-da."], "decoys": ["i-ling-da."], "tip": "Many stars are they, so the verb takes ri-."}
+	{"en": "At night the stars shine.", "tiles": ["Yeshma", "sao-ir", "ri-ling-da."], "decoys": ["i-ling-da."], "tip": "Many stars are they, so the verb takes ri-."},
+	# longer sentences unlock at higher levels (lv 2 and 3)
+	{"lv": 2, "en": "The woman saw the child in the village.", "tiles": ["Rumake", "sanu", "tekama", "i-pal-pa-da."], "decoys": ["Ruma", "tekaru"], "tip": "The seer takes -ke, the one seen has no ending, the place takes -ma, and the verb comes last."},
+	{"lv": 2, "en": "The traveler caught the fish at the river.", "tiles": ["Kelarke", "tari", "morama", "i-nuk-ak-pa-da."], "decoys": ["Kelar", "morata"], "tip": "Agent with -ke, then the fish, then the place with -ma, then the verb."},
+	{"lv": 2, "en": "I gave the bread to Ketu.", "tiles": ["Anke", "panak", "Keturu", "k-i-ven-ak-pa-da."], "decoys": ["An", "Ketuma"], "tip": "To Ketu is Ketu-ru. Order: the one acting, the thing, the place or person it goes to, the verb."},
+	{"lv": 2, "en": "Mira cooked the food in the village.", "tiles": ["Mirake", "yamat", "tekama", "i-dar-ak-pa-da."], "decoys": ["Mira", "i-dar-im-da."], "tip": "Cooked is finished and past: -ak-pa."},
+	{"lv": 3, "en": "The child is sleeping in the village.", "tiles": ["Sanu", "tekama", "i-sul-im-da."], "decoys": ["Sanuke", "tekaru", "na-sul-im-da."], "tip": "Sleeping acts on nothing, so no -ke; he or she is i-."},
+	{"lv": 3, "en": "The traveler went fishing.", "tiles": ["Kelar", "i-tari-nuk-ak-pa-da."], "decoys": ["Kelarke", "tari", "i-nuk-ak-pa-da."], "tip": "Fishing in general puts tari inside the verb, and then the traveler takes no -ke."},
+	{"lv": 3, "en": "I usually travel to the small island by boat.", "tiles": ["An", "sena-li", "sendor-ru", "na-kel-ur-da."], "decoys": ["Anke", "sena-ma", "sendor-ta"], "tip": "By boat is -li, to the island is -ru, usually is -ur."},
+	{"lv": 3, "en": "They say there is a room behind the big water.", "tiles": ["Var", "wak-ni", "shanma", "gan", "i-esh-nu."], "decoys": ["wak-ma", "i-esh-da."], "tip": "Behind something is X-ni shan-ma, and they say is the hearsay ending -nu."},
+	{"lv": 3, "en": "Please give me medicine and tea.", "tiles": ["Yok", "e", "cha", "t-na-ven-o-ye."], "decoys": ["vo", "k-i-ven-o-ye."], "tip": "And is e. You give to me is t-na-ven, and please is -o-ye."},
+	{"lv": 4, "en": "This hill is the highest of all.", "tiles": ["Ki", "sang", "polu-ta", "i-u-gao."], "decoys": ["polu-ma", "i-gao."], "tip": "Than all is polu-ta, and more is u- before the root."},
+	{"lv": 4, "en": "I did not see them.", "tiles": ["Ma-k-ri-pal-ak-pa-ki-da."], "decoys": ["Ma-k-i-pal-ak-pa-ki-da.", "K-ri-pal-ak-pa-da.", "Ma-r-na-pal-ak-pa-ki-da."], "tip": "k- I act, ri- them, ma- ... -ki not. This one is straight from the grammar."}
 ]
+
+# Market rush: things Ketu's stall sells. word -> English
+const GOODS = {"guro": "fruit", "panak": "bread", "tari": "fish", "cha": "tea"}
+const NUMBERS = ["nul", "yan", "vel", "mur", "kes", "pan", "luk", "set", "bar", "gov", "dar"]
+
+# "Say it yourself" challenges: residents ask you to build a sentence (index into TILES). Unlock at level 2.
+const CHALLENGES = {"mira": 15, "tor": 2, "ketu": 8, "vira": 20, "desh": 17, "lira": 14, "oren": 6, "tamu": 18, "oku": 19, "neri": 1, "suri": 12, "pomo": 21, "sanu": 16, "ena": 9, "yalo": 11, "gav": 13}
+
+const LEVEL_NAMES = ["", "Explorer", "Speaker", "Storyteller", "Elder"]
 
 # Times of day, announced as they change.
 const TIMES = {"salma": "dawn", "monar": "morning", "yar": "day", "wanar": "evening", "yesh": "night"}

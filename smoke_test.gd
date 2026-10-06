@@ -10,6 +10,7 @@ func press(label: String):
 	if b: b.pressed.emit()
 func find_button(node: Node, label: String) -> Button:
 	for child in node.get_children():
+		if child.is_queued_for_deletion() or (child is CanvasItem and not child.visible): continue
 		if child is Button and child.text == label and not child.disabled: return child
 		var deeper = find_button(child, label)
 		if deeper: return deeper
@@ -162,9 +163,16 @@ func run():
 	press("Give mur tari (3 fish)")
 	assert(not game.completed.has("market"))
 	game.mastered.append("w:nuk")
+	for k in range(2):
+		game.fishing()
+		assert(game.mg["type"] == "fish")
+		game.mg["u"] = game.mg["zx"] + game.mg["zw"] * 0.5
+		game.fish_pull()
 	game.fishing()
-	game.fishing()
-	assert(game.fish_caught == 3)
+	game.mg["u"] = fmod(game.mg["zx"] + 0.5, 1.0) if game.mg["zx"] + game.mg["zw"] < 0.45 or game.mg["zx"] > 0.55 else 0.0
+	if game.mg["u"] >= game.mg["zx"] - 0.02 and game.mg["u"] <= game.mg["zx"] + game.mg["zw"] + 0.02: game.mg["u"] = 1.5
+	game.fish_pull()
+	assert(game.fish_caught == 3, "missed pull does not catch")
 	game.talk("ketu")
 	press("Give mur tari (3 fish)")
 	assert(game.completed.has("market") and game.inventory.has("tea") and game.fish_caught == 0)
@@ -394,15 +402,119 @@ func run():
 		if not game.riding: break
 	assert(game.player.position.z < 43.0, "back at the harbor")
 	# production practice
-	for i in range(Data.TILES.size()):
-		game.tile_puzzle(i)
-		for w in Data.TILES[i]["tiles"]: press(w)
-		press("Check")
-		assert(game.mastered.has("t:" + str(i)), "tiles " + str(i))
+	for lvb in [-1, 1, 3]:
+		game.diff_bias = lvb
+		for i in range(Data.TILES.size()):
+			game.tile_puzzle(i)
+			for w in Data.TILES[i]["tiles"]: game.tile_tapped(tray_tile(w))
+			press("Check")
+			assert(game.mastered.has("t:" + str(i)), "tiles " + str(i))
+			game.mastered.erase("t:" + str(i))
+	game.diff_bias = 0
+	# drag a wrong tile into the first box, then swap in the right one by dragging
 	game.tile_puzzle(1)
-	press("Kelarke")
+	game.drop_on(game.dd["slots"][0], tray_tile("Kelarke"))
+	assert(game.dd_words()[0] == "Kelarke")
+	game.drop_on(game.dd["slots"][0], tray_tile("Kelar"))
+	assert(game.dd_words()[0] == "Kelar" and tray_tile("Kelarke") != null, "swapped tile returns to the tray")
+	game.drop_on(game.dd["slots"][1], tray_tile("tekaru"))
+	game.drop_on(game.dd["slots"][2], tray_tile("i-tal-ak-pa-da."))
 	press("Check")
-	assert(game.content.get_children().any(func(c): return c is Label and c.text.begins_with("Not quite")))
+	assert(game.mastered.has("t:1"))
+	game.tile_puzzle(1)
+	game.drop_on(game.dd["slots"][0], tray_tile("Kelarke"))
+	game.drop_on(game.dd["slots"][1], tray_tile("tekaru"))
+	game.drop_on(game.dd["slots"][2], tray_tile("i-tal-ak-pa-da."))
+	press("Check")
+	assert(has_text("Not quite"))
+	# gap fill, word forge, word match, challenges
+	for k in range(12):
+		game.gap_fill()
+		for i in range(game.dd["slots"].size()):
+			var sl = game.dd["slots"][i]
+			if not sl.get_meta("locked"): game.drop_on(sl, tray_tile(game.dd["answers"][i]))
+		press("Check")
+		assert(has_text("Correct!"), "gap fill")
+	for k in range(16):
+		game.diff_bias = k % 3
+		game.word_forge()
+		for a in game.dd["answers"]: game.tile_tapped(tray_tile(a))
+		press("Check")
+		assert(has_text("Correct!"), "forge " + str(game.dd["answers"]))
+	game.diff_bias = 0
+	for w in ["wak", "guro", "kor", "sek", "lin", "tari", "par", "dom"]: game.learn(w)
+	game.word_match()
+	for i in range(game.dd["slots"].size()): game.drop_on(game.dd["slots"][i], tray_tile(game.dd["answers"][i]))
+	press("Check")
+	assert(has_text("Correct!"), "word match")
+	game.diff_bias = 1
+	var g0 = game.gin
+	game.challenge("mira")
+	for w in Data.TILES[Data.CHALLENGES["mira"]]["tiles"]: game.tile_tapped(tray_tile(w))
+	press("Check")
+	assert(game.mastered.has("c:mira") and game.gin == g0 + 1)
+	game.talk("tor")
+	press("Say it yourself")
+	game.diff_bias = 0
+	# memory, market rush, speed round
+	game.memory_game()
+	assert(game.mg["type"] == "memory")
+	var cards: Array = []
+	for c in game.content.get_children():
+		if c is GridContainer and not c.is_queued_for_deletion(): cards = c.get_children()
+	assert(cards.size() >= 8)
+	var gm = game.gin
+	var by_text = {}
+	for b in cards: by_text[b] = null
+	# open every pair by trying all combinations quickly
+	for b1 in cards:
+		for b2 in cards:
+			if b1 == b2 or b1.disabled or b2.disabled: continue
+			if b1.text != "?" or b2.text != "?": continue
+			b1.pressed.emit()
+			b2.pressed.emit()
+			if not b1.disabled:
+				game.mg["busy"] = false
+				game.mg["open"] = []
+				b1.text = "?"
+				b2.text = "?"
+	assert(game.mg["left"] == 0 and game.gin > gm and game.mastered.has("g:memory"))
+	game.complete("market")
+	game.diff_bias = 2
+	game.market_rush()
+	var served = 0
+	while game.mg.get("type", "") == "market":
+		for g in game.mg["order"].keys(): game.mg["counts"][g] = game.mg["order"][g]
+		press("Hand it over")
+		served += 1
+	assert(served >= 5 and game.mastered.has("g:market"))
+	game.market_rush()
+	game.update_minigame(30.0)
+	assert(game.mg["i"] == 1, "timer moves to the next customer")
+	game.close_panel()
+	game.diff_bias = 0
+	for w in ["mar", "gor", "fal", "hen", "nav", "gao", "sen", "var"]: game.learn(w)
+	game.speed_round()
+	for k in range(12):
+		var w = game.content.get_children().filter(func(c): return c is PanelContainer and not c.is_queued_for_deletion())[0].get_child(0).text
+		press(game.short_gloss(w))
+	game.update_minigame(61.0)
+	assert(game.best_speed >= 12 and game.mastered.has("g:speed"))
+	game.show_games()
+	game.show_more()
+	press("Harder")
+	assert(game.diff_bias == 1)
+	press("Automatic")
+	# levels and sentence cards at each level
+	for b in [-1, 0, 1, 3]:
+		game.diff_bias = b
+		game.sentence_card("village_big")
+		press("The village is big.")
+		game.count_puzzle("cairn")
+		press("mur")
+		game.show_practice()
+	game.diff_bias = 0
+	assert(game.level() >= 1 and game.level() <= 4)
 	for i in range(Data.VERBS.size()):
 		var target: String = Data.VERBS[i][1]
 		var parts = target.split("-")
@@ -436,6 +548,7 @@ func run():
 	game.update_sky(0.0)
 	game.show_map()
 	game.show_inventory()
+	print("PASS: fourth expansion: drag and drop, gap fill, forge, match, challenges, memory, market rush, speed round, levels")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
@@ -457,3 +570,14 @@ func _click() -> InputEventMouseButton:
 	ev.pressed = true
 	ev.button_index = MOUSE_BUTTON_LEFT
 	return ev
+
+func tray_tile(w: String) -> Control:
+	for t in game.dd["tray"].get_children():
+		if t.get_meta("word") == w: return t
+	return null
+
+func has_text(t: String) -> bool:
+	for c in game.content.get_children():
+		if c.is_queued_for_deletion(): continue
+		if (c is Label or c is RichTextLabel) and c.text.begins_with(t): return true
+	return false

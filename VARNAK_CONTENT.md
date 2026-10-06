@@ -219,3 +219,23 @@ New notebook words in the second expansion come from the document's vocabulary l
 | Riddles: Yarma henma i-esh-da. I-ret. / Yeshma henma i-esh-da. I-var. / Yeshma henma ri-esh-da. Ri-sen. / Wakma i-esh-da. Ma-i-nang-ki-da. / I-gao. Par-ir sa-ma ri-esh-ur-da. | sun, moon, stars, fish, tree | Composed | Locatives, statives, plural ri-, negation, habitual |
 | Salma, monar, yar, wanar, yesh | dawn, morning, day, evening, night | Doc | Section 31.4 |
 | Verb builder forms, such as na-lum-pa, ri-tal-pa-shi, ma-na-lum-ki-da | | Composed | Template in section 21.1; ma-na-lum-ki-da and i-tal-ak are in the document |
+
+
+## Fourth expansion
+
+New sentence-builder items (unlocked by level):
+
+| Form | Meaning | Source | Rule used |
+|---|---|---|---|
+| Rumake sanu tekama i-pal-pa-da. | The woman saw the child in the village. | Doc | Section 25.1 |
+| Kelarke tari morama i-nuk-ak-pa-da. | The traveler caught the fish at the river. | Composed | Neutral order, locative |
+| Anke panak Keturu k-i-ven-ak-pa-da. | I gave the bread to Ketu. | Composed | Recipient with -ru, as in sa-ru (section 34) |
+| Mirake yamat tekama i-dar-ak-pa-da. | Mira cooked the food in the village. | Composed | Perfective past |
+| Sanu tekama i-sul-im-da. | The child is sleeping in the village. | Doc | Section 25.1 |
+| Kelar i-tari-nuk-ak-pa-da. | The traveler went fishing. | Doc | Section 23 |
+| Yok e cha t-na-ven-o-ye. | Please give me medicine and tea. | Composed | As before |
+| Ma-k-ri-pal-ak-pa-ki-da. | I did not see them. | Doc | Section 21.1 |
+
+Market rush orders are built from numbers and goods, for example Mur guro e vel panak t-na-ven-o-ye (please give me three fruit and two breads). Speech bubbles reuse phrases already listed above, plus An na-seng-da (I am happy, composed) for Ila and Sendor-ru? (to Sendor?) for Tamu.
+
+Decoy tiles at higher levels are made automatically by swapping endings (-ke added or removed, -ma to -ru, -ru to -ta, -da to -nu, i- to ri-). They are deliberately wrong and never shown as correct.

@@ -127,6 +127,12 @@ var ferry_node: Node3D
 var falls_node: Node3D
 var chest_node: Node3D
 var hiding: Dictionary = {}
+var diff_bias: int = 0
+var last_level: int = 0
+var best_speed: int = 0
+var mg: Dictionary = {}
+var quote_re: RegEx
+var bubble_range: float = 9.0
 var words = {
 	"wak":"water", "guro":"fruit", "kor":"container", "kel":"bag", "murak":"tree / wood",
 	"sek":"stone", "lin":"rope", "tari":"fish", "par":"bird", "dom":"house", "teka":"village",
@@ -217,6 +223,7 @@ func _ready():
 	build_ui()
 	load_game()
 	refresh_world()
+	last_level = level()
 	show_intro()
 
 # ------------------------------------------------------------ world
@@ -286,8 +293,10 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 	label.visibility_range_end = 34.0 if kind == "npc" else (40.0 if kind == "item" else (7.0 if kind == "star" else 16.0))
 	var e = {"id":id,"kind":kind,"word":word,"node":node,"home":pos,"gy":pos.y,"pr":pr,"ph":ph}
 	if kind == "item": Art.beacon(node).scale = Vector3.ONE / node.scale.x
-	if kind == "npc": e["mark"] = Art.quest_mark(node, 2.75)
+	if kind == "npc":
+		e["mark"] = Art.quest_mark(node, 2.75)
 	entities.append(e)
+	if kind == "npc": make_bubble(e)
 	return e
 
 func build_world():
@@ -1107,7 +1116,7 @@ func build_ui():
 	ui.add_child(status)
 	status_small = Label.new()
 	status_small.position = Vector2(14,30)
-	status_small.size = Vector2(150,40)
+	status_small.size = Vector2(148,40)
 	status_small.add_theme_stylebox_override("normal", chip_style(0.7))
 	status_small.add_theme_color_override("font_color", Color("fff6df"))
 	status_small.add_theme_font_size_override("font_size", 17)
@@ -1121,6 +1130,7 @@ func build_ui():
 	button("Notebook",show_notebook,top_row)
 	button("Bag",show_inventory,top_row)
 	button("Map",show_map,top_row)
+	button("More",show_more,top_row)
 	prompt = Label.new()
 	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	prompt.position = Vector2(-160,40)
@@ -1205,9 +1215,11 @@ func toast(text: String):
 	if toast_label == null: return
 	toast_label.text = text
 	toast_label.modulate.a = 1.0
+	toast_label.position.y = (get_viewport().get_visible_rect().size.y - 92.0) if panel.visible else 186.0
 	toast_time = 2.6
 
-func clear_panel(title: String):
+func clear_panel(title: String, keep_game: bool = false):
+	if not keep_game: mg = {}
 	joy = Vector2.ZERO
 	move_finger = -1
 	look_finger = -1
@@ -1216,12 +1228,14 @@ func clear_panel(title: String):
 	left_down = false
 	walk_to = {}
 	for c in content.get_children():
-		content.remove_child(c)
+		if c.is_queued_for_deletion(): continue
+		c.hide()
 		c.queue_free()
 	panel.show()
 	text_line(title,26)
 
-func text_line(text: String, font_size: int = 20) -> Label:
+func text_line(text: String, font_size: int = 20) -> Control:
+	if text.contains("“"): return rich_line(text, font_size)
 	var label = Label.new()
 	label.text = text
 	label.add_theme_font_size_override("font_size",font_size)
@@ -1231,6 +1245,7 @@ func text_line(text: String, font_size: int = 20) -> Label:
 	return label
 
 func close_panel():
+	mg = {}
 	panel.hide()
 	lesson = ""
 
@@ -1240,7 +1255,8 @@ func show_intro():
 	button("Explore",close_panel,content)
 	text_line("Tap or click any person, animal or object to walk to it and interact. Things you can pick up glow with a column of light. A yellow ! marks the next step of the story; a blue ! marks someone with a side quest.")
 	text_line("Phone: drag the lower left to walk (push farther to run), swipe the right side to look.\n\nDesktop: W/S walk, A/D sidestep, Shift runs, left/right arrows turn, drag with the mouse to look. Click things, or walk up and press E.")
-	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal.")
+	text_line("Tap the quest box at the top to fold it away; tap it again to read your goal. The More button has games, difficulty settings and Reset progress.")
+	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
 	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
 	text_line("In the Notebook, try the Verb builder and the Sentence builder to put Varnak together yourself.")
 
@@ -1376,6 +1392,8 @@ func _process(delta):
 	update_whale(delta)
 	update_ride(delta)
 	update_night_life(delta)
+	update_bubbles()
+	update_minigame(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -1396,8 +1414,6 @@ func animate_people(delta: float):
 		(arms[1] as Node3D).rotation.x = -sin(clock * (1.2 + talk_amt * 3.0) + idx) * swing
 		(node.get_meta("body") as Node3D).scale.y = 1.0 + sin(clock * 1.6 + idx) * 0.008
 		(node.get_meta("head") as Node3D).rotation.z = sin(clock * 0.7 + idx) * 0.04
-		if e.has("mark"):
-			(e["mark"] as Node3D).position.y = 2.75 + sin(clock * 2.5 + idx) * 0.08
 
 func animate_items():
 	var i = 0
@@ -1825,7 +1841,7 @@ func _answer(opt: String, answer: String, buttons: Array, feedback: Label, on_ri
 		if on_right.is_valid(): on_right.call()
 		if extra.is_valid(): extra.call()
 		last_skip.text = "Return"
-		content.move_child(last_skip, content.get_child_count() - 1)
+		content.move_child(last_skip, -1)
 	else:
 		feedback.text = "Not quite. " + wrong_text
 		feedback.add_theme_color_override("font_color", Color("8a2f1f"))
@@ -1842,14 +1858,34 @@ func master(key: String):
 func sentence_card(sid: String, back: Callable = Callable()):
 	var s: Dictionary = Data.SENTENCES[sid]
 	for w in s["words"]: learn(w)
-	clear_panel(s["v"])
-	text_line(s["gesture"])
+	clear_panel("What does it mean?")
+	varnak_banner(s["v"])
+	var lv = level()
+	var g = text_line(s["gesture"], 18)
+	g.add_theme_color_override("font_color", Color("6b4a2e"))
+	if lv >= 3:
+		g.visible = false
+		var hb = Button.new()
+		hb.text = "Show the gesture (hint)"
+		hb.custom_minimum_size.y = 46
+		hb.pressed.connect(func():
+			g.visible = true
+			hb.visible = false)
+		content.add_child(hb)
 	if not phrases.has(sid):
 		phrases.append(sid)
 		toast("Added to your phrasebook")
 		save_game()
 	var options: Array = [s["en"]]
 	options.append_array(s["wrong"])
+	if lv >= 2:
+		var others = Data.SENTENCES.keys()
+		others.shuffle()
+		for o in others:
+			var en: String = Data.SENTENCES[o]["en"]
+			if o != sid and not options.has(en):
+				options.append(en)
+				break
 	ask("What do you think this means?", options, 0, func(): master("s:" + sid), "\n" + s["parts"] + "\n= " + s["en"], "Look at the gesture again and compare the word endings.", back)
 
 func door_puzzle(id: String):
@@ -1868,6 +1904,11 @@ func count_puzzle(id: String):
 	var c: Dictionary = Data.COUNTS[id]
 	var options: Array = [c["numword"]]
 	options.append_array(c["wrongs"])
+	if level() >= 2:
+		for nw in Data.NUMBERS.slice(1):
+			if not options.has(nw) and randf() < 0.3:
+				options.append(nw)
+				break
 	var phrase = c["numword"].capitalize() + " " + c["noun"] + "."
 	choice_puzzle(c["noun"], "You count " + str(c["n"]) + " " + c["en"] + " here. Which number word is right?", options, 0, func():
 		learn(c["noun"])
@@ -1877,7 +1918,7 @@ func count_puzzle(id: String):
 
 func fishing():
 	if mastered.has("w:nuk"):
-		quick_catch()
+		fishing_game()
 		return
 	choice_puzzle("tari-nuk: fishing", "You crouch at the water and cast a line. You want to say that you are fishing in general. A fish is not the focus, so the noun joins the verb. Which form fits?",
 		["Na-tari-nuk-im.", "Tari k-i-nuk-ak-pa-da.", "Ma-na-tari-nuk-ki-da."], 0,
@@ -2080,7 +2121,7 @@ func talk(id: String):
 			learn("anni")
 			learn("tekaru")
 			clear_panel("Ena")
-			text_line("Ena points to your bag, then gestures toward you.\n\n“Kel.”\n\nTry telling Ena: “My bag.”")
+			text_line("Ena points to your bag, then gestures toward you.\n\n“Kel.”\n\nTry telling Ena: \"My bag.\"")
 			button("Anni kel",func():
 				if inventory.has("own_bag"):
 					complete("belongings")
@@ -2302,6 +2343,8 @@ func talk(id: String):
 				var order = Data.DESH.duplicate()
 				order.shuffle()
 				button("Play Desh's game", desh_round.bind(0, order), content)
+	if level() >= 2 and Data.CHALLENGES.has(id):
+		button("Say it yourself" + ("  [ok]" if mastered.has("c:" + id) else ""), challenge.bind(id), content)
 	for p in Data.PARCELS.keys():
 		if inventory.has(p) and id != "gav":
 			button("Give a parcel", give_parcel.bind(id), content)
@@ -2383,7 +2426,7 @@ func show_notebook():
 	row2.add_theme_constant_override("separation", 8)
 	content.add_child(row2)
 	var b4 = button("Verb builder", show_verb_builder.bind(-1), row2)
-	var b5 = button("Sentence builder", tile_puzzle.bind(-1, Callable()), row2)
+	var b5 = button("Games", show_games, row2)
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
@@ -2428,6 +2471,15 @@ func show_practice():
 
 func practice_word(pool: Array):
 	var w: String = pool[randi() % pool.size()]
+	var lv = level()
+	if lv >= 2 and randf() < 0.5 and pool.size() >= 4:
+		var opts: Array = [w]
+		var sh = pool.duplicate()
+		sh.shuffle()
+		for o in sh:
+			if o != w and short_gloss(o) != short_gloss(w) and opts.size() < (3 if lv < 3 else 4): opts.append(o)
+		choice_puzzle("Practice", "Which Varnak form means \"" + short_gloss(w) + "\"?", opts, 0, func(): master("w:" + w), "“" + w + "” means " + str(words[w]) + ".", "Check the notebook for a hint, then try the next one.", show_notebook, func(): button("Next question", show_practice, content))
+		return
 	var good = short_gloss(w)
 	var options: Array = [good]
 	var others: Array = pool.duplicate()
@@ -2435,17 +2487,27 @@ func practice_word(pool: Array):
 	for o in others:
 		var g = short_gloss(o)
 		if g != good and not options.has(g) and options.size() < 3: options.append(g)
-	var fillers = ["water", "bridge", "bag", "river", "path", "boat", "stone"]
+	var fillers = ["water", "bridge", "bag", "river", "path", "boat", "stone", "fire", "sea"]
+	var n_opts = 3 if lv < 3 else 4
+	for o in others:
+		var g2 = short_gloss(o)
+		if g2 != good and not options.has(g2) and options.size() < n_opts: options.append(g2)
 	for f in fillers:
-		if f != good and not options.has(f) and options.size() < 3: options.append(f)
-	choice_puzzle("Practice", "What does “" + w + "” mean?", options, 0, func(): master("w:" + w), "That is “" + str(words[w]) + "”.", "Check the notebook for a hint, then try the next one.", show_notebook, func(): button("Next question", show_practice, content))
+		if f != good and not options.has(f) and options.size() < n_opts: options.append(f)
+	choice_puzzle("Practice", "What does “" + w + "” mean?", options, 0, func(): master("w:" + w), "That is \"" + str(words[w]) + "\".", "Check the notebook for a hint, then try the next one.", show_notebook, func(): button("Next question", show_practice, content))
 
 func practice_phrase():
 	var sid: String = phrases[randi() % phrases.size()]
 	var s: Dictionary = Data.SENTENCES[sid]
 	var options: Array = [s["en"]]
 	options.append_array(s["wrong"])
-	choice_puzzle("Practice", "What does this mean?\n\n" + s["v"], options, 0, func(): master("s:" + sid), s["parts"], "Think about the endings: -ma, -ru, -ta, -da and -im each add meaning.", show_notebook, func(): button("Next question", show_practice, content))
+	if level() >= 2:
+		for o in Data.SENTENCES.keys():
+			var en2: String = Data.SENTENCES[o]["en"]
+			if o != sid and not options.has(en2) and randf() < 0.2:
+				options.append(en2)
+				break
+	choice_puzzle("Practice", "What does this mean?\n\n“" + s["v"] + "”", options, 0, func(): master("s:" + sid), s["parts"], "Think about the endings: -ma, -ru, -ta, -da and -im each add meaning.", show_notebook, func(): button("Next question", show_practice, content))
 
 func show_workshop():
 	clear_panel("Word workshop")
@@ -2492,7 +2554,7 @@ func workshop_challenge():
 		if suffix_ok(root, s): sufs.append(s)
 	sufs.shuffle()
 	var options: Array = [root + sufs[0], root + sufs[1], root + sufs[2]]
-	choice_puzzle("Workshop challenge", "How do you say “" + suffix_meaning(root, sufs[0]) + "”?", options, 0, func():
+	choice_puzzle("Workshop challenge", "How do you say \"" + suffix_meaning(root, sufs[0]) + "\"?", options, 0, func():
 		learn("-" + sufs[0])
 		master("w:-" + sufs[0]), root + " + " + sufs[0] + " = " + root + sufs[0] + ".", "Check the endings: -ma in, -ru to, -ta from, -li with, -ni of, -ir plural.", show_workshop, func(): button("Another challenge", workshop_challenge, content))
 
@@ -2641,7 +2703,9 @@ func confirm_reset():
 		visited.clear()
 		fish_caught = 0
 		gin = 0
+		best_speed = 0
 		hiding.clear()
+		last_level = 1
 		for e in entities: e["node"].show()
 		player.position = Vector3(0,0.1,36)
 		player.rotation = Vector3.ZERO
@@ -2655,7 +2719,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"day":day_t,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 
 func load_game():
@@ -2675,6 +2739,8 @@ func load_game():
 	day_t = float(data.get("day", 0.12))
 	hud_small = bool(data.get("hud_small", false))
 	whale_seen = bool(data.get("whale", false))
+	diff_bias = int(data.get("bias", 0))
+	best_speed = int(data.get("best_speed", 0))
 	var p = data.get("position",[0,0.1,36])
 	player.position = Vector3(p[0],p[1],p[2])
 	if T.deep(player.position.x, player.position.z) and not near_dock(player.position): player.position = Vector3(0, 0.1, 36)
@@ -3038,13 +3104,15 @@ func layout_hud():
 	update_status()
 	status.visible = not hud_small
 	status_small.visible = hud_small
-	top_row.position = Vector2(174, 30) if hud_small else Vector2(14, 124)
+	top_row.position = Vector2(170, 30) if hud_small else Vector2(14, 124)
 
 func update_status():
 	var obj = objective()
 	var total = quests.size() + side_quests.size()
 	status_small.text = "Quests " + str(quests_done()) + "/" + str(total)
-	status.text = obj + "\nDone: " + str(quests_done()) + " of " + str(total) + ".  Tap this box to fold it."
+	var lv = level()
+	status.text = obj + "\nLevel " + str(lv) + " " + Data.LEVEL_NAMES[lv] + ".  Done " + str(quests_done()) + " of " + str(total) + ".  Tap to fold."
+	check_level()
 	if hud_small and obj != last_objective and last_objective != "": toast("New goal! Tap Quests to read it.")
 	last_objective = obj
 
@@ -3189,55 +3257,6 @@ func collect_star(e: Dictionary):
 
 # ---- production practice: sentence tiles and the verb builder ----
 
-func tile_puzzle(i: int = -1, back: Callable = Callable()):
-	if i < 0: i = randi() % Data.TILES.size()
-	var tp: Dictionary = Data.TILES[i]
-	if not back.is_valid(): back = show_notebook
-	clear_panel("Sentence builder")
-	text_line("Build this sentence in Varnak:\n“" + tp["en"] + "”")
-	var built: Array = []
-	var shown = text_line("…", 24)
-	var flow = HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 8)
-	flow.add_theme_constant_override("v_separation", 8)
-	content.add_child(flow)
-	var pool: Array = tp["tiles"].duplicate()
-	pool.append_array(tp["decoys"])
-	pool.shuffle()
-	var used: Array = []
-	var feedback = text_line("", 19)
-	for w in pool:
-		var b = Button.new()
-		b.text = w
-		b.custom_minimum_size = Vector2(70, 50)
-		flow.add_child(b)
-		b.pressed.connect(func():
-			built.append(w)
-			used.append(b)
-			b.disabled = true
-			shown.text = " ".join(built))
-	var row = HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	content.add_child(row)
-	var undo = button("Undo", func():
-		if built.is_empty(): return
-		built.pop_back()
-		(used.pop_back() as Button).disabled = false
-		shown.text = " ".join(built) if not built.is_empty() else "…", row)
-	var check = button("Check", func():
-		if built == tp["tiles"]:
-			feedback.text = "Correct! " + " ".join(tp["tiles"])
-			feedback.add_theme_color_override("font_color", Color("2f6b2f"))
-			master("t:" + str(i))
-		else:
-			feedback.text = "Not quite. " + tp["tip"] + " The usual order is: the one acting, the thing acted on, places, then the verb."
-			feedback.add_theme_color_override("font_color", Color("8a2f1f")), row)
-	undo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.move_child(feedback, content.get_child_count() - 1)
-	button("Another sentence", tile_puzzle.bind(-1, back), content)
-	button("Back", back, content)
-
 func verb_form(choice: Dictionary) -> String:
 	var parts: Array = []
 	var neg = choice.get(0, "") == "ma-"
@@ -3255,7 +3274,7 @@ func show_verb_builder(i: int = -1):
 	var ch: Array = Data.VERBS[i]
 	for w in ["na-", "ta-", "i-", "ri-", "lum", "pav", "sul", "sum", "tal", "nang"]: learn(w)
 	clear_panel("Verb builder")
-	text_line("Build one Varnak verb that means:\n“" + ch[0] + "”")
+	text_line("Build one Varnak verb that means:\n\"" + ch[0] + "\"")
 	text_line("lum go · pav run · sul sleep · sum swim · tal arrive · nang walk\n-im in progress · -ak completed · -ur usually · -pa past · -fu future · -da seen · -shi apparently · -nu reportedly · ma- ... -ki not", 15)
 	var choice: Dictionary = {}
 	var preview = text_line("", 28)
@@ -3320,3 +3339,786 @@ func near_dock(p: Vector3) -> bool:
 	if absf(p.x) < 4.2 and p.z > 29.5 and p.z < 42.5: return true
 	if absf(p.x - 48.0) < 1.5 and p.z > 65.8 and p.z < 74.2: return true
 	return false
+
+# ------------------------------------------------------------ fourth expansion: salient Varnak, levels, options
+
+# Varnak inside curly quotes is drawn larger, bold and highlighted so it stands out from English.
+func rich_line(text: String, font_size: int = 20) -> RichTextLabel:
+	if quote_re == null: quote_re = RegEx.create_from_string("“([^”]*)”")
+	var r = RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.scroll_active = false
+	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	r.add_theme_font_size_override("normal_font_size", font_size)
+	r.add_theme_font_size_override("bold_font_size", font_size + 7)
+	r.add_theme_color_override("default_color", Color("2e1c0c"))
+	var safe = text.replace("[", "[lb]")
+	r.text = quote_re.sub(safe, "[bgcolor=#f3d9a0][b][color=#7a1f3d] $1 [/color][/b][/bgcolor]", true)
+	content.add_child(r)
+	return r
+
+func varnak_banner(text: String, size: int = 30) -> PanelContainer:
+	var pc = PanelContainer.new()
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = Color("24495a")
+	sb.border_color = Color("e9c46a")
+	sb.set_border_width_all(3)
+	sb.set_corner_radius_all(12)
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 12
+	sb.content_margin_bottom = 12
+	pc.add_theme_stylebox_override("panel", sb)
+	var l = Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_color_override("font_color", Color("fff3c4"))
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	pc.add_child(l)
+	content.add_child(pc)
+	return pc
+
+func level_points() -> int:
+	return quests_done() * 3 + mastered.size()
+
+func level() -> int:
+	var pts = level_points()
+	var lv = 1
+	if pts >= 25: lv = 2
+	if pts >= 60: lv = 3
+	if pts >= 110: lv = 4
+	return clampi(lv + diff_bias, 1, 4)
+
+func check_level():
+	var lv = level()
+	if last_level != 0 and lv > last_level:
+		toast("Level up! " + Data.LEVEL_NAMES[lv])
+		for i in range(2):
+			var fw: CPUParticles3D = fireworks[i]
+			fw.position = player.position + Vector3(randf_range(-4, 4), 9, randf_range(-6, -2)).rotated(Vector3.UP, player.rotation.y)
+			fw.color = Color("ffd34d") if i == 0 else Color("6de0ff")
+			fw.restart()
+	last_level = lv
+
+func level_note(lv: int) -> String:
+	match lv:
+		1: return "Explorer: three answer choices, gestures and tips shown, short sentences."
+		2: return "Speaker: an extra wrong choice, residents ask you to build sentences yourself, longer sentences and more decoy tiles."
+		3: return "Storyteller: gestures hidden until you ask, tips only after a second try, timed market orders, a faster fishing line."
+	return "Elder: the hardest sentences, the most decoys and the shortest timers."
+
+func show_more():
+	clear_panel("More")
+	var lv = level()
+	text_line("Your level: " + str(lv) + ", " + Data.LEVEL_NAMES[lv] + ". Points: " + str(level_points()) + ". You earn points by finishing quests and mastering words, phrases and games. The game gets harder as you level up.")
+	text_line(level_note(lv), 17)
+	text_line("Difficulty", 22)
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	content.add_child(row)
+	for d in [[-1, "Easier"], [0, "Automatic"], [1, "Harder"]]:
+		var b = button(d[1] + (" (on)" if diff_bias == d[0] else ""), func():
+			diff_bias = d[0]
+			last_level = level()
+			save_game()
+			show_more(), row)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button("Games and activities", show_games, content)
+	button("How to play", show_intro, content)
+	button("Fold the quest box" if not hud_small else "Unfold the quest box", func():
+		hud_small = not hud_small
+		layout_hud()
+		save_game()
+		show_more(), content)
+	button("Reset progress (start over)", confirm_reset, content)
+	button("Return", close_panel, content)
+
+func greeting(id: String) -> String:
+	match id:
+		"ena": return "Anni kel."
+		"mira": return "Yamat i-nav."
+		"sanu": return "Sava ruk."
+		"tor": return "Gira i-sava-da." if completed.has("bridge") else "Gira ma-i-sava-ki-da."
+		"lira": return "Teka i-var."
+		"oren": return "Mar hala i-pav."
+		"neri": return "Teka i-var!"
+		"ketu": return "Mur tari t-na-ven-o-ye." if not completed.has("market") else "Tari i-ho!"
+		"suri": return "Ravarir ri-puka-rav-im-da."
+		"rin": return "An ravar na-an-da."
+		"ola": return "Ti kelar ta-an-ha?"
+		"pomo": return "Bei, nam, dong, sai."
+		"vira": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Ila i-seng-da."
+		"ila": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
+		"yalo": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
+		"desh": return "Ta-sum-o!"
+		"sair1": return "Anke panak k-i-mai-fu."
+		"sair2": return "Cha i-ret."
+		"sair3": return "I-ser-ng."
+		"oku": return "Ki dom i-shora."
+		"gav": return "Kel-ir! Kel-ir!" if not completed.has("mail") else "K-ta-har-da!"
+		"tamu": return "Sendor-ru?"
+	return ""
+
+func make_bubble(e: Dictionary):
+	var l = Label3D.new()
+	l.font_size = 30
+	l.pixel_size = 0.0075
+	l.outline_size = 12
+	l.outline_modulate = Color(0.16, 0.06, 0.12, 1.0)
+	l.modulate = Color("ffe08a")
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.position = Vector3(0, 2.5, 0)
+	l.visible = false
+	(e["node"] as Node3D).add_child(l)
+	e["bubble"] = l
+
+func update_bubbles():
+	for e in entities:
+		if not e.has("bubble"): continue
+		var b = e["bubble"] as Label3D
+		var node = e["node"] as Node3D
+		var near = not panel.visible and not riding and node.visible and Vector2(node.position.x - player.position.x, node.position.z - player.position.z).length() < bubble_range
+		b.visible = near
+		if near:
+			b.text = "“" + greeting(e["id"]) + "”"
+			b.position.y = 2.48 + sin(clock * 1.7 + node.position.x) * 0.03
+		if e.has("mark"): (e["mark"] as Node3D).position.y = (3.15 if near else 2.75) + sin(clock * 2.5) * 0.08
+
+# ------------------------------------------------------------ drag and drop activities
+
+var dd: Dictionary = {}
+
+func tile_box(c: Color, border: Color) -> StyleBoxFlat:
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = c
+	sb.border_color = border
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(9)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 12
+	sb.content_margin_top = 8
+	sb.content_margin_bottom = 8
+	return sb
+
+func make_tile(text: String) -> PanelContainer:
+	var t = PanelContainer.new()
+	t.add_theme_stylebox_override("panel", tile_box(Color("f2d27e"), Color("8a5a2b")))
+	var l = Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", 22)
+	l.add_theme_color_override("font_color", Color("4a1530"))
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	t.add_child(l)
+	t.custom_minimum_size = Vector2(46, 50)
+	t.mouse_filter = Control.MOUSE_FILTER_STOP
+	t.set_meta("word", text)
+	t.set_drag_forwarding(func(_at):
+		var pv = Label.new()
+		pv.text = text
+		pv.add_theme_font_size_override("font_size", 24)
+		pv.add_theme_color_override("font_color", Color("4a1530"))
+		pv.add_theme_stylebox_override("normal", tile_box(Color("ffe39a"), Color("8a5a2b")))
+		t.set_drag_preview(pv)
+		return {"tile": t},
+		func(_at, data): return data is Dictionary and data.has("tile") and t.get_parent() != dd.get("tray"),
+		func(_at, data): drop_on.call_deferred(t.get_parent(), data["tile"]))
+	t.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed: t.set_meta("down", ev.global_position)
+			elif t.has_meta("down") and (ev.global_position - t.get_meta("down")).length() < 10.0: tile_tapped(t))
+	return t
+
+func make_slot(locked_text: String) -> PanelContainer:
+	var s = PanelContainer.new()
+	var locked = locked_text != ""
+	s.add_theme_stylebox_override("panel", tile_box(Color("dcd3c0") if locked else Color("fff8e6"), Color("8a7a66") if locked else Color("b08850")))
+	s.custom_minimum_size = Vector2(70, 54)
+	var l = Label.new()
+	l.text = locked_text if locked else "   ?   "
+	l.add_theme_font_size_override("font_size", 22)
+	l.add_theme_color_override("font_color", Color("3b2d25") if locked else Color("c2a878"))
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	s.add_child(l)
+	s.set_meta("locked", locked)
+	s.set_meta("placeholder", l)
+	if not locked:
+		s.set_drag_forwarding(Callable(),
+			func(_at, data): return data is Dictionary and data.has("tile"),
+			func(_at, data): drop_on.call_deferred(s, data["tile"]))
+	return s
+
+func slot_tile(s: Control) -> Control:
+	for c in s.get_children():
+		if c.has_meta("word"): return c
+	return null
+
+func drop_on(target: Control, t: Control):
+	if target == null or t == null: return
+	if target == dd.get("tray"):
+		move_tile(t, target)
+	elif target.has_meta("locked") and not target.get_meta("locked"):
+		var old = slot_tile(target)
+		if old == t: return
+		var from = t.get_parent()
+		if old != null:
+			if from != null and from.has_meta("locked"): move_tile(old, from)
+			else: move_tile(old, dd["tray"])
+		move_tile(t, target)
+	dd_refresh()
+
+func move_tile(t: Control, to: Control):
+	var from = t.get_parent()
+	if from: from.remove_child(t)
+	to.add_child(t)
+
+func tile_tapped(t: Control):
+	var parent = t.get_parent()
+	if parent == dd.get("tray"):
+		for s in dd["slots"]:
+			if not s.get_meta("locked") and slot_tile(s) == null:
+				move_tile(t, s)
+				break
+	else:
+		move_tile(t, dd["tray"])
+	dd_refresh()
+
+func dd_words() -> Array:
+	var out: Array = []
+	for s in dd["slots"]:
+		if s.get_meta("locked"): out.append((s.get_meta("placeholder") as Label).text)
+		else:
+			var t = slot_tile(s)
+			out.append(t.get_meta("word") if t else "")
+	return out
+
+func dd_join(ws: Array) -> String:
+	var parts: Array = []
+	for w in ws:
+		if w != "": parts.append(w)
+	if dd.get("pieces", false):
+		var j = "".join(parts).replace("--", "-")
+		return j.trim_prefix("-").trim_suffix("-")
+	return " ".join(parts)
+
+func dd_refresh():
+	for s in dd["slots"]:
+		var ph = s.get_meta("placeholder") as Label
+		ph.visible = s.get_meta("locked") or slot_tile(s) == null
+		s.add_theme_stylebox_override("panel", tile_box(Color("dcd3c0") if s.get_meta("locked") else Color("fff8e6"), Color("8a7a66") if s.get_meta("locked") else Color("b08850")))
+	var shown: String = dd_join(dd_words())
+	(dd["preview"] as Label).text = shown if shown != "" else "..."
+
+# One engine for every drag-and-drop activity.
+# cfg: title, prompt, answers (Array), locked (Array of bool), hints (Array of row labels), pool (extra tiles),
+#      pieces (join word pieces without spaces), tip, key, back, again, on_right
+func dnd(cfg: Dictionary):
+	clear_panel(cfg["title"], true)
+	text_line(cfg["prompt"])
+	var hint_text = text_line("Drag each tile into a box, or tap a tile to place it. Tap a placed tile to take it back.", 15)
+	hint_text.add_theme_color_override("font_color", Color("6b4a2e"))
+	var preview = Label.new()
+	preview.add_theme_font_size_override("font_size", 24)
+	preview.add_theme_color_override("font_color", Color("7a1f3d"))
+	preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var answers: Array = cfg["answers"]
+	var locked: Array = cfg.get("locked", [])
+	var hints: Array = cfg.get("hints", [])
+	var slots: Array = []
+	if hints.is_empty():
+		var row = HFlowContainer.new()
+		row.add_theme_constant_override("h_separation", 6)
+		row.add_theme_constant_override("v_separation", 6)
+		content.add_child(row)
+		for i in range(answers.size()):
+			var s = make_slot(answers[i] if (i < locked.size() and locked[i]) else "")
+			row.add_child(s)
+			slots.append(s)
+	else:
+		for i in range(answers.size()):
+			var hr = HBoxContainer.new()
+			hr.add_theme_constant_override("separation", 10)
+			content.add_child(hr)
+			var hl = Label.new()
+			hl.text = hints[i]
+			hl.custom_minimum_size.x = 150
+			hl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			hl.add_theme_font_size_override("font_size", 19)
+			hr.add_child(hl)
+			var s = make_slot("")
+			s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			hr.add_child(s)
+			slots.append(s)
+	content.add_child(preview)
+	var tl = text_line("Tiles", 16)
+	tl.add_theme_color_override("font_color", Color("6b4a2e"))
+	var tray = HFlowContainer.new()
+	tray.add_theme_constant_override("h_separation", 8)
+	tray.add_theme_constant_override("v_separation", 8)
+	tray.custom_minimum_size.y = 60
+	tray.mouse_filter = Control.MOUSE_FILTER_STOP
+	content.add_child(tray)
+	tray.set_drag_forwarding(Callable(),
+		func(_at, data): return data is Dictionary and data.has("tile"),
+		func(_at, data): drop_on.call_deferred(tray, data["tile"]))
+	var pool: Array = []
+	for i in range(answers.size()):
+		if not (i < locked.size() and locked[i]): pool.append(answers[i])
+	for x in cfg.get("pool", []):
+		if not pool.has(x): pool.append(x)
+	pool.shuffle()
+	dd = {"slots": slots, "tray": tray, "preview": preview, "answers": answers, "pieces": cfg.get("pieces", false), "tries": 0}
+	for w in pool: tray.add_child(make_tile(w))
+	var feedback = text_line("", 19)
+	var row2 = HBoxContainer.new()
+	row2.add_theme_constant_override("separation", 8)
+	content.add_child(row2)
+	var clear_b = button("Clear", func():
+		for s in slots:
+			var t = slot_tile(s)
+			if t: move_tile(t, tray)
+		dd_refresh(), row2)
+	var check_b = button("Check", func():
+		var got = dd_words()
+		if got.has(""):
+			feedback.text = "Fill every box first."
+			feedback.add_theme_color_override("font_color", Color("8a2f1f"))
+			return
+		if got == answers:
+			feedback.text = "Correct!  " + dd_join(answers)
+			feedback.add_theme_color_override("font_color", Color("2f6b2f"))
+			if cfg.has("key"): master(cfg["key"])
+			if cfg.has("on_right") and (cfg["on_right"] as Callable).is_valid(): (cfg["on_right"] as Callable).call()
+			for s in slots: s.add_theme_stylebox_override("panel", tile_box(Color("cfe8c4"), Color("2f6b2f")))
+		else:
+			dd["tries"] += 1
+			var tip: String = cfg.get("tip", "")
+			var show_tip = level() < 3 or dd["tries"] >= 2
+			feedback.text = "Not quite. " + (tip if show_tip else "Look again at the endings and the order.")
+			feedback.add_theme_color_override("font_color", Color("8a2f1f"))
+			if level() <= 2:
+				for i in range(slots.size()):
+					if not slots[i].get_meta("locked") and got[i] != answers[i]:
+						slots[i].add_theme_stylebox_override("panel", tile_box(Color("f6d0c4"), Color("8a2f1f"))), row2)
+	clear_b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	check_b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if cfg.has("again"): button(cfg.get("again_label", "Another one"), cfg["again"], content)
+	button("Back", cfg.get("back", show_games), content)
+	dd_refresh()
+
+func auto_decoys(tiles: Array, n: int) -> Array:
+	var out: Array = []
+	var cands: Array = []
+	for w in tiles:
+		var s: String = w
+		var dot = s.ends_with(".")
+		var core = s.trim_suffix(".")
+		if s.contains("-") and dot:
+			if core.ends_with("-da"): cands.append(core.trim_suffix("-da") + "-nu.")
+			if core.begins_with("k-i-"): cands.append("t-i-" + core.substr(4) + ".")
+			elif core.begins_with("i-"): cands.append("ri-" + core.substr(2) + ".")
+			continue
+		if core.ends_with("ke") and core.length() > 3: cands.append(core.substr(0, core.length() - 2))
+		elif core.ends_with("ma"): cands.append(core.substr(0, core.length() - 2) + "ru")
+		elif core.ends_with("ru"): cands.append(core.substr(0, core.length() - 2) + "ta")
+		elif core.ends_with("ta"): cands.append(core.substr(0, core.length() - 2) + "ma")
+		elif not core.contains("-"): cands.append(core + "ke")
+	cands.shuffle()
+	for c in cands:
+		if not tiles.has(c) and not out.has(c) and out.size() < n: out.append(c)
+	return out
+
+func pick_tile_index() -> int:
+	var lv = level()
+	var ok: Array = []
+	var top: Array = []
+	for i in range(Data.TILES.size()):
+		var tl = int(Data.TILES[i].get("lv", 1))
+		if tl <= lv: ok.append(i)
+		if tl == lv: top.append(i)
+	if not top.is_empty() and lv > 1 and randf() < 0.6: return top[randi() % top.size()]
+	return ok[randi() % ok.size()]
+
+func tile_pool(tp: Dictionary) -> Array:
+	var lv = level()
+	var given: Array = tp["decoys"]
+	var pool: Array = given.slice(0, 1) if lv == 1 else given.duplicate()
+	pool.append_array(auto_decoys(tp["tiles"], [0, 0, 1, 2, 3][lv]))
+	return pool
+
+func tile_puzzle(i: int = -1, back: Callable = Callable()):
+	if i < 0: i = pick_tile_index()
+	var tp: Dictionary = Data.TILES[i]
+	if not back.is_valid(): back = show_games
+	dnd({"title": "Sentence builder", "prompt": "Put the words in order to say:\n\"" + tp["en"] + "\"", "answers": tp["tiles"], "pool": tile_pool(tp),
+		"tip": tp["tip"] + " Usual order: the one acting, the thing acted on, places, then the verb.", "key": "t:" + str(i),
+		"again": tile_puzzle.bind(-1, back), "again_label": "Another sentence", "back": back})
+
+func challenge(id: String):
+	var i: int = Data.CHALLENGES[id]
+	var tp: Dictionary = Data.TILES[i]
+	var who = names.get(id, id.capitalize())
+	dnd({"title": "Say it yourself", "prompt": who + " wants to hear you say it in Varnak:\n\"" + tp["en"] + "\"", "answers": tp["tiles"], "pool": tile_pool(tp),
+		"tip": tp["tip"], "key": "t:" + str(i), "back": talk.bind(id),
+		"on_right": func():
+			if not mastered.has("c:" + id):
+				master("c:" + id)
+				gin += 1
+				toast(who + " is impressed! +1 gin")
+				save_game()})
+
+func gap_fill(back: Callable = Callable()):
+	var i = pick_tile_index()
+	var tp: Dictionary = Data.TILES[i]
+	if tp["tiles"].size() < 2:
+		gap_fill(back)
+		return
+	var n = tp["tiles"].size()
+	var gaps = 1 if level() < 3 or n < 3 else 2
+	var idx: Array = range(n)
+	idx.shuffle()
+	var locked: Array = []
+	for k in range(n): locked.append(not idx.slice(0, gaps).has(k))
+	if not back.is_valid(): back = show_games
+	dnd({"title": "Fill the gap", "prompt": "Complete the sentence:\n\"" + tp["en"] + "\"", "answers": tp["tiles"], "locked": locked, "pool": tile_pool(tp),
+		"tip": tp["tip"], "key": "f:" + str(i), "again": gap_fill.bind(back), "again_label": "Another gap", "back": back})
+
+func word_forge(back: Callable = Callable()):
+	if not back.is_valid(): back = show_games
+	var lv = level()
+	if lv >= 2 and randf() < 0.55:
+		var vi = randi() % Data.VERBS.size()
+		var target: String = Data.VERBS[vi][1]
+		var parts = target.split("-")
+		var pieces: Array = []
+		for k in range(parts.size()):
+			var pc: String = parts[k]
+			if k == 0 and pc == "ma": pieces.append("ma-")
+			elif pc in ["na", "ta", "i", "ri"] and pieces.size() <= 1: pieces.append(pc + "-")
+			elif pc in ["lum", "pav", "sul", "sum", "tal", "nang"]: pieces.append(pc)
+			else: pieces.append("-" + pc)
+		var decoys: Array = []
+		for d in ["na-", "ta-", "i-", "ri-", "-pa", "-fu", "-da", "-nu", "-im", "-ur", "-ak"]:
+			if not pieces.has(d): decoys.append(d)
+		decoys.shuffle()
+		dnd({"title": "Word forge: verbs", "prompt": "Build one verb that means:\n\"" + Data.VERBS[vi][0] + "\"\n\nlum go, pav run, sul sleep, sum swim, tal arrive, nang walk", "answers": pieces, "pool": decoys.slice(0, lv),
+			"pieces": true, "tip": "Order: ma- (not), who, action, -im/-ak/-ur, -pa/-fu, -ki, then -da/-shi/-nu.", "key": "vb:" + str(vi), "again": word_forge.bind(back), "again_label": "Another word", "back": back})
+		return
+	var roots: Array = []
+	for r in Data.NOUNS.keys():
+		if discovered.has(r): roots.append(r)
+	if roots.size() < 3: roots = Data.NOUNS.keys()
+	var root: String = roots[randi() % roots.size()]
+	var sufs: Array = []
+	for s in ["ma", "ru", "ta", "li", "ni", "su", "ven", "ir"]:
+		if suffix_ok(root, s): sufs.append(s)
+	sufs.shuffle()
+	var decoys: Array = []
+	for s in sufs.slice(1, 1 + lv + 1): decoys.append("-" + s)
+	dnd({"title": "Word forge: endings", "prompt": "Build the word for:\n\"" + suffix_meaning(root, sufs[0]) + "\"", "answers": [root, "-" + sufs[0]], "pool": decoys,
+		"pieces": true, "tip": "-ma in, -ru to, -ta from, -li with, -ni of, -su together with, -ven as far as, -ir plural.", "key": "w:-" + sufs[0], "again": word_forge.bind(back), "again_label": "Another word", "back": back})
+
+func glossed_pool(n: int) -> Array:
+	var pool: Array = []
+	var seen: Array = []
+	var cand = discovered.duplicate()
+	cand.shuffle()
+	for w in cand:
+		var g = short_gloss(w)
+		if g == "" or w.begins_with("-") or w.ends_with("-") or seen.has(g) or w.contains(" "): continue
+		pool.append(w)
+		seen.append(g)
+		if pool.size() >= n: break
+	return pool
+
+func word_match(back: Callable = Callable()):
+	if not back.is_valid(): back = show_games
+	var lv = level()
+	var n = [0, 4, 5, 6, 6][lv]
+	var ws = glossed_pool(n + 1)
+	if ws.size() < 4:
+		message("Word match", "Collect a few more words first: talk to people and examine things.")
+		return
+	var use = ws.slice(0, mini(n, ws.size()))
+	var hints: Array = []
+	for w in use: hints.append(short_gloss(w))
+	var extra: Array = ws.slice(use.size()) if lv >= 2 else []
+	dnd({"title": "Word match", "prompt": "Drag each Varnak word next to its meaning.", "answers": use, "hints": hints, "pool": extra,
+		"tip": "Check the notebook for any word you are unsure of.", "key": "g:match", "again": word_match.bind(back), "again_label": "New words", "back": back})
+
+# ------------------------------------------------------------ mini-games with timers and cards
+
+func update_minigame(delta: float):
+	if mg.is_empty() or not panel.visible: return
+	match mg.get("type", ""):
+		"fish":
+			mg["t"] += delta * mg["speed"]
+			var bar = mg["bar"] as Control
+			var w = bar.size.x
+			var u = (sin(mg["t"]) + 1.0) * 0.5
+			mg["u"] = u
+			(mg["marker"] as Control).position = Vector2(u * (w - 10.0), 0)
+			var zone = mg["zone"] as Control
+			zone.position = Vector2(mg["zx"] * w, 0)
+			zone.size = Vector2(mg["zw"] * w, bar.size.y)
+		"market", "speed":
+			if mg.get("time", 0.0) > 0.0:
+				mg["time"] -= delta
+				if mg.has("clock_label") and is_instance_valid(mg["clock_label"]): (mg["clock_label"] as Label).text = "Time: " + str(int(ceil(mg["time"])))
+				if mg["time"] <= 0.0:
+					if mg["type"] == "market":
+						toast("Too slow! The customer left.")
+						mg["i"] += 1
+						market_next()
+					else: speed_end()
+
+func fishing_game():
+	clear_panel("Na-tari-nuk-im.", true)
+	var lv = level()
+	text_line("You cast your line. Tap Pull! when the white marker is inside the green zone.")
+	var bar = Panel.new()
+	bar.custom_minimum_size = Vector2(0, 46)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = Color("2f7f96")
+	sb.set_corner_radius_all(8)
+	bar.add_theme_stylebox_override("panel", sb)
+	content.add_child(bar)
+	var zone = ColorRect.new()
+	zone.color = Color(0.45, 0.85, 0.45, 0.85)
+	bar.add_child(zone)
+	var marker = ColorRect.new()
+	marker.color = Color(1, 1, 1)
+	marker.size = Vector2(10, 46)
+	bar.add_child(marker)
+	var zw = [0.0, 0.3, 0.22, 0.16, 0.12][lv]
+	mg = {"type": "fish", "t": randf() * TAU, "speed": [0.0, 1.6, 2.1, 2.7, 3.3][lv], "zw": zw, "zx": randf_range(0.05, 0.95 - zw), "bar": bar, "zone": zone, "marker": marker}
+	button("Pull!", fish_pull, content)
+	text_line("Fish in your bag: " + str(fish_caught) + ".", 17)
+	button("Stop fishing", close_panel, content)
+
+func fish_pull():
+	if mg.get("type", "") != "fish": return
+	var u: float = mg.get("u", -1.0)
+	var hit = u >= mg["zx"] - 0.02 and u <= mg["zx"] + mg["zw"] + 0.02
+	if hit:
+		fish_caught += 1
+		master("g:fish")
+		save_game()
+		clear_panel("A catch!")
+		text_line("You pull out a silver fish.\n\n“Anke tari k-i-nuk-ak-pa-da.”\nI caught the fish.")
+		fish_count_note()
+		button("Fish again", fishing_game, content)
+		button("Return", close_panel, content)
+	else:
+		toast("It got away! Try again.")
+		mg["zx"] = randf_range(0.05, 0.95 - mg["zw"])
+
+func memory_game(back: Callable = Callable()):
+	if not back.is_valid(): back = show_games
+	var lv = level()
+	var n = [0, 4, 6, 8, 8][lv]
+	var ws = glossed_pool(n)
+	if ws.size() < 4:
+		message("Memory cards", "Collect a few more words first: talk to people and examine things.")
+		return
+	clear_panel("Memory cards", true)
+	text_line("Turn over two cards at a time. Match each Varnak word with its meaning.")
+	var info = text_line("Moves: 0", 17)
+	var grid = GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	content.add_child(grid)
+	var cards: Array = []
+	for i in range(ws.size()):
+		cards.append({"t": ws[i], "pair": i, "v": true})
+		cards.append({"t": short_gloss(ws[i]), "pair": i, "v": false})
+	cards.shuffle()
+	mg = {"type": "memory", "open": [], "moves": 0, "left": ws.size(), "busy": false}
+	for c in cards:
+		var b = Button.new()
+		b.text = "?"
+		b.custom_minimum_size = Vector2(92, 74)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.add_theme_font_size_override("font_size", 17)
+		grid.add_child(b)
+		b.pressed.connect(func():
+			if mg.get("type", "") != "memory" or mg["busy"] or b.text != "?": return
+			b.text = c["t"]
+			if c["v"]: b.add_theme_color_override("font_color", Color("7a1f3d"))
+			mg["open"].append([b, c])
+			if mg["open"].size() == 2:
+				mg["moves"] += 1
+				info.text = "Moves: " + str(mg["moves"])
+				var a1 = mg["open"][0]
+				var a2 = mg["open"][1]
+				if a1[1]["pair"] == a2[1]["pair"] and a1[1]["v"] != a2[1]["v"]:
+					for x in [a1[0], a2[0]]: x.disabled = true
+					mg["open"] = []
+					mg["left"] -= 1
+					if mg["left"] == 0:
+						var reward = maxi(1, ws.size() / 2)
+						gin += reward
+						master("g:memory")
+						save_game()
+						info.text = "All pairs in " + str(mg["moves"]) + " moves! +" + str(reward) + " gin"
+				else:
+					mg["busy"] = true
+					get_tree().create_timer(0.9).timeout.connect(func():
+						if mg.get("type", "") != "memory": return
+						for x in [a1[0], a2[0]]:
+							if is_instance_valid(x): x.text = "?"
+						mg["open"] = []
+						mg["busy"] = false))
+	button("New cards", memory_game.bind(back), content)
+	button("Back", back, content)
+
+func market_rush():
+	var lv = level()
+	mg = {"type": "market", "i": 0, "n": [0, 3, 4, 5, 6][lv], "score": 0, "per": [0.0, 0.0, 0.0, 25.0, 18.0][lv]}
+	market_next()
+
+func market_next():
+	if mg.get("type", "") != "market": return
+	if mg["i"] >= mg["n"]:
+		var s: int = mg["score"]
+		mg = {}
+		if s >= 3: master("g:market")
+		gin += s
+		save_game()
+		message("Ketu counts the takings", "You served " + str(s) + " of the customers correctly and earned " + str(s) + " gin. “Ho!” says Ketu.")
+		return
+	var lv = level()
+	var goods = Data.GOODS.keys()
+	goods.shuffle()
+	var k = randi_range(1, [0, 1, 2, 2, 3][lv])
+	var order: Dictionary = {}
+	var said: Array = []
+	for g in goods.slice(0, k):
+		var q = randi_range(1, 3 if lv < 3 else 5)
+		order[g] = q
+		said.append(Data.NUMBERS[q] + " " + g)
+	mg["order"] = order
+	mg["counts"] = {}
+	for g in Data.GOODS.keys(): mg["counts"][g] = 0
+	mg["time"] = mg["per"]
+	clear_panel("Market rush: customer " + str(mg["i"] + 1) + " of " + str(mg["n"]), true)
+	var line = " e ".join(said)
+	text_line("A customer says:\n\n“" + line.substr(0, 1).to_upper() + line.substr(1) + " t-na-ven-o-ye.”")
+	if mg["per"] > 0.0:
+		mg["clock_label"] = text_line("Time: " + str(int(mg["per"])), 18)
+	for g in Data.GOODS.keys():
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		content.add_child(row)
+		var name_l = Label.new()
+		name_l.text = g + "  (" + Data.GOODS[g] + ")"
+		name_l.custom_minimum_size.x = 150
+		name_l.add_theme_font_size_override("font_size", 19)
+		row.add_child(name_l)
+		var count_l = Label.new()
+		count_l.text = "nul"
+		count_l.custom_minimum_size.x = 70
+		count_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		count_l.add_theme_font_size_override("font_size", 22)
+		count_l.add_theme_color_override("font_color", Color("7a1f3d"))
+		var minus = button("-", func():
+			mg["counts"][g] = maxi(0, mg["counts"][g] - 1)
+			count_l.text = Data.NUMBERS[mg["counts"][g]], row)
+		row.add_child(count_l)
+		var plus = button("+", func():
+			mg["counts"][g] = mini(10, mg["counts"][g] + 1)
+			count_l.text = Data.NUMBERS[mg["counts"][g]], row)
+		minus.custom_minimum_size.x = 54
+		plus.custom_minimum_size.x = 54
+	button("Hand it over", func():
+		var ok = true
+		for g in Data.GOODS.keys():
+			if mg["counts"][g] != mg["order"].get(g, 0): ok = false
+		if ok:
+			mg["score"] += 1
+			toast("“K-ta-har-da!” Correct order.")
+		else:
+			var want: Array = []
+			for g in mg["order"].keys(): want.append(str(mg["order"][g]) + " " + Data.GOODS[g])
+			toast("Not quite: they wanted " + ", ".join(want) + ".")
+		mg["i"] += 1
+		market_next(), content)
+	button("Stop", close_panel, content)
+
+func speed_round():
+	var ws = glossed_pool(40)
+	if ws.size() < 6:
+		message("Speed round", "Collect at least six words first.")
+		return
+	mg = {"type": "speed", "time": 60.0, "score": 0, "pool": ws}
+	speed_next()
+
+func speed_next():
+	if mg.get("type", "") != "speed": return
+	var lv = level()
+	var ws: Array = mg["pool"]
+	var w: String = ws[randi() % ws.size()]
+	var opts: Array = [short_gloss(w)]
+	var sh = ws.duplicate()
+	sh.shuffle()
+	for o in sh:
+		var g = short_gloss(o)
+		if not opts.has(g) and opts.size() < [0, 3, 4, 4, 5][lv]: opts.append(g)
+	var right = opts[0]
+	opts.shuffle()
+	clear_panel("Speed round", true)
+	mg["clock_label"] = text_line("Time: " + str(int(ceil(mg["time"]))) + "     Score: " + str(mg["score"]) + "     Best: " + str(best_speed), 18)
+	varnak_banner(w, 34)
+	for o in opts:
+		button(o, func():
+			if mg.get("type", "") != "speed": return
+			if o == right:
+				mg["score"] += 1
+				master("w:" + w)
+			else:
+				mg["time"] -= 3.0
+				toast("“" + w + "” = " + right + "  (-3 s)")
+			speed_next(), content)
+	button("Stop", speed_end, content)
+
+func speed_end():
+	if mg.get("type", "") != "speed": return
+	var s: int = mg["score"]
+	mg = {}
+	var best = s > best_speed
+	best_speed = maxi(best_speed, s)
+	if s >= 10: master("g:speed")
+	if s >= 15:
+		gin += 2
+	save_game()
+	message("Time!", "You scored " + str(s) + "." + (" A new best!" if best else " Best: " + str(best_speed) + ".") + (" Suri gives you vel gin for a great round." if s >= 15 else ""))
+
+func show_games():
+	clear_panel("Games and activities")
+	var lv = level()
+	text_line("Level " + str(lv) + ": " + Data.LEVEL_NAMES[lv] + ". Games get harder as your level rises. You have " + str(gin) + " gin.", 17)
+	var n = glossed_pool(8).size()
+	var games = [
+		["Sentence builder (drag and drop)", tile_puzzle.bind(-1, show_games), true, "Put words in order."],
+		["Fill the gap (drag and drop)", gap_fill.bind(show_games), true, "Drag the missing word into the sentence."],
+		["Word forge (drag and drop)", word_forge.bind(show_games), true, "Build words from roots and endings."],
+		["Word match (drag and drop)", word_match.bind(show_games), n >= 4, "Match Varnak words with meanings."],
+		["Memory cards", memory_game.bind(show_games), n >= 4, "Find the pairs. Earn gin."],
+		["Speed round", speed_round, glossed_pool(6).size() >= 6, "60 seconds. How many can you get?"],
+		["Market rush", market_rush, completed.has("market"), "Serve Ketu's customers. Unlocks after Ketu's quest."],
+		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."]
+	]
+	for g in games:
+		var b = button(g[0] + ("" if g[2] else "  (locked)"), g[1], content)
+		b.disabled = not g[2]
+		var d = text_line(g[3], 15)
+		d.add_theme_color_override("font_color", Color("6b4a2e"))
+	text_line("Fishing: tap a jumping fish at the river, the dock or the lagoon.", 16)
+	button("Return", close_panel, content)
