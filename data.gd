@@ -64,6 +64,15 @@ const WORDS = {
 	"ti-ni": "your (ti + ni)", "ti-ru": "to you (ti + ru)",
 	"ning-guro": "song-berry (ning + guro): a glowing berry that makes you speak in poems",
 	"sao-dau": "star-head mushroom (sao + dau): a glowing mushroom that makes you speak in strange poems",
+	# borrowed words: respelled with Varnak sounds
+	"choni": "underwear (borrowed from Mexican Spanish chones, chonies)", "buruhaha": "an uproar, a commotion (borrowed from French brouhaha)",
+	"kafufel": "a fuss (borrowed from Scots kerfuffle)", "halabalu": "a noisy racket (borrowed from English hullabaloo)",
+	"shenani": "mischief, tricks (borrowed from English shenanigans)", "gesunhait": "bless you, said after a sneeze (borrowed from German Gesundheit)",
+	"hutspa": "nerve, cheek (borrowed from Yiddish chutzpah)", "kawai": "cute (borrowed from Japanese kawaii; a describing root: i-kawai)",
+	"manyana": "later, some other day (borrowed from Spanish manana)", "fiyesta": "a party (borrowed from Spanish fiesta)",
+	"bombom": "candy (borrowed from French bonbon)", "wala": "ta-da! (borrowed from French voila)", "pajama": "pajamas (borrowed through English from Hindi and Urdu)",
+	"kaput": "broken (borrowed from German kaputt; a describing root: i-kaput)", "aloha": "hello, goodbye (borrowed from Hawaiian)", "chau": "bye (borrowed from Italian ciao)",
+	"kaf": "coffee (an old borrowing, like cha)",
 	"-en": "who / that (relative clause ending: i-ning-im-en par, the bird that is singing)",
 	"-ka": "and then (same subject keeps going)", "shi (if)": "if (after the clause)"
 }
@@ -312,7 +321,13 @@ const SENTENCES = {
 		"words": ["tari", "-ir", "hen", "-ta", "kar"], "wrong": ["Birds are coming from the sea.", "It is raining on the fish."]},
 	"rolling_fruit": {"v": "Var guro hala i-pav-im-da!", "parts": "var  guro  hala  i-pav-im-da\nbig  fruit  fast  3S-run-IPFV-DIR", "en": "A giant fruit is running fast!",
 		"gesture": "A giant fruit rolls down the main path. Everyone jumps out of the way.",
-		"words": ["var", "guro", "hala", "pav"], "wrong": ["A small fruit is sleeping.", "The fruit is not moving."]}
+		"words": ["var", "guro", "hala", "pav"], "wrong": ["A small fruit is sleeping.", "The fruit is not moving."]},
+	"odd_choni": {"v": "Gav-ni choni fardom-ni tarma i-esh-da!", "parts": "Gav-ni  choni  fardom-ni  tar-ma  i-esh-da\nGav-GEN  underwear  lighthouse-GEN  top-LOC  3S-be.located-DIR", "en": "Gav's underwear is on top of the lighthouse!",
+		"gesture": "A pair of spotted chonies flaps from the very top of the lighthouse like a flag. Choni is a word Varnak borrowed.",
+		"words": ["choni", "-ni", "fardom", "tar", "-ma"], "wrong": ["Gav is on top of the lighthouse.", "The lighthouse is wearing a hat."]},
+	"party_noise": {"v": "Fiyesta-ma buruhaha i-esh-pa-nu.", "parts": "fiyesta-ma  buruhaha  i-esh-pa-nu\nparty-LOC  uproar  3S-exist-PST-REP", "en": "They say there was an uproar at the party.",
+		"gesture": "Desh grins and mimes a crowd going wild. Fiyesta and buruhaha are both borrowed words.",
+		"words": ["fiyesta", "buruhaha", "-nu"], "wrong": ["The party was quiet.", "There will be a party tomorrow."]}
 }
 
 # Village gossip. by: who tells it, about: who it is about, ev: how the teller knows.
@@ -354,6 +369,15 @@ const GOSSIP = [
 	{"id": "vira_medicine", "by": "ila", "about": "vira", "ev": "da", "v": "Vira-ni yok i-wai-da.", "en": "Vira's medicine tastes bad. I know firsthand.",
 		"gesture": "Ila sticks out her tongue and shudders.",
 		"reply": {"v": "Yok i-wai, dan Ila i-seng-da!", "en": "The medicine is bad, but Ila is happy!", "gesture": "Vira shrugs, completely unbothered."}},
+	{"id": "tor_choni", "by": "gav", "about": "tor", "ev": "shi", "v": "Torke Gav-ni choni i-nuk-pa-shi.", "en": "Apparently Tor took Gav's chonies.",
+		"gesture": "Gav points at a suspicious spotted corner sticking out of Tor's tool bag.",
+		"reply": {"v": "Maki! ...Choni i-kawai-da.", "en": "No! ...The chonies are cute.", "gesture": "Tor stuffs the spotted corner deeper into the bag."}},
+	{"id": "pomo_manyana", "by": "ketu", "about": "pomo", "ev": "da", "v": "Pomo manyana i-vun-ur-da.", "en": "Pomo always works manyana: later. I've seen it.",
+		"gesture": "Ketu waves a hand lazily toward tomorrow.",
+		"reply": {"v": "Ho, ho... manyana.", "en": "Yes, yes... later.", "gesture": "Pomo settles in for a nap."}},
+	{"id": "desh_party", "by": "lira", "about": "desh", "ev": "nu", "v": "Desh-ni fiyesta-ma halabalu i-esh-pa-nu.", "en": "They say there was a hullabaloo at Desh's party.",
+		"gesture": "Lira covers her ears, then dances a little.",
+		"reply": {"v": "Ho! Fiyesta i-ho-pa-da! Wala!", "en": "Yes! The party was great! Ta-da!", "gesture": "Desh plays a drum roll and throws imaginary confetti."}},
 	{"id": "lira_story", "by": "pomo", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
 		"gesture": "Pomo points down the hill at the village and mimes a chattering mouth.",
 		"reply": {"v": "Ho! Ki tovu i-ho!", "en": "Ha! This story is good!", "gesture": "Lira is already telling someone else."}}
@@ -361,7 +385,7 @@ const GOSSIP = [
 
 # Rumor composer: pieces for open-ended sentences.
 const RUMOR_PLACES = [["", "", ""], ["tekama", "in the village", ""], ["haima", "in the sea", ""], ["kurma", "at the market", ""], ["sang-ma", "on the hill", ""],
-	["wak-korma", "in the well", "silly"], ["sulumma", "in bed", ""], ["girama", "on the bridge", ""], ["murakma", "in a tree", "silly"], ["fardomma", "in the lighthouse", ""], ["guro-ma", "inside a fruit", "silly"]]
+	["wak-korma", "in the well", "silly"], ["sulumma", "in bed", ""], ["girama", "on the bridge", ""], ["murakma", "in a tree", "silly"], ["fardomma", "in the lighthouse", ""], ["guro-ma", "inside a fruit", "silly"], ["fiyesta-ma", "at the party", ""], ["pajama-ma", "in pajamas", "silly"]]
 # root: [base, -ing, past, he/she form]
 const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["swim", "swimming", "swam", "swims"], "ning": ["sing", "singing", "sang", "sings"],
 	"pav": ["run", "running", "ran", "runs"], "nang": ["walk", "walking", "walked", "walks"], "mel": ["talk", "talking", "talked", "talks"],
@@ -525,7 +549,7 @@ const TILES = [
 ]
 
 # Market rush: things Ketu's stall sells. word -> English
-const GOODS = {"guro": "fruit", "panak": "bread", "tari": "fish", "cha": "tea"}
+const GOODS = {"guro": "fruit", "panak": "bread", "tari": "fish", "cha": "tea", "bombom": "candy"}
 const NUMBERS = ["nul", "yan", "vel", "mur", "kes", "pan", "luk", "set", "bar", "gov", "dar"]
 
 # "Say it yourself" challenges: residents ask you to build a sentence (index into TILES). Unlock at level 2.
@@ -549,7 +573,7 @@ const PEOPLE = {
 		"secret": {"v": "Gira i-sava... shi.", "en": "The bridge is safe... apparently. (-shi: Tor is only guessing!)"}},
 	"lira": {"trait": "giggly", "thing": ["tovu", "story"], "likes": ["gin"], "hates": ["tari"],
 		"secret": {"v": "Anni tovu-ir ri-fau-da.", "en": "My stories are false."}},
-	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha"],
+	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha", "bombom"],
 		"secret": {"v": "An mar-ru na-ning-ur-da.", "en": "I sing to the horse."}},
 	"neri": {"trait": "cheerful", "thing": ["puka", "notebook"], "likes": ["tari", "panak", "cha", "gin"], "hates": [],
 		"secret": {"v": "An tari-ta na-par-ur-da.", "en": "I am afraid of fish."}},
@@ -557,9 +581,9 @@ const PEOPLE = {
 		"secret": {"v": "Tari-ir anni palar-ir ri-an-da.", "en": "The fish are my friends."}},
 	"suri": {"trait": "proud", "thing": ["senak", "school"], "likes": ["cha"], "hates": [],
 		"secret": {"v": "Anke puka ma-k-i-rav-pa-ki-da.", "en": "I did not read the book."}},
-	"rin": {"trait": "giggly", "thing": ["puka", "book"], "likes": ["panak"], "hates": ["cha"],
+	"rin": {"trait": "giggly", "thing": ["puka", "book"], "likes": ["panak", "bombom"], "hates": ["cha"],
 		"secret": {"v": "Anke Ola-ni guro k-i-nuk-pa-da.", "en": "I took Ola's fruit. (Ola was framed!)"}},
-	"ola": {"trait": "giggly", "thing": ["guro", "fruit"], "likes": ["panak"], "hates": ["cha"],
+	"ola": {"trait": "giggly", "thing": ["guro", "fruit"], "likes": ["panak", "bombom"], "hates": ["cha"],
 		"secret": {"v": "An sao-ir-ru na-mel-ur-da.", "en": "I talk to the stars."}},
 	"pomo": {"trait": "sleepy", "thing": ["sang", "hill"], "likes": ["cha"], "hates": ["tari"],
 		"secret": {"v": "An sang-ma na-sul-ur-da.", "en": "I do sleep on the hill."}},
@@ -573,7 +597,7 @@ const PEOPLE = {
 		"secret": {"v": "Tari-ir ma-ri-seng-ur-ki-da.", "en": "The fish are not happy when I sing."}},
 	"oku": {"trait": "proud", "thing": ["sek-ir", "stones"], "likes": ["cha"], "hates": ["gin"],
 		"secret": {"v": "Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da.", "en": "The stones don't talk. I do."}},
-	"gav": {"trait": "cheerful", "thing": ["kel-ir", "bags"], "likes": ["panak"], "hates": [],
+	"gav": {"trait": "cheerful", "thing": ["kel-ir", "bags"], "likes": ["panak", "bombom"], "hates": [],
 		"secret": {"v": "Kel-ir-ma yamat i-ho-da.", "en": "The food in the bags is good."}},
 	"tamu": {"trait": "grumpy", "thing": ["sena", "boat"], "likes": ["tari"], "hates": ["panak"],
 		"secret": {"v": "An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.", "en": "I don't travel by boat. I swim."}}
@@ -587,9 +611,12 @@ const JOKES = [
 	{"v": "Par sena-li i-kel-ur-da!", "en": "The bird usually travels by boat!"},
 	{"v": "Sek-ir ri-ning-ur-nu!", "en": "They say the stones usually sing!"},
 	{"v": "Tari-ir dom-ma ri-sul-ur-da!", "en": "The fish usually sleep in the house!"},
-	{"v": "Gira i-pav-im-da!", "en": "The bridge is running!"}
+	{"v": "Gira i-pav-im-da!", "en": "The bridge is running!"},
+	{"v": "Mar-ni choni-ir ri-kawai-da!", "en": "The horse's chonies are cute!"},
+	{"v": "Gira i-kaput... wala! Gira i-sava-da!", "en": "The bridge is broken... ta-da! The bridge is safe!"},
+	{"v": "Yue pajama-ma i-sul-im-da!", "en": "The moon is sleeping in pajamas!"}
 ]
-const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin"}
+const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin", "bombom": "candy"}
 
 
 # ---- quick practice for new words: word classes and English forms ----
@@ -600,11 +627,13 @@ const EXT_VERBS_I = {"lum": ["go", "went", "going"], "pav": ["run", "ran", "runn
 const EXT_VERBS_T = {"pal": ["see", "saw"], "nuk": ["take", "took"], "rav": ["read", "read"], "por": ["open", "opened"], "hep": ["close", "closed"],
 	"dar": ["cook", "cooked"], "varn": ["build", "built"], "sir": ["look for", "looked for"], "mai": ["buy", "bought"], "ven": ["give", "gave"], "tar": ["bring", "brought"]}
 const EXT_STATIVES = {"var": "big", "sen": "small", "nav": "warm", "ret": "hot", "len": "cold", "gao": "tall", "ho": "good", "wai": "bad", "seng": "happy",
-	"sava": "safe", "ling": "bright", "dam": "dark", "dun": "short", "shora": "old", "nava": "new", "lei": "tired", "mar": "full", "hala": "fast"}
+	"sava": "safe", "ling": "bright", "dam": "dark", "dun": "short", "shora": "old", "nava": "new", "lei": "tired", "mar": "full", "hala": "fast", "kawai": "cute", "kaput": "broken"}
 const EXT_NOUNS_EXTRA = {"kel": ["bag", "bags"], "sek": ["stone", "stones"], "lin": ["rope", "ropes"], "yamat": ["food", "food"], "cha": ["tea", "tea"],
 	"yok": ["herb", "herbs"], "ket": ["chair", "chairs"], "yir": ["shirt", "shirts"], "gin": ["coin", "coins"], "sao": ["star", "stars"], "yue": ["moon", "moons"],
 	"riya": ["sun", "suns"], "hen": ["sky", "skies"], "tovu": ["story", "stories"], "palar": ["friend", "friends"], "ruk": ["path", "paths"], "pai": ["paper", "papers"],
-	"senar": ["teacher", "teachers"], "ravar": ["student", "students"], "kelar": ["traveler", "travelers"], "dor": ["land", "lands"], "gan": ["room", "rooms"]}
+	"senar": ["teacher", "teachers"], "ravar": ["student", "students"], "kelar": ["traveler", "travelers"], "dor": ["land", "lands"], "gan": ["room", "rooms"],
+	"choni": ["pair of chonies", "chonies"], "bombom": ["candy", "candies"], "pajama": ["pajamas", "pajamas"], "fiyesta": ["party", "parties"],
+	"buruhaha": ["uproar", "uproars"], "kafufel": ["fuss", "fusses"], "halabalu": ["racket", "rackets"], "shenani": ["trick", "tricks"]}
 
 # ---- poems from ning-guro berries and sao-dau mushrooms ----
 # Poem nouns: [singular, plural]
@@ -612,8 +641,9 @@ const POEM_NOUNS = {"yue": ["the moon", "moons"], "riya": ["the sun", "suns"], "
 	"murak": ["the tree", "the trees"], "par": ["the bird", "the birds"], "tari": ["the fish", "the fish"], "fal": ["the flower", "the flowers"], "guro": ["the fruit", "the fruits"],
 	"sek": ["the stone", "the stones"], "sang": ["the hill", "the hills"], "far": ["the fire", "the fires"], "dom": ["the house", "the houses"], "sena": ["the boat", "the boats"],
 	"puka": ["the book", "the books"], "panak": ["the bread", "the loaves"], "gor": ["the dog", "the dogs"], "mar": ["the horse", "the horses"], "ket": ["the chair", "the chairs"],
-	"gira": ["the bridge", "the bridges"], "yamat": ["the food", "the meals"]}
+	"gira": ["the bridge", "the bridges"], "yamat": ["the food", "the meals"], "choni": ["a pair of chonies", "the chonies"], "bombom": ["the candy", "the candies"],
+	"pajama": ["the pajama shirt", "the pajamas"], "fiyesta": ["the party", "the parties"]}
 const POEM_PLACES = {"hen": "in the sky", "hai": "in the sea", "mora": "in the river", "yesh": "in the night", "salma": "at dawn", "teka": "in the village",
-	"sang": "on the hill", "guro": "inside a fruit", "dau": "in my head", "kel": "in a bag"}
+	"sang": "on the hill", "guro": "inside a fruit", "dau": "in my head", "kel": "in a bag", "fiyesta": "at the party", "pajama": "in pajamas"}
 const POEM_INC = [["wak-ta", "drinks water", "drink water"], ["yamat-dar", "cooks food", "cook food"], ["puka-rav", "reads books", "read books"],
 	["tari-nuk", "goes fishing", "go fishing"], ["mara-vun", "works the fields", "work the fields"]]

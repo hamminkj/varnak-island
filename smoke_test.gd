@@ -575,7 +575,7 @@ func run():
 	game.talk("lira")
 	assert(find_button(game.content, "Tell some gossip") != null)
 	# strange things
-	for id in ["odd_fish", "odd_chair", "odd_clothes", "odd_book", "odd_bed", "odd_fruit", "odd_teapot"]:
+	for id in ["odd_fish", "odd_chair", "odd_clothes", "odd_book", "odd_bed", "odd_fruit", "odd_teapot", "odd_choni"]:
 		game.target = game.entity_by_id(id)
 		game.interact()
 		press(Data.SENTENCES[id]["en"])
@@ -770,6 +770,23 @@ func run():
 	assert(game.completed.has("poems"))
 	game.show_poems()
 	game.show_inventory()
+	# ---- borrowed words ----
+	for id in Data.PEOPLE.keys():
+		game.do_compliment(id, ["Ti ta-kawai-da!", "You are cute!", "cute"])
+		assert(game.panel.visible)
+	seed(3)
+	for k in range(12): game.tease("tor")
+	for g in Data.GOSSIP:
+		if g["id"] in ["tor_choni", "pomo_manyana", "desh_party"]:
+			game.gossip_card(g, 0)
+			press(g["en"])
+	game.inventory.append("candy")
+	game.give_gift("rin", "bombom")
+	assert(not game.inventory.has("candy"))
+	game.discovered.append("choni")
+	game.show_loans()
+	assert(has_text("choni"))
+	print("PASS: borrowed words: kawai compliments, choni teases, loan gossip, bombom gifts, borrowed words page")
 	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
 	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")

@@ -166,7 +166,7 @@ var side_quests = [
 	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
 	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
 	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
-	["strange","","Something odd is going on. Find seven strange things around the island."],
+	["strange","","Something odd is going on. Find eight strange things around the island."],
 	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
 	["poems","","Find glowing ning-guro berries and sao-dau mushrooms. Eat them or give them to people, and collect five poems."],
 	["friends","","Make five friends. Chat with people (compliment them, tell jokes, give gifts) until they call you palar, friend."],
@@ -933,6 +933,7 @@ func build_entities():
 	entity("odd_bed","object","sulum",Vector3(20,0,-23.2),Color.WHITE,1.6,Vector2(1.6,1.2))
 	entity("odd_fruit","object","guro",Vector3(26,0,-13.4),Color.WHITE,3.4,Vector2(1.7,2.8))
 	entity("odd_teapot","object","cha-kor",Vector3(1.55,0,-21.4),Color.WHITE,1.7,Vector2(0.8,1.5))
+	entity("odd_choni","object","choni",Vector3(74.6,0,-6.0),Color.WHITE,15.6,Vector2(2.4,16.0))
 	for pl in PLANTS:
 		var pe = entity(pl[0], "plant", pl[1], pl[2], Color.WHITE)
 		pe["ripe_at"] = 0.0
@@ -1843,8 +1844,11 @@ func examine(e: Dictionary):
 			var found = 0
 			for k in Data.SENTENCES.keys():
 				if k.begins_with("odd_") and solved.has("odd:" + k): found += 1
-			toast("Strange thing " + str(found) + " of 7!")
-			if found >= 7: complete("strange")
+			var total = 0
+			for k in Data.SENTENCES.keys():
+				if k.begins_with("odd_"): total += 1
+			toast("Strange thing " + str(found) + " of " + str(total) + "!")
+			if found >= total: complete("strange")
 		sentence_card(id)
 		return
 	if Data.COUNTS.has(id):
@@ -2191,6 +2195,7 @@ func add_topics(id: String):
 				topic("Ask about the lamp", "lighthouse_dark", id)
 				topic("Ask what is wrong", "no_fire", id)
 		"desh":
+			topic("Ask about the party", "party_noise", id)
 			topic("Ask Desh about swimming", "desh_swims", id)
 			topic("Ask about the sea", "sea_cold", id)
 		"oku":
@@ -2295,6 +2300,15 @@ func talk(id: String):
 						save_game()
 						talk("ketu"), content)
 				button("Buy panak (bread)", buy_bread, content)
+				button("Buy bombom (candy): gin yan", func():
+					if gin >= 1:
+						gin -= 1
+						inventory.append("candy")
+						learn("bombom")
+						toast("Bombom! (-1 gin)")
+						save_game()
+						talk("ketu")
+					else: message("Not enough gin", "Candy costs one coin. Sell a fish to Ketu first."), content)
 				button("Buy cha (tea): gin yan", func():
 					if gin >= 1:
 						gin -= 1
@@ -2496,6 +2510,7 @@ func consume(items: Array):
 func item_word(id: String) -> String:
 	if id == "tea": return "cha"
 	if id == "bread": return "panak"
+	if id == "candy": return "bombom"
 	if id == "map": return "pai (an old map)"
 	if Data.PARCELS.has(id): return "kel: " + str(Data.PARCELS[id]).capitalize() + "-ru"
 	for e in entities:
@@ -2535,6 +2550,7 @@ func show_notebook():
 	var b5 = button("Games", show_games, row2)
 	var b6 = button("Poems", show_poems, row2)
 	b6.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button("Borrowed words", show_loans, content)
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
@@ -3377,7 +3393,8 @@ func dig_treasure():
 	fw.position = chest_node.global_position + Vector3(0, 1.0, 0)
 	fw.color = Color("ffd34d")
 	fw.restart()
-	message("Dar gin!", "Your shovel hits wood. A chest! Inside are dar gin: ten coins, and a note in Neri's handwriting: “Ho! Ti kelar i-ho.” Good, you are a good traveler.")
+	learn("wala")
+	message("Wala! Dar gin!", "Your shovel hits wood. A chest! Inside are dar gin: ten coins, and a note in Neri's handwriting: “Ho! Ti kelar i-ho.” Good, you are a good traveler.")
 
 func collect_star(e: Dictionary):
 	(e["node"] as Node3D).hide()
@@ -3534,7 +3551,7 @@ func level() -> int:
 func check_level():
 	var lv = level()
 	if last_level != 0 and lv > last_level:
-		toast("Level up! " + Data.LEVEL_NAMES[lv])
+		toast("Wala! Level up! " + Data.LEVEL_NAMES[lv])
 		for i in range(2):
 			var fw: CPUParticles3D = fireworks[i]
 			fw.position = player.position + Vector3(randf_range(-4, 4), 9, randf_range(-6, -2)).rotated(Vector3.UP, player.rotation.y)
@@ -3577,7 +3594,7 @@ func show_more():
 	button("Return", close_panel, content)
 
 func greeting(id: String) -> String:
-	if guro_t >= 0.0: return "Var guro!"
+	if guro_t >= 0.0: return "Var guro!" if id.length() % 2 == 0 else "Buruhaha!"
 	var e = entity_by_id(id)
 	if e.has("say") and clock < float(e["say"][1]): return e["say"][0]
 	if mood.get(id, 0) <= -2: return "Hmph!"
@@ -3593,17 +3610,17 @@ func greeting(id: String) -> String:
 		"suri": return "Ravarir ri-puka-rav-im-da."
 		"rin": return "An ravar na-an-da."
 		"ola": return "Ti kelar ta-an-ha?"
-		"pomo": return "Bei, nam, dong, sai."
+		"pomo": return "Bei, nam, dong, sai... manyana."
 		"vira": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Ila i-seng-da."
 		"ila": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
 		"yalo": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
-		"desh": return "Ta-sum-o!"
+		"desh": return "Aloha! Ta-sum-o!"
 		"sair1": return "Anke panak k-i-mai-fu."
 		"sair2": return "Cha i-ret."
 		"sair3": return "I-ser-ng."
 		"oku": return "Ki dom i-shora."
 		"gav": return "Kel-ir! Kel-ir!" if not completed.has("mail") else "K-ta-har-da!"
-		"tamu": return "Sendor-ru?"
+		"tamu": return "Chau... Sendor-ru?"
 	return ""
 
 func make_bubble(e: Dictionary):
@@ -4321,6 +4338,20 @@ func build_places5():
 	Art.cyl(tp, Vector3(0.17, 0.14, 0), 0.02, 0.035, 0.18, Color("2a9d8f"), Vector3(0, 0, -55), 6)
 	Art.sph(tp, Vector3(0, 0.27, 0), 0.04, Color("e9c46a"), Vector3.ONE, 6)
 	odd_nodes["odd_teapot"] = tp
+	# Gav's chonies flying from the lighthouse
+	var ch = Node3D.new()
+	ch.position = Vector3(77.4, 12.2, -6.25)
+	add_child(ch)
+	Art.cyl(ch, Vector3(0, 0.6, 0), 0.025, 0.025, 1.2, Color("3b2d25"), Vector3.ZERO, 5)
+	var flag = Node3D.new()
+	flag.position = Vector3(0.05, 1.05, 0)
+	flag.scale = Vector3.ONE * 2.0
+	ch.add_child(flag)
+	Art.box(flag, Vector3(0.35, 0, 0), Vector3(0.6, 0.32, 0.04), Color("f2f2f2"))
+	for i in range(5):
+		Art.sph(flag, Vector3(0.12 + (i % 3) * 0.2, -0.08 + (i / 3) * 0.16, 0.025), 0.04, Color("e76f51"), Vector3(1, 1, 0.3), 5)
+	Art.box(flag, Vector3(0.35, -0.2, 0), Vector3(0.22, 0.14, 0.04), Color("f2f2f2"))
+	odd_nodes["odd_choni"] = flag
 	# the rolling giant fruit (an event)
 	guro_node = Node3D.new()
 	add_child(guro_node)
@@ -4363,13 +4394,14 @@ func update_silly(delta: float):
 		bed.rotation_degrees.z = sin(clock * 0.9) * 3.0
 	if odd_nodes.has("odd_book"): (odd_nodes["odd_book"] as Node3D).position.y = -0.06 + sin(clock * 1.7) * 0.03
 	if odd_nodes.has("odd_fish"): (odd_nodes["odd_fish"] as Node3D).rotation_degrees.z = sin(clock * 2.0) * 12.0
+	if odd_nodes.has("odd_choni"): (odd_nodes["odd_choni"] as Node3D).rotation_degrees.y = sin(clock * 2.6) * 25.0
 	# fish rain
 	if fish_rain_t > 0.0:
 		if not fish_fx.emitting:
 			fish_fx.emitting = true
 			learn("kar")
 			if not phrases.has("fish_rain"): phrases.append("fish_rain")
-			toast("Tari-ir hen-ta ri-kar-im-da! It is raining fish!")
+			toast("Halabalu! Tari-ir hen-ta ri-kar-im-da! It is raining fish!")
 		fish_rain_t -= delta
 		if fish_rain_t <= 0.0:
 			fish_fx.emitting = false
@@ -4990,7 +5022,8 @@ func compliment(id: String):
 	clear_panel("Compliment " + id.capitalize())
 	add_portrait(id)
 	text_line("Choose what to say. (Think about what each one means!)", 17)
-	var opts = [["Ti-ni " + thing[0] + " i-ho!", "Your " + thing[1] + " is good!", "thing"], ["Ti ta-ho-da!", "You are good!", "you"], ["Ti-ni dau i-var!", "Your head is big!", "head"]]
+	learn("kawai")
+	var opts = [["Ti-ni " + thing[0] + " i-ho!", "Your " + thing[1] + " is good!", "thing"], ["Ti ta-ho-da!", "You are good!", "you"], ["Ti-ni dau i-var!", "Your head is big!", "head"], ["Ti ta-kawai-da!", "You are cute! (kawai is borrowed)", "cute"]]
 	opts.shuffle()
 	for o in opts:
 		button("“" + o[0] + "”", func(): do_compliment(id, o), content)
@@ -5010,6 +5043,13 @@ func do_compliment(id: String, o: Array):
 			react(id, o[0], o[1], rv, re, k, 2)
 		"you":
 			react(id, o[0], o[1], "Ti ta-ho-da!", "You are good too!", "happy", 1)
+		"cute":
+			match tt:
+				"proud": react(id, o[0], o[1], "I-zen-da. An na-kawai-da.", "True. I am cute.", "proud", 2)
+				"grumpy": react(id, o[0], o[1], "Hmph... ho.", "Hmph... thanks.", "embarrassed", 1)
+				"dramatic": react(id, o[0], o[1], "Ho!! Ho!!", "(Overwhelmed by cuteness.)", "faint", 2)
+				"sleepy": react(id, o[0], o[1], "Kawai... zzz", "Cute... zzz", "sleepy", 1)
+				_: react(id, o[0], o[1], "Ha! Ti ta-kawai-da!", "Ha! YOU are cute!", "embarrassed", 2)
 		"head":
 			match tt:
 				"proud": react(id, o[0], o[1], "Ho! Anni dau i-var-da!", "Yes! My head IS big!", "proud", 1)
@@ -5025,6 +5065,19 @@ func tease(id: String):
 	learn("wai")
 	var sv = "Ti-ni " + thing[0] + " i-wai!"
 	var se = "Your " + thing[1] + " is bad!"
+	if randf() < 0.4:
+		learn("choni")
+		learn("kawai")
+		sv = "Ti-ni choni i-kawai!"
+		se = "Your chonies are cute! (choni and kawai are borrowed words)"
+		match Data.PEOPLE[id]["trait"]:
+			"dramatic": react(id, sv, se, "Hal-ta?! Hal-ta?!", "From whom?! Who told you?!", "shocked", -1)
+			"proud": react(id, sv, se, "I-zen-da...", "That's... true.", "embarrassed", 0)
+			"grumpy": react(id, sv, se, "Hutspa! Ti-ni hutspa i-var!", "The nerve! Your nerve is big!", "angry", -1)
+			"giggly": react(id, sv, se, "Ha! Ha! Ha!", "(Laughs until they cry.)", "laugh", 1)
+			"sleepy": react(id, sv, se, "Choni...? zzz", "Chonies...? zzz", "sleepy", 0)
+			_: react(id, sv, se, "Shenani! Ha!", "Mischief! Ha!", "embarrassed", 0)
+		return
 	if id == "vira":
 		react(id, sv, se, "Ho! Yok i-wai-da! Polu i-zen-da!", "Yes! The medicine is bad! Everyone knows!", "laugh", 1)
 		return
@@ -5063,9 +5116,9 @@ func do_joke(id: String, j: Dictionary):
 func gift_menu(id: String):
 	clear_panel("Give " + id.capitalize() + " a gift")
 	add_portrait(id)
-	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(gin) + " gin. (Ketu sells panak and cha.)", 17)
-	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0}
-	for g in ["tari", "panak", "cha", "gin"]:
+	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(gin) + " gin. (Ketu sells panak, cha and bombom.)", 17)
+	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy")}
+	for g in ["tari", "panak", "cha", "bombom", "gin"]:
 		var b = button("“Ki " + g + " ti-ru!”  (This " + Data.GIFT_WORDS[g] + ", for you!)", give_gift.bind(id, g), content)
 		b.disabled = not have[g]
 	if berries > 0: button("“Ki ning-guro ti-ru!”  (A song-berry, for you!)", villager_poem.bind(id, "ning-guro"), content)
@@ -5077,6 +5130,7 @@ func give_gift(id: String, g: String):
 		"tari": fish_caught -= 1
 		"panak": inventory.erase("bread")
 		"cha": inventory.erase("tea")
+		"bombom": inventory.erase("candy")
 		"gin": gin -= 1
 	learn("ti-ru")
 	var pp: Dictionary = Data.PEOPLE[id]
@@ -5154,6 +5208,12 @@ func update_ambient(delta: float):
 	elif r < 0.5: pick = ["happy", "Ho! Ho!"]
 	emote(e["id"], pick[0], 2.6)
 	e["say"] = [pick[1], clock + 2.6]
+	if pick[0] == "sneeze":
+		for o in near:
+			if o != e:
+				o["say"] = ["Gesunhait!", clock + 2.8]
+				learn("gesunhait")
+				break
 
 # ------------------------------------------------------------ seventh expansion: using new words, poem plants
 
@@ -5295,7 +5355,7 @@ func s3(base: String) -> String:
 
 func comparative(adj: String) -> String:
 	var c = {"big": "bigger", "small": "smaller", "warm": "warmer", "hot": "hotter", "cold": "colder", "tall": "taller", "good": "better", "bad": "worse",
-		"happy": "happier", "safe": "safer", "bright": "brighter", "dark": "darker", "short": "shorter", "old": "older", "new": "newer", "full": "fuller", "fast": "faster"}
+		"happy": "happier", "safe": "safer", "bright": "brighter", "dark": "darker", "short": "shorter", "old": "older", "new": "newer", "full": "fuller", "fast": "faster", "cute": "cuter"}
 	return c.get(adj, "more " + adj)
 
 func poem_line(t: int, rng: RandomNumberGenerator, force_noun: String = "") -> Array:
@@ -5446,3 +5506,16 @@ func show_credits():
 	text_line("Every model, effect and piece of island nonsense is built from simple shapes in code. No outside assets are used.", 16)
 	button("Back", show_more, content)
 	button("Return", close_panel, content)
+
+func show_loans():
+	clear_panel("Borrowed words")
+	text_line("Varnak borrows words from other languages and respells them with Varnak sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
+	var any = false
+	for w in words.keys():
+		if str(words[w]).contains("borrow"):
+			any = true
+			var known = discovered.has(w)
+			var l = text_line((w if known else "???") + "  " + (str(words[w]) if known else "(not found yet)"), 18)
+			if known: l.add_theme_color_override("font_color", Color("7a1f3d"))
+	if not any: text_line("None yet.")
+	button("Notebook", show_notebook, content)
