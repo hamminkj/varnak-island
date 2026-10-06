@@ -1205,3 +1205,35 @@ static func emote_fx(parent: Node3D) -> Node3D:
 	fx.set_meta("labels", labels)
 	for c in fx.get_children(): c.visible = false
 	return fx
+
+# ---------- poem plants ----------
+
+static func berry_bush() -> Node3D:
+	var n = Node3D.new()
+	for i in range(5):
+		var a = i * TAU / 5.0
+		sph(n, Vector3(cos(a) * 0.32, 0.35 + (i % 2) * 0.12, sin(a) * 0.32), 0.36, Color("3d7a3a").lerp(Color("5a9a3e"), float(i % 3) / 3.0), Vector3(1, 0.85, 1), 9)
+	var fruit = Node3D.new()
+	n.add_child(fruit)
+	for i in range(9):
+		var a = i * TAU / 9.0 + 0.3
+		var b = sph(fruit, Vector3(cos(a) * 0.55, 0.42 + sin(i * 1.7) * 0.18, sin(a) * 0.55), 0.075, Color("b84dff"), Vector3.ONE, 7, 1.6)
+		b.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.set_meta("fruit", fruit)
+	return n
+
+static func mushroom_patch() -> Node3D:
+	var n = Node3D.new()
+	var fruit = Node3D.new()
+	n.add_child(fruit)
+	for i in range(4):
+		var p = Vector3([-0.25, 0.2, 0.0, 0.35][i], 0, [0.1, -0.2, 0.3, 0.15][i])
+		var h = [0.42, 0.3, 0.24, 0.34][i]
+		cyl(fruit, p + Vector3(0, h * 0.5, 0), 0.05, 0.07, h, Color("f2ead8"), Vector3.ZERO, 7)
+		var cap = sph(fruit, p + Vector3(0, h, 0), 0.17, Color("3fc6e0"), Vector3(1, 0.55, 1), 10, 1.4)
+		cap.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		for k in range(3):
+			var a = k * TAU / 3.0 + i
+			sph(fruit, p + Vector3(cos(a) * 0.09, h + 0.07, sin(a) * 0.09), 0.025, Color("ffffff"), Vector3.ONE, 4)
+	n.set_meta("fruit", fruit)
+	return n

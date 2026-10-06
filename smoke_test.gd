@@ -696,6 +696,81 @@ func run():
 	game.friend.clear()
 	game.load_game()
 	assert(game.friend.size() == fr.size())
+	# ---- seventh expansion: boat landing, new-word practice, poem plants ----
+	game.close_panel()
+	game.start_ride(true)
+	for i in range(40):
+		game.update_ride(0.5)
+		if not game.riding: break
+	game.player.rotation.y = PI
+	game.joy = Vector2(0, -1)
+	for i in range(150): await physics_frame
+	game.joy = Vector2.ZERO
+	assert(game.player.position.z > 76.0, "walked off the dock onto Sendor: " + str(game.player.position))
+	game.player.position = Vector3(0, 0.1, 30)
+	game.last_safe = game.player.position
+	# practice for every word class
+	for w in Data.EXT_VERBS_I.keys() + Data.EXT_VERBS_T.keys() + Data.EXT_STATIVES.keys() + ["teka", "kel", "tari", "sao", "luk", "gov"]:
+		var it = game.ext_items(w)
+		assert(not it["forms"].is_empty() and not it["builds"].is_empty(), "practice for " + w)
+		for f in it["forms"]:
+			assert(not f[2].has(f[1]), "wrong options differ for " + w)
+		game.ext_form(w, Callable())
+		for b in it["builds"]:
+			game.dnd({"title": "t", "prompt": "p", "answers": b["tiles"], "pool": b["decoys"], "tip": b["tip"], "key": "xb:" + w})
+			for t in b["tiles"]: game.tile_tapped(tray_tile(t))
+			press("Check")
+			assert(has_text("Correct!"), "build " + str(b["tiles"]))
+	game.discovered.erase("sena")
+	game.pending_ext.clear()
+	game.talk("ena")
+	press("Ask about the boat")
+	game.talk("ena")
+	assert(game.content.get_children().any(func(c): return c is PanelContainer and not c.is_queued_for_deletion() and find_button(c, "Use it in a new form") != null), "practice box after a new word")
+	game.ext_form("sena", game.talk.bind("ena"))
+	for f in game.ext_items("sena")["forms"]:
+		if find_button(game.content, f[1]) != null and has_text("You know sena"):
+			var prompt_ok = false
+			for c in game.content.get_children():
+				if not c.is_queued_for_deletion() and (c is Label or c is RichTextLabel) and c.text.contains("\"" + f[0] + "\""): prompt_ok = true
+			if prompt_ok: press(f[1])
+	assert(game.mastered.has("x:sena"))
+	game.reveal_word("sena")
+	press("Build a new sentence with it")
+	# poems
+	for i in range(400):
+		var lines = game.make_poem("ning-guro" if i % 2 == 0 else "sao-dau", "" if i % 3 else "mira")
+		for ln in lines:
+			assert(ln[0] != "" and ln[1] != "" and not ln[0].contains("  "), "poem line " + str(ln))
+	var pe = game.entity_by_id("berry1")
+	assert(T.height(pe["home"].x, pe["home"].z) > -0.05)
+	for pl in game.PLANTS:
+		var h: Vector3 = game.entity_by_id(pl[0])["home"]
+		assert(T.height(h.x, h.z) > -0.05 and not game.is_blocked(h.x, h.z, 0.0), "plant on open land " + pl[0])
+	game.berries = 0
+	game.poems.clear()
+	game.completed.erase("poems")
+	pe["ripe_at"] = 0.0
+	game.target = pe
+	game.interact()
+	assert(game.berries == 1)
+	press("Eat it now")
+	assert(game.berries == 0 and game.poems.size() == 1)
+	game.target = pe
+	game.interact()
+	assert(game.berries == 0, "berries need time to regrow")
+	game.shrooms = 3
+	game.berries = 2
+	game.gift_menu("tor")
+	press("“Ki ning-guro ti-ru!”  (A song-berry, for you!)")
+	assert(game.poems.size() == 2 and game.poems[-1]["by"] == "tor")
+	game.villager_poem("lira", "sao-dau")
+	game.eat_poem("sao-dau")
+	game.eat_poem("sao-dau")
+	assert(game.completed.has("poems"))
+	game.show_poems()
+	game.show_inventory()
+	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
 	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")
 	print("PASS: fourth expansion: drag and drop, gap fill, forge, match, challenges, memory, market rush, speed round, levels")

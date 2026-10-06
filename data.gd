@@ -61,7 +61,11 @@ const WORDS = {
 	"sela": "alone", "cha-kor": "teapot (cha + kor)", "-ai": "antipassive: doing something in general (pal-ai: look around)",
 	"ha": "ha (a laugh)", "sir": "look for, search (root)",
 	"palar": "friend", "fau": "false", "lei": "tired", "ber": "illness",
-	"ti-ni": "your (ti + ni)", "ti-ru": "to you (ti + ru)"
+	"ti-ni": "your (ti + ni)", "ti-ru": "to you (ti + ru)",
+	"ning-guro": "song-berry (ning + guro): a glowing berry that makes you speak in poems",
+	"sao-dau": "star-head mushroom (sao + dau): a glowing mushroom that makes you speak in strange poems",
+	"-en": "who / that (relative clause ending: i-ning-im-en par, the bird that is singing)",
+	"-ka": "and then (same subject keeps going)", "shi (if)": "if (after the clause)"
 }
 
 # Glosses that replace earlier ones because the document gives a second meaning.
@@ -586,3 +590,30 @@ const JOKES = [
 	{"v": "Gira i-pav-im-da!", "en": "The bridge is running!"}
 ]
 const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin"}
+
+
+# ---- quick practice for new words: word classes and English forms ----
+# Intransitive verbs: [base, past, -ing]
+const EXT_VERBS_I = {"lum": ["go", "went", "going"], "pav": ["run", "ran", "running"], "sul": ["sleep", "slept", "sleeping"], "sum": ["swim", "swam", "swimming"],
+	"ning": ["sing", "sang", "singing"], "nang": ["walk", "walked", "walking"], "tal": ["arrive", "arrived", "arriving"], "mel": ["talk", "talked", "talking"], "kar": ["come", "came", "coming"]}
+# Transitive verbs: [base, past]
+const EXT_VERBS_T = {"pal": ["see", "saw"], "nuk": ["take", "took"], "rav": ["read", "read"], "por": ["open", "opened"], "hep": ["close", "closed"],
+	"dar": ["cook", "cooked"], "varn": ["build", "built"], "sir": ["look for", "looked for"], "mai": ["buy", "bought"], "ven": ["give", "gave"], "tar": ["bring", "brought"]}
+const EXT_STATIVES = {"var": "big", "sen": "small", "nav": "warm", "ret": "hot", "len": "cold", "gao": "tall", "ho": "good", "wai": "bad", "seng": "happy",
+	"sava": "safe", "ling": "bright", "dam": "dark", "dun": "short", "shora": "old", "nava": "new", "lei": "tired", "mar": "full", "hala": "fast"}
+const EXT_NOUNS_EXTRA = {"kel": ["bag", "bags"], "sek": ["stone", "stones"], "lin": ["rope", "ropes"], "yamat": ["food", "food"], "cha": ["tea", "tea"],
+	"yok": ["herb", "herbs"], "ket": ["chair", "chairs"], "yir": ["shirt", "shirts"], "gin": ["coin", "coins"], "sao": ["star", "stars"], "yue": ["moon", "moons"],
+	"riya": ["sun", "suns"], "hen": ["sky", "skies"], "tovu": ["story", "stories"], "palar": ["friend", "friends"], "ruk": ["path", "paths"], "pai": ["paper", "papers"],
+	"senar": ["teacher", "teachers"], "ravar": ["student", "students"], "kelar": ["traveler", "travelers"], "dor": ["land", "lands"], "gan": ["room", "rooms"]}
+
+# ---- poems from ning-guro berries and sao-dau mushrooms ----
+# Poem nouns: [singular, plural]
+const POEM_NOUNS = {"yue": ["the moon", "moons"], "riya": ["the sun", "suns"], "sao": ["a star", "the stars"], "hai": ["the sea", "seas"], "mora": ["the river", "rivers"],
+	"murak": ["the tree", "the trees"], "par": ["the bird", "the birds"], "tari": ["the fish", "the fish"], "fal": ["the flower", "the flowers"], "guro": ["the fruit", "the fruits"],
+	"sek": ["the stone", "the stones"], "sang": ["the hill", "the hills"], "far": ["the fire", "the fires"], "dom": ["the house", "the houses"], "sena": ["the boat", "the boats"],
+	"puka": ["the book", "the books"], "panak": ["the bread", "the loaves"], "gor": ["the dog", "the dogs"], "mar": ["the horse", "the horses"], "ket": ["the chair", "the chairs"],
+	"gira": ["the bridge", "the bridges"], "yamat": ["the food", "the meals"]}
+const POEM_PLACES = {"hen": "in the sky", "hai": "in the sea", "mora": "in the river", "yesh": "in the night", "salma": "at dawn", "teka": "in the village",
+	"sang": "on the hill", "guro": "inside a fruit", "dau": "in my head", "kel": "in a bag"}
+const POEM_INC = [["wak-ta", "drinks water", "drink water"], ["yamat-dar", "cooks food", "cook food"], ["puka-rav", "reads books", "read books"],
+	["tari-nuk", "goes fishing", "go fishing"], ["mara-vun", "works the fields", "work the fields"]]

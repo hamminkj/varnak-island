@@ -263,3 +263,25 @@ Secrets (composed): An haima ma-na-sum-ur-ki-da; An yamat ma-na-dar-ur-ki-da. Ke
 Jokes (composed): Mar wak-korma i-esh-da; Yue guro i-an-shi; Gor ket-ma i-sul-im-da; Par sena-li i-kel-ur-da; Sek-ir ri-ning-ur-nu; Tari-ir dom-ma ri-sul-ur-da; Gira i-pav-im-da.
 
 Things to check: 14. Exclamations like Ho!, Maki... MAKI!, Ha! Ha! and Hmph! are used as interjections.
+
+
+## Seventh expansion: practice for new words, and poems
+
+Practice forms are generated from rules already listed above: X-ru, X-ma, X-ta, anni X, mur X, X-su; na-V-fu, ma-ta-V-o-ki, ri-V-im, i-V-pa-da; k-i-V-pa, t-i-V-o, t-na-V-pa; Dom ma-i-S-ki, S dom, Sena dom-ta i-u-S; N-ve and N tari. Practice sentences: X i-var; X tekama i-esh-da; Anke X k-i-pal-da; X t-na-ven-o-ye; Tor kurma i-V-pa-nu; Gor haima i-V-im-da; Mirake puka i-V-pa-da; Anni yamat i-S; Tari-ir ri-S.
+
+New compounds (composed): ning-guro (song-fruit: a berry) and sao-dau (star-head: a mushroom).
+
+Poem line patterns (all composed from the grammar):
+- N place-ma i-S-ev (evidential stative)
+- N-ir N2-su ri-V-ur-da (plural with comitative)
+- N N2-ta i-u-S (comparative, section 29)
+- Ti ta-V-fu shi, N i-S-fu (conditional, section 28.3)
+- I-V-im-en N place-ma i-esh-da (relative clause, section 28.1)
+- N i-V-ak-ka, place-ru i-lum-pa-da (same-subject converb, section 27.2)
+- N ma-i-V-ki-da, dan i-V2-ur-da (negation and dan)
+- N i-wak-ta-ur-da and other incorporations from section 23 (wak-ta, yamat-dar, puka-rav, tari-nuk, mara-vun)
+- An place-ma na-V-fu, N-su
+- N, ta-V-o-ye! (a polite command, used for talking to things)
+- N-ir place-ma ri-esh-shi!
+
+Things to check: 15. The poems combine nouns freely, so some lines are deliberately nonsense (The sea usually cooks food). 16. Addressing a noun directly (Yue, ta-ning-o-ye!) assumes a bare noun works for calling to someone.

@@ -168,6 +168,7 @@ var side_quests = [
 	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
 	["strange","","Something odd is going on. Find seven strange things around the island."],
 	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
+	["poems","","Find glowing ning-guro berries and sao-dau mushrooms. Eat them or give them to people, and collect five poems."],
 	["friends","","Make five friends. Chat with people (compliment them, tell jokes, give gifts) until they call you palar, friend."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
@@ -191,6 +192,17 @@ var portrait_id: String = ""
 var panel_title: Control
 var ambient_cd: float = 20.0
 var talk_partner: String = ""
+var pending_ext: Array = []
+var berries: int = 0
+var shrooms: int = 0
+var poems: Array = []
+const PLANTS = [
+	["berry1", "ning-guro", Vector3(8, 0, 18.5)], ["berry2", "ning-guro", Vector3(-36, 0, 9)], ["berry3", "ning-guro", Vector3(39, 0, -6.5)],
+	["berry4", "ning-guro", Vector3(57, 0, 13)], ["berry5", "ning-guro", Vector3(-56, 0, -29)], ["berry6", "ning-guro", Vector3(46.5, 0, 79)],
+	["berry7", "ning-guro", Vector3(-67, 0, 36)], ["berry8", "ning-guro", Vector3(18, 0, -37)],
+	["shroom1", "sao-dau", Vector3(12, 0, -15.5)], ["shroom2", "sao-dau", Vector3(-17, 0, -11)], ["shroom3", "sao-dau", Vector3(-38, 0, -29)],
+	["shroom4", "sao-dau", Vector3(58, 0, -36.5)], ["shroom5", "sao-dau", Vector3(70, 0, -15)], ["shroom6", "sao-dau", Vector3(-66, 0, 27.5)]
+]
 # skin, hair, hair style, accent
 var looks = {
 	"ena": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
@@ -297,6 +309,11 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 			if word == "tari":
 				pr = 0.9
 				ph = 1.6
+		"plant":
+			node = Art.berry_bush() if word == "ning-guro" else Art.mushroom_patch()
+			label_y = 1.25 if word == "ning-guro" else 0.85
+			pr = 0.9
+			ph = 1.1
 		"star":
 			node = Art.sea_star(color)
 			label_y = 0.45
@@ -916,6 +933,9 @@ func build_entities():
 	entity("odd_bed","object","sulum",Vector3(20,0,-23.2),Color.WHITE,1.6,Vector2(1.6,1.2))
 	entity("odd_fruit","object","guro",Vector3(26,0,-13.4),Color.WHITE,3.4,Vector2(1.7,2.8))
 	entity("odd_teapot","object","cha-kor",Vector3(1.55,0,-21.4),Color.WHITE,1.7,Vector2(0.8,1.5))
+	for pl in PLANTS:
+		var pe = entity(pl[0], "plant", pl[1], pl[2], Color.WHITE)
+		pe["ripe_at"] = 0.0
 	var parrot = entity("parrot","observe","par",Vector3(-41.5,0,7.5),Color("e76f51"))
 	(parrot["node"] as Node3D).scale = Vector3.ONE * 1.5
 	add_animal(parrot, "bird", 0.0, 0.0)
@@ -1299,12 +1319,14 @@ func show_intro():
 	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
 	text_line("In the Notebook, try the Verb builder and the Games to put Varnak together yourself.")
 	text_line("Everyone has feelings, and they show them. Choose Chat with someone to compliment, tease, joke or give a gift in Varnak. Watch their portrait: people faint, fume, blush, cry tiny rain clouds or fall over laughing. Make friends to learn their secrets.")
+	text_line("When someone teaches you a new word, a green box offers quick optional practice: use the word in a new form, or build a new sentence with it. Glowing purple ning-guro berries and blue sao-dau mushrooms grow around the island. Eat one, or give it to someone, and poems come out.")
 	text_line("The villagers love to gossip. Ask people \"Any gossip?\", notice how they know (-da saw it, -shi apparently, -nu people say), then make up your own rumors and watch them spread. Keep an eye out for strange things, too.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
 		discovered.append(word)
 		toast("New word: " + word)
+		if talk_partner != "" and ext_kind(word) != "" and not pending_ext.has(word): pending_ext.append(word)
 
 func complete(id: String):
 	if not completed.has(id):
@@ -1610,7 +1632,7 @@ func _physics_process(delta):
 	if player.is_on_floor(): player.velocity.y = minf(player.velocity.y, 0.0)
 	player.move_and_slide()
 	player.position.x = clampf(player.position.x,-95,95)
-	player.position.z = clampf(player.position.z,-80,65)
+	player.position.z = clampf(player.position.z,-80,98)
 	if T.deep(player.position.x, player.position.z) and player.position.y < -0.05:
 		player.position = last_safe
 		player.velocity = Vector3.ZERO
@@ -1660,7 +1682,7 @@ func hint(text: String):
 func verb(e: Dictionary) -> String:
 	match e["kind"]:
 		"npc": return "talk"
-		"item", "star": return "pick up"
+		"item", "star", "plant": return "pick up"
 		"observe": return "watch"
 	return "look"
 
@@ -1802,6 +1824,7 @@ func interact():
 			button("Return",close_panel,content)
 		"observe": observe(e)
 		"star": collect_star(e)
+		"plant": pick_plant(entity_by_id(e["id"]))
 		_: examine(e)
 
 func examine(e: Dictionary):
@@ -2430,6 +2453,7 @@ func talk(id: String):
 			button("Give a parcel", give_parcel.bind(id), content)
 			break
 	add_topics(id)
+	extension_box(talk.bind(id))
 	button("Return to island",close_panel,content)
 
 func account(id: String, phrase: String, gesture: String):
@@ -2507,6 +2531,8 @@ func show_notebook():
 	content.add_child(row2)
 	var b4 = button("Verb builder", show_verb_builder.bind(-1), row2)
 	var b5 = button("Games", show_games, row2)
+	var b6 = button("Poems", show_poems, row2)
+	b6.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
@@ -2525,6 +2551,9 @@ func reveal_word(word: String):
 		guesses[word] = guess.text
 		save_game(),content)
 	button("Reveal meaning",func(): text_line(words.get(word,"")),content)
+	if ext_kind(word) != "":
+		button("Use it in a new form", ext_form.bind(word, reveal_word.bind(word)), content)
+		button("Build a new sentence with it", ext_build.bind(word, reveal_word.bind(word)), content)
 	text_line("Use this meaning as a hint, then look for the form in another encounter.")
 	button("Notebook",show_notebook,content)
 	button("Return to island",close_panel,content)
@@ -2648,6 +2677,12 @@ func show_inventory():
 	if gin > 0: text_line("gin × " + str(gin) + "  (coins)")
 	var n = stars_found()
 	if n > 0: text_line("hai-sao × " + str(n) + "  (sea stars)")
+	if berries > 0:
+		text_line("ning-guro × " + str(berries) + "  (song-berries)")
+		button("Eat a ning-guro", eat_poem.bind("ning-guro"), content)
+	if shrooms > 0:
+		text_line("sao-dau × " + str(shrooms) + "  (star-head mushrooms)")
+		button("Eat a sao-dau", eat_poem.bind("sao-dau"), content)
 	if inventory.has("map"): button("Read the old map", func(): sentence_card("treasure_map", show_inventory), content)
 	button("Return",close_panel,content)
 
@@ -2788,6 +2823,9 @@ func confirm_reset():
 		rumor_count = 0
 		friend.clear()
 		mood.clear()
+		poems.clear()
+		berries = 0
+		shrooms = 0
 		chat_day.clear()
 		hiding.clear()
 		last_level = 1
@@ -2804,7 +2842,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 
 func load_game():
@@ -2827,6 +2865,9 @@ func load_game():
 	diff_bias = int(data.get("bias", 0))
 	rumors = data.get("rumors", [])
 	friend = data.get("friend", {})
+	berries = int(data.get("berries", 0))
+	shrooms = int(data.get("shrooms", 0))
+	poems = data.get("poems", [])
 	mood = data.get("mood", {})
 	chat_day = data.get("chat_day", {})
 	day_count = int(data.get("day_count", 0))
@@ -4308,6 +4349,10 @@ func build_places5():
 	fish_fx.position = Vector3(0, 12, 0)
 
 func update_silly(delta: float):
+	for e in entities:
+		if e["kind"] == "plant":
+			var fr = (e["node"] as Node3D).get_meta("fruit") as Node3D
+			fr.visible = clock >= float(e.get("ripe_at", 0.0))
 	if fish_fx.get_parent() == null and player: player.add_child(fish_fx)
 	if odd_nodes.has("odd_bed"):
 		var bed = odd_nodes["odd_bed"] as Node3D
@@ -5020,6 +5065,8 @@ func gift_menu(id: String):
 	for g in ["tari", "panak", "cha", "gin"]:
 		var b = button("“Ki " + g + " ti-ru!”  (This " + Data.GIFT_WORDS[g] + ", for you!)", give_gift.bind(id, g), content)
 		b.disabled = not have[g]
+	if berries > 0: button("“Ki ning-guro ti-ru!”  (A song-berry, for you!)", villager_poem.bind(id, "ning-guro"), content)
+	if shrooms > 0: button("“Ki sao-dau ti-ru!”  (A star-head mushroom, for you!)", villager_poem.bind(id, "sao-dau"), content)
 	button("Back", chat_menu.bind(id), content)
 
 func give_gift(id: String, g: String):
@@ -5104,3 +5151,285 @@ func update_ambient(delta: float):
 	elif r < 0.5: pick = ["happy", "Ho! Ho!"]
 	emote(e["id"], pick[0], 2.6)
 	e["say"] = [pick[1], clock + 2.6]
+
+# ------------------------------------------------------------ seventh expansion: using new words, poem plants
+
+func ext_kind(w: String) -> String:
+	if Data.EXT_VERBS_I.has(w): return "vi"
+	if Data.EXT_VERBS_T.has(w): return "vt"
+	if Data.EXT_STATIVES.has(w): return "st"
+	if Data.NOUNS.has(w) or Data.EXT_NOUNS_EXTRA.has(w): return "n"
+	if Data.NUMBERS.has(w) and w != "nul": return "num"
+	return ""
+
+func noun_en(w: String) -> Array:
+	if Data.NOUNS.has(w): return Data.NOUNS[w]
+	return Data.EXT_NOUNS_EXTRA[w]
+
+func cap(s: String) -> String:
+	return s.substr(0, 1).to_upper() + s.substr(1) if s != "" else s
+
+func extension_box(back: Callable):
+	if pending_ext.is_empty(): return
+	var ws: Array = pending_ext.slice(maxi(0, pending_ext.size() - 2))
+	pending_ext.clear()
+	var pc = PanelContainer.new()
+	pc.add_theme_stylebox_override("panel", tile_box(Color("e3f0d4"), Color("5b8c5a")))
+	var vb = VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	pc.add_child(vb)
+	var head = Label.new()
+	head.text = "New word" + ("s" if ws.size() > 1 else "") + "! Quick practice (optional):"
+	head.add_theme_font_size_override("font_size", 17)
+	head.add_theme_color_override("font_color", Color("2f5a2f"))
+	vb.add_child(head)
+	for w in ws:
+		var l = Label.new()
+		l.text = w + "  (" + short_gloss(w) + ")"
+		l.add_theme_font_size_override("font_size", 21)
+		l.add_theme_color_override("font_color", Color("7a1f3d"))
+		vb.add_child(l)
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		vb.add_child(row)
+		var b1 = button("Use it in a new form", ext_form.bind(w, back), row)
+		var b2 = button("Build a sentence", ext_build.bind(w, back), row)
+		for b in [b1, b2]:
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.add_theme_font_size_override("font_size", 16)
+	content.add_child(pc)
+
+func ext_items(w: String) -> Dictionary:
+	var k = ext_kind(w)
+	var forms: Array = []
+	var builds: Array = []
+	match k:
+		"n":
+			var en = noun_en(w)
+			var sg: String = en[0]
+			var pl: String = en[1]
+			forms = [["to the " + sg, w + "ru", [w + "ma", w + "ta"], "-ru means to."],
+				["in the " + sg, w + "ma", [w + "ru", w + "li"], "-ma means in or at."],
+				["from the " + sg, w + "ta", [w + "ma", w + "su"], "-ta means from."],
+				["my " + sg, "anni " + w, [w + " anni", "anke " + w], "The owner comes first and takes -ni: an-ni."],
+				["three " + pl, "mur " + w, [w + " mur", "mur " + w + "ke"], "Numbers come before the noun."],
+				["together with the " + sg, w + "su", [w + "ni", w + "ta"], "-su means together with."]]
+			builds = [{"en": "The " + sg + " is big.", "tiles": [cap(w), "i-var."], "decoys": [cap(w) + "ke", "i-sen."], "tip": "Describing verbs like var take i- and the subject takes no -ke."},
+				{"en": "The " + sg + " is in the village.", "tiles": [cap(w), "tekama", "i-esh-da."], "decoys": ["tekaru"], "tip": "In the village is teka-ma; esh means be located."},
+				{"en": "I see the " + sg + ".", "tiles": ["Anke", w, "k-i-pal-da."], "decoys": ["An", w + "ke"], "tip": "I act on it: anke, and the verb takes k-i-."},
+				{"en": "Please give me the " + sg + ".", "tiles": [cap(w), "t-na-ven-o-ye."], "decoys": [w + "ru", "k-i-ven-o-ye."], "tip": "You give to me: t-na-ven, and please is -o-ye."}]
+		"vi":
+			var f: Array = Data.EXT_VERBS_I[w]
+			forms = [["I will " + f[0], "na-" + w + "-fu", ["ta-" + w + "-fu", "na-" + w + "-pa"], "na- is I, -fu is the future."],
+				["Don't " + f[0] + "!", "ma-ta-" + w + "-o-ki!", ["ta-" + w + "-o!", "ma-ta-" + w + "-ki-o!"], "Don't: ma- in front, -o for the command, -ki after it."],
+				["They are " + f[2], "ri-" + w + "-im", ["i-" + w + "-im", "ri-" + w + "-pa"], "ri- is they, -im is in progress."],
+				["She " + f[1] + " (I saw it)", "i-" + w + "-pa-da", ["i-" + w + "-pa-nu", "na-" + w + "-pa-da"], "-pa is past, -da means I saw it."]]
+			builds = [{"en": "Tor " + f[1] + " at the market (people say).", "tiles": ["Tor", "kurma", "i-" + w + "-pa-nu."], "decoys": ["Torke", "kurru", "i-" + w + "-pa-da."], "tip": "No -ke: this verb acts on nothing. People say is -nu."},
+				{"en": "The dog is " + f[2] + " in the sea.", "tiles": ["Gor", "haima", "i-" + w + "-im-da."], "decoys": ["Gorke", "haita"], "tip": "In the sea is hai-ma, and in progress is -im."}]
+		"vt":
+			var f: Array = Data.EXT_VERBS_T[w]
+			forms = [["I " + f[1] + " it", "k-i-" + w + "-pa", ["na-" + w + "-pa", "t-i-" + w + "-pa"], "k- is I acting, i- is it receiving."],
+				[cap(f[0]) + " it!", "t-i-" + w + "-o!", ["k-i-" + w + "-o!", "ta-" + w + "-o!"], "t- you act, i- on it, -o makes a command."],
+				["You " + f[1] + " me", "t-na-" + w + "-pa", ["k-ta-" + w + "-pa", "na-" + w + "-pa"], "t- you act, na- on me."]]
+			builds = [{"en": "Mira " + f[1] + " the book.", "tiles": ["Mirake", "puka", "i-" + w + "-pa-da."], "decoys": ["Mira", "pukake"], "tip": "The one acting takes -ke; the book takes nothing."}]
+		"st":
+			var adj: String = Data.EXT_STATIVES[w]
+			forms = [["The house is not " + adj, "Dom ma-i-" + w + "-ki.", ["Dom i-" + w + "-ki.", "Ma-dom i-" + w + "."], "Not: ma- ... -ki wraps the verb."],
+				["a " + adj + " house", w + " dom", ["dom " + w, "dom-" + w + "-ma"], "Describing words come right before the noun."],
+				["The boat is more " + adj + " than the house", "Sena dom-ta i-u-" + w + ".", ["Sena dom-ma i-u-" + w + ".", "Sena dom-ta i-" + w + "-u."], "Compare with -ta (from) and u- before the root."]]
+			builds = [{"en": "My food is " + adj + ".", "tiles": ["Anni", "yamat", "i-" + w + "."], "decoys": ["An", "i-" + w + "-ki."], "tip": "My is anni; is " + adj + " is i-" + w + "."},
+				{"en": "The fish are " + adj + ".", "tiles": ["Tari-ir", "ri-" + w + "."], "decoys": ["i-" + w + "."], "tip": "Many fish are they, so the verb takes ri-."}]
+		"num":
+			var idx = Data.NUMBERS.find(w)
+			var ords = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
+			forms = [["the " + ords[idx], w + "ve", [w, "ve" + w], "Add -ve to make order words: yan-ve, first."],
+				[str(idx) + " fish", w + " tari", ["tari " + w, w + "-tari"], "Numbers come before the noun."]]
+			builds = [{"en": "Please give me " + str(idx) + " fish.", "tiles": [cap(w), "tari", "t-na-ven-o-ye."], "decoys": ["Tarike", "tari-ir"], "tip": "The number comes first, then the noun, then the request."}]
+	return {"forms": forms, "builds": builds}
+
+func ext_form(w: String, back: Callable):
+	var it = ext_items(w)
+	var fs: Array = it["forms"]
+	if fs.is_empty(): return
+	var f: Array = fs[randi() % fs.size()]
+	var opts: Array = [f[1]]
+	opts.append_array(f[2])
+	choice_puzzle("Use it: " + w, "You know " + w + " (" + short_gloss(w) + "). How do you say:\n\n\"" + f[0] + "\"", opts, 0, func():
+		master("x:" + w), f[1] + ": " + f[3], f[3], back,
+		func():
+			button("Another form", ext_form.bind(w, back), content)
+			button("Build a sentence with " + w, ext_build.bind(w, back), content))
+
+func ext_build(w: String, back: Callable):
+	var it = ext_items(w)
+	var bs: Array = it["builds"]
+	if bs.is_empty(): return
+	var b: Dictionary = bs[randi() % bs.size()]
+	dnd({"title": "Build it: " + w, "prompt": "Use your new word " + w + " in a new sentence:\n\"" + b["en"] + "\"", "answers": b["tiles"], "pool": b["decoys"],
+		"tip": b["tip"], "key": "xb:" + w, "again": ext_build.bind(w, back), "again_label": "Another sentence with " + w, "back": back,
+		"on_right": func(): master("x:" + w)})
+
+# ---- poem plants ----
+
+func pick_plant(e: Dictionary):
+	var w: String = e["word"]
+	learn(w)
+	if clock < float(e.get("ripe_at", 0.0)):
+		message(w, "Nothing to pick yet. " + ("The berries" if w == "ning-guro" else "The mushrooms") + " grow back in a couple of minutes.")
+		return
+	e["ripe_at"] = clock + 120.0
+	if w == "ning-guro": berries += 1
+	else: shrooms += 1
+	save_game()
+	clear_panel(w)
+	text_line("You pick a glowing " + w + " (" + ("a song-berry" if w == "ning-guro" else "a star-head mushroom") + "). It hums faintly.\n\nPeople say that whoever eats one starts speaking in poems.")
+	button("Eat it now", eat_poem.bind(w), content)
+	button("Keep it (you can give it to someone)", close_panel, content)
+
+func s3(base: String) -> String:
+	if base == "go": return "goes"
+	return base + "s"
+
+func comparative(adj: String) -> String:
+	var c = {"big": "bigger", "small": "smaller", "warm": "warmer", "hot": "hotter", "cold": "colder", "tall": "taller", "good": "better", "bad": "worse",
+		"happy": "happier", "safe": "safer", "bright": "brighter", "dark": "darker", "short": "shorter", "old": "older", "new": "newer", "full": "fuller", "fast": "faster"}
+	return c.get(adj, "more " + adj)
+
+func poem_line(t: int, rng: RandomNumberGenerator, force_noun: String = "") -> Array:
+	var nouns = Data.POEM_NOUNS.keys()
+	var n: String = force_noun if force_noun != "" and Data.POEM_NOUNS.has(force_noun) else nouns[rng.randi() % nouns.size()]
+	var n2: String = nouns[rng.randi() % nouns.size()]
+	while n2 == n: n2 = nouns[rng.randi() % nouns.size()]
+	var places = Data.POEM_PLACES.keys()
+	var pl: String = places[rng.randi() % places.size()]
+	var sts = ["var", "sen", "nav", "ret", "len", "gao", "ho", "seng", "ling", "dam", "shora", "nava", "lei", "mar"]
+	var s: String = sts[rng.randi() % sts.size()]
+	var adj: String = Data.EXT_STATIVES[s]
+	var vis = Data.EXT_VERBS_I.keys()
+	var v: String = vis[rng.randi() % vis.size()]
+	var v2: String = vis[rng.randi() % vis.size()]
+	while v2 == v: v2 = vis[rng.randi() % vis.size()]
+	var fv: Array = Data.EXT_VERBS_I[v]
+	var fv2: Array = Data.EXT_VERBS_I[v2]
+	var ns: Array = Data.POEM_NOUNS[n]
+	var ns2: Array = Data.POEM_NOUNS[n2]
+	match t:
+		0:
+			var ev = ["da", "shi", "nu"][rng.randi() % 3]
+			var pre = {"da": "", "shi": "Apparently ", "nu": "They say "}[ev]
+			var post = " (I saw it)" if ev == "da" else ""
+			return [cap(n) + " " + pl + "-ma i-" + s + "-" + ev + ".", cap(pre + ns[0] + " " + Data.POEM_PLACES[pl] + " is " + adj + post + "."), "-" + ev + " tells how the poet knows."]
+		1:
+			return [cap(n) + "-ir " + n2 + "-su ri-" + v + "-ur-da.", cap(ns[1] + " usually " + fv[0] + " with " + ns2[0] + "."), "-ir makes many, so the verb takes ri- (they); -su means together with."]
+		2:
+			return [cap(n) + " " + n2 + "-ta i-u-" + s + ".", cap(ns[0] + " is " + comparative(adj) + " than " + ns2[0] + "."), "Comparing: -ta (from) on the other thing, u- before the root."]
+		3:
+			return ["Ti ta-" + v + "-fu shi, " + n + " i-" + s + "-fu.", "If you " + fv[0] + ", " + ns[0] + " will be " + adj + ".", "shi after a clause means if; -fu is the future."]
+		4:
+			return ["I-" + v + "-im-en " + n + " " + pl + "-ma i-esh-da.", cap(ns[0] + " that is " + fv[2] + " is " + Data.POEM_PLACES[pl] + "."), "-en turns a verb into a describer: i-" + v + "-im-en " + n + ", the " + n + " that is " + fv[2] + "."]
+		5:
+			var tos = ["hen", "hai", "mora", "teka", "sang"]
+			var to: String = tos[rng.randi() % tos.size()]
+			var to_en = {"hen": "the sky", "hai": "the sea", "mora": "the river", "teka": "the village", "sang": "the hill"}[to]
+			return [cap(n) + " i-" + v + "-ak-ka, " + to + "-ru i-lum-pa-da.", cap(ns[0] + " " + fv[1] + ", and then went to " + to_en + "."), "-ka links two actions by the same one: did this, and then that."]
+		6:
+			return [cap(n) + " ma-i-" + v + "-ki-da, dan i-" + v2 + "-ur-da.", cap(ns[0] + " does not " + fv[0] + ", but it usually " + s3(fv2[0]) + "."), "ma- ... -ki says not; dan means but."]
+		7:
+			var inc: Array = Data.POEM_INC[rng.randi() % Data.POEM_INC.size()]
+			return [cap(n) + " i-" + inc[0] + "-ur-da.", cap(ns[0] + " usually " + inc[1] + "."), "The noun hides inside the verb: " + inc[0] + " is one word."]
+		8:
+			return ["An " + pl + "-ma na-" + v + "-fu, " + n + "-su.", "I will " + fv[0] + " " + Data.POEM_PLACES[pl] + ", with " + ns[0] + ".", "na- is I; -su is together with."]
+		9:
+			return [cap(n) + ", ta-" + v + "-o-ye!", cap(ns[0].trim_prefix("the ").trim_prefix("a ")) + ", please " + fv[0] + "!", "Talking to " + ns[0] + ": ta- (you), -o (command), -ye (please)."]
+		_:
+			return [cap(n) + "-ir " + pl + "-ma ri-esh-shi!", cap("apparently " + ns[1] + " are " + Data.POEM_PLACES[pl] + "!"), "Plural subject: ri-. Apparently: -shi."]
+
+func make_poem(kind: String, who: String = "") -> Array:
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var pool = [0, 1, 3, 4, 5, 9] if kind == "ning-guro" else [2, 6, 7, 8, 10, 4]
+	pool.shuffle()
+	var lines: Array = []
+	var thing = ""
+	if who != "" and Data.PEOPLE.has(who): thing = Data.PEOPLE[who]["thing"][0]
+	for i in range(4):
+		lines.append(poem_line(pool[i], rng, thing if i == 0 else ""))
+	if who != "" and Data.PEOPLE.has(who):
+		var tail = {"dramatic": ["Ho! Ho!!", "(dramatic sigh)"], "giggly": ["Ha! Ha!", "(giggles)"], "grumpy": ["Hmph.", "(grumbles)"],
+			"sleepy": ["zzz...", "(falls asleep)"], "proud": ["I-zen-da!", "It's true!"], "cheerful": ["Ho!", "Great!"]}[Data.PEOPLE[who]["trait"]]
+		lines.append([tail[0], tail[1], ""])
+	return lines
+
+func show_poem_lines(lines: Array):
+	var ens: Array = []
+	for ln in lines:
+		varnak_banner(ln[0], 22)
+		var e = text_line(ln[1], 16)
+		e.add_theme_color_override("font_color", Color("6b4a2e"))
+		e.visible = level() < 3
+		ens.append(e)
+	button("Show or hide meanings", func():
+		for e in ens: e.visible = not e.visible, content)
+	var notes: Array = []
+	for ln in lines:
+		if ln[2] != "" and not notes.has(ln[2]): notes.append(ln[2])
+	var nl = text_line("How the poem works:\n- " + "\n- ".join(notes), 15)
+	nl.add_theme_color_override("font_color", Color("2f5a2f"))
+
+func record_poem(lines: Array, by: String):
+	var vs: Array = []
+	var es: Array = []
+	for ln in lines:
+		vs.append(ln[0])
+		es.append(ln[1])
+	poems.append({"by": by, "v": vs, "en": es})
+	if poems.size() > 30: poems.pop_front()
+	master("poem:" + vs[0])
+	if poems.size() >= 5 and not completed.has("poems"): complete("poems")
+	save_game()
+
+func eat_poem(kind: String):
+	if kind == "ning-guro":
+		if berries <= 0: return
+		berries -= 1
+	else:
+		if shrooms <= 0: return
+		shrooms -= 1
+	for w in ["ning", "-en", "-ka"]: learn(w)
+	var lines = make_poem(kind)
+	clear_panel("You eat the " + kind + "...")
+	text_line(("Your mouth tingles and the world turns purple. Words start rhyming on their own. You stand up and recite:" if kind == "ning-guro" else "The trees lean closer. The sky winks at you. Strange words tumble out:"), 17)
+	show_poem_lines(lines)
+	record_poem(lines, "you")
+	button("Return", close_panel, content)
+
+func villager_poem(id: String, kind: String):
+	if kind == "ning-guro": berries -= 1
+	else: shrooms -= 1
+	talk_partner = id
+	var lines = make_poem(kind, id)
+	clear_panel(id.capitalize() + " eats the " + kind)
+	add_portrait(id)
+	emote(id, "dizzy" if kind == "sao-dau" else "love", 6.0)
+	var e = entity_by_id(id)
+	e["say"] = [lines[0][0], clock + 10.0]
+	add_friend(id, 1)
+	text_line(id.capitalize() + "'s eyes go swirly. " + id.capitalize() + " climbs onto an imaginary stage and recites:", 17)
+	show_poem_lines(lines)
+	record_poem(lines, id)
+	button("Keep chatting", chat_menu.bind(id), content)
+	button("Return", close_panel, content)
+
+func show_poems():
+	clear_panel("Poem book")
+	if poems.is_empty():
+		text_line("No poems yet. Look for glowing purple ning-guro bushes and blue sao-dau mushrooms. Eat them, or give them to someone.")
+	for i in range(poems.size() - 1, -1, -1):
+		var pm: Dictionary = poems[i]
+		button(("Your poem" if pm["by"] == "you" else str(pm["by"]).capitalize() + "'s poem") + ": " + str(pm["v"][0]), func():
+			clear_panel(("Your poem" if pm["by"] == "you" else str(pm["by"]).capitalize() + "'s poem"))
+			var lines: Array = []
+			for k in range(pm["v"].size()): lines.append([pm["v"][k], pm["en"][k], ""])
+			show_poem_lines(lines)
+			button("Poem book", show_poems, content), content)
+	button("Notebook", show_notebook, content)
