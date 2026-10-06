@@ -168,6 +168,7 @@ var side_quests = [
 	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
 	["strange","","Something odd is going on. Find seven strange things around the island."],
 	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
+	["friends","","Make five friends. Chat with people (compliment them, tell jokes, give gifts) until they call you palar, friend."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -179,6 +180,17 @@ var guro_cd: float = 140.0
 var fish_rain_t: float = -1.0
 var fish_fx: CPUParticles3D
 var odd_nodes: Dictionary = {}
+var friend: Dictionary = {}
+var mood: Dictionary = {}
+var chat_day: Dictionary = {}
+var day_count: int = 0
+var mood_clock: float = 0.0
+var portrait_vp: SubViewport
+var portrait_cam: Camera3D
+var portrait_id: String = ""
+var panel_title: Control
+var ambient_cd: float = 20.0
+var talk_partner: String = ""
 # skin, hair, hair style, accent
 var looks = {
 	"ena": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
@@ -326,6 +338,7 @@ func build_world():
 	build_sky_life()
 	build_player()
 	build_night_and_weather()
+	build_portrait()
 
 func build_environment():
 	var we = WorldEnvironment.new()
@@ -1255,7 +1268,8 @@ func clear_panel(title: String, keep_game: bool = false):
 		c.hide()
 		c.queue_free()
 	panel.show()
-	text_line(title,26)
+	portrait_id = ""
+	panel_title = text_line(title,26)
 
 func text_line(text: String, font_size: int = 20) -> Control:
 	if text.contains("“"): return rich_line(text, font_size)
@@ -1269,6 +1283,8 @@ func text_line(text: String, font_size: int = 20) -> Control:
 
 func close_panel():
 	mg = {}
+	portrait_id = ""
+	talk_partner = ""
 	panel.hide()
 	lesson = ""
 
@@ -1282,6 +1298,7 @@ func show_intro():
 	text_line("Varnak is shown in bold, highlighted text, and people say Varnak phrases in speech bubbles when you come near. As you finish quests and master words you level up (Explorer, Speaker, Storyteller, Elder), and the puzzles get harder: more choices, hidden hints, longer sentences and timers. From level 2, people ask you to build sentences yourself.")
 	text_line("The island is big: a market, school and old ruins to the west, a hill with a lookout, a healer, a lighthouse, a waterfall and a lagoon to the east, and a small island you can reach by boat. Days turn to nights, it sometimes rains, and the sea has a few surprises. Open Map to see where everything is, check your quests, and travel to places you have already visited.")
 	text_line("In the Notebook, try the Verb builder and the Games to put Varnak together yourself.")
+	text_line("Everyone has feelings, and they show them. Choose Chat with someone to compliment, tease, joke or give a gift in Varnak. Watch their portrait: people faint, fume, blush, cry tiny rain clouds or fall over laughing. Make friends to learn their secrets.")
 	text_line("The villagers love to gossip. Ask people \"Any gossip?\", notice how they know (-da saw it, -shi apparently, -nu people say), then make up your own rumors and watch them spread. Keep an eye out for strange things, too.")
 
 func learn(word: String):
@@ -1290,7 +1307,14 @@ func learn(word: String):
 		toast("New word: " + word)
 
 func complete(id: String):
-	if not completed.has(id): completed.append(id)
+	if not completed.has(id):
+		completed.append(id)
+		var giver = {"belongings": "ena", "meal": "mira", "bag": "sanu", "bridge": "tor", "evidence": "tor", "cove": "neri"}.get(id, "")
+		for s in side_quests:
+			if s[0] == id: giver = s[1]
+		if giver != "" and Data.PEOPLE.has(giver):
+			emote(giver, "love" if Data.PEOPLE[giver]["trait"] != "proud" else "proud", 3.5)
+			add_friend(giver, 2)
 	if id in ["bridge", "meal", "lighthouse"]: refresh_world()
 	update_marks()
 	save_game()
@@ -1419,6 +1443,8 @@ func _process(delta):
 	update_bubbles()
 	update_minigame(delta)
 	update_silly(delta)
+	update_portrait()
+	update_ambient(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -1439,6 +1465,7 @@ func animate_people(delta: float):
 		(arms[1] as Node3D).rotation.x = -sin(clock * (1.2 + talk_amt * 3.0) + idx) * swing
 		(node.get_meta("body") as Node3D).scale.y = 1.0 + sin(clock * 1.6 + idx) * 0.008
 		(node.get_meta("head") as Node3D).rotation.z = sin(clock * 0.7 + idx) * 0.04
+		apply_emote(e, delta)
 
 func animate_items():
 	var i = 0
@@ -1874,6 +1901,7 @@ func _answer(opt: String, answer: String, buttons: Array, feedback: Label, on_ri
 		for b in buttons: b.disabled = true
 		feedback.text = "Correct. " + right_text
 		feedback.add_theme_color_override("font_color", Color("2f6b2f"))
+		if talk_partner != "": emote(talk_partner, "happy", 2.0)
 		if on_right.is_valid(): on_right.call()
 		if extra.is_valid(): extra.call()
 		last_skip.text = "Return"
@@ -1881,6 +1909,7 @@ func _answer(opt: String, answer: String, buttons: Array, feedback: Label, on_ri
 	else:
 		feedback.text = "Not quite. " + wrong_text
 		feedback.add_theme_color_override("font_color", Color("8a2f1f"))
+		if talk_partner != "": emote(talk_partner, "confused", 2.0)
 
 func choice_puzzle(title: String, situation: String, options: Array, correct: int, on_right: Callable, right_text: String, wrong_text: String, back: Callable = Callable(), extra: Callable = Callable()):
 	clear_panel(title)
@@ -2151,6 +2180,7 @@ func topic(label: String, sid: String, npc: String):
 	button(label, func(): sentence_card(sid, talk.bind(npc)), content)
 
 func talk(id: String):
+	talk_partner = id
 	match id:
 		"ena":
 			learn("kel")
@@ -2240,6 +2270,14 @@ func talk(id: String):
 						save_game()
 						talk("ketu"), content)
 				button("Buy panak (bread)", buy_bread, content)
+				button("Buy cha (tea): gin yan", func():
+					if gin >= 1:
+						gin -= 1
+						inventory.append("tea")
+						toast("Cha! (-1 gin)")
+						save_game()
+						talk("ketu")
+					else: message("Not enough gin", "Tea costs one coin. Sell a fish to Ketu first."), content)
 			else:
 				text_line("Ketu holds up three fingers, then mimes a fish wriggling.\n\n“Mur tari t-na-ven-o-ye.”\n\nYou have " + str(fish_caught) + " fish.")
 				button("Give mur tari (3 fish)", func():
@@ -2381,6 +2419,9 @@ func talk(id: String):
 				var order = Data.DESH.duplicate()
 				order.shuffle()
 				button("Play Desh's game", desh_round.bind(0, order), content)
+	if Data.PEOPLE.has(id):
+		button("Chat with " + id.capitalize(), chat_menu.bind(id), content)
+		add_portrait(id)
 	gossip_buttons(id)
 	if level() >= 2 and Data.CHALLENGES.has(id):
 		button("Say it yourself" + ("  [ok]" if mastered.has("c:" + id) else ""), challenge.bind(id), content)
@@ -2745,6 +2786,9 @@ func confirm_reset():
 		best_speed = 0
 		rumors.clear()
 		rumor_count = 0
+		friend.clear()
+		mood.clear()
+		chat_day.clear()
 		hiding.clear()
 		last_level = 1
 		for e in entities: e["node"].show()
@@ -2760,7 +2804,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 
 func load_game():
@@ -2782,6 +2826,10 @@ func load_game():
 	whale_seen = bool(data.get("whale", false))
 	diff_bias = int(data.get("bias", 0))
 	rumors = data.get("rumors", [])
+	friend = data.get("friend", {})
+	mood = data.get("mood", {})
+	chat_day = data.get("chat_day", {})
+	day_count = int(data.get("day_count", 0))
 	rumor_count = int(data.get("rumor_count", 0))
 	best_speed = int(data.get("best_speed", 0))
 	var p = data.get("position",[0,0.1,36])
@@ -2916,7 +2964,9 @@ func time_phase(t: float) -> String:
 	return "yesh"
 
 func update_sky(delta: float):
+	var before = day_t
 	day_t = fmod(day_t + delta / DAY_LEN, 1.0)
+	if day_t < before: day_count += 1
 	var t2 = day_t + (1.0 if day_t < 0.1 else 0.0)
 	night = smoothstep(0.58, 0.7, t2) * (1.0 - smoothstep(0.92, 1.06, t2))
 	var warm = maxf(maxf(1.0 - absf(t2 - 0.63) / 0.07, 1.0 - absf(t2 - 1.0) / 0.07), 0.0)
@@ -3214,6 +3264,7 @@ func start_hide():
 		var e = entity_by_id(kid)
 		var spot: Vector3 = HIDE_SPOTS[kid]
 		(e["node"] as Node3D).position = Vector3(spot.x, gy(spot.x, spot.z), spot.z)
+		if e.has("emote"): e.erase("emote")
 		hiding[kid] = true
 	message("Ma-ta-pal-o-ki!", "Ola covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Rin and Ola are gone. One hid near the school, one near the market. Find them!")
 
@@ -3222,6 +3273,7 @@ func found_puzzle(id: String):
 		["K-ta-pal-da!", "T-na-pal-da!", "Ma-k-ta-pal-ki-da!"], 0, func():
 			hiding[id] = false
 			var e = entity_by_id(id)
+			if e.has("emote"): e.erase("emote")
 			(e["node"] as Node3D).position = e["home"]
 			if not hiding.get("rin", false) and not hiding.get("ola", false):
 				complete("hide"),
@@ -3482,6 +3534,9 @@ func show_more():
 
 func greeting(id: String) -> String:
 	if guro_t >= 0.0: return "Var guro!"
+	var e = entity_by_id(id)
+	if e.has("say") and clock < float(e["say"][1]): return e["say"][0]
+	if mood.get(id, 0) <= -2: return "Hmph!"
 	match id:
 		"ena": return "Anni kel."
 		"mira": return "Yamat i-nav."
@@ -4358,7 +4413,12 @@ func gossip_reply(g: Dictionary):
 	var r: Dictionary = g["reply"]
 	learn("maki")
 	clear_panel(str(g["about"]).capitalize() + " hears the gossip")
+	add_portrait(g["about"])
+	var gk = {"oren_horse": "angry", "tor_bridge": "proud", "mira_food": "embarrassed", "ketu_fish": "happy", "yalo_night": "shocked", "desh_sea": "laugh",
+		"pomo_sleep": "sleepy", "oku_stones": "dizzy", "gav_food": "embarrassed", "sanu_bag": "confused", "ola_fruit": "embarrassed", "vira_medicine": "happy", "lira_story": "laugh"}.get(g["id"], "shocked")
+	emote(g["about"], gk, 3.5)
 	text_line("You repeat what " + str(g["by"]).capitalize() + " said: “" + g["v"] + "”")
+	text_line(reaction_text(g["about"], gk), 17)
 	varnak_banner(r["v"])
 	text_line(r["gesture"], 18)
 	var en = text_line("(Tap Show meaning if you need it.)", 16)
@@ -4481,8 +4541,18 @@ func rumor_react(listener: String, rc: Dictionary):
 		gesture = listener.capitalize() + " leans in: Who told you? (hal-ta: from whom?)"
 	if who == "An": gesture += " Also, you are gossiping about yourself."
 	if silly: gesture += " Then " + listener.capitalize() + " laughs so hard they have to sit down. “Ha! Ha!”"
+	add_portrait(listener)
+	var rk = "happy"
+	if who.to_lower() == listener: rk = "angry"
+	elif silly: rk = "laugh"
+	elif rc["ev"] == "da": rk = "shocked"
+	elif rc["ev"] == "shi": rk = "confused"
+	emote(listener, rk, 3.5)
+	if who.to_lower() != "an" and Data.PEOPLE.has(who.to_lower()) and who.to_lower() != listener:
+		mood[who.to_lower()] = mood.get(who.to_lower(), 0) - 1
 	varnak_banner(line)
 	text_line(gesture, 18)
+	text_line(reaction_text(listener, rk), 16)
 	for w in ["haku", "maki", "pal", "-ha"]: learn(w)
 	rumors.append({"who": who, "v": parts["nu"], "en": en.replace(" (I saw it!)", "").replace(" (apparently)", "").replace(" (people say)", "") + " (people say)", "teller": listener})
 	if rumors.size() > 12: rumors.pop_front()
@@ -4506,7 +4576,10 @@ func news(id: String):
 		button("Back", talk.bind(id), content)
 		return
 	learn("-nu")
+	add_portrait(id)
 	if str(pick["who"]).to_lower() == id:
+		emote(id, "angry", 4.0)
+		mood[id] = mood.get(id, 0) - 1
 		varnak_banner("Halke ki tovu i-gao-pa-ha?!")
 		text_line(id.capitalize() + " has heard a rumor about themselves: “" + pick["v"] + "” and is furious. Who told this story?! (halke: who, acting; gao: tell; -ha: a question)", 18)
 	else:
@@ -4543,3 +4616,491 @@ func parrot_panel():
 		out.text = "\n".join(lines)
 		master("p:parrot"), content)
 	button("Return", close_panel, content)
+
+# ------------------------------------------------------------ sixth expansion: feelings, friendship and big reactions
+
+func build_portrait():
+	portrait_vp = SubViewport.new()
+	portrait_vp.size = Vector2i(420, 210)
+	portrait_vp.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	portrait_vp.msaa_3d = Viewport.MSAA_2X
+	add_child(portrait_vp)
+	portrait_cam = Camera3D.new()
+	portrait_cam.fov = 38
+	portrait_cam.near = 0.05
+	portrait_cam.far = 200.0
+	portrait_vp.add_child(portrait_cam)
+	portrait_cam.current = true
+
+func add_portrait(id: String):
+	var e = entity_by_id(id)
+	if e.is_empty(): return
+	portrait_id = id
+	var frame = PanelContainer.new()
+	frame.add_theme_stylebox_override("panel", tile_box(Color("24495a"), Color("e9c46a")))
+	var tr = TextureRect.new()
+	tr.texture = portrait_vp.get_texture()
+	tr.custom_minimum_size = Vector2(0, 168)
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_child(tr)
+	content.add_child(frame)
+	var at = (panel_title.get_index() + 1) if is_instance_valid(panel_title) else 1
+	content.move_child(frame, at)
+	if Data.PEOPLE.has(id):
+		var hr = hearts_row(id)
+		content.add_child(hr)
+		content.move_child(hr, at + 1)
+	portrait_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+
+func hearts_row(id: String) -> Control:
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var f: int = friend.get(id, 0)
+	var l = Label.new()
+	l.text = "Friendship "
+	l.add_theme_font_size_override("font_size", 16)
+	row.add_child(l)
+	for i in range(10):
+		var c = Panel.new()
+		var sb = StyleBoxFlat.new()
+		sb.bg_color = Color("ff4f81") if i < f else Color("e6d8bf")
+		sb.set_corner_radius_all(9)
+		c.add_theme_stylebox_override("panel", sb)
+		c.custom_minimum_size = Vector2(16, 16)
+		c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(c)
+	var md = Label.new()
+	var mv: int = mood.get(id, 0)
+	md.text = "  Mood: " + ("seng (happy)" if mv >= 1 else ("grumpy" if mv <= -1 else "fine"))
+	md.add_theme_font_size_override("font_size", 16)
+	row.add_child(md)
+	return row
+
+func update_portrait():
+	if portrait_id == "" or not panel.visible:
+		if portrait_vp and portrait_vp.render_target_update_mode != SubViewport.UPDATE_DISABLED:
+			portrait_vp.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		return
+	var e = entity_by_id(portrait_id)
+	if e.is_empty(): return
+	var node = e["node"] as Node3D
+	var head = node.get_meta("head") as Node3D
+	var target = head.global_position + Vector3(0, 0.3, 0)
+	var d = player.global_position - node.global_position
+	d.y = 0.0
+	if d.length() < 0.1: d = Vector3(0, 0, 1)
+	d = d.normalized()
+	var want = target + d * 2.7 + Vector3(0, 0.2, 0)
+	portrait_cam.global_position = portrait_cam.global_position.lerp(want, 0.25) if portrait_cam.global_position.distance_to(want) < 4.0 else want
+	portrait_cam.look_at(target, Vector3.UP)
+
+func ensure_fx(e: Dictionary):
+	if e.has("fx"): return
+	var node = e["node"] as Node3D
+	e["fx"] = Art.emote_fx(node)
+	var head = node.get_meta("head") as Node3D
+	var skin = head.get_child(0) as MeshInstance3D
+	var m = (skin.material_override as StandardMaterial3D).duplicate()
+	skin.material_override = m
+	e["face"] = m
+	e["skin"] = m.albedo_color
+	e["base_scale"] = node.scale.x
+
+func emote(id: String, kind: String, dur: float = 2.8):
+	var e = entity_by_id(id)
+	if e.is_empty() or e["kind"] != "npc": return
+	ensure_fx(e)
+	var node0 = e["node"] as Node3D
+	var x0 = node0.position.x
+	var y0 = node0.position.y
+	if e.has("emote"):
+		x0 = e["emote"]["x0"]
+		y0 = e["emote"]["y0"]
+	clear_fx(e)
+	node0.position.x = x0
+	node0.position.y = y0
+	e["emote"] = {"kind": kind, "t": 0.0, "dur": dur, "x0": x0, "y0": y0}
+	var fx = e["fx"] as Node3D
+	var labels: Dictionary = fx.get_meta("labels")
+	match kind:
+		"love", "happy": (fx.get_meta("hearts") as Node3D).visible = true
+		"angry": (fx.get_meta("steam") as Node3D).visible = true
+		"sad": (fx.get_meta("cloud") as Node3D).visible = true
+		"dizzy", "faint": (fx.get_meta("stars") as Node3D).visible = true
+		"embarrassed": (fx.get_meta("sweat") as Node3D).visible = true
+		"shocked": (labels["!"] as Node3D).visible = true
+		"confused": (labels["?"] as Node3D).visible = true
+		"sleepy": (labels["zzz"] as Node3D).visible = true
+		"laugh": (labels["Ha!"] as Node3D).visible = true
+		"sneeze": (labels["!"] as Node3D).visible = true
+	if kind == "happy": (fx.get_meta("hearts") as Node3D).visible = randf() < 0.5
+
+func clear_fx(e: Dictionary):
+	var fx = e["fx"] as Node3D
+	for c in fx.get_children(): c.visible = false
+	(e["face"] as StandardMaterial3D).albedo_color = e["skin"]
+	var node = e["node"] as Node3D
+	(node.get_meta("head") as Node3D).scale = Vector3.ONE
+	(node.get_meta("head") as Node3D).rotation.x = 0.0
+	node.rotation.x = 0.0
+	node.rotation.z = 0.0
+	node.scale = Vector3.ONE * float(e.get("base_scale", node.scale.x))
+
+func apply_emote(e: Dictionary, delta: float):
+	if not e.has("emote"): return
+	var em: Dictionary = e["emote"]
+	em["t"] += delta
+	var t: float = em["t"]
+	var node = e["node"] as Node3D
+	var arms: Array = node.get_meta("arms")
+	var head = node.get_meta("head") as Node3D
+	var fx = e["fx"] as Node3D
+	var face = e["face"] as StandardMaterial3D
+	var skin: Color = e["skin"]
+	var bs: float = e.get("base_scale", 1.0)
+	var y0: float = em["y0"]
+	if t >= em["dur"]:
+		e.erase("emote")
+		clear_fx(e)
+		node.position.y = y0
+		node.position.x = em["x0"]
+		return
+	var end_fade = clampf((em["dur"] - t) / 0.4, 0.0, 1.0)
+	node.position.y = y0
+	match em["kind"]:
+		"happy":
+			node.position.y = y0 + absf(sin(t * 9.0)) * 0.45
+			if t < 0.9: node.rotation.y += delta * 14.0
+			(arms[0] as Node3D).rotation.z = -2.4 + sin(t * 14.0) * 0.4
+			(arms[1] as Node3D).rotation.z = 2.4 - sin(t * 14.0) * 0.4
+			(fx.get_meta("hearts") as Node3D).position.y = fmod(t * 0.6, 0.6)
+		"love":
+			node.rotation.z = sin(t * 4.0) * 0.18
+			face.albedo_color = skin.lerp(Color("ff8fb1"), 0.55 * end_fade)
+			(fx.get_meta("hearts") as Node3D).position.y = fmod(t * 0.5, 0.7)
+			(fx.get_meta("hearts") as Node3D).rotation.y = t * 2.0
+			node.scale = Vector3.ONE * bs * (1.0 + absf(sin(t * 6.0)) * 0.06)
+			(arms[0] as Node3D).rotation.x = -1.2
+			(arms[1] as Node3D).rotation.x = -1.2
+		"angry":
+			node.position.x = float(em["x0"]) + sin(t * 70.0) * 0.05
+			node.position.y = y0 + absf(sin(t * 15.0)) * 0.12
+			face.albedo_color = skin.lerp(Color("e0302a"), 0.75 * end_fade)
+			node.scale = Vector3.ONE * bs * (1.0 + minf(t, 1.0) * 0.15 * end_fade)
+			var st = fx.get_meta("steam") as Node3D
+			st.scale = Vector3.ONE * (1.0 + absf(sin(t * 10.0)) * 1.2)
+			st.position.y = absf(sin(t * 10.0)) * 0.2
+			(arms[0] as Node3D).rotation.z = -2.6 + sin(t * 25.0) * 0.3
+			(arms[1] as Node3D).rotation.z = 2.6 + sin(t * 25.0) * 0.3
+		"shocked":
+			var j = clampf(t / 0.45, 0.0, 1.0)
+			node.position.y = y0 + sin(j * PI) * 1.1
+			node.scale = Vector3(bs * 0.85, bs * 1.28, bs * 0.85) if t < 1.6 else Vector3.ONE * bs
+			face.albedo_color = skin.lerp(Color("f4f4ff"), 0.5 * end_fade)
+			(arms[0] as Node3D).rotation.z = -1.5
+			(arms[1] as Node3D).rotation.z = 1.5
+		"sad":
+			node.scale = Vector3(bs, bs * 0.9, bs)
+			head.rotation.x = 0.45
+			node.rotation.z = sin(t * 1.5) * 0.06
+			var drops: Array = fx.get_meta("drops")
+			for i in range(drops.size()):
+				(drops[i] as Node3D).position.y = 0.55 - fmod(t * 1.6 + i * 0.27, 1.0) * 0.55
+			face.albedo_color = skin.lerp(Color("9fb8d8"), 0.4 * end_fade)
+		"embarrassed":
+			face.albedo_color = skin.lerp(Color("ff4040"), 0.7 * end_fade)
+			node.scale = Vector3.ONE * bs * 0.82
+			node.rotation.y += sin(t * 3.0) * delta * 3.0 + delta * 2.5
+			(arms[0] as Node3D).rotation.x = -2.2
+			(arms[1] as Node3D).rotation.x = -2.2
+		"laugh":
+			var tt: String = Data.PEOPLE.get(e["id"], {}).get("trait", "cheerful")
+			(fx.get_meta("labels")["Ha!"] as Node3D).position.y = 0.55 + absf(sin(t * 8.0)) * 0.2
+			if tt == "giggly" and t > 0.9 and t < em["dur"] - 0.5:
+				node.rotation.x = lerpf(node.rotation.x, -1.5, minf(delta * 8.0, 1.0))
+				(arms[0] as Node3D).rotation.x = sin(t * 20.0) * 1.2
+				(arms[1] as Node3D).rotation.x = -sin(t * 20.0) * 1.2
+			else:
+				node.rotation.x = -sin(t * 7.0) * 0.3
+				node.position.y = y0 + absf(sin(t * 7.0)) * 0.15
+		"faint":
+			if t < 0.6:
+				node.rotation.z = sin(t * 18.0) * 0.2
+			elif t < em["dur"] - 0.5:
+				node.rotation.x = lerpf(node.rotation.x, -1.55, minf(delta * 7.0, 1.0))
+				(fx.get_meta("stars") as Node3D).rotation.y += delta * 6.0
+			else:
+				node.rotation.x = lerpf(node.rotation.x, 0.0, minf(delta * 12.0, 1.0))
+			face.albedo_color = skin.lerp(Color("ff8fb1"), 0.4 * end_fade)
+		"dizzy":
+			(fx.get_meta("stars") as Node3D).rotation.y += delta * 6.0
+			node.rotation.z = sin(t * 5.0) * 0.25
+			node.rotation.x = cos(t * 4.0) * 0.12
+		"confused":
+			head.rotation.z = 0.45
+			(arms[1] as Node3D).rotation.z = 2.4
+			(arms[1] as Node3D).rotation.x = sin(t * 18.0) * 0.3
+		"sleepy":
+			head.rotation.x = 0.35 + sin(t * 2.0) * 0.15
+			(fx.get_meta("labels")["zzz"] as Node3D).position.y = 0.55 + fmod(t * 0.4, 0.4)
+			node.rotation.z = sin(t * 1.2) * 0.08
+		"proud":
+			head.scale = Vector3.ONE * (1.0 + minf(t * 1.5, 0.7) * end_fade)
+			node.scale = Vector3(bs * 1.12, bs, bs * 1.12)
+			(arms[0] as Node3D).rotation.z = 0.9
+			(arms[1] as Node3D).rotation.z = -0.9
+			node.position.y = y0 + minf(t, 0.3) * 0.3
+		"disgust":
+			face.albedo_color = skin.lerp(Color("7fc75a"), 0.75 * end_fade)
+			node.rotation.x = -0.3
+			(arms[0] as Node3D).rotation.x = -1.4
+			(arms[1] as Node3D).rotation.x = -1.4
+		"sneeze":
+			if t < 0.7: node.rotation.x = -t * 0.5
+			elif t < 0.9: node.rotation.x = 0.6
+			else: node.rotation.x = lerpf(node.rotation.x, 0.0, minf(delta * 8.0, 1.0))
+
+func reaction_text(id: String, kind: String) -> String:
+	var n = names.get(id, id.capitalize())
+	match kind:
+		"faint": return n + " faints dramatically from joy!"
+		"love": return "Hearts float around " + n + "."
+		"proud": return n + "'s head swells with pride. Literally."
+		"angry": return "Steam shoots out of " + n + "'s ears!"
+		"sad": return "A tiny rain cloud appears over " + n + "."
+		"laugh": return n + " laughs so hard they fall over."
+		"shocked": return n + " jumps a meter into the air!"
+		"embarrassed": return n + " turns bright red and tries to hide."
+		"confused": return n + " scratches their head."
+		"sleepy": return n + " has fallen asleep standing up."
+		"disgust": return n + " turns green."
+		"happy": return n + " does a happy little spin."
+		"dizzy": return "Stars spin around " + n + "'s head."
+	return ""
+
+func add_friend(id: String, n: int):
+	if not Data.PEOPLE.has(id): return
+	var before: int = friend.get(id, 0)
+	var after = clampi(before + n, 0, 10)
+	friend[id] = after
+	if before < 5 and after >= 5: toast(id.capitalize() + " likes you! Ask about a secret.")
+	if before < 8 and after >= 8:
+		toast("“Anni palar ta-an-da!” " + id.capitalize() + " calls you a friend!")
+		learn("palar")
+		var count = 0
+		for k in friend.keys():
+			if int(friend[k]) >= 8: count += 1
+		if count >= 5 and not completed.has("friends"): complete("friends")
+
+func once_today(id: String, what: String) -> bool:
+	var key = id + ":" + what
+	if int(chat_day.get(key, -1)) == day_count: return false
+	chat_day[key] = day_count
+	return true
+
+func chat_menu(id: String):
+	talk_partner = id
+	var pp: Dictionary = Data.PEOPLE[id]
+	clear_panel("Chat with " + id.capitalize())
+	add_portrait(id)
+	text_line(id.capitalize() + " is " + {"cheerful": "cheerful", "dramatic": "very dramatic", "sleepy": "always sleepy", "proud": "rather proud", "giggly": "giggly", "grumpy": "grumpy"}[pp["trait"]] + ". What do you say?", 17)
+	button("Compliment", compliment.bind(id), content)
+	button("Tease", tease.bind(id), content)
+	button("Tell a joke", joke_menu.bind(id), content)
+	button("Give a gift", gift_menu.bind(id), content)
+	button("Ask: Ti ta-seng-ha? (Are you happy?)", feel.bind(id), content)
+	if int(friend.get(id, 0)) >= 5:
+		button("Ask about a secret" + ("  [ok]" if mastered.has("sec:" + id) else ""), secret.bind(id), content)
+	button("Back", talk.bind(id), content)
+
+func react(id: String, said_v: String, said_en: String, reply_v: String, reply_en: String, kind: String, gain: int):
+	talk_partner = id
+	clear_panel(id.capitalize())
+	add_friend(id, gain)
+	if gain < 0: mood[id] = mood.get(id, 0) + gain
+	elif gain > 0: mood[id] = mini(mood.get(id, 0) + 1, 3)
+	add_portrait(id)
+	emote(id, kind, 3.6)
+	text_line("You say: “" + said_v + "”")
+	var se = text_line("(" + said_en + ")", 15)
+	se.add_theme_color_override("font_color", Color("6b4a2e"))
+	varnak_banner(reply_v)
+	text_line(reply_en, 16)
+	var rt = text_line(reaction_text(id, kind) + ("  Friendship +" + str(gain) if gain > 0 else ("  Friendship " + str(gain) if gain < 0 else "")), 17)
+	rt.add_theme_color_override("font_color", Color("7a1f3d"))
+	master("chat:" + id + ":" + kind)
+	save_game()
+	button("Keep chatting", chat_menu.bind(id), content)
+	button("Return", close_panel, content)
+
+func compliment(id: String):
+	var pp: Dictionary = Data.PEOPLE[id]
+	var thing: Array = pp["thing"]
+	for w in ["ti-ni", "ho", "dau", "var", thing[0]]: learn(w)
+	clear_panel("Compliment " + id.capitalize())
+	add_portrait(id)
+	text_line("Choose what to say. (Think about what each one means!)", 17)
+	var opts = [["Ti-ni " + thing[0] + " i-ho!", "Your " + thing[1] + " is good!", "thing"], ["Ti ta-ho-da!", "You are good!", "you"], ["Ti-ni dau i-var!", "Your head is big!", "head"]]
+	opts.shuffle()
+	for o in opts:
+		button("“" + o[0] + "”", func(): do_compliment(id, o), content)
+	button("Back", chat_menu.bind(id), content)
+
+func do_compliment(id: String, o: Array):
+	var tt: String = Data.PEOPLE[id]["trait"]
+	var fresh = once_today(id, "compliment:" + o[2])
+	if not fresh:
+		react(id, o[0], o[1], "Ho, ho... ti ta-mel-pa-da.", "Yes, yes... you already said that.", "sleepy" if tt == "sleepy" else "confused", 0)
+		return
+	match o[2]:
+		"thing":
+			var k = {"dramatic": "faint", "proud": "proud", "grumpy": "embarrassed", "sleepy": "sleepy"}.get(tt, "love")
+			var rv = {"dramatic": "Ho! Ho!! ...ho...", "proud": "I-zen-da! Polu i-zen-da!", "grumpy": "Hmph. ...K-ta-har-da.", "sleepy": "Ho... zzz"}.get(tt, "K-ta-har-da! Na-seng-da!")
+			var re = {"dramatic": "Yes! YES!! ...yes...", "proud": "It's true! Everyone knows it!", "grumpy": "Hmph. ...Thank you.", "sleepy": "Nice... zzz"}.get(tt, "Thank you! I'm happy!")
+			react(id, o[0], o[1], rv, re, k, 2)
+		"you":
+			react(id, o[0], o[1], "Ti ta-ho-da!", "You are good too!", "happy", 1)
+		"head":
+			match tt:
+				"proud": react(id, o[0], o[1], "Ho! Anni dau i-var-da!", "Yes! My head IS big!", "proud", 1)
+				"giggly": react(id, o[0], o[1], "Ha! Ha! Ha!", "(Laughs uncontrollably.)", "laugh", 1)
+				"dramatic": react(id, o[0], o[1], "Haku?! Haku?!", "Why?! Why would you say that?!", "shocked", -1)
+				"grumpy": react(id, o[0], o[1], "Ti-ni dau i-var!", "YOUR head is big!", "angry", -1)
+				"sleepy": react(id, o[0], o[1], "Han...? zzz", "What...? zzz", "sleepy", 0)
+				_: react(id, o[0], o[1], "Han?", "What?", "confused", 0)
+
+func tease(id: String):
+	var pp: Dictionary = Data.PEOPLE[id]
+	var thing: Array = pp["thing"]
+	learn("wai")
+	var sv = "Ti-ni " + thing[0] + " i-wai!"
+	var se = "Your " + thing[1] + " is bad!"
+	if id == "vira":
+		react(id, sv, se, "Ho! Yok i-wai-da! Polu i-zen-da!", "Yes! The medicine is bad! Everyone knows!", "laugh", 1)
+		return
+	match pp["trait"]:
+		"dramatic": react(id, sv, se, "Maki... maki... MAKI!", "No... no... NO!", "sad", -2)
+		"proud": react(id, sv, se, "Ma-i-wai-ki-da! I-ho-da!", "It is NOT bad! It is good!", "angry", -2)
+		"grumpy": react(id, sv, se, "Hmph! Ti-ni dau i-var!", "Hmph! YOUR head is big!", "angry", -1)
+		"giggly": react(id, sv, se, "Ha! Ha! I-wai-da!", "Ha ha! It IS bad!", "laugh", 0)
+		"sleepy": react(id, sv, se, "Han...? zzz", "What...? zzz", "sleepy", 0)
+		_: react(id, sv, se, "Haku?!", "Why?!", "shocked", -1)
+
+func joke_menu(id: String):
+	clear_panel("Tell " + id.capitalize() + " a joke")
+	add_portrait(id)
+	text_line("Pick a silly sentence to say.", 17)
+	var jokes = Data.JOKES.duplicate()
+	jokes.shuffle()
+	for j in jokes.slice(0, 3):
+		button("“" + j["v"] + "”", func(): do_joke(id, j), content)
+	button("Back", chat_menu.bind(id), content)
+
+func do_joke(id: String, j: Dictionary):
+	var tt: String = Data.PEOPLE[id]["trait"]
+	var fresh = once_today(id, "joke:" + j["v"])
+	var g = 1 if fresh else 0
+	match tt:
+		"giggly": react(id, j["v"], j["en"], "Ha! Ha! Ha! Ha!", "(Rolls on the ground laughing.)", "laugh", g + (1 if fresh else 0))
+		"grumpy":
+			if randf() < 0.3: react(id, j["v"], j["en"], "Ha... HA! HA! HA!", "(Tries not to laugh, then explodes.)", "laugh", g + 1)
+			else: react(id, j["v"], j["en"], "Ha. Ha.", "(Not amused.)", "confused", 0)
+		"sleepy": react(id, j["v"], j["en"], "Ha... ha... zzz", "(Falls asleep in the middle of laughing.)", "sleepy", g)
+		"dramatic": react(id, j["v"], j["en"], "HA! HA! ...Ho!", "(Laughs so hard they faint.)", "faint", g)
+		"proud": react(id, j["v"], j["en"], "Han? ...Ha.", "What? ...Oh. Ha.", "confused", g)
+		_: react(id, j["v"], j["en"], "Ha! Ha! I-ho-da!", "Ha ha! That's good!", "laugh", g)
+
+func gift_menu(id: String):
+	clear_panel("Give " + id.capitalize() + " a gift")
+	add_portrait(id)
+	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(gin) + " gin. (Ketu sells panak and cha.)", 17)
+	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0}
+	for g in ["tari", "panak", "cha", "gin"]:
+		var b = button("“Ki " + g + " ti-ru!”  (This " + Data.GIFT_WORDS[g] + ", for you!)", give_gift.bind(id, g), content)
+		b.disabled = not have[g]
+	button("Back", chat_menu.bind(id), content)
+
+func give_gift(id: String, g: String):
+	match g:
+		"tari": fish_caught -= 1
+		"panak": inventory.erase("bread")
+		"cha": inventory.erase("tea")
+		"gin": gin -= 1
+	learn("ti-ru")
+	var pp: Dictionary = Data.PEOPLE[id]
+	var sv = "Ki " + g + " ti-ru!"
+	var se = "This " + Data.GIFT_WORDS[g] + ", for you!"
+	if pp["likes"].has(g):
+		var k = "faint" if pp["trait"] == "dramatic" else "love"
+		react(id, sv, se, "K-ta-har-da! " + g.capitalize() + " i-ho! I-ho!!", "Thank you! " + Data.GIFT_WORDS[g].capitalize() + " is good! So good!!", k, 3)
+	elif pp["hates"].has(g):
+		react(id, sv, se, "Maki! " + g.capitalize() + " i-wai!", "No! " + Data.GIFT_WORDS[g].capitalize() + " is bad!", "disgust", -1)
+	else:
+		react(id, sv, se, "K-ta-har-da.", "Thank you.", "happy", 1)
+
+func feel(id: String):
+	learn("-ha")
+	learn("seng")
+	var mv: int = mood.get(id, 0)
+	var tt: String = Data.PEOPLE[id]["trait"]
+	var about_me = false
+	for r in rumors:
+		if str(r["who"]).to_lower() == id: about_me = true
+	if mv >= 1:
+		react(id, "Ti ta-seng-ha?", "Are you happy?", "Ho! Na-seng-da!", "Yes! I'm happy!", "happy", 0)
+	elif mv <= -1:
+		if about_me: react(id, "Ti ta-seng-ha?", "Are you happy?", "Ma-na-seng-ki-da! Tovu i-wai!", "I'm NOT happy! That story is bad! (Someone spread a rumor about them.)", "angry", 0)
+		else: react(id, "Ti ta-seng-ha?", "Are you happy?", "Ma-na-seng-ki-da... Ti!", "I'm not happy... YOU! (You teased them. Try a gift or a compliment.)", "sad", 0)
+	else:
+		if tt == "sleepy": react(id, "Ti ta-seng-ha?", "Are you happy?", "Na-lei-da... zzz", "I'm tired... zzz", "sleepy", 0)
+		else: react(id, "Ti ta-seng-ha?", "Are you happy?", "Na-seng... shi.", "I'm happy... apparently.", "confused", 0)
+
+func secret(id: String):
+	var sc: Dictionary = Data.PEOPLE[id]["secret"]
+	talk_partner = id
+	clear_panel(id.capitalize() + "'s secret")
+	add_portrait(id)
+	emote(id, "embarrassed", 4.0)
+	text_line(id.capitalize() + " checks that nobody is listening, then whispers:", 17)
+	varnak_banner(sc["v"])
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = sc["en"], content)
+	if not mastered.has("sec:" + id):
+		master("sec:" + id)
+		gin += 2
+		toast("A secret! " + id.capitalize() + " also gives you vel gin.")
+		save_game()
+	button("Keep chatting", chat_menu.bind(id), content)
+
+# Every so often someone nearby does something silly.
+func update_ambient(delta: float):
+	mood_clock += delta
+	if mood_clock > 45.0:
+		mood_clock = 0.0
+		for k in mood.keys():
+			var v: int = mood[k]
+			if v > 0: mood[k] = v - 1
+			elif v < 0: mood[k] = v + 1
+	ambient_cd -= delta
+	if ambient_cd > 0.0 or panel.visible or riding: return
+	ambient_cd = randf_range(14.0, 28.0)
+	var near: Array = []
+	for e in entities:
+		if e["kind"] == "npc" and Data.PEOPLE.has(e["id"]) and not e.has("emote"):
+			var n = e["node"] as Node3D
+			if n.visible and n.position.distance_to(player.position) < 22.0: near.append(e)
+	if near.is_empty(): return
+	var e = near[randi() % near.size()]
+	var tt: String = Data.PEOPLE[e["id"]]["trait"]
+	var pick = ["sneeze", "Ha-chu!"]
+	var r = randf()
+	if tt == "sleepy" and r < 0.6: pick = ["sleepy", "zzz..."]
+	elif tt == "giggly" and r < 0.6: pick = ["laugh", "Ha! Ha!"]
+	elif tt == "dramatic" and r < 0.5: pick = ["shocked", "Haku?!"]
+	elif tt == "grumpy" and r < 0.5: pick = ["angry", "Hmph!"]
+	elif tt == "proud" and r < 0.5: pick = ["proud", "Ho!"]
+	elif r < 0.5: pick = ["happy", "Ho! Ho!"]
+	emote(e["id"], pick[0], 2.6)
+	e["say"] = [pick[1], clock + 2.6]

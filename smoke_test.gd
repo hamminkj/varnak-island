@@ -632,6 +632,71 @@ func run():
 	game.rumors.clear()
 	game.load_game()
 	assert(game.rumors.size() == nr)
+	# ---- sixth expansion: feelings, friendship, reactions ----
+	game.close_panel()
+	game.completed.clear()
+	game.friend.clear()
+	game.mood.clear()
+	game.chat_day.clear()
+	for id in Data.PEOPLE.keys():
+		assert(game.looks.has(id), "person exists " + id)
+		game.chat_menu(id)
+		assert(game.portrait_id == id)
+		game.compliment(id)
+		for o in ["thing", "you", "head"]:
+			game.chat_menu(id)
+			var pp = Data.PEOPLE[id]
+			var opts = {"thing": ["Ti-ni " + pp["thing"][0] + " i-ho!", "Your x"], "you": ["Ti ta-ho-da!", "x"], "head": ["Ti-ni dau i-var!", "x"]}
+			game.do_compliment(id, [opts[o][0], opts[o][1], o])
+			assert(game.panel.visible)
+		game.do_compliment(id, ["Ti ta-ho-da!", "x", "you"])
+		game.tease(id)
+		game.joke_menu(id)
+		game.do_joke(id, Data.JOKES[0])
+		game.feel(id)
+	assert(game.mastered.has("chat:mira:faint") and game.mastered.has("chat:tor:proud") and game.mastered.has("chat:lira:laugh"))
+	# gifts: likes, hates and neutral
+	game.fish_caught = 3
+	game.gin = 5
+	game.inventory.append_array(["bread", "tea"])
+	var f0 = int(game.friend.get("ketu", 0))
+	game.give_gift("ketu", "tari")
+	assert(int(game.friend["ketu"]) == mini(f0 + 3, 10) and game.fish_caught == 2)
+	var f1 = int(game.friend.get("mira", 0))
+	game.give_gift("mira", "panak")
+	assert(int(game.friend["mira"]) == maxi(f1 - 1, 0) and not game.inventory.has("bread"))
+	game.give_gift("desh", "gin")
+	# secrets and the friends quest
+	for id in ["ena", "ketu", "desh", "neri", "gav"]: game.add_friend(id, 10)
+	assert(game.completed.has("friends"))
+	game.chat_menu("ketu")
+	press("Ask about a secret")
+	assert(game.mastered.has("sec:ketu"))
+	game.mood["oren"] = -2
+	assert(game.greeting("oren") == "Hmph!")
+	game.feel("oren")
+	# every reaction animates and resets cleanly
+	for k in ["happy", "love", "angry", "shocked", "sad", "embarrassed", "laugh", "faint", "dizzy", "confused", "sleepy", "proud", "disgust", "sneeze"]:
+		var e = game.entity_by_id("lira")
+		var hx = e["node"].position.x
+		game.emote("lira", k, 1.0)
+		for i in range(12): game.apply_emote(e, 0.1)
+		assert(not e.has("emote") and absf(e["node"].position.x - hx) < 0.001 and e["node"].rotation.x == 0.0, "emote resets " + k)
+		assert(game.reaction_text("lira", k) != "" or k == "sneeze")
+	game.ambient_cd = 0.0
+	game.close_panel()
+	game.player.position = Vector3(0, 0.1, 10)
+	game.update_ambient(0.1)
+	game.add_portrait("mira")
+	game.panel.show()
+	game.portrait_id = "mira"
+	game.update_portrait()
+	game.save_game()
+	var fr = game.friend.duplicate()
+	game.friend.clear()
+	game.load_game()
+	assert(game.friend.size() == fr.size())
+	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
 	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")
 	print("PASS: fourth expansion: drag and drop, gap fill, forge, match, challenges, memory, market rush, speed round, levels")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")

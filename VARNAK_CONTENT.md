@@ -252,3 +252,14 @@ Strange things: Tari wak-korma i-esh-da; Ket dom-ni tarma i-esh-da (tar: top, se
 Rumor composer: Subject + place with -ma + adverb (hala, sela) + verb. The verb is (ma-) + na-/i- + root (sul, sum, ning, pav, nang, mel, tal, sir) + -im/-pa/-ur/-fu + (-ki) + -da/-shi/-nu, following section 21.1. Reactions: T-i-pal-pa-ha?! (You saw it?), Haku? (Why?), Hal-ta? (From whom? hal with the ablative: please check), and Halke ki tovu i-gao-pa-ha?! (Who told this story?). Retold rumors swap the evidential to -nu.
 
 Things to check: 12. par as fear and yam as eat are homonyms in the document (bird, salt and voice); the gossip uses them on purpose. 13. Places like guro-ma (inside a fruit) and fardomma (in the lighthouse) are plain concatenations.
+
+
+## Sixth expansion: feelings and friendship
+
+Chat phrases (composed): Ti-ni X i-ho! (Your X is good!) / Ti ta-ho-da! (You are good!, a stative with the 2S prefix ta-) / Ti-ni dau i-var! (Your head is big!) / Ti-ni X i-wai! (Your X is bad!) / Ki X ti-ru! (This X, for you!) / Ti ta-seng-ha? (Are you happy?) / Na-seng-da (I am happy), Ma-na-seng-ki-da (I am not happy), Na-lei-da (I am tired) / Anni palar ta-an-da (You are my friend, copula with ta-) / Ti ta-mel-pa-da (you already said it: you spoke; intransitive mel with ta-).
+
+Secrets (composed): An haima ma-na-sum-ur-ki-da; An yamat ma-na-dar-ur-ki-da. Ketuke i-dar-ur-da; An rukma na-sul-ur-da; Gira i-sava... shi; Anni tovu-ir ri-fau-da; An mar-ru na-ning-ur-da; An tari-ta na-par-ur-da; Tari-ir anni palar-ir ri-an-da; Anke puka ma-k-i-rav-pa-ki-da; Anke Ola-ni guro k-i-nuk-pa-da; An sao-ir-ru na-mel-ur-da; An sang-ma na-sul-ur-da; Yok i-wai-da. Polu i-zen-da; Anni dauma tong ma-i-esh-pa-ki-da; An yesh-ta na-par-ur-da. I-zen-da; Tari-ir ma-ri-seng-ur-ki-da; Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da; Kel-ir-ma yamat i-ho-da; An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.
+
+Jokes (composed): Mar wak-korma i-esh-da; Yue guro i-an-shi; Gor ket-ma i-sul-im-da; Par sena-li i-kel-ur-da; Sek-ir ri-ning-ur-nu; Tari-ir dom-ma ri-sul-ur-da; Gira i-pav-im-da.
+
+Things to check: 14. Exclamations like Ho!, Maki... MAKI!, Ha! Ha! and Hmph! are used as interjections.

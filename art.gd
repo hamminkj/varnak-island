@@ -1136,3 +1136,72 @@ static func rain(parent: Node3D) -> CPUParticles3D:
 	p.position = Vector3(0, 14, 0)
 	parent.add_child(p)
 	return p
+
+# ---------- emotions: cartoon effects that float around a character's head ----------
+
+static func heart(parent: Node3D, pos: Vector3, s: float, color: Color) -> Node3D:
+	var h = Node3D.new()
+	h.position = pos
+	h.scale = Vector3.ONE * s
+	parent.add_child(h)
+	var m = unshaded(color)
+	for x in [-0.07, 0.07]:
+		var b = sph(h, Vector3(x, 0.05, 0), 0.085, color, Vector3.ONE, 8)
+		b.material_override = m
+	var tip = box(h, Vector3(0, -0.04, 0), Vector3(0.14, 0.14, 0.06), color, Vector3(0, 0, 45))
+	tip.material_override = m
+	return h
+
+static func emote_fx(parent: Node3D) -> Node3D:
+	var fx = Node3D.new()
+	fx.position = Vector3(0, 1.62, 0)
+	parent.add_child(fx)
+	var hearts = Node3D.new()
+	fx.add_child(hearts)
+	for i in range(4):
+		heart(hearts, Vector3(-0.3 + i * 0.2, 0.4, 0.1), 1.0, Color("ff4f81") if i % 2 == 0 else Color("ff8fb1"))
+	var steam = Node3D.new()
+	fx.add_child(steam)
+	for x in [-0.3, 0.3]:
+		var p = sph(steam, Vector3(x, 0.15, 0), 0.12, Color.WHITE, Vector3.ONE, 8)
+		p.material_override = unshaded(Color(1, 1, 1, 0.85), true)
+	var cloud = Node3D.new()
+	fx.add_child(cloud)
+	for i in range(4):
+		var c = sph(cloud, Vector3(-0.22 + i * 0.15, 0.75 + (0.06 if i % 2 else 0.0), 0), 0.16, Color("6f7682"), Vector3(1, 0.8, 0.8), 8)
+		c.material_override = unshaded(Color("6f7682"))
+	var drops: Array = []
+	for i in range(4):
+		var d = sph(cloud, Vector3(-0.2 + i * 0.13, 0.5, 0), 0.03, Color("6db9ff"), Vector3(0.7, 1.6, 0.7), 5)
+		d.material_override = unshaded(Color("6db9ff"))
+		drops.append(d)
+	var stars = Node3D.new()
+	fx.add_child(stars)
+	for i in range(4):
+		var a = i * TAU / 4.0
+		var st = box(stars, Vector3(cos(a) * 0.32, 0.3, sin(a) * 0.32), Vector3(0.09, 0.09, 0.09), Color("ffd34d"), Vector3(45, 45, 0))
+		st.material_override = unshaded(Color("ffd34d"))
+	var sweat = sph(fx, Vector3(0.2, 0.15, 0.12), 0.05, Color("8fd3ff"), Vector3(0.8, 1.3, 0.8), 6)
+	sweat.material_override = unshaded(Color("8fd3ff"))
+	var labels = {}
+	for k in ["!", "?", "zzz", "Ha!"]:
+		var l = Label3D.new()
+		l.text = k
+		l.font_size = 90 if k != "zzz" else 60
+		l.pixel_size = 0.008
+		l.outline_size = 16
+		l.modulate = Color("ff3b3b") if k == "!" else (Color("ffd34d") if k != "zzz" else Color("bfe4ff"))
+		l.outline_modulate = Color(0.1, 0.05, 0.05)
+		l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		l.position = Vector3(0.35, 0.55, 0)
+		fx.add_child(l)
+		labels[k] = l
+	fx.set_meta("hearts", hearts)
+	fx.set_meta("steam", steam)
+	fx.set_meta("cloud", cloud)
+	fx.set_meta("drops", drops)
+	fx.set_meta("stars", stars)
+	fx.set_meta("sweat", sweat)
+	fx.set_meta("labels", labels)
+	for c in fx.get_children(): c.visible = false
+	return fx

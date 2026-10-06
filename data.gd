@@ -59,7 +59,9 @@ const WORDS = {
 	"yir": "clothing", "par": "bird (as a verb root, par means fear)",
 	"yam": "eat (root); also salt and voice", "tovu": "story",
 	"sela": "alone", "cha-kor": "teapot (cha + kor)", "-ai": "antipassive: doing something in general (pal-ai: look around)",
-	"ha": "ha (a laugh)", "sir": "look for, search (root)"
+	"ha": "ha (a laugh)", "sir": "look for, search (root)",
+	"palar": "friend", "fau": "false", "lei": "tired", "ber": "illness",
+	"ti-ni": "your (ti + ni)", "ti-ru": "to you (ti + ru)"
 }
 
 # Glosses that replace earlier ones because the document gives a second meaning.
@@ -529,3 +531,58 @@ const LEVEL_NAMES = ["", "Explorer", "Speaker", "Storyteller", "Elder"]
 
 # Times of day, announced as they change.
 const TIMES = {"salma": "dawn", "monar": "morning", "yar": "day", "wanar": "evening", "yesh": "night"}
+
+# Personalities. thing: what they are proud of (Varnak, English). trait decides how big their reactions are.
+# likes and hates are gifts: tari (fish), panak (bread), cha (tea), gin (a coin).
+const PEOPLE = {
+	"ena": {"trait": "cheerful", "thing": ["kel", "bag"], "likes": ["tari"], "hates": [],
+		"secret": {"v": "An haima ma-na-sum-ur-ki-da.", "en": "I can't swim in the sea. (A harbor master who cannot swim!)"}},
+	"mira": {"trait": "dramatic", "thing": ["yamat", "food"], "likes": ["cha"], "hates": ["panak"],
+		"secret": {"v": "An yamat ma-na-dar-ur-ki-da. Ketuke i-dar-ur-da.", "en": "I don't cook the food. Ketu cooks it."}},
+	"sanu": {"trait": "sleepy", "thing": ["ruk", "path"], "likes": ["panak"], "hates": [],
+		"secret": {"v": "An rukma na-sul-ur-da.", "en": "I usually sleep on the path."}},
+	"tor": {"trait": "proud", "thing": ["gira", "bridge"], "likes": ["cha"], "hates": ["gin"],
+		"secret": {"v": "Gira i-sava... shi.", "en": "The bridge is safe... apparently. (-shi: Tor is only guessing!)"}},
+	"lira": {"trait": "giggly", "thing": ["tovu", "story"], "likes": ["gin"], "hates": ["tari"],
+		"secret": {"v": "Anni tovu-ir ri-fau-da.", "en": "My stories are false."}},
+	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha"],
+		"secret": {"v": "An mar-ru na-ning-ur-da.", "en": "I sing to the horse."}},
+	"neri": {"trait": "cheerful", "thing": ["puka", "notebook"], "likes": ["tari", "panak", "cha", "gin"], "hates": [],
+		"secret": {"v": "An tari-ta na-par-ur-da.", "en": "I am afraid of fish."}},
+	"ketu": {"trait": "cheerful", "thing": ["tari", "fish"], "likes": ["tari", "gin"], "hates": ["panak"],
+		"secret": {"v": "Tari-ir anni palar-ir ri-an-da.", "en": "The fish are my friends."}},
+	"suri": {"trait": "proud", "thing": ["senak", "school"], "likes": ["cha"], "hates": [],
+		"secret": {"v": "Anke puka ma-k-i-rav-pa-ki-da.", "en": "I did not read the book."}},
+	"rin": {"trait": "giggly", "thing": ["puka", "book"], "likes": ["panak"], "hates": ["cha"],
+		"secret": {"v": "Anke Ola-ni guro k-i-nuk-pa-da.", "en": "I took Ola's fruit. (Ola was framed!)"}},
+	"ola": {"trait": "giggly", "thing": ["guro", "fruit"], "likes": ["panak"], "hates": ["cha"],
+		"secret": {"v": "An sao-ir-ru na-mel-ur-da.", "en": "I talk to the stars."}},
+	"pomo": {"trait": "sleepy", "thing": ["sang", "hill"], "likes": ["cha"], "hates": ["tari"],
+		"secret": {"v": "An sang-ma na-sul-ur-da.", "en": "I do sleep on the hill."}},
+	"vira": {"trait": "cheerful", "thing": ["yok", "medicine"], "likes": ["cha"], "hates": [],
+		"secret": {"v": "Yok i-wai-da. Polu i-zen-da.", "en": "The medicine is bad. Everyone knows."}},
+	"ila": {"trait": "dramatic", "thing": ["yir", "clothes"], "likes": ["panak"], "hates": ["tari"],
+		"secret": {"v": "Anni dauma tong ma-i-esh-pa-ki-da.", "en": "There was no pain in my head. (She faked it!)"}},
+	"yalo": {"trait": "dramatic", "thing": ["fardom", "lighthouse"], "likes": ["cha"], "hates": ["tari"],
+		"secret": {"v": "An yesh-ta na-par-ur-da. I-zen-da.", "en": "I am afraid of the night. It's true."}},
+	"desh": {"trait": "giggly", "thing": ["ning", "song"], "likes": ["tari"], "hates": [],
+		"secret": {"v": "Tari-ir ma-ri-seng-ur-ki-da.", "en": "The fish are not happy when I sing."}},
+	"oku": {"trait": "proud", "thing": ["sek-ir", "stones"], "likes": ["cha"], "hates": ["gin"],
+		"secret": {"v": "Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da.", "en": "The stones don't talk. I do."}},
+	"gav": {"trait": "cheerful", "thing": ["kel-ir", "bags"], "likes": ["panak"], "hates": [],
+		"secret": {"v": "Kel-ir-ma yamat i-ho-da.", "en": "The food in the bags is good."}},
+	"tamu": {"trait": "grumpy", "thing": ["sena", "boat"], "likes": ["tari"], "hates": ["panak"],
+		"secret": {"v": "An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.", "en": "I don't travel by boat. I swim."}}
+}
+
+# Jokes you can tell. Silly sentences built from words you have met.
+const JOKES = [
+	{"v": "Mar wak-korma i-esh-da!", "en": "The horse is in the well!"},
+	{"v": "Yue guro i-an-shi!", "en": "Apparently the moon is a fruit!"},
+	{"v": "Gor ket-ma i-sul-im-da!", "en": "The dog is sleeping on a chair!"},
+	{"v": "Par sena-li i-kel-ur-da!", "en": "The bird usually travels by boat!"},
+	{"v": "Sek-ir ri-ning-ur-nu!", "en": "They say the stones usually sing!"},
+	{"v": "Tari-ir dom-ma ri-sul-ur-da!", "en": "The fish usually sleep in the house!"},
+	{"v": "Gira i-pav-im-da!", "en": "The bridge is running!"}
+]
+const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin"}
