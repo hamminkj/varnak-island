@@ -2793,11 +2793,7 @@ func show_notebook():
 func reveal_word(word: String):
 	clear_panel(word)
 	text_line("What do you think this form means?")
-	var guess = LineEdit.new()
-	guess.placeholder_text = "Write your guess here"
-	guess.text = guesses.get(word, "")
-	guess.custom_minimum_size.y = 54
-	content.add_child(guess)
+	var guess = text_field("Write your guess here", guesses.get(word, ""))
 	button("Save guess",func():
 		guesses[word] = guess.text
 		save_game(),content)
@@ -4936,15 +4932,40 @@ func news(id: String):
 	if rumor_count >= 3 and not completed.has("rumor"): complete("rumor")
 	button("Back", talk.bind(id), content)
 
+# ---- typing on phones ----
+# Phone browsers often send nothing to a web game's text box, so on touch screens the box
+# opens the phone's own text prompt instead, and the answer is copied into the box.
+var last_prompt_ms: int = 0
+
+func touch_web() -> bool:
+	return OS.has_feature("web") and DisplayServer.is_touchscreen_available()
+
+func text_field(placeholder: String, initial: String = "") -> LineEdit:
+	var le = LineEdit.new()
+	le.placeholder_text = placeholder
+	le.text = initial
+	le.custom_minimum_size.y = 54
+	content.add_child(le)
+	if touch_web():
+		le.editable = false
+		le.virtual_keyboard_enabled = false
+		le.placeholder_text = placeholder + " (tap to type)"
+		le.add_theme_color_override("font_uneditable_color", Color("2e1c0c"))
+		le.gui_input.connect(func(ev):
+			var down = (ev is InputEventScreenTouch and ev.pressed) or (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT)
+			if not down or Time.get_ticks_msec() - last_prompt_ms < 800: return
+			last_prompt_ms = Time.get_ticks_msec()
+			var r = JavaScriptBridge.eval("window.prompt(" + JSON.stringify(placeholder) + ", " + JSON.stringify(le.text) + ")", true)
+			last_prompt_ms = Time.get_ticks_msec()
+			if r != null: le.text = str(r))
+	return le
+
 # ---- a parrot that repeats anything ----
 
 func parrot_panel():
 	clear_panel("par: a parrot")
 	text_line("A big red parrot on a crate tilts its head at you. Type something in Varnak and it will say it back.")
-	var input = LineEdit.new()
-	input.placeholder_text = "Type Varnak here"
-	input.custom_minimum_size.y = 54
-	content.add_child(input)
+	var input = text_field("Type Varnak here")
 	var out = text_line("", 20)
 	button("Say it to the parrot", func():
 		var t = input.text.strip_edges()
