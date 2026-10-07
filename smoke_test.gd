@@ -270,6 +270,44 @@ func run():
 		if game.panel.visible: break
 	assert(game.panel.visible, "auto-walk reached Mira")
 	game.close_panel()
+	# ---- bridges: walk across each crossing, even steering a little sideways ----
+	for c in game.CROSSINGS:
+		for drift in [0.0, 0.35, -0.35]:
+			var a: Vector3 = c[0]
+			var bb: Vector3 = c[1]
+			game.player.position = Vector3(a.x, 0.3, a.z + 1.5)
+			game.player.velocity = Vector3.ZERO
+			game.player.rotation.y = 0.0
+			var reverted = 0
+			game.joy = Vector2(drift, -1.0)
+			for i in range(200):
+				await physics_frame
+				if game.player.position.z < bb.z - 0.8: break
+			game.joy = Vector2.ZERO
+			assert(game.player.position.z < bb.z - 0.8, "crossed at x=" + str(a.x) + " drift " + str(drift) + ", stuck at " + str(game.player.position))
+			game.player.rotation.y = PI
+			game.joy = Vector2(drift, -1.0)
+			for i in range(200):
+				await physics_frame
+				if game.player.position.z > a.z + 0.8: break
+			game.joy = Vector2.ZERO
+			assert(game.player.position.z > a.z + 0.8, "crossed back at x=" + str(a.x) + " drift " + str(drift))
+	# auto-walk over the river picks a bridge
+	var route = game.plan_route(Vector3(-20, 0, -10), Vector3(-20, 0, -36))
+	assert(route.size() == 2, "route uses a crossing")
+	game.player.position = Vector3(-12, 0.3, -12)
+	game.player.velocity = Vector3.ZERO
+	var tgt = game.entity_by_id("neri")
+	game.walk_to = tgt
+	game.walk_via = game.plan_route(game.player.position, (tgt["node"] as Node3D).global_position)
+	game.walk_last = INF
+	game.walk_check = 0.8
+	assert(not game.walk_via.is_empty())
+	for i in range(900):
+		await physics_frame
+		if game.panel.visible: break
+	assert(game.panel.visible, "auto-walk crossed the river to Neri, stuck at " + str(game.player.position))
+	game.close_panel()
 	# ---- terrain: everything stands on reachable land ----
 	var walk = {}
 	var q2 = [Vector2i(0, 34), Vector2i(48, 72)]

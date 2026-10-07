@@ -5,6 +5,8 @@ const Data = preload("res://data.gd")
 const T = preload("res://terrain.gd")
 const SAVE = "user://varnak_island.json"
 const REACH = 4.0
+# River crossings: [village-side end, far-side end]
+const CROSSINGS = [[Vector3(0, 0, -18.4), Vector3(0, 0, -27.6)], [Vector3(-30, 0, -18.0), Vector3(-30, 0, -28.0)], [Vector3(52, 0, -19.4), Vector3(52, 0, -33.6)]]
 const WALK_RANGE = 70.0
 # Paths painted on the ground (x1, z1, x2, z2). The main north-south path along x = 0 is drawn by the shader.
 const PATHS = [
@@ -63,6 +65,7 @@ var hover: Dictionary = {}
 var walk_to: Dictionary = {}
 var walk_check: float = 0.0
 var walk_last: float = 0.0
+var walk_via: Array = []
 var last_safe: Vector3 = Vector3(0, 0.1, 36)
 var clock: float = 0.0
 var save_clock: float = 0.0
@@ -315,6 +318,44 @@ func solid(pos: Vector3, size: Vector3, yaw: float = 0.0):
 	cs.shape = shape
 	body.add_child(cs)
 	add_child(body)
+
+# Invisible rails along a north-south crossing, with short funnels at each end
+# that guide a walker onto the deck instead of stopping them.
+func guard_rails(cx: float, z_near: float, z_far: float, hw: float):
+	var mid = (z_near + z_far) * 0.5
+	for sx in [-1.0, 1.0]:
+		solid(Vector3(cx + sx * hw, 0.6, mid), Vector3(0.12, 1.2, absf(z_near - z_far)))
+		for end in [[z_near, 1.0], [z_far, -1.0]]:
+			var a = Vector2(cx + sx * hw, end[0])
+			var b = Vector2(cx + sx * (hw + 0.9), end[0] + end[1] * 1.5)
+			var c = (a + b) * 0.5
+			var d = b - a
+			solid(Vector3(c.x, 0.6, c.y), Vector3(0.12, 1.2, d.length()), rad_to_deg(atan2(d.x, d.y)))
+
+# A sloped walkway from a (low end) to b (top end), so the player can step onto a bridge deck.
+func ramp(a: Vector3, b: Vector3, width: float, color: Color = Color(0, 0, 0, 0)):
+	var d = b - a
+	var body = StaticBody3D.new()
+	var fwd = d.normalized()
+	var right = Vector3.UP.cross(-fwd).normalized()
+	var up = fwd.cross(right).normalized() * -1.0
+	if up.y < 0.0: up = -up
+	var basis = Basis(right, up, -fwd).orthonormalized()
+	body.transform = Transform3D(basis, (a + b) * 0.5 - up * 0.1)
+	var cs = CollisionShape3D.new()
+	var shape = BoxShape3D.new()
+	shape.size = Vector3(width, 0.2, d.length())
+	cs.shape = shape
+	body.add_child(cs)
+	add_child(body)
+	if color.a > 0.0:
+		var mi = MeshInstance3D.new()
+		var bm = BoxMesh.new()
+		bm.size = Vector3(width, 0.1, d.length())
+		mi.mesh = bm
+		mi.material_override = Art.mat(color)
+		mi.transform = Transform3D(basis, (a + b) * 0.5 - up * 0.05)
+		add_child(mi)
 
 func block(x: float, z: float, r: float):
 	blocked.append(Vector3(x, z, r))
@@ -618,6 +659,10 @@ func build_river():
 	var info = Art.bridge(self, Vector3(0, 0, -23))
 	bridge_info = info
 	solid(Vector3(0,0.04,-23), Vector3(3,0.08,7))
+	# invisible rails so nobody tumbles off the side
+	guard_rails(0.0, -19.5, -26.5, 1.55)
+	ramp(Vector3(0, -0.4, -17.3), Vector3(0, 0.08, -19.5), 3.0, Color("8f6a43"))
+	ramp(Vector3(0, -0.4, -28.7), Vector3(0, 0.08, -26.5), 3.0, Color("8f6a43"))
 	for sz in [-25.0, -21.0]:
 		for sx in [-1.4, 1.4]:
 			Art.cyl(self, Vector3(sx, -0.6, sz), 0.12, 0.14, 1.3, Color("5b3d28"), Vector3.ZERO, 7)
@@ -672,7 +717,11 @@ func build_places():
 		Art.sph(self, Vector3(p.x, T.height(p.x, p.z) + 0.05, p.z), 0.45, Color("8d9394").lerp(Color("b4aea0"), float(i % 3) / 3.0), Vector3(1.3, 0.6, 1), 7)
 	# ---- stepping stones across the river (west) ----
 	for p in Art.stepping_stones(self, Vector3(-30, 0, -19.6), Vector3(-30, 0, -26.4), 7):
-		solid(Vector3(p.x, -0.05, p.z), Vector3(1.15, 0.3, 1.15))
+		solid(Vector3(p.x, -0.05, p.z), Vector3(1.8, 0.3, 1.8))
+	solid(Vector3(-30, -0.05, -23), Vector3(2.4, 0.3, 8.6))
+	guard_rails(-30.0, -18.9, -27.1, 1.25)
+	ramp(Vector3(-30, -0.4, -16.6), Vector3(-30, 0.1, -18.7), 2.4)
+	ramp(Vector3(-30, -0.4, -29.4), Vector3(-30, 0.1, -27.3), 2.4)
 	Art.signpost(self, Vector3(-28, 0, -17.5), "mora-ni\naruma", 180)
 	# ---- west hill lookout ----
 	var top = Vector3(-61, T.height(-61, -39.5), -39.5)
@@ -712,7 +761,10 @@ func build_places():
 	block(63.5, 25.5, 1.6)
 	# ---- east log bridge ----
 	Art.log_bridge(self, Vector3(52, 0, -20.6), Vector3(52, 0, -32.4))
-	solid(Vector3(52, -0.1, -26.5), Vector3(1.6, 0.3, 11.8))
+	solid(Vector3(52, -0.1, -26.5), Vector3(2.4, 0.3, 11.8))
+	guard_rails(52.0, -21.0, -32.0, 1.25)
+	ramp(Vector3(52, -0.4, -18.4), Vector3(52, 0.05, -20.6), 2.4)
+	ramp(Vector3(52, -0.4, -34.6), Vector3(52, 0.05, -32.4), 2.4)
 	# ---- market and other signposts ----
 	Art.signpost(self, Vector3(-7, 0, 20.5), "kur-ru", -90)
 	Art.signpost(self, Vector3(-45.5, 0, 3.2), "senak-ru", 0)
@@ -1293,8 +1345,10 @@ func build_ui():
 	ui.add_child(cross)
 	toast_label = Label.new()
 	toast_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	toast_label.position = Vector2(-170,180)
-	toast_label.size = Vector2(340,40)
+	toast_label.position = Vector2(-200,180)
+	toast_label.custom_minimum_size = Vector2(400, 0)
+	toast_label.size = Vector2(400,40)
+	toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_label.add_theme_stylebox_override("normal", chip_style(0.78))
 	toast_label.add_theme_color_override("font_color", Color("ffe9a8"))
@@ -1366,6 +1420,7 @@ func build_ui():
 func toast(text: String):
 	if toast_label == null: return
 	toast_label.text = text
+	toast_label.reset_size()
 	toast_label.modulate.a = 1.0
 	toast_label.position.y = 180.0
 	toast_time = 2.6
@@ -1688,11 +1743,24 @@ func _physics_process(delta):
 	if axis != Vector2.ZERO: manual = true
 	var speed = 4.5
 	if Input.is_physical_key_pressed(KEY_SHIFT) or joy.length() > 0.95: speed = 7.5
-	if manual: walk_to = {}
+	if manual:
+		walk_to = {}
+		walk_via.clear()
 	elif not walk_to.is_empty():
 		var node = walk_to["node"] as Node3D
 		var d = Vector2(node.global_position.x - player.position.x, node.global_position.z - player.position.z)
 		var stop = maxf(2.2, float(walk_to["pr"]) + 1.1)
+		# head for the next bridge end first, if the way crosses the river
+		while not walk_via.is_empty():
+			var wp: Vector3 = walk_via[0]
+			var dv = Vector2(wp.x - player.position.x, wp.z - player.position.z)
+			if dv.length() < 0.9:
+				walk_via.pop_front()
+				walk_last = INF
+				continue
+			d = dv
+			stop = -1.0
+			break
 		if d.length() < stop or not node.visible:
 			var arrived = walk_to
 			walk_to = {}
@@ -1710,7 +1778,7 @@ func _physics_process(delta):
 				if walk_last - d.length() < 0.6:
 					var stuck_on = walk_to
 					walk_to = {}
-					if d.length() <= REACH + maxf(float(stuck_on["pr"]) - 0.8, 0.0):
+					if walk_via.is_empty() and d.length() <= REACH + maxf(float(stuck_on["pr"]) - 0.8, 0.0):
 						target = stuck_on
 						interact()
 						return
@@ -1887,10 +1955,39 @@ func tap(pos: Vector2):
 		interact()
 	elif d <= WALK_RANGE:
 		walk_to = e
-		walk_last = d
+		walk_via = plan_route(player.position, node.global_position)
+		walk_last = INF if not walk_via.is_empty() else d
 		walk_check = 0.8
 	else:
 		hint("That is far away. Walk closer, or travel from the Map.")
+
+func on_crossing(p: Vector3) -> bool:
+	for c in CROSSINGS:
+		var a: Vector3 = c[0]
+		var b: Vector3 = c[1]
+		if absf(p.x - a.x) < 1.4 and p.z <= a.z + 0.5 and p.z >= b.z - 0.5: return true
+	return false
+
+# If a straight walk would go through the river, route it over the nearest crossing.
+func plan_route(from: Vector3, to: Vector3) -> Array:
+	var wet = false
+	for i in range(1, 40):
+		var p = from.lerp(to, i / 40.0)
+		if T.deep(p.x, p.z) and T.river_dist(p.x, p.z) < 4.5 and not on_crossing(p):
+			wet = true
+			break
+	if not wet: return []
+	var from_south = from.z > T.river_z(from.x)
+	var best: Array = []
+	var best_cost = INF
+	for c in CROSSINGS:
+		var near: Vector3 = c[0] if from_south else c[1]
+		var far: Vector3 = c[1] if from_south else c[0]
+		var cost = Vector2(from.x - near.x, from.z - near.z).length() + near.distance_to(far) + Vector2(far.x - to.x, far.z - to.z).length()
+		if cost < best_cost:
+			best_cost = cost
+			best = [near, far]
+	return best
 
 func look(amount: Vector2):
 	player.rotation.y -= amount.x * 0.004

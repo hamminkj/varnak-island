@@ -965,7 +965,7 @@ static func stepping_stones(parent: Node3D, a: Vector3, b: Vector3, n: int) -> A
 	var out: Array = []
 	for i in range(n):
 		var p = a.lerp(b, float(i) / float(n - 1))
-		cyl(parent, Vector3(p.x, -0.1, p.z), 0.62, 0.7, 0.42, Color("8d9394").lerp(Color("b4aea0"), float(i % 3) / 3.0), Vector3.ZERO, 10)
+		cyl(parent, Vector3(p.x, -0.1, p.z), 0.92, 1.0, 0.42, Color("8d9394").lerp(Color("b4aea0"), float(i % 3) / 3.0), Vector3.ZERO, 10)
 		out.append(p)
 	return out
 
@@ -974,11 +974,11 @@ static func log_bridge(parent: Node3D, a: Vector3, b: Vector3) -> void:
 	var length = Vector2(d.x, d.z).length()
 	var yaw = atan2(d.x, d.z)
 	var mid = (a + b) * 0.5
-	for off in [-0.42, 0.0, 0.42]:
+	for off in [-0.84, -0.42, 0.0, 0.42, 0.84]:
 		var side = Vector3(cos(yaw), 0, -sin(yaw)) * off
 		var lg = cyl(parent, mid + side + Vector3(0, -0.12, 0), 0.22, 0.24, length, Color("7d5a3c").lerp(Color("9c7a52"), absf(off)), Vector3(90, rad_to_deg(yaw), 0), 9)
-		lg.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	for off in [-0.85, 0.85]:
+		lg.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if absf(off) < 0.5 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for off in [-1.2, 1.2]:
 		var side = Vector3(cos(yaw), 0, -sin(yaw)) * off
 		for t in [0.0, 0.5, 1.0]:
 			cyl(parent, a.lerp(b, t) + side + Vector3(0, 0.45, 0), 0.05, 0.06, 1.0, Color("6d4a33"), Vector3.ZERO, 6)
