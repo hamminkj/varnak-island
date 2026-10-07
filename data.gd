@@ -1007,3 +1007,59 @@ const COMMANDS = {
 const WHERE_PLACES = {"kur": ["the market", Vector3(-50, 0, 12)], "senak": ["the school", Vector3(-47, 0, -5)], "fardom": ["the lighthouse", Vector3(75, 0, -7)],
 	"sang": ["the hill", Vector3(-60, 0, -38)], "Hirimara": ["the prank field", Vector3(-108, 0, 0)], "gira": ["the bridge", Vector3(0, 0, -19)]}
 const DIRS = {"bei": "north", "nam": "south", "dong": "east", "sai": "west"}
+
+# ---------------------------------------------------------------- eleventh expansion: word wand, pass it on, guess who
+const WORDS11 = {
+	"gao-murak": "the word wand (gao tell + murak tree, wood: a telling stick). Sentences said with it come true.",
+	"dau-yir": "hat (calque: dau head + yir clothing, head clothes)", "pal-sek": "glasses (calque: pal see + sek stone, see-stones)",
+	"barba": "beard (borrowed from Spanish, Italian and Portuguese barba)", "kabum": "boom! (borrowed from English kaboom)"
+}
+
+# Word wand pieces. Who: [English, correct prefix]
+const WAND_WHO = {"An": ["I", "na"], "Tor": ["Tor", "i"], "Mira": ["Mira", "i"], "Ketu": ["Ketu", "i"], "Desh": ["Desh", "i"], "Pomo": ["Pomo", "i"],
+	"Oren": ["Oren", "i"], "Lira": ["Lira", "i"], "Gav": ["Gav", "i"], "Yalo": ["Yalo", "i"], "Polu": ["everyone", "ri"]}
+# Where: [English, position]. haima is found at run time (the nearest sea).
+const WAND_PLACES = {"tekama": ["in the village", Vector3(0, 0, 14)], "kurma": ["at the market", Vector3(-48, 0, 15)], "haima": ["in the sea", Vector3.ZERO],
+	"fardom-ma": ["at the lighthouse", Vector3(70, 0, -6)], "sang-ma": ["on the hill", Vector3(-58, 0, -35)], "senak-ma": ["at the school", Vector3(-45, 0, 1)],
+	"Hirimara-ma": ["in the prank field", Vector3(-98, 0, 4)]}
+const WAND_VERBS = {"sum": ["swim", "swimming", "swam", "swim"], "ning": ["sing", "singing", "sang", "sing"], "kachaka": ["dance", "dancing", "danced", "dance"],
+	"pul": ["jump", "jumping", "jumped", "jump"], "tum": ["sit", "sitting", "sat", "sit"], "sul": ["sleep", "sleeping", "slept", "sleep"], "pav-pav": ["run around", "running around", "ran around", "run"]}
+const WAND_TENSE = {"im": "now (-im)", "fu": "soon (-fu)", "pa": "in the past (-pa)"}
+const WAND_EV = {"da": "I see it (-da)", "shi": "apparently (-shi)", "nu": "people say (-nu)"}
+
+# Pass it on: carry a story to two people. You heard it from the source, so a faithful relay changes
+# the person (An -> the source's name, k-i- -> i-) and the evidential (-da -> -nu).
+const RELAYS = [
+	{"src": "lira", "to": ["mira", "ketu"], "v": "Anke Tor-ni choni girama k-i-pal-pa-da!", "en": "I saw Tor's chonies on the bridge!",
+		"ok": "Lirake Tor-ni choni girama i-pal-pa-nu.", "ok_en": "They say Lira saw Tor's chonies on the bridge.",
+		"wrong": {"me": ["Anke Tor-ni choni girama k-i-pal-pa-da.", "Now everyone thinks YOU saw Tor's chonies. You were never on that bridge!"],
+			"da": ["Lirake Tor-ni choni girama i-pal-pa-da.", "You said it like an eyewitness (-da), as if you watched Lira watching. Nobody believes you."],
+			"noun": ["Lirake Tor-ni mar girama i-pal-pa-nu.", "choni turned into mar. Now the story is that Tor's HORSE is on the bridge. In chonies."]}},
+	{"src": "gav", "to": ["ena", "tamu"], "v": "Yeshma Oku sek-ir-su i-ning-pa-da!", "en": "Last night Oku sang with the stones! I saw it!",
+		"ok": "Yeshma Oku sek-ir-su i-ning-pa-nu.", "ok_en": "They say Oku sang with the stones last night.",
+		"wrong": {"me": ["Yeshma an sek-ir-su na-ning-pa-da.", "na- means I. Now the harbor thinks YOU sang to the stones all night."],
+			"da": ["Yeshma Oku sek-ir-su i-ning-pa-da.", "You used -da, as if you saw it yourself. Tamu wants to know why you were at the ruins at night."],
+			"noun": ["Yeshma Oku tari-ir-su i-ning-pa-nu.", "sek-ir turned into tari-ir. Now Oku sings with the FISH."]}},
+	{"src": "desh", "to": ["vira", "ila"], "v": "Anke haima yue k-i-pal-pa-da! Yue i-sum-im-da!", "en": "I saw the moon in the sea! The moon is swimming!",
+		"ok": "Deshke haima yue i-pal-pa-nu. Yue i-sum-im-nu.", "ok_en": "They say Desh saw the moon in the sea, and that the moon is swimming.",
+		"wrong": {"me": ["Anke haima yue k-i-pal-pa-da! Yue i-sum-im-da!", "Now Vira thinks YOU saw the moon swimming, and she wants to check your temperature."],
+			"da": ["Deshke haima yue i-pal-pa-da. Yue i-sum-im-da.", "-da says you saw it. Ila asks you to show her the swimming moon. You can't."],
+			"noun": ["Deshke haima yok i-pal-pa-nu. Yok i-sum-im-nu.", "yue turned into yok. Now the MEDICINE is swimming in the sea, and Vira is very upset."]}}
+]
+
+# Guess who: yes/no questions. key -> [Varnak, English]
+const GUESS_Q = {
+	"hat": ["Sa-su dau-yir i-esh-ha?", "Do they have a hat? (Is a hat with them?)"],
+	"glasses": ["Sa-su pal-sek i-esh-ha?", "Do they have glasses?"],
+	"beard": ["Sa-su barba i-esh-ha?", "Do they have a beard?"],
+	"small": ["Sa i-sen-ha?", "Are they small?"],
+	"tall": ["Sa i-gao-ha?", "Are they tall?"],
+	"east": ["Sa dong-ma i-esh-ur-ha?", "Do they usually stay in the east?"],
+	"west": ["Sa sai-ma i-esh-ur-ha?", "Do they usually stay in the west?"],
+	"swim": ["Sa i-sum-kan-ha?", "Can they swim?"],
+	"read": ["Sa i-rav-kan-ha?", "Can they read?"],
+	"sing": ["Sa i-ning-kan-ha?", "Can they sing?"],
+	"sleepy": ["Sa i-sul-ur-ha?", "Do they sleep a lot?"],
+	"happy": ["Sa i-seng-ur-ha?", "Are they usually happy?"]
+}
+const GUESS_PEOPLE = ["ena", "mira", "sanu", "tor", "lira", "oren", "ketu", "suri", "rin", "ola", "pomo", "vira", "ila", "yalo", "desh", "oku", "gav", "tamu"]

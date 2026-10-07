@@ -179,6 +179,9 @@ var side_quests = [
 	["hirimara","","Explore Hirimara, the prank field, far to the west past the market. Find its five secrets."],
 	["letters","gav","Mystery letters! Someone keeps writing to you. Gav at the harbor delivers them. Write back, listen in when villagers whisper, and work out who it is."],
 	["survey","","Find someone who can... Ask people Ti ta-___-kan-ha? (Can you ___?) until you find someone who can swim, sing, cook, read, build things and run fast. (Chat, then Ask or tell.)"],
+	["wand","oku","Oku at the old ruins has an old stick that makes sentences come true. Make five different sentences come true with it."],
+	["relay","","Pass it on! Lira, Gav and Desh have news. Pass each story to two people without changing it (you heard it, so: -nu)."],
+	["guesswho","neri","Play Guess who with Neri and win three times."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -300,6 +303,7 @@ func _ready():
 	words.merge(Data.WORDS)
 	words.merge(Data.WORDS9)
 	words.merge(Data.WORDS10)
+	words.merge(Data.WORDS11)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -1676,6 +1680,7 @@ func _process(delta):
 	update_ambient(delta)
 	update_overhear(delta)
 	update_acts(delta)
+	if not wand_pending.is_empty(): wand_tick()
 	update_talk_view(delta)
 
 func animate_people(delta: float):
@@ -2454,6 +2459,7 @@ func add_topics(id: String):
 				button("Practice with Neri", show_practice, content)
 			topic("Ask about the campfire", "fire_pops", id)
 			button("Teach Neri some Varnak", teach_neri.bind(talk.bind("neri")), content)
+			button("Play Guess who: Hal i-an-ha?", guess_start, content)
 		"ketu":
 			topic("Ask what Ketu sells", "ketu_sells", id)
 			topic("Ask about the well", "well_full", id)
@@ -2489,6 +2495,7 @@ func add_topics(id: String):
 		"oku":
 			topic("Ask about the ruins", "ruins_old", id)
 			topic("Ask why Oku's hair is a mess", "oku_brainstorm", id)
+			button("Ask about the old stick" if not solved.has("wand") else "Use the word wand", oku_wand, content)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
 		"gav":
 			topic("Ask Gav about his work", "gav_mail", id)
@@ -4619,6 +4626,8 @@ func show_games():
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
 		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
 		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
+		["Word wand", wand_panel, solved.has("wand"), "Say a sentence and it comes true. Get the wand from Oku at the old ruins."],
+		["Guess who", guess_start, true, "Ask Neri yes or no questions and work out who they are thinking of."],
 		["Teach Neri", teach_neri.bind(show_games), true, "Neri makes a mistake in Varnak. Find it and fix it."],
 		["Review rusty words", review_rusty, discovered.size() >= 3, "Words you have found but not yet mastered."]
 	]
@@ -4798,6 +4807,12 @@ func check_gossip_quest():
 		toast("Gossip quest complete! Everyone talks about everyone.")
 
 func gossip_buttons(id: String):
+	if not relay.is_empty():
+		var rr: Dictionary = Data.RELAYS[relay["i"]]
+		if rr["to"].has(id) and not relay["done"].has(id): button("Pass on " + str(rr["src"]).capitalize() + "'s news", relay_tell.bind(id), content)
+		if rr["src"] == id and relay["done"].size() >= 2: button("Ask how the story came back", relay_end, content)
+	elif relay_for(id) >= 0:
+		button("Any news? (pass it on)" + ("  [ok]" if mastered.has("relay:" + id) else ""), relay_start.bind(relay_for(id)), content)
 	for g in gossip_by(id):
 		button("Any gossip?" + ("  [ok]" if solved.has("gh:" + g["id"]) else ""), gossip_card.bind(g, 0), content)
 	for g in Data.GOSSIP:
@@ -5219,7 +5234,8 @@ func emote(id: String, kind: String, dur: float = 2.8):
 	var node0 = e["node"] as Node3D
 	var x0 = node0.position.x
 	var y0 = node0.position.y
-	if e.has("emote"):
+	if e.has("emote") and absf(float(e["emote"]["x0"]) - x0) < 0.3 and absf(float(e["emote"]["y0"]) - y0) < 0.8:
+		# undo a shake or a hop, unless the person has really moved somewhere else
 		x0 = e["emote"]["x0"]
 		y0 = e["emote"]["y0"]
 	clear_fx(e)
@@ -5268,8 +5284,9 @@ func apply_emote(e: Dictionary, delta: float):
 	if t >= em["dur"]:
 		e.erase("emote")
 		clear_fx(e)
-		node.position.y = y0
-		node.position.x = em["x0"]
+		if absf(node.position.x - float(em["x0"])) < 0.3 and absf(node.position.y - y0) < 0.8:
+			node.position.y = y0
+			node.position.x = em["x0"]
 		return
 	var end_fade = clampf((em["dur"] - t) / 0.4, 0.0, 1.0)
 	node.position.y = y0
@@ -7570,7 +7587,7 @@ func update_acts(delta: float):
 				var dur = 3.2
 				var i = int(t / dur)
 				if i >= list.size():
-					node.position = a["base"]
+					node.position = home if a.get("teleport", false) else a["base"]
 					(node.get_meta("body") as Node3D).position = Vector3.ZERO
 					for arm in node.get_meta("arms"): (arm as Node3D).rotation.z = 0.0
 					(node.get_meta("head") as Node3D).rotation.y = 0.0
@@ -7609,6 +7626,11 @@ func update_acts(delta: float):
 						node.rotation.y = ang + PI * 0.5
 						(arms[0] as Node3D).rotation.x = sin(clock * 14.0) * 0.9
 						(arms[1] as Node3D).rotation.x = -sin(clock * 14.0) * 0.9
+					"swim":
+						node.position.y = base.y + sin(clock * 3.0) * 0.06
+						node.rotation.y += delta * 0.8
+						(arms[0] as Node3D).rotation.x = sin(clock * 6.0) * 1.6
+						(arms[1] as Node3D).rotation.x = -sin(clock * 6.0) * 1.6
 					"sleep":
 						(node.get_meta("head") as Node3D).rotation.z = 0.5
 						e["say"] = ["Kororo... zzz", clock + 0.5]
@@ -7619,3 +7641,398 @@ func update_acts(delta: float):
 func buttons_to_end(labels: Array):
 	for c in content.get_children():
 		if c is Button and labels.has((c as Button).text) and not c.is_queued_for_deletion(): content.move_child(c, -1)
+
+# ------------------------------------------------------------ eleventh expansion: word wand, pass it on, guess who
+
+# ---- the word wand: sentences come true ----
+
+var wand: Dictionary = {"who": "Tor", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+var wand_pending: Array = []
+var sea_spot: Vector3 = Vector3.INF
+
+func find_sea() -> Vector3:
+	if sea_spot != Vector3.INF: return sea_spot
+	for r in range(30, 80):
+		var p = Vector3(2.0, 0, float(r))
+		if T.height(p.x, p.z) < -0.6:
+			sea_spot = Vector3(p.x, -0.25, p.z)
+			return sea_spot
+	sea_spot = Vector3(2, -0.25, 50)
+	return sea_spot
+
+func wand_place_pos(w: String) -> Vector3:
+	if w == "haima": return find_sea()
+	var p: Vector3 = Data.WAND_PLACES[w][1]
+	return Vector3(p.x, gy(p.x, p.z), p.z)
+
+func wand_sentence() -> String:
+	var v = ("ma-" if wand["neg"] else "") + str(wand["pre"]) + "-" + str(wand["verb"]) + "-" + str(wand["tense"]) + ("-ki" if wand["neg"] else "") + "-" + str(wand["ev"])
+	return str(wand["who"]) + " " + str(wand["where"]) + " " + v + "."
+
+func wand_english() -> String:
+	var who: String = Data.WAND_WHO[wand["who"]][0]
+	var vb: Array = Data.WAND_VERBS[wand["verb"]]
+	var pl: String = Data.WAND_PLACES[wand["where"]][0]
+	var be = "am" if who == "I" else ("are" if who == "everyone" else "is")
+	var t = ""
+	match str(wand["tense"]):
+		"im": t = (be + (" not " if wand["neg"] else " ") + vb[1])
+		"fu": t = "will " + ("not " if wand["neg"] else "") + vb[0]
+		"pa": t = ("did not " + vb[0]) if wand["neg"] else vb[2]
+	var ev = {"da": " (I see it)", "shi": " (apparently)", "nu": " (people say)"}[wand["ev"]]
+	return who.capitalize() + " " + t + " " + pl + ev
+
+func wand_panel():
+	compact_buttons.call_deferred()
+	clear_panel("The word wand: gao-murak")
+	talk_partner = ""
+	learn("gao-murak")
+	text_line("Build a sentence and wave the wand. Whatever you say comes true... exactly as you say it. Tap a piece to change it.", 16)
+	varnak_banner(wand_sentence(), 22)
+	var en = text_line("(" + wand_english() + ")", 15)
+	en.add_theme_color_override("font_color", Color("6b4a2e"))
+	var rows = [["Who", "who", Data.WAND_WHO.keys()], ["Where", "where", Data.WAND_PLACES.keys()], ["Person prefix", "pre", ["na", "ta", "i", "ri"]],
+		["Action", "verb", Data.WAND_VERBS.keys()], ["When", "tense", Data.WAND_TENSE.keys()], ["How you know", "ev", Data.WAND_EV.keys()]]
+	for r in rows:
+		var key: String = r[1]
+		var opts: Array = r[2]
+		var cur = str(wand[key])
+		var label = cur + "-" if key == "pre" else ("-" + cur if key in ["tense", "ev"] else cur)
+		var extra = ""
+		match key:
+			"who": extra = Data.WAND_WHO[cur][0]
+			"where": extra = Data.WAND_PLACES[cur][0]
+			"verb": extra = Data.WAND_VERBS[cur][0]
+			"tense": extra = Data.WAND_TENSE[cur]
+			"ev": extra = Data.WAND_EV[cur]
+			"pre": extra = {"na": "I", "ta": "you", "i": "he, she, it", "ri": "they"}[cur]
+		button(r[0] + ":  " + label + "  (" + extra + ")", func():
+			var i = opts.find(wand[key])
+			wand[key] = opts[(i + 1) % opts.size()]
+			wand_panel(), content)
+	button(("Not: ma- ... -ki  (on)" if wand["neg"] else "Not: ma- ... -ki  (off)"), func():
+		wand["neg"] = not wand["neg"]
+		wand_panel(), content)
+	button("Wave the wand!", wand_cast, content)
+	button("Return", close_panel, content)
+
+func wand_people(who: String) -> Array:
+	if who == "Polu":
+		var out: Array = []
+		for e in entities:
+			if e["kind"] == "npc" and Data.PEOPLE.has(e["id"]) and (e["node"] as Node3D).visible: out.append(e["id"])
+		return out
+	return [who.to_lower()]
+
+func wand_cast():
+	var s = wand_sentence()
+	var who: String = wand["who"]
+	var need: String = Data.WAND_WHO[who][1]
+	var vb: String = wand["verb"]
+	var ok_grammar = need == wand["pre"]
+	log_event("wand", {"sentence": s, "meaning": wand_english()}, ok_grammar)
+	clear_panel("Kabum!" if not ok_grammar else "The wand glows")
+	varnak_banner(s, 22)
+	if not ok_grammar:
+		var who_en = Data.WAND_WHO[who][0]
+		text_line("The wand sputters and goes kabum! The person prefix does not match: " + who_en + " needs " + need + "-, not " + str(wand["pre"]) + "-. (na- I, ta- you, i- he or she, ri- they)", 17)
+		button("Fix it", wand_panel, content)
+		button("Return", close_panel, content)
+		return
+	learn(vb)
+	var pos = wand_place_pos(wand["where"])
+	var watcher = ""
+	if wand["tense"] == "pa":
+		var p = who.to_lower() if who != "An" and who != "Polu" else "tor"
+		text_line("Past tense: it already happened, so nothing changes now.", 17)
+		if who == "An": text_line("You suddenly remember " + Data.WAND_VERBS[vb][2] + " " + Data.WAND_PLACES[wand["where"]][0] + " last week. Did you? The wand says so.", 17)
+		else:
+			talk_partner = p
+			text_line(p.capitalize() + " scratches their head: “Ho... " + ("ma-" if wand["neg"] else "") + "na-" + vb + "-pa" + ("-ki" if wand["neg"] else "") + "-da?” (I... did that?)", 17)
+			emote(p, "confused", 3.0)
+	elif wand["ev"] == "nu":
+		text_line("-nu means people say. So the wand makes it a RUMOR, not a fact. Listen: everyone nearby is repeating it.", 17)
+		for e in entities:
+			if e["kind"] == "npc" and (e["node"] as Node3D).position.distance_to(player.position) < 40.0: e["say"] = [s.substr(s.find(" ") + 1), clock + 8.0]
+		wand_success()
+	elif who == "An":
+		if wand["neg"]:
+			text_line("You declare that you are NOT doing it there. The wand shrugs. Nothing happens.", 17)
+		else:
+			player.position = pos + Vector3(0, 0.6, 2.0) if wand["where"] != "haima" else Vector3(pos.x, 0.1, pos.z - 4.0)
+			if T.deep(player.position.x, player.position.z): player.position = Vector3(0, 0.1, 36)
+			text_line("Whoosh! The wand takes you " + Data.WAND_PLACES[wand["where"]][0] + ". (na- means I: you did it yourself!)", 17)
+			wand_success()
+	else:
+		var ppl = wand_people(who)
+		var delay = 6.0 if wand["tense"] == "fu" else 0.0
+		var half = wand["ev"] == "shi"
+		for i in range(ppl.size()):
+			var off = Vector3.ZERO if ppl.size() == 1 else Vector3(cos(i * TAU / ppl.size()), 0, sin(i * TAU / ppl.size())) * 3.0
+			wand_pending.append({"id": ppl[i], "at": clock + delay, "pos": pos + off, "verb": vb, "neg": wand["neg"], "half": half, "where": wand["where"]})
+		watcher = ppl[0]
+		if half: text_line("-shi means apparently. The wand only half believes you: it happens, but not where you said. Apparently.", 17)
+		elif wand["tense"] == "fu": text_line("-fu is the future, so it will happen in a moment. Watch...", 17)
+		else: text_line("-im and -da: it is happening right now, and you can see it!", 17)
+		if wand["neg"]: text_line("And ma- ... -ki: they go there and very clearly do NOT do it.", 17)
+		if who == "Polu": text_line("Polu: everyone!", 17)
+		wand_success()
+		talk_partner = watcher
+		if delay == 0.0: wand_tick()
+	var mean = text_line("", 16)
+	button("Show meaning", func(): mean.text = wand_english(), content)
+	button("Another sentence", wand_panel, content)
+	button("Return", close_panel, content)
+
+func wand_success():
+	master("wand:" + str(wand["verb"]) + ":" + str(wand["tense"]) + ":" + str(wand["ev"]) + (":neg" if wand["neg"] else ""))
+	if count_mastered("wand:") >= 5: complete("wand")
+
+func wand_tick():
+	var keep: Array = []
+	for w in wand_pending:
+		if clock < float(w["at"]):
+			keep.append(w)
+			continue
+		var e = entity_by_id(w["id"])
+		if e.is_empty(): continue
+		var node = e["node"] as Node3D
+		var vb: String = w["verb"]
+		var act: String = Data.WAND_VERBS[vb][3]
+		if w["half"]:
+			npc_act(w["id"], [act, act, act])
+			e["say"] = ["...shi?", clock + 4.0]
+			emote(w["id"], "confused", 3.0)
+			continue
+		var p: Vector3 = w["pos"]
+		node.position = p
+		if w["where"] != "haima": node.position.y = gy(p.x, p.z)
+		var list: Array = []
+		if w["neg"]:
+			list = ["sit"]
+			e["say"] = ["Ma-na-" + vb + "-im-ki-da!", clock + 9.0]
+			emote(w["id"], "angry", 4.0)
+		elif vb == "sum" and w["where"] != "haima":
+			list = ["sleep", "sleep"]
+			e["say"] = ["Sum...? Ups. Dor i-len.", clock + 7.0]
+			emote(w["id"], "embarrassed", 4.0)
+		else:
+			for k in range(8): list.append(act)
+			emote(w["id"], "happy" if vb != "sul" else "sleepy", 3.0)
+		acts[w["id"]] = {"kind": "seq", "list": list, "i": 0, "t0": clock, "base": node.position, "yaw": node.rotation.y, "teleport": true}
+	wand_pending = keep
+
+# ---- pass it on: a telephone game with reported speech ----
+
+var relay: Dictionary = {}
+
+func relay_for(src: String) -> int:
+	for i in range(Data.RELAYS.size()):
+		if Data.RELAYS[i]["src"] == src: return i
+	return -1
+
+func relay_start(i: int):
+	var r: Dictionary = Data.RELAYS[i]
+	relay = {"i": i, "done": [], "muts": []}
+	talk_partner = r["src"]
+	clear_panel(str(r["src"]).capitalize() + " has news")
+	add_portrait(r["src"])
+	emote(r["src"], "embarrassed", 3.0)
+	text_line(str(r["src"]).capitalize() + " leans in and whispers:", 17)
+	varnak_banner(r["v"], 22)
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = r["en"], content)
+	var names = " and ".join(r["to"].map(func(x): return str(x).capitalize()))
+	text_line("“" + str(r["to"][0]).capitalize() + "-ru e " + str(r["to"][1]).capitalize() + "-ru ta-gao-o-ye!” Please tell " + names + ".", 17)
+	text_line("Careful: you did not see it yourself. You heard it from " + str(r["src"]).capitalize() + ".", 16)
+	log_event("relay_start", r["src"])
+	toast("Pass it on: find " + names + ".")
+	buttons_to_end([])
+	button("Return", close_panel, content)
+
+func relay_tell(id: String):
+	var r: Dictionary = Data.RELAYS[relay["i"]]
+	talk_partner = id
+	compact_buttons.call_deferred()
+	clear_panel("Tell " + id.capitalize())
+	add_portrait(id)
+	text_line(str(r["src"]).capitalize() + " told you: “" + str(r["v"]) + "” How do you pass it on?", 17)
+	var opts: Array = [["ok", r["ok"]]]
+	for k in r["wrong"].keys(): opts.append([k, r["wrong"][k][0]])
+	opts.shuffle()
+	for o in opts:
+		button(o[1], relay_said.bind(id, o[0]), content)
+	button("Back", talk.bind(id), content)
+
+func relay_said(id: String, k: String):
+	var r: Dictionary = Data.RELAYS[relay["i"]]
+	relay["done"].append(id)
+	log_event("answer", {"activity": "Pass it on", "item": r["v"], "chose": r["ok"] if k == "ok" else r["wrong"][k][0], "correct": r["ok"]}, k == "ok")
+	if k == "ok":
+		react(id, r["ok"], r["ok_en"], "Ho?! I-zen-ha?! Ha!", "Really?! Is it true?! Ha! (You reported it with -nu: they say.)", "shocked", 1)
+	else:
+		relay["muts"].append(k)
+		var reply = {"me": ["Ti?! Haku?!", "You?! Why?!", "shocked"], "da": ["Ti ta-pal-pa-ha? Hama?", "You saw it? Where?", "confused"], "noun": ["Han?! Ha! Ha!", "What?! Ha! Ha!", "laugh"]}[k]
+		react(id, r["wrong"][k][0], "(what you actually said)", reply[0], reply[1], reply[2], 0)
+	if relay["done"].size() >= 2:
+		text_line("Both told! Go back to " + str(r["src"]).capitalize() + " and hear how the story came back.", 16)
+	buttons_to_end(["Keep chatting", "Return"])
+
+func relay_end():
+	var r: Dictionary = Data.RELAYS[relay["i"]]
+	var src: String = r["src"]
+	talk_partner = src
+	clear_panel("How the story came back")
+	add_portrait(src)
+	var muts: Array = relay["muts"]
+	if muts.is_empty():
+		varnak_banner(r["ok"], 20)
+		text_line("The story came back exactly right. " + src.capitalize() + " is delighted: “Ho! Ti palar ho-ho!” You're a super good friend! (+3 gin)", 17)
+		gin += 3
+		emote(src, "love", 4.0)
+		master("relay:" + src)
+		complete_relays()
+	else:
+		text_line("The story went around the island and came back... different.", 17)
+		for m in muts:
+			varnak_banner(r["wrong"][m][0], 18)
+			text_line(r["wrong"][m][1], 16)
+		text_line(src.capitalize() + " stares at you: “Maki! Anke maki k-i-gao-pa-da!” I never said that!", 17)
+		emote(src, "faint" if muts.size() > 1 else "shocked", 4.0)
+		button("Try again", relay_start.bind(relay["i"]), content)
+	log_event("relay_end", {"src": src, "mutations": muts}, muts.is_empty())
+	relay = {}
+	save_game()
+	button("Return", close_panel, content)
+
+func complete_relays():
+	var n = 0
+	for r in Data.RELAYS:
+		if mastered.has("relay:" + r["src"]): n += 1
+	if n >= Data.RELAYS.size(): complete("relay")
+
+# ---- guess who: yes/no questions and crossing people out ----
+
+var guess: Dictionary = {}
+
+func guess_fact(id: String, q: String) -> bool:
+	var ex: Dictionary = person_ex.get(id, {})
+	var e = entity_by_id(id)
+	var hx = float((e["home"] as Vector3).x) if not e.is_empty() else 0.0
+	match q:
+		"hat": return ex.has("hat") or int(looks[id][2]) == 3
+		"glasses": return str(ex.get("face", "")) != ""
+		"beard": return ex.has("beard")
+		"small": return float(ex.get("h", 1.0)) < 0.85
+		"tall": return float(ex.get("h", 1.0)) >= 1.08
+		"east": return hx > 30.0
+		"west": return hx < -30.0
+		"swim": return Data.KAN["sum"][1].has(id)
+		"read": return Data.KAN["rav"][1].has(id)
+		"sing": return Data.KAN["ning"][1].has(id)
+		"sleepy": return Data.PEOPLE[id]["trait"] == "sleepy"
+		"happy": return Data.PEOPLE[id]["trait"] in ["cheerful", "giggly"]
+	return false
+
+func guess_start():
+	var pool: Array = Data.GUESS_PEOPLE
+	guess = {"secret": pool[randi() % pool.size()], "out": [], "asked": [], "mode": "cross", "wrong": 0}
+	for w in ["dau-yir", "pal-sek", "barba", "sa"]: learn(w)
+	log_event("guess_start", guess["secret"])
+	guess_panel()
+
+func guess_panel(last: String = ""):
+	compact_buttons.call_deferred()
+	clear_panel("Hal i-an-ha? Guess who!")
+	talk_partner = ""
+	text_line("Neri is thinking of someone on the island. Ask yes or no questions, cross people out, then guess." if last == "" else last, 16)
+	var grid = GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	content.add_child(grid)
+	for id in Data.GUESS_PEOPLE:
+		var crossed = guess["out"].has(id)
+		var b = Button.new()
+		b.text = ("x " if crossed else "") + id.capitalize()
+		b.custom_minimum_size = Vector2(0, 40)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 16)
+		var sb = StyleBoxFlat.new()
+		var col: Color = (person_ex.get(id, {}) as Dictionary).get("shirt", Color("c9a46d"))
+		sb.bg_color = col.lerp(Color("e6dccb"), 0.75 if crossed else 0.35)
+		sb.set_corner_radius_all(8)
+		sb.set_border_width_all(3 if guess["mode"] == "guess" and not crossed else 1)
+		sb.border_color = Color("7a1f3d") if guess["mode"] == "guess" else col.darkened(0.3)
+		b.add_theme_stylebox_override("normal", sb)
+		b.add_theme_color_override("font_color", Color("8a8070") if crossed else Color("2b1d14"))
+		b.pressed.connect(guess_tap.bind(id))
+		grid.add_child(b)
+	if guess["mode"] == "guess":
+		text_line("Tap the person you think it is.", 17)
+		button("Not yet: keep asking", func():
+			guess["mode"] = "cross"
+			guess_panel(), content)
+	else:
+		button("Make a guess", func():
+			guess["mode"] = "guess"
+			guess_panel(), content)
+		text_line("Ask Neri (questions asked: " + str(guess["asked"].size()) + "):", 17)
+		for q in Data.GUESS_Q.keys():
+			if guess["asked"].has(q): continue
+			button(Data.GUESS_Q[q][0], guess_ask.bind(q), content)
+	button("Return", close_panel, content)
+
+func guess_ask(q: String):
+	guess["asked"].append(q)
+	var yes = guess_fact(guess["secret"], q)
+	log_event("guess_ask", {"q": q, "yes": yes})
+	var line = Data.GUESS_Q[q][0] + "  Neri: " + ("“Ho!” (yes)" if yes else "“Maki.” (no)")
+	guess["log"] = guess.get("log", []) + [line + "   [" + Data.GUESS_Q[q][1] + "]"]
+	guess_panel("\n".join(guess["log"]))
+
+func guess_tap(id: String):
+	if guess["mode"] == "guess":
+		var ok = id == guess["secret"]
+		log_event("answer", {"activity": "Guess who", "item": "questions " + str(guess["asked"].size()), "chose": id, "correct": guess["secret"]}, ok)
+		if ok:
+			var reward = maxi(1, 6 - guess["asked"].size() / 2 - guess["wrong"])
+			gin += reward
+			master("guess:" + id)
+			if count_mastered("guess:") >= 3: complete("guesswho")
+			talk_partner = "neri"
+			clear_panel("Ho! " + id.capitalize() + "!")
+			add_portrait("neri")
+			emote("neri", "laugh", 3.0)
+			varnak_banner("Ho! Sa " + id.capitalize() + " i-an-da!", 24)
+			text_line("Yes! It's " + id.capitalize() + "! You asked " + str(guess["asked"].size()) + " questions. +" + str(reward) + " gin", 17)
+			button("Play again", guess_start, content)
+			button("Return", close_panel, content)
+			save_game()
+		else:
+			guess["wrong"] += 1
+			guess["out"].append(id)
+			guess["mode"] = "cross"
+			guess_panel("“Sa " + id.capitalize() + " i-an-ha?” Neri: “Maki!” Not " + id.capitalize() + ". Keep asking.")
+		return
+	if guess["out"].has(id): guess["out"].erase(id)
+	else: guess["out"].append(id)
+	guess_panel("\n".join(guess.get("log", [])))
+
+
+func oku_wand():
+	talk_partner = "oku"
+	if not solved.has("wand"):
+		solved.append("wand")
+		learn("gao-murak")
+		save_game()
+		clear_panel("The old stick")
+		add_portrait("oku")
+		emote("oku", "proud", 3.0)
+		varnak_banner("Ki gao-murak i-an-da. Ti ta-gao-fu... sa i-zen-fu!", 20)
+		text_line("This is the telling stick. You will say it... and it will be true!", 16)
+		text_line("Oku hands you a knobbly stick that hums. Say a sentence with it and the sentence happens. Exactly as you say it: the endings matter.", 17)
+		button("Try the wand", wand_panel, content)
+		button("Return", close_panel, content)
+		return
+	wand_panel()

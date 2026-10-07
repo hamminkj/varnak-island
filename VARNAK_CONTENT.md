@@ -407,3 +407,24 @@ New interactions (Chat > Ask or tell...):
 - Commands: the villager reacts to what the player actually said. A statement (-da) confuses them, na- makes them tell you to do it, ma- ... -ki tells them not to, and grumpy or proud villagers ignore commands without -ye until you are close friends.
 
 Things to check: 30. -kan and -vai are new suffixes; their slot (right after the root, before aspect) is a design choice. 31. Ma-ta-pul-o-ki for a negative command and Ta-pul-o-ka ta-ning-o (-ka on an imperative) extend existing patterns. 32. Na-u-gao-vai-da puts the comparative u- inside a desiderative.
+
+## Eleventh expansion: word wand, pass it on, guess who
+
+New words: gao-murak (the word wand: gao tell + murak wood), dau-yir (hat: head clothing, a calque), pal-sek (glasses: see-stones, a calque), barba (beard, borrowed from Spanish, Italian and Portuguese).
+
+Word wand (from Oku at the ruins): the player builds Who + Where + verb and it comes true. The endings decide what happens:
+- the person prefix must agree (Tor i-, Polu ri-, An na-), or the wand fizzles (kabum);
+- -im now, -fu in a moment, -pa already happened (nothing changes);
+- -da it happens, -shi it half happens (at home, apparently), -nu it only becomes a rumor that people repeat;
+- ma- ... -ki: they go there and pointedly do not do it. Swimming anywhere but haima goes badly.
+Example: Polu kurma ri-kachaka-im-da. (Everyone is dancing at the market.) An fardom-ma na-pul-im-da. (I am jumping at the lighthouse: this moves the player.)
+
+Pass it on (reported speech): the source says what they saw with An and -da; a faithful relay names the source with -ke, drops the I-prefix and uses -nu.
+- Anke Tor-ni choni girama k-i-pal-pa-da! -> Lirake Tor-ni choni girama i-pal-pa-nu.
+- Yeshma Oku sek-ir-su i-ning-pa-da! -> Yeshma Oku sek-ir-su i-ning-pa-nu.
+- Anke haima yue k-i-pal-pa-da! Yue i-sum-im-da! -> Deshke haima yue i-pal-pa-nu. Yue i-sum-im-nu.
+Wrong relays (keeping An, keeping -da, or a swapped noun) come back as a changed rumor.
+
+Guess who (with Neri): yes/no questions built on -ha, possession with -su and esh (Sa-su dau-yir i-esh-ha? Do they have a hat?), -kan (Sa i-sum-kan-ha?), -ur (Sa i-sul-ur-ha?) and directions (Sa dong-ma i-esh-ur-ha?).
+
+Things to check: 33. Possession as X-su Y i-esh (Y is with X) is composed from the comitative. 34. Lirake ... i-pal-pa-nu reports someone else's witnessed event with hearsay -nu. 35. Ti ta-gao-fu... sa i-zen-fu (you will say it, it will be true) uses zen as a stative "true".

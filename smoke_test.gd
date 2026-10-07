@@ -1167,6 +1167,127 @@ func run():
 	game.show_varnak()
 	assert(has_any("Can and want"))
 	print("PASS: tenth expansion: talk view, distinct villagers, -kan, -vai, hama, commands, survey")
+	# eleventh: word wand, pass it on, guess who
+	game.close_panel()
+	game.solved.erase("wand")
+	game.completed.erase("wand")
+	game.talk("oku")
+	press("Ask about the old stick")
+	assert(game.solved.has("wand"))
+	press("Try the wand")
+	assert(has_any("gao-murak"))
+	# wrong prefix fizzles
+	game.wand = {"who": "Tor", "where": "kurma", "pre": "ri", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(has_any("kabum") and game.wand_pending.is_empty())
+	# cycling a piece changes the sentence
+	game.wand_panel()
+	press("Who:  Tor  (Tor)")
+	assert(game.wand["who"] != "Tor")
+	# -im -da: Tor dances at the market right now
+	var tn = game.entity_by_id("tor")["node"]
+	var thome = game.entity_by_id("tor")["home"]
+	game.wand = {"who": "Tor", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(tn.position.distance_to(Data.WAND_PLACES["kurma"][1]) < 3.0 and game.acts.has("tor"), "teleported to the market " + str(tn.position) + str(game.acts.keys()) + str(game.wand_pending.size()))
+	assert(game.talk_partner == "tor")
+	for f in range(800):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	assert(tn.position.distance_to(thome) < 0.1 and not game.acts.has("tor"), "Tor comes home")
+	# -fu waits, then happens
+	game.wand = {"who": "Mira", "where": "haima", "pre": "i", "neg": false, "verb": "sum", "tense": "fu", "ev": "da"}
+	game.wand_cast()
+	assert(game.wand_pending.size() == 1 and not game.acts.has("mira"))
+	game.clock += 7.0
+	game.wand_tick()
+	assert(game.acts.has("mira") and game.acts["mira"]["list"][0] == "swim")
+	assert(game.T.height(game.entity_by_id("mira")["node"].position.x, game.entity_by_id("mira")["node"].position.z) < -0.5, "Mira swims in the sea")
+	# -pa changes nothing, -nu makes a rumor, -shi stays home, negation refuses, swimming on land flops
+	game.acts.clear()
+	game.wand = {"who": "Desh", "where": "sang-ma", "pre": "i", "neg": false, "verb": "ning", "tense": "pa", "ev": "da"}
+	game.wand_cast()
+	assert(game.wand_pending.is_empty() and has_any("already happened"))
+	game.wand["tense"] = "im"
+	game.wand["ev"] = "nu"
+	game.wand_cast()
+	assert(game.wand_pending.is_empty() and has_any("RUMOR"))
+	game.wand["ev"] = "shi"
+	var dhome = game.entity_by_id("desh")["home"]
+	game.wand_cast()
+	assert(game.acts.has("desh") and game.entity_by_id("desh")["node"].position.distance_to(dhome) < 0.5)
+	game.acts.clear()
+	game.wand = {"who": "Ketu", "where": "kurma", "pre": "i", "neg": true, "verb": "ning", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(str(game.entity_by_id("ketu")["say"][0]).begins_with("Ma-na-ning-im-ki-da"))
+	game.wand = {"who": "Gav", "where": "kurma", "pre": "i", "neg": false, "verb": "sum", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(game.acts["gav"]["list"][0] == "sleep")
+	# I (na-) moves the player; everyone (ri-) moves everyone
+	game.wand = {"who": "An", "where": "fardom-ma", "pre": "na", "neg": false, "verb": "pul", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(game.player.position.distance_to(Data.WAND_PLACES["fardom-ma"][1]) < 6.0)
+	game.wand = {"who": "Polu", "where": "tekama", "pre": "ri", "neg": false, "verb": "pul", "tense": "im", "ev": "da"}
+	game.wand_cast()
+	assert(game.acts.size() >= 15)
+	assert(game.completed.has("wand"))
+	for f in range(800):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	assert(game.acts.is_empty())
+	for id in Data.GUESS_PEOPLE:
+		assert(game.entity_by_id(id)["node"].position.distance_to(game.entity_by_id(id)["home"]) < 0.1, id + " home")
+	# pass it on
+	for r in Data.RELAYS:
+		game.mastered.erase("relay:" + r["src"])
+	game.completed.erase("relay")
+	for ri in range(Data.RELAYS.size()):
+		var rl: Dictionary = Data.RELAYS[ri]
+		game.talk(rl["src"])
+		press("Any news? (pass it on)")
+		assert(game.relay["i"] == ri)
+		game.talk(rl["to"][0])
+		press("Pass on " + str(rl["src"]).capitalize() + "'s news")
+		press(rl["ok"])
+		game.talk(rl["to"][1])
+		press("Pass on " + str(rl["src"]).capitalize() + "'s news")
+		press(rl["wrong"]["noun"][0] if ri == 0 else rl["ok"])
+		game.talk(rl["src"])
+		press("Ask how the story came back")
+		assert(game.relay.is_empty())
+		if ri == 0:
+			assert(has_any("came back") and not game.mastered.has("relay:lira"))
+			press("Try again")
+			for to in rl["to"]:
+				game.relay_tell(to)
+				press(rl["ok"])
+			game.relay_end()
+		assert(game.mastered.has("relay:" + str(rl["src"])))
+	assert(game.completed.has("relay"))
+	# guess who: facts are consistent, and winning works
+	for q in Data.GUESS_Q.keys():
+		var yes = 0
+		for id in Data.GUESS_PEOPLE:
+			if game.guess_fact(id, q): yes += 1
+		assert(yes > 0 and yes < Data.GUESS_PEOPLE.size(), "question " + q + " splits people")
+	game.completed.erase("guesswho")
+	for round in range(3):
+		game.guess_start()
+		var secret = game.guess["secret"]
+		press(Data.GUESS_Q["hat"][0])
+		assert(has_any("Neri:"))
+		game.guess_tap("ena" if secret != "ena" else "mira")
+		assert(game.guess["out"].size() == 1)
+		press("Make a guess")
+		var other = "tor" if secret != "tor" else "oku"
+		game.guess_tap(other)
+		assert(game.guess["wrong"] == 1)
+		press("Make a guess")
+		game.guess_tap(secret)
+		assert(has_any("i-an-da!"))
+		game.mastered.append("guess:x" + str(round))
+	assert(game.completed.has("guesswho"))
+	print("PASS: eleventh expansion: word wand, pass it on, guess who")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
