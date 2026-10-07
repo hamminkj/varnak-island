@@ -1072,6 +1072,101 @@ func run():
 	game.show_notebook()
 	assert(find_button(game.content, "Letters") != null and find_button(game.content, "My learning") != null)
 	print("PASS: ninth expansion b: overheard talk, mystery letters, Teach Neri, learning log and export")
+	# tenth: talk view, asking and telling with -kan, -vai, hama and commands
+	game.close_panel()
+	var dn = game.entity_by_id("desh")["node"]
+	game.player.position = dn.position + Vector3(0, 0.1, 3.0)
+	game.chat_menu("desh")
+	game.update_talk_view(0.016)
+	assert(game.talk_view_id == "desh" and game.talk_cam.current and game.panel.anchor_top > 0.4, "talk view frames the villager")
+	assert(game.close_x.visible and game.close_x.anchor_top > 0.4)
+	game.close_x.pressed.emit()
+	game.update_talk_view(0.016)
+	assert(game.talk_view_id == "" and game.camera.current and game.panel.anchor_top == 0.0)
+	# no talk view during drag and drop
+	game.challenge("desh")
+	game.update_talk_view(0.016)
+	assert(game.talk_view_id == "")
+	game.close_panel()
+	# can you...?
+	game.mastered = game.mastered.filter(func(m): return not (str(m).begins_with("kan") or str(m).begins_with("cmd:") or str(m).begins_with("hama:") or str(m).begins_with("want:")))
+	game.completed.erase("survey")
+	game.chat_menu("desh")
+	press("Ask or tell...")
+	press("Can you...? (-kan)")
+	press("Sing")
+	press("Ti na-ning-kan-ha?")
+	assert(not game.mastered.has("kan:ning:desh"))
+	press("Ti ta-ning-kan-ha?")
+	await process_frame
+	assert(game.mastered.has("kan:ning:desh") and game.survey_found("ning").has("desh") and has_any("Tarara"))
+	for v in Data.KAN.keys():
+		for who in Data.KAN[v][1]: game.can_answer(who, v)
+	game.can_answer("tor", "fei")
+	assert(game.completed.has("survey"))
+	game.show_survey()
+	assert(has_any("Desh"))
+	# what do you want?
+	game.want_ask("ketu")
+	press("Ti han t-i-nuk-vai-ha?")
+	await process_frame
+	assert(game.mastered.has("want:ketu") and game.panel.visible)
+	for rep10 in range(10): game.want_answer(["oren", "pomo", "lira", "mira", "tor", "ena"][rep10 % 6])
+	# where is...?
+	game.where_say("desh", "fardom")
+	press("Fardom hama i-esh-ha?")
+	await process_frame
+	assert(has_any("Fardom bei-ma i-esh-da."))
+	press("north")
+	assert(game.mastered.has("hama:fardom"))
+	for t in Data.WHERE_PLACES.keys(): game.where_answer("ketu", t)
+	for p in ["neri", "yalo", "suri"]: game.where_answer("ketu", p)
+	assert(has_any("Suri anni dalma i-esh-da!"))
+	# commands: villagers react to what you actually say
+	game.friend["oren"] = 2
+	game.mood["oren"] = 0
+	game.command_do("oren", "pul", "plain")
+	assert(has_any("Maki!") and not game.mastered.has("cmd:pul"))
+	game.command_do("oren", "pul", "polite")
+	assert(game.mastered.has("cmd:pul") and game.acts.has("oren"))
+	for f in range(240):
+		game.clock += 0.016
+		game.update_acts(0.016)
+	game.command_do("desh", "kachaka", "statement")
+	assert(has_any("Han?"))
+	game.command_do("desh", "kachaka", "me")
+	assert(has_any("Ta-kachaka-o!"))
+	game.command_do("desh", "pul+ning", "polite")
+	assert(game.acts["desh"]["list"] == ["jump", "sing"])
+	for f in range(500):
+		game.clock += 0.016
+		game.update_acts(0.016)
+	assert(not game.acts.has("desh"))
+	var home = game.entity_by_id("desh")["home"]
+	assert(dn.position.distance_to(home) < 0.05, "back in place after acting")
+	for v in Data.COMMANDS.keys(): game.command_do("ketu", v, "polite")
+	for f in range(300):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	# come with me, then go home
+	game.command_do("ketu", "kar", "polite")
+	assert(game.npc_following("ketu"))
+	var kn = game.entity_by_id("ketu")["node"]
+	game.player.position = kn.position + Vector3(8, 0.1, 0)
+	for f in range(120):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	assert(kn.position.distance_to(game.player.position) < 3.5, "follows the player")
+	game.where_answer("desh", "ketu")
+	assert(has_any("ti-su"))
+	game.send_home("ketu")
+	for f in range(400):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	assert(not game.acts.has("ketu") and kn.position.distance_to(game.entity_by_id("ketu")["home"]) < 0.3)
+	game.show_varnak()
+	assert(has_any("Can and want"))
+	print("PASS: tenth expansion: talk view, distinct villagers, -kan, -vai, hama, commands, survey")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

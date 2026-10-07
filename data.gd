@@ -961,3 +961,49 @@ const LETTERS = [
 
 # Who could the writer be? The answer is "par" (Ketu's parrot).
 const SUSPECTS = [["Par", "Ketu's parrot"], ["Gav", "Gav the mail carrier"], ["Poltergais", "the poltergeist"], ["Oku", "Oku at the ruins"]]
+
+# ---------------------------------------------------------------- tenth expansion: new grammar for asking and telling
+# Game additions to the grammar: -kan (can, ability) and -vai (want to) go right after the root.
+# New roots: pul (jump), tum (sit), fei (fly). kachaka (dance music) is also used as a verb root: dance.
+const WORDS10 = {
+	"-kan": "can, be able to (ability; a game addition, right after the root: na-sum-kan-da, I can swim)",
+	"-vai": "want to (desire; a game addition, right after the root: na-sul-vai-da, I want to sleep)",
+	"pul": "jump (root)", "tum": "sit (root)", "fei": "fly (root)",
+	"bei-ma": "in the north (bei + -ma)", "nam-ma": "in the south", "dong-ma": "in the east", "sai-ma": "in the west"
+}
+
+# Find someone who can... verb root -> [English, people who can]
+const KAN = {
+	"sum": ["swim", ["desh", "tamu", "ketu", "ola"]],
+	"ning": ["sing", ["desh", "lira", "mira", "ila"]],
+	"dar": ["cook", ["mira", "ketu", "vira"]],
+	"rav": ["read", ["suri", "rin", "oku", "neri", "ena", "yalo"]],
+	"varn": ["build things", ["tor", "tamu", "oren"]],
+	"pav": ["run fast", ["ola", "rin", "gav", "neri"]],
+	"fei": ["fly", []]
+}
+# Special answers: "id:root" -> [Varnak, English, emote]
+const KAN_LINES = {
+	"tor:sum": ["Maki! ...Ups. Mora i-len-da.", "No! ...Oops. The river is cold.", "embarrassed"],
+	"desh:ning": ["Ho! Na-ning-kan-da! Tarara! TARARA!", "Yes! I can sing! Toot! TOOT!", "laugh"],
+	"desh:sum": ["Ho! Haima na-ning-ka na-sum-ur-da!", "Yes! In the sea I sing and then I swim!", "proud"],
+	"yalo:sum": ["Maki! Hai i-var-var! Tari-ir ri-var-var!", "No! The sea is huge! The fish are huge!", "shocked"],
+	"oren:ning": ["Maki. Mar i-ning-kan-da. An maki.", "No. The horse can sing. Not me.", "angry"],
+	"pomo:pav": ["Pav...? Ma-na-pav-kan-ki-da... zzz", "Run...? I can't run... zzz", "sleepy"],
+	"gav:pav": ["Ho! Polu-ru na-pav-ur-da!", "Yes! I run to everyone, every day!", "proud"],
+	"mira:dar": ["HO! Na-dar-kan-da! Yamat i-ho-ho!", "YES! I can cook! The food is super good!", "proud"],
+	"oku:rav": ["Ho. Anke sek-ir-ni tovu k-i-rav-kan-da.", "Yes. I can read the stones' stories.", "proud"],
+	"sanu:sul": ["Ho... polu-ma na-sul-kan-da... zzz", "Yes... I can sleep anywhere... zzz", "sleepy"]
+}
+const FEI_NO = [["Maki! An par ma-na-an-ki-da!", "No! I am not a bird!"], ["Fei? Ha! Maki!", "Fly? Ha! No!"], ["Maki... dan par i-fei-kan-da.", "No... but birds can fly."], ["Maki! Ti ta-fei-kan-ha?!", "No! Can YOU fly?!"]]
+
+# Things you can ask a villager to do. root -> [English, plain command, action]
+const COMMANDS = {
+	"ning": ["Sing!", "sing"], "kachaka": ["Dance!", "dance"], "pul": ["Jump!", "jump"], "tum": ["Sit down!", "sit"],
+	"pav-pav": ["Run around and around!", "run"], "sul": ["Go to sleep!", "sleep"], "pal-ai": ["Look around!", "look"]
+}
+
+# Places you can ask about. word -> [English, position]
+const WHERE_PLACES = {"kur": ["the market", Vector3(-50, 0, 12)], "senak": ["the school", Vector3(-47, 0, -5)], "fardom": ["the lighthouse", Vector3(75, 0, -7)],
+	"sang": ["the hill", Vector3(-60, 0, -38)], "Hirimara": ["the prank field", Vector3(-108, 0, 0)], "gira": ["the bridge", Vector3(0, 0, -19)]}
+const DIRS = {"bei": "north", "nam": "south", "dong": "east", "sai": "west"}

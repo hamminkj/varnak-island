@@ -245,6 +245,8 @@ static func cyl_mesh(radius: float, height: float, seg: int = 7) -> CylinderMesh
 # ---------- people ----------
 
 static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accent: Color = Color("f2e6c8"), ex: Dictionary = {}) -> Node3D:
+	shirt = ex.get("shirt", shirt)
+	style = ex.get("style", style)
 	var n = Node3D.new()
 	var rig = Node3D.new()
 	var h: float = ex.get("h", 1.0)
@@ -262,6 +264,21 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	cyl(body, Vector3(0, 0.95, 0), 0.22, 0.28, 0.78, shirt, Vector3.ZERO, 14).scale = Vector3(w, 1, w)
 	cyl(body, Vector3(0, 0.62, 0), 0.285, 0.285, 0.07, accent.darkened(0.2), Vector3.ZERO, 14).scale = Vector3(w, 1, w)
 	torus(body, Vector3(0, 1.36, 0), 0.07, 0.18, accent, Vector3.ZERO)
+	if ex.get("build", "") == "round":
+		sph(body, Vector3(0, 0.88, 0.07), 0.3 * w, shirt, Vector3(1, 0.95, 0.95), 14)
+	if ex.has("dress"):
+		cyl(body, Vector3(0, 0.38, 0), 0.27 * w, 0.4 * w, 0.62, ex["dress"], Vector3.ZERO, 16)
+	if ex.has("robe"):
+		cyl(body, Vector3(0, 0.55, 0), 0.29 * w, 0.36 * w, 1.0, ex["robe"], Vector3.ZERO, 16)
+		cyl(body, Vector3(0, 0.82, 0), 0.3 * w, 0.3 * w, 0.06, ex.get("belt", ex["robe"].darkened(0.4)), Vector3.ZERO, 16)
+	if ex.has("overalls"):
+		var ov: Color = ex["overalls"]
+		box(body, Vector3(0, 1.0, 0.22 * w), Vector3(0.3 * w, 0.32, 0.05), ov)
+		for sd in [-1.0, 1.0]: box(body, Vector3(sd * 0.11 * w, 1.2, 0.0), Vector3(0.05, 0.05, 0.5 * w), ov)
+		cyl(body, Vector3(0, 0.7, 0), 0.29 * w, 0.29 * w, 0.24, ov, Vector3.ZERO, 14)
+	if ex.has("vest"):
+		for sd in [-1.0, 1.0]: box(body, Vector3(sd * 0.13 * w, 0.98, 0.18 * w), Vector3(0.13 * w, 0.58, 0.14), ex["vest"], Vector3(0, sd * -18.0, 0))
+		box(body, Vector3(0, 0.98, -0.2 * w), Vector3(0.42 * w, 0.58, 0.06), ex["vest"])
 	if ex.has("apron"):
 		box(body, Vector3(0, 0.84, 0.25 * w + 0.01), Vector3(0.34 * w, 0.52, 0.02), ex["apron"])
 		box(body, Vector3(0, 1.16, 0.2 * w + 0.01), Vector3(0.2, 0.16, 0.02), ex["apron"])
@@ -289,9 +306,40 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	sph(head, Vector3.ZERO, 0.21, skin, Vector3(ex.get("head_w", 1.0), ex.get("head_h", 1.0), 1.0), 14)
 	sph(head, Vector3(0, -0.02, 0.2), ex.get("nose", 0.04), skin.darkened(0.08), Vector3.ONE, 6)
 	var eye: Color = ex.get("eyes", Color("1a120e"))
-	sph(head, Vector3(-0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
-	sph(head, Vector3(0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
-	box(head, Vector3(0, -0.1, 0.19), Vector3(0.09, 0.015, 0.02), skin.darkened(0.35))
+	var eyes: String = ex.get("eye_kind", "")
+	for sd in [-1.0, 1.0]:
+		if eyes == "sleepy":
+			sph(head, Vector3(sd * 0.08, 0.02, 0.185), 0.04, eye, Vector3(1.1, 0.45, 0.7), 6)
+			box(head, Vector3(sd * 0.08, 0.045, 0.19), Vector3(0.1, 0.03, 0.03), skin.darkened(0.12))
+		elif eyes == "big":
+			sph(head, Vector3(sd * 0.085, 0.03, 0.18), 0.055, Color("fbf7ef"), Vector3(1, 1.2, 0.6), 8)
+			sph(head, Vector3(sd * 0.085, 0.025, 0.205), 0.035, eye, Vector3(1, 1.2, 0.6), 6)
+			sph(head, Vector3(sd * 0.075, 0.045, 0.222), 0.011, Color.WHITE, Vector3.ONE, 4)
+		else:
+			sph(head, Vector3(sd * 0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
+	var lip = skin.darkened(0.4)
+	match str(ex.get("mouth", "")):
+		"smile":
+			box(head, Vector3(-0.035, -0.095, 0.192), Vector3(0.06, 0.016, 0.02), lip, Vector3(0, 0, -22))
+			box(head, Vector3(0.035, -0.095, 0.192), Vector3(0.06, 0.016, 0.02), lip, Vector3(0, 0, 22))
+		"grin":
+			box(head, Vector3(0, -0.095, 0.19), Vector3(0.12, 0.05, 0.03), Color("5a2a22"))
+			box(head, Vector3(0, -0.08, 0.2), Vector3(0.1, 0.018, 0.02), Color("fbf7ef"))
+		"frown":
+			box(head, Vector3(-0.035, -0.105, 0.192), Vector3(0.06, 0.016, 0.02), lip, Vector3(0, 0, 20))
+			box(head, Vector3(0.035, -0.105, 0.192), Vector3(0.06, 0.016, 0.02), lip, Vector3(0, 0, -20))
+		"o":
+			sph(head, Vector3(0, -0.1, 0.19), 0.032, Color("5a2a22"), Vector3(1, 1.2, 0.5), 8)
+		_:
+			box(head, Vector3(0, -0.1, 0.19), Vector3(0.09, 0.015, 0.02), lip)
+	if ex.has("brows"):
+		var bc: Color = ex.get("brow_color", hair if style != 7 else ex.get("beard", hair))
+		var bt = 0.03 if ex.get("thick", false) else 0.018
+		var tilt = {"angry": 18.0, "worried": -16.0, "raised": 0.0, "flat": 0.0}.get(ex["brows"], 0.0)
+		var by = 0.115 if ex["brows"] == "raised" else 0.095
+		for sd in [-1.0, 1.0]: box(head, Vector3(sd * 0.085, by, 0.19), Vector3(0.085, bt, 0.025), bc, Vector3(0, 0, sd * tilt))
+	if ex.get("freckles", false):
+		for k in range(6): sph(head, Vector3((-1 if k < 3 else 1) * (0.07 + (k % 3) * 0.025), -0.03 + (k % 2) * 0.02, 0.19), 0.009, skin.darkened(0.3), Vector3.ONE, 4)
 	if ex.get("cheeks", false):
 		for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.12, -0.05, 0.16), 0.045, Color("f08a8a"), Vector3(1, 0.7, 0.4), 6)
 	match style:
@@ -320,6 +368,21 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 		7:
 			# bald with a fringe
 			box(head, Vector3(0, -0.02, -0.17), Vector3(0.36, 0.14, 0.08), hair)
+		8:
+			# big curly afro
+			for k in range(9):
+				var a = k * TAU / 9.0
+				sph(head, Vector3(cos(a) * 0.17, 0.12 + sin(k * 1.7) * 0.06, sin(a) * 0.15 - 0.04), 0.14, hair, Vector3.ONE, 8)
+			sph(head, Vector3(0, 0.22, -0.03), 0.2, hair, Vector3(1.1, 0.8, 1.0), 10)
+		9:
+			# long braid down the back
+			sph(head, Vector3(0, 0.07, -0.02), 0.225, hair, Vector3(1, 0.7, 1.02), 12)
+			for k in range(5): sph(head, Vector3(0, -0.12 - k * 0.1, -0.2 - k * 0.012), 0.055 - k * 0.004, hair, Vector3.ONE, 6)
+			sph(head, Vector3(0, -0.62, -0.25), 0.04, accent, Vector3.ONE, 6)
+		10:
+			# mohawk
+			box(head, Vector3(0, 0.25, -0.02), Vector3(0.06, 0.16, 0.36), hair)
+			sph(head, Vector3(0, 0.0, -0.06), 0.212, hair.darkened(0.3), Vector3(1, 0.9, 0.85), 10)
 	var hat: String = ex.get("hat", "")
 	var hc: Color = ex.get("hat_color", accent.darkened(0.2))
 	match hat:
@@ -343,6 +406,14 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 			cyl(head, Vector3(0, 0.18, 0), 0.215, 0.215, 0.04, hc, Vector3.ZERO, 14)
 		"band":
 			torus(head, Vector3(0, 0.1, 0), 0.2, 0.235, hc, Vector3.ZERO)
+		"toque":
+			cyl(head, Vector3(0, 0.22, 0), 0.2, 0.2, 0.14, Color("fbf7ef"), Vector3.ZERO, 14)
+			sph(head, Vector3(0, 0.4, 0), 0.24, Color("fbf7ef"), Vector3(1, 0.75, 1), 12)
+		"cowboy":
+			cyl(head, Vector3(0, 0.16, 0), 0.4, 0.4, 0.025, hc, Vector3(8, 0, 0), 16)
+			cyl(head, Vector3(0, 0.27, 0), 0.15, 0.2, 0.2, hc, Vector3.ZERO, 14)
+			box(head, Vector3(0, 0.37, 0), Vector3(0.06, 0.04, 0.26), hc.darkened(0.2))
+			cyl(head, Vector3(0, 0.2, 0), 0.205, 0.205, 0.04, Color("2b1d14"), Vector3.ZERO, 14)
 		"flower":
 			for k in range(5): sph(head, Vector3(0.17 + cos(k * 1.26) * 0.05, 0.14 + sin(k * 1.26) * 0.05, 0.08), 0.035, hc, Vector3.ONE, 6)
 			sph(head, Vector3(0.17, 0.14, 0.09), 0.025, Color("ffd34d"), Vector3.ONE, 6)
@@ -360,6 +431,7 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 		box(head, Vector3(0.05, -0.065, 0.205), Vector3(0.1, 0.035, 0.04), ex["mustache"], Vector3(0, 0, -12))
 	if ex.get("earrings", false):
 		for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.21, -0.08, 0.0), 0.03, Color("ffd34d"), Vector3.ONE, 6, 0.3)
+	if ex.has("prop"): add_prop(arms[1] if ex["prop"] != "cane" else arms[0], body, str(ex["prop"]), ex)
 	var small: Array = [head]
 	small.append_array(arms)
 	for part in small:
@@ -369,6 +441,73 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	n.set_meta("head", head)
 	n.set_meta("arms", arms)
 	return n
+
+static func add_prop(arm: Node3D, body: Node3D, kind: String, ex: Dictionary):
+	var p = Node3D.new()
+	p.position = Vector3(0, -0.62, 0.06)
+	arm.add_child(p)
+	var wood = Color("7a5232")
+	match kind:
+		"hammer":
+			cyl(p, Vector3(0, 0.0, 0.12), 0.025, 0.025, 0.42, wood, Vector3(90, 0, 0), 6)
+			box(p, Vector3(0, 0.0, 0.33), Vector3(0.09, 0.22, 0.09), Color("5d6670"))
+		"ladle":
+			cyl(p, Vector3(0, 0.1, 0.08), 0.015, 0.015, 0.4, Color("c9ccd1"), Vector3(30, 0, 0), 6)
+			sph(p, Vector3(0, -0.07, 0.0), 0.08, Color("c9ccd1"), Vector3(1, 0.6, 1), 8)
+		"fish":
+			sph(p, Vector3(0, -0.12, 0.05), 0.09, Color("8fc9d6"), Vector3(0.55, 1.7, 0.8), 8)
+			prism(p, Vector3(0, -0.32, 0.05), Vector3(0.03, 0.12, 0.14), Color("e9946a"))
+		"book":
+			box(p, Vector3(0, -0.02, 0.1), Vector3(0.05, 0.26, 0.2), Color("7a1f3d"))
+			box(p, Vector3(0.012, -0.02, 0.1), Vector3(0.04, 0.24, 0.18), Color("f4f1e8"))
+		"lantern":
+			cyl(p, Vector3(0, -0.12, 0.05), 0.07, 0.07, 0.16, Color("ffd27a"), Vector3.ZERO, 8, 2.5)
+			cyl(p, Vector3(0, -0.02, 0.05), 0.08, 0.06, 0.04, Color("2b2b2b"), Vector3.ZERO, 8)
+			cyl(p, Vector3(0, -0.22, 0.05), 0.08, 0.08, 0.03, Color("2b2b2b"), Vector3.ZERO, 8)
+		"drum":
+			p.queue_free()
+			var d = cyl(body, Vector3(0, 0.82, 0.32), 0.2, 0.2, 0.22, Color("e76f51"), Vector3(90, 0, 0), 14)
+			d.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			cyl(body, Vector3(0, 0.82, 0.44), 0.19, 0.19, 0.01, Color("f4f1e8"), Vector3(90, 0, 0), 14)
+			box(body, Vector3(0, 1.08, 0.12), Vector3(0.04, 0.04, 0.5), Color("2b1d14"), Vector3(-35, 0, 0))
+		"cane":
+			cyl(p, Vector3(0, -0.4, 0.06), 0.02, 0.02, 0.8, wood, Vector3.ZERO, 6)
+			torus(p, Vector3(0, 0.02, 0.0), 0.015, 0.06, wood, Vector3(0, 90, 0))
+		"telescope":
+			cyl(p, Vector3(0, 0.0, 0.18), 0.035, 0.05, 0.42, Color("c9a46d"), Vector3(90, 0, 0), 8)
+			cyl(p, Vector3(0, 0.0, 0.4), 0.055, 0.055, 0.04, Color("6d4a33"), Vector3(90, 0, 0), 8)
+		"oar":
+			cyl(p, Vector3(0, 0.1, 0.0), 0.022, 0.022, 1.2, wood, Vector3.ZERO, 6)
+			box(p, Vector3(0, -0.55, 0.0), Vector3(0.03, 0.3, 0.15), wood.lightened(0.15))
+		"clipboard":
+			box(p, Vector3(0, -0.05, 0.1), Vector3(0.03, 0.28, 0.21), Color("b0814f"))
+			box(p, Vector3(0.018, -0.07, 0.1), Vector3(0.01, 0.22, 0.17), Color("fbf7ef"))
+			box(p, Vector3(0.02, 0.08, 0.1), Vector3(0.02, 0.03, 0.08), Color("c9ccd1"))
+		"pillow":
+			box(p, Vector3(0, -0.05, 0.12), Vector3(0.14, 0.24, 0.32), Color("f4f1e8"))
+		"cup":
+			cyl(p, Vector3(0, -0.04, 0.06), 0.05, 0.04, 0.1, ex.get("cup_color", Color("fbf7ef")), Vector3.ZERO, 8)
+			torus(p, Vector3(0.06, -0.04, 0.06), 0.008, 0.03, ex.get("cup_color", Color("fbf7ef")), Vector3(90, 0, 0))
+		"carrot":
+			cyl(p, Vector3(0, -0.1, 0.08), 0.035, 0.0, 0.22, Color("f28c28"), Vector3(160, 0, 0), 6)
+			sph(p, Vector3(0, 0.03, 0.06), 0.035, Color("4f8b3c"), Vector3(1, 1.4, 1), 5)
+		"letter":
+			box(p, Vector3(0, -0.04, 0.08), Vector3(0.02, 0.15, 0.22), Color("fbf7ef"))
+			box(p, Vector3(0.012, -0.0, 0.08), Vector3(0.01, 0.05, 0.05), Color("c0392b"))
+		"basket":
+			cyl(p, Vector3(0, -0.15, 0.05), 0.15, 0.11, 0.16, Color("c9a46d"), Vector3.ZERO, 10)
+			torus(p, Vector3(0, -0.02, 0.05), 0.012, 0.14, Color("a8834f"), Vector3(0, 0, 90))
+			for k in range(4): sph(p, Vector3(-0.07 + k * 0.05, -0.06, 0.05 + (k % 2) * 0.04), 0.045, Color("9bd06a"), Vector3(1.3, 0.6, 1), 6)
+		"map":
+			cyl(p, Vector3(0, -0.04, 0.08), 0.035, 0.035, 0.3, Color("e9dcb4"), Vector3(0, 0, 90), 8)
+		"pencil":
+			cyl(p, Vector3(0, -0.04, 0.08), 0.015, 0.015, 0.22, Color("f2c14e"), Vector3(70, 0, 0), 6)
+		"fruit":
+			sph(p, Vector3(0, -0.08, 0.06), 0.07, Color("e63946"), Vector3.ONE, 8)
+		"mug":
+			cyl(p, Vector3(0, -0.04, 0.06), 0.055, 0.055, 0.12, Color("a78bda"), Vector3.ZERO, 8)
+	for c in p.get_children():
+		if c is GeometryInstance3D: c.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 # ---------- items ----------
 

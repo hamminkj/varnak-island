@@ -391,3 +391,19 @@ Reply sentences the player builds include Hal ti ta-an-ha? (Who are you?), Tovu 
 Teach Neri builds a mistake from each Sentence builder item: one tile is swapped for one of its decoys (or an automatic wrong ending), or the verb is moved out of final position.
 
 Things to check: 26. Wh-questions with an object and -ke (Halke pai i-nuk-pa-ha?) follow the existing Halke puka pattern. 27. Transitive negative commands (Panak ma-t-i-nuk-o-ki!) extend the intransitive ma-ta-X-o-ki pattern. 28. sela as a predicate with the copula an (Sela na-an-ur-da) and sair as an indefinite "someone" are composed. 29. gao (tell) with a recipient prefix (t-na-gao, you tell me) follows t-na-ven.
+
+## Tenth expansion: new grammar for asking and telling
+
+New grammar (game additions, not in the handoff document):
+- -kan (can, ability) and -vai (want to) go right after the root and combine with every other ending: Na-sum-kan-da (I can swim), Ma-na-sum-kan-ki-da (I can't swim), Ti ta-ning-kan-ha? (Can you sing?), Anke cha k-i-nuk-vai-da (I want tea), Ti han t-i-nuk-vai-ha? (What do you want?), Na-u-gao-vai-da (I want to be taller).
+- New roots: pul (jump), tum (sit), fei (fly). kachaka (borrowed dance music) is also used as a verb root, dance.
+- Directions take -ma: bei-ma, nam-ma, dong-ma, sai-ma (in the north, south, east, west). Next to me: anni dal-ma (an-ni dal-ma).
+- Commands: Ta-pul-o! (plain), Ta-pul-o-ye! (polite), Ta-pul-o-ka ta-ning-o-ye! (jump and then sing; -ka was already a gloss in the game), Ansu ta-kar-o-ye! (come with me), Ti-ni dom-ru ta-lum-o-ye (go home).
+
+New interactions (Chat > Ask or tell...):
+- Can you...? Find someone who can swim, sing, cook, read, build and run fast (survey quest). Nobody can fly.
+- What do you want? Villagers answer with a liked gift or something in character (Sela na-an-vai-da, I want to be alone).
+- Where is...? Answers use direction + -ma and an evidential: -da if the speaker can see it, -nu for a person far away.
+- Commands: the villager reacts to what the player actually said. A statement (-da) confuses them, na- makes them tell you to do it, ma- ... -ki tells them not to, and grumpy or proud villagers ignore commands without -ye until you are close friends.
+
+Things to check: 30. -kan and -vai are new suffixes; their slot (right after the root, before aspect) is a design choice. 31. Ma-ta-pul-o-ki for a negative command and Ta-pul-o-ka ta-ning-o (-ka on an imperative) extend existing patterns. 32. Na-u-gao-vai-da puts the comparative u- inside a desiderative.

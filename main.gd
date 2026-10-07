@@ -178,6 +178,7 @@ var side_quests = [
 	["chonies","gav","Gav has lost six chonies all over the island! Ask Gav for clues (Ask about the lost chonies) and find them all."],
 	["hirimara","","Explore Hirimara, the prank field, far to the west past the market. Find its five secrets."],
 	["letters","gav","Mystery letters! Someone keeps writing to you. Gav at the harbor delivers them. Write back, listen in when villagers whisper, and work out who it is."],
+	["survey","","Find someone who can... Ask people Ti ta-___-kan-ha? (Can you ___?) until you find someone who can swim, sing, cook, read, build things and run fast. (Chat, then Ask or tell.)"],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -248,28 +249,28 @@ var looks = {
 }
 # Extra features so every villager has their own silhouette.
 var person_ex = {
-	"ena": {"hat": "cap", "hat_color": Color("1d3557"), "pants": Color("2b3a55"), "cheeks": true},
-	"mira": {"apron": Color("f4f1e8"), "hat": "flower", "hat_color": Color("e76f51"), "w": 1.12, "h": 0.96},
-	"sanu": {"hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.86, "cheeks": true},
-	"tor": {"w": 1.22, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("c0392b"), "pants": Color("5a4632")},
-	"lira": {"face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a")},
-	"oren": {"mustache": Color("4a4a4a"), "hat": "straw", "hat_color": Color("8c5a3c"), "w": 1.08, "h": 1.04},
-	"neri": {"backpack": Color("c0392b"), "scarf": Color("f4a261")},
-	"ketu": {"w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14")},
-	"suri": {"h": 1.12, "w": 0.92, "face": "glasses", "earrings": true},
-	"rin": {"cheeks": true},
-	"ola": {"cheeks": true},
-	"pomo": {"beard": Color("d9d9d9"), "h": 0.98, "w": 1.12},
-	"vira": {"face": "glasses", "frame": Color("6b4f36"), "apron": Color("9bd06a")},
-	"ila": {"hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true},
-	"yalo": {"h": 1.16, "w": 0.86, "hat": "captain", "mustache": Color("2e2a5a")},
-	"desh": {"face": "sunglasses", "stripe": Color("f4f1e8")},
+	"ena": {"shirt": Color("f4f1e8"), "stripe": Color("1d3557"), "hat": "cap", "hat_color": Color("1d3557"), "pants": Color("2b3a55"), "style": 9, "prop": "clipboard", "freckles": true, "brows": "raised", "mouth": "smile"},
+	"mira": {"shirt": Color("bb714b"), "apron": Color("f4f1e8"), "hat": "toque", "build": "round", "w": 1.15, "h": 0.95, "prop": "ladle", "brows": "raised", "mouth": "o", "earrings": true},
+	"sanu": {"shirt": Color("8ecae6"), "stripe": Color("f4f1e8"), "pants": Color("8ecae6"), "hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.8, "cheeks": true, "prop": "pillow", "eye_kind": "sleepy"},
+	"tor": {"shirt": Color("c0392b"), "overalls": Color("4a5d78"), "pants": Color("4a5d78"), "w": 1.25, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("e9c46a"), "prop": "hammer", "brows": "flat", "thick": true, "mouth": "grin"},
+	"lira": {"shirt": Color("9678a5"), "dress": Color("7d5a94"), "face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a"), "prop": "cup", "brows": "raised", "mouth": "grin"},
+	"oren": {"shirt": Color("7e9975"), "vest": Color("6d4a33"), "mustache": Color("4a4a4a"), "hat": "cowboy", "hat_color": Color("8c5a3c"), "w": 0.95, "h": 1.1, "prop": "carrot", "brows": "angry", "thick": true, "mouth": "frown"},
+	"neri": {"shirt": Color("bd795f"), "backpack": Color("c0392b"), "scarf": Color("f4a261"), "prop": "map", "mouth": "smile", "brows": "flat"},
+	"ketu": {"shirt": Color("e76f51"), "build": "round", "w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14"), "prop": "fish", "mouth": "grin", "brows": "raised"},
+	"suri": {"shirt": Color("2a9d8f"), "dress": Color("21867a"), "h": 1.14, "w": 0.9, "face": "glasses", "earrings": true, "prop": "book", "brows": "raised", "mouth": "line"},
+	"rin": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
+	"ola": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
+	"pomo": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
+	"vira": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
+	"ila": {"shirt": Color("a78bda"), "scarf": Color("f4f1e8"), "hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true, "prop": "mug", "brows": "worried", "mouth": "o"},
+	"yalo": {"shirt": Color("f2c14e"), "robe": Color("e0ac2a"), "h": 1.18, "w": 0.85, "hat": "captain", "mustache": Color("2e2a5a"), "prop": "lantern", "brows": "worried", "mouth": "o"},
+	"desh": {"shirt": Color("ff5d8f"), "stripe": Color("f4f1e8"), "face": "sunglasses", "style": 8, "prop": "drum", "mouth": "grin", "w": 1.05},
 	"sair1": {"h": 0.93, "scarf": Color("a78bda")},
 	"sair2": {"w": 1.2, "hat": "beanie", "hat_color": Color("e9c46a")},
 	"sair3": {"h": 1.07, "face": "glasses"},
-	"oku": {"beard": Color("e6e1d6"), "face": "glasses", "h": 0.93, "w": 0.9},
-	"gav": {"hat": "cap", "hat_color": Color("2a6f97"), "bag": Color("8c5a3c")},
-	"tamu": {"hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.16}
+	"oku": {"shirt": Color("6b4f36"), "robe": Color("5a4030"), "belt": Color("c9a46d"), "beard": Color("e6e1d6"), "face": "glasses", "h": 0.93, "w": 0.9, "prop": "cane", "brows": "flat", "thick": true, "brow_color": Color("e6e1d6")},
+	"gav": {"shirt": Color("2a6f97"), "hat": "cap", "hat_color": Color("e9c46a"), "bag": Color("8c5a3c"), "style": 0, "prop": "letter", "freckles": true, "mouth": "smile", "brows": "raised"},
+	"tamu": {"shirt": Color("f4f1e8"), "stripe": Color("c0392b"), "vest": Color("1d3557"), "hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.18, "build": "round", "prop": "oar", "brows": "angry", "thick": true, "mouth": "frown"}
 }
 var names = {"sair1": "sair", "sair2": "sair", "sair3": "sair"}
 var house_centers = [Vector3(-9,0,12), Vector3(10,0,7), Vector3(-11,0,1), Vector3(12,0,-4)]
@@ -298,6 +299,8 @@ var central = {
 func _ready():
 	words.merge(Data.WORDS)
 	words.merge(Data.WORDS9)
+	words.merge(Data.WORDS10)
+	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
 	build_ui()
@@ -420,7 +423,9 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 	var e = {"id":id,"kind":kind,"word":word,"node":node,"home":pos,"gy":pos.y,"pr":pr,"ph":ph}
 	if kind == "item": Art.beacon(node).scale = Vector3.ONE / node.scale.x
 	if kind == "npc":
+		label.layers = 2
 		e["mark"] = Art.quest_mark(node, 2.75)
+		(e["mark"] as Label3D).layers = 2
 	entities.append(e)
 	if kind == "npc": make_bubble(e)
 	return e
@@ -1172,6 +1177,11 @@ func build_player():
 	camera.far = 600.0
 	camera.current = true
 	player.add_child(camera)
+	talk_cam = Camera3D.new()
+	talk_cam.fov = 75
+	talk_cam.far = 400.0
+	talk_cam.cull_mask = 0xFFFFF & ~2
+	add_child(talk_cam)
 
 func refresh_world():
 	for i in range(1, 5):
@@ -1407,12 +1417,22 @@ func build_ui():
 	close_x = Button.new()
 	close_x.name = "CloseX"
 	close_x.text = "X"
-	close_x.add_theme_font_size_override("font_size", 22)
+	close_x.add_theme_font_size_override("font_size", 26)
 	close_x.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	close_x.offset_left = -76
+	close_x.offset_left = -78
 	close_x.offset_right = -24
 	close_x.offset_top = 232
-	close_x.offset_bottom = 280
+	close_x.offset_bottom = 284
+	for st in ["normal", "hover", "pressed"]:
+		var xsb = StyleBoxFlat.new()
+		xsb.bg_color = Color("8a2f1f") if st != "pressed" else Color("5e1f15")
+		xsb.set_corner_radius_all(26)
+		xsb.set_border_width_all(2)
+		xsb.border_color = Color("f4e9d0")
+		close_x.add_theme_stylebox_override(st, xsb)
+	close_x.add_theme_color_override("font_color", Color.WHITE)
+	close_x.add_theme_color_override("font_hover_color", Color.WHITE)
+	close_x.tooltip_text = "Close"
 	close_x.pressed.connect(close_panel)
 	close_x.hide()
 	ui.add_child(close_x)
@@ -1457,9 +1477,11 @@ func toast(text: String):
 	toast_label.reset_size()
 	toast_label.modulate.a = 1.0
 	toast_label.position.y = 180.0
+	if talk_view_id != "": toast_label.position.y = get_viewport().get_visible_rect().size.y * TALK_TOP - toast_label.size.y - 8.0
 	toast_time = 2.6
 
 func clear_panel(title: String, keep_game: bool = false):
+	dnd_on = false
 	if not keep_game: mg = {}
 	joy = Vector2.ZERO
 	move_finger = -1
@@ -1653,6 +1675,8 @@ func _process(delta):
 	update_portrait()
 	update_ambient(delta)
 	update_overhear(delta)
+	update_acts(delta)
+	update_talk_view(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -1663,7 +1687,10 @@ func animate_people(delta: float):
 		var d = player.position - node.position
 		var yaw = sin(clock * 0.35 + float(idx)) * 0.12
 		var near = Vector2(d.x, d.z).length() < 9.0
-		if near: yaw = atan2(d.x, d.z)
+		if e["id"] == talk_view_id:
+			var dc = talk_cam.global_position - node.position
+			yaw = atan2(dc.x, dc.z)
+		elif near: yaw = atan2(d.x, d.z)
 		node.rotation.y = lerp_angle(node.rotation.y, yaw, minf(delta * 3.0, 1.0))
 		var arms: Array = node.get_meta("arms")
 		var talk_amt = 0.0
@@ -2839,6 +2866,7 @@ func show_notebook():
 	var b7 = button("Letters" + (" (new!)" if next_letter() >= 0 else ""), show_letters, row3)
 	var b8 = button("Overheard", show_overheard, row3)
 	var b9 = button("My learning", show_progress, row3)
+	button("Survey: find someone who can...", show_survey, content)
 	for b in [b7, b8, b9]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
@@ -4089,6 +4117,7 @@ func dd_refresh():
 #      pieces (join word pieces without spaces), tip, key, back, again, on_right
 func dnd(cfg: Dictionary):
 	clear_panel(cfg["title"], true)
+	dnd_on = true
 	text_line(cfg["prompt"])
 	var hint_text = text_line("Drag each tile into a box, or tap a tile to place it. Tap a placed tile to take it back.", 15)
 	hint_text.add_theme_color_override("font_color", Color("6b4a2e"))
@@ -5074,6 +5103,8 @@ func add_portrait(id: String):
 	head.add_theme_constant_override("separation", 10)
 	var frame = PanelContainer.new()
 	frame.add_theme_stylebox_override("panel", tile_box(Color("24495a"), Color("e9c46a")))
+	portrait_frame = frame
+	frame.visible = talk_view_id == ""
 	var tr = TextureRect.new()
 	tr.texture = portrait_vp.get_texture()
 	tr.custom_minimum_size = Vector2(118, 104)
@@ -5388,6 +5419,7 @@ func chat_menu(id: String):
 	button("Give a gift", gift_menu.bind(id), content)
 	button("Ask for an errand", errand_menu.bind(id), content)
 	button("Ask: Ti ta-seng-ha?", feel.bind(id), content)
+	button("Ask or tell...", ask_menu.bind(id), content)
 	if int(friend.get(id, 0)) >= 5:
 		button("Ask about a secret" + ("  [ok]" if mastered.has("sec:" + id) else ""), secret.bind(id), content)
 	button("Back", talk.bind(id), content)
@@ -6137,6 +6169,9 @@ func show_varnak():
 		["Nouns inside verbs", "A noun can move inside the verb, making a single word for the whole activity.", ["“Tari-nuk” fish-catch, go fishing.   “Wak-ta” water-drink."]],
 		["Compounds and calques", "Joining two words makes a new one, sometimes by translating another language piece by piece (a calque).", ["“Hai-sao” sea-star.   “Far-par” fire-bird, firefly.   “Ret-gor” hot-dog."]],
 		["Doubling", "Repeating a word makes it stronger or repeats the action. This is a game addition.", ["“Var-var” huge.   “Pav-pav” run around and around.   “Guro-guro” fruit of all kinds."]],
+		["Can and want (new)", "Two endings added for the game go right after the verb root: -kan means can, and -vai means want to. They work with every other ending.", ["“Na-sum-kan-da.” I can swim.   “Ti ta-ning-kan-ha?” Can you sing?   “Anke cha k-i-nuk-vai-da.” I want tea."]],
+		["Telling people what to do", "A command takes -o. Adding -ye makes it polite, and grumpy or proud people may ignore you without it. -ka means and then, for a second action by the same person.", ["“Ta-pul-o!” Jump!   “Ta-pul-o-ye!” Please jump!   “Ta-pul-o-ka ta-ning-o-ye!” Please jump and then sing!   “Ansu ta-kar-o-ye!” Please come with me!"]],
+		["Directions", "Bei north, nam south, dong east and sai west take -ma for in: bei-ma, in the north. To ask where, use hama with -ha.", ["“Kur hama i-esh-ha?” Where is the market?   “Kur sai-ma i-esh-da.” The market is in the west."]],
 		["Borrowed words and sound words", "Varnak borrows from other languages (choni, kawai, habibi, puts, pororo from Guarani) and respells them with its own sounds.", []]
 	]
 	for sec in secs:
@@ -7088,3 +7123,499 @@ func teach_fix(i: int, said: Array, m: Dictionary, back: Callable):
 	if opts.size() < 2: opts.append(wrong)
 	ask("Fix it:", opts, 0, done, good + "  " + tp["tip"], "Not quite. " + tp["tip"], back, func():
 		button("Another one", teach_neri.bind(back), content))
+
+
+# ---- talk view: frame the villager's face above the menu ----
+
+var talk_cam: Camera3D
+var talk_view_id: String = ""
+var talk_dir: Dictionary = {}
+var portrait_frame: Control
+var dnd_on: bool = false
+const TALK_TOP = 0.47
+
+func talk_view_target() -> String:
+	if not panel.visible or dnd_on or riding: return ""
+	var id = portrait_id if portrait_id != "" else talk_partner
+	if id == "": return ""
+	var e = entity_by_id(id)
+	if e.is_empty() or e["kind"] != "npc" or not (e["node"] as Node3D).visible: return ""
+	return id
+
+func set_talk_layout(on: bool):
+	if on:
+		panel.anchor_top = TALK_TOP
+		panel.offset_top = 0
+		close_x.anchor_top = TALK_TOP
+		close_x.anchor_bottom = TALK_TOP
+		close_x.offset_top = 6
+		close_x.offset_bottom = 58
+		talk_cam.current = true
+	else:
+		panel.anchor_top = 0.0
+		panel.offset_top = 226
+		close_x.anchor_top = 0.0
+		close_x.anchor_bottom = 0.0
+		close_x.offset_top = 232
+		close_x.offset_bottom = 284
+		camera.current = true
+	if is_instance_valid(portrait_frame): portrait_frame.visible = not on
+
+func talk_cam_pose(id: String) -> Array:
+	var e = entity_by_id(id)
+	var node = e["node"] as Node3D
+	var head = (node.get_meta("head") as Node3D).global_position
+	var d = player.global_position - node.global_position
+	d.y = 0.0
+	if d.length() < 0.1: d = Vector3(sin(node.rotation.y), 0, cos(node.rotation.y))
+	d = d.normalized()
+	var hs = float(node.get_meta("h", 1.0)) if node.has_meta("h") else 1.0
+	var dist = 3.3 * clampf(hs, 0.75, 1.2)
+	if talk_dir.has(id): d = talk_dir[id]
+	else:
+		var space = get_world_3d().direct_space_state
+		var best = d
+		for ang in [0.0, 40.0, -40.0, 80.0, -80.0, 125.0, -125.0, 180.0]:
+			var dd = d.rotated(Vector3.UP, deg_to_rad(ang))
+			var q = PhysicsRayQueryParameters3D.create(head + dd * 0.45, head + dd * (dist + 0.4) + Vector3(0, 0.1, 0))
+			q.exclude = [player.get_rid()]
+			if space.intersect_ray(q).is_empty() and T.height(head.x + dd.x * dist, head.z + dd.z * dist) < head.y - 0.6:
+				best = dd
+				break
+		d = best
+		talk_dir[id] = d
+	var side = d.cross(Vector3.UP).normalized()
+	var pos = head + d * dist + side * 0.35 + Vector3(0, 0.1, 0)
+	# the band between the top buttons and the menu is centered above the screen middle
+	var vp = get_viewport().get_visible_rect().size
+	var band_mid = (175.0 + vp.y * TALK_TOP) * 0.5
+	var frac = (vp.y * 0.5 - band_mid) / (vp.y * 0.5)
+	var k = dist * frac * tan(deg_to_rad(talk_cam.fov * 0.5))
+	var look = head + Vector3(0, 0.12 - 0.25 * hs, 0) - Vector3(0, k, 0)
+	return [pos, look]
+
+func update_talk_view(delta: float):
+	if talk_cam == null: return
+	var id = talk_view_target()
+	if id != talk_view_id:
+		var was = talk_view_id
+		talk_view_id = id
+		if (was == "") != (id == ""): set_talk_layout(id != "")
+		talk_dir.clear()
+		if id != "":
+			var pose = talk_cam_pose(id)
+			talk_cam.global_position = pose[0]
+			talk_cam.look_at(pose[1], Vector3.UP)
+		return
+	if id == "": return
+	var p = talk_cam_pose(id)
+	talk_cam.global_position = talk_cam.global_position.lerp(p[0], minf(delta * 4.0, 1.0))
+	talk_cam.look_at(p[1], Vector3.UP)
+
+# ------------------------------------------------------------ tenth expansion: asking and telling (new grammar)
+
+func ask_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel("Ask " + id.capitalize())
+	add_portrait(id)
+	text_line("What do you want to ask or tell " + id.capitalize() + "?", 17)
+	button("Can you...? (-kan)", can_menu.bind(id), content)
+	button("What do you want? (-vai)", want_ask.bind(id), content)
+	button("Where is...? (hama)", where_menu.bind(id), content)
+	button("Ask them to do something (-o)", command_menu.bind(id), content)
+	if npc_following(id): button("Go home (Ti-ni dom-ru ta-lum-o-ye)", send_home.bind(id), content)
+	button("Back", chat_menu.bind(id), content)
+
+func three_forms(right: String, wrongs: Array) -> Array:
+	var out: Array = [right]
+	for w in wrongs:
+		if not out.has(w): out.append(w)
+	return out
+
+# ---- Can you...? ----
+
+func can_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel("Ask " + id.capitalize() + ": Can you...?")
+	add_portrait(id)
+	learn("-kan")
+	text_line("-kan means can. It goes right after the verb root: ta-sum-kan-ha? Can you swim?", 16)
+	for v in Data.KAN.keys():
+		var asked = mastered.has("kan:" + v + ":" + id)
+		button(Data.KAN[v][0].capitalize() + ("  [asked]" if asked else ""), can_say.bind(id, v), content)
+	button("My survey sheet", show_survey, content)
+	button("Back", ask_menu.bind(id), content)
+
+func can_say(id: String, v: String):
+	learn(v)
+	learn("-ha")
+	clear_panel("Ask " + id.capitalize())
+	add_portrait(id)
+	talk_partner = id
+	var en: String = Data.KAN[v][0]
+	var right = "Ti ta-" + v + "-kan-ha?"
+	var opts = three_forms(right, ["Ti na-" + v + "-kan-ha?", "Ti ta-" + v + "-kan-da.", "Ti ta-kan-" + v + "-ha?"])
+	opts = opts.slice(0, 3 if level() < 3 else 4)
+	ask("How do you ask: \"Can you " + en + "?\"", opts, 0, func(): can_answer.call_deferred(id, v),
+		"", "Look at the person prefix (ta- you), where -kan goes (right after the root) and the ending (-ha asks).", can_menu.bind(id))
+
+func can_answer(id: String, v: String):
+	var yes: bool = Data.KAN[v][1].has(id)
+	if v == "sul": yes = true
+	var said = "Ti ta-" + v + "-kan-ha?"
+	var said_en = "Can you " + Data.KAN[v][0] + "?"
+	var line: Array
+	if Data.KAN_LINES.has(id + ":" + v): line = Data.KAN_LINES[id + ":" + v]
+	elif v == "fei":
+		var f = Data.FEI_NO[randi() % Data.FEI_NO.size()]
+		line = [f[0], f[1], "laugh"]
+	elif yes: line = ["Ho! Na-" + v + "-kan-da!", "Yes! I can " + Data.KAN[v][0] + "!", "proud" if Data.PEOPLE[id]["trait"] == "proud" else "happy"]
+	else: line = ["Maki. Ma-na-" + v + "-kan-ki-da.", "No. I can't " + Data.KAN[v][0] + ".", "sad" if Data.PEOPLE[id]["trait"] != "grumpy" else "angry"]
+	var first = not mastered.has("kan:" + v + ":" + id)
+	master("kan:" + v + ":" + id)
+	if yes: master("kanyes:" + v + ":" + id)
+	log_event("can_ask", {"npc": id, "verb": v, "yes": yes})
+	react(id, said, said_en, line[0], line[1], line[2], 1 if first else 0)
+	button("Ask something else", can_menu.bind(id), content)
+	buttons_to_end(["Keep chatting", "Return"])
+	check_survey()
+
+func survey_found(v: String) -> Array:
+	var who: Array = []
+	for m in mastered:
+		var ms = str(m)
+		if ms.begins_with("kanyes:" + v + ":"): who.append(ms.split(":")[2])
+	return who
+
+func check_survey():
+	if completed.has("survey"): return
+	for v in Data.KAN.keys():
+		if v == "fei": continue
+		if survey_found(v).is_empty(): return
+	complete("survey")
+	gin += 3
+	toast("Survey complete! You found someone for every row. +3 gin")
+
+func show_survey():
+	compact_buttons.call_deferred()
+	clear_panel("Find someone who can...")
+	text_line("Ask people “Ti ta-___-kan-ha?” (Can you ___?) and fill in the sheet. Chat, then Ask.", 16)
+	for v in Data.KAN.keys():
+		var who = survey_found(v)
+		var asked: Array = []
+		for m in mastered:
+			var ms = str(m)
+			if ms.begins_with("kan:" + v + ":"): asked.append(ms.split(":")[2])
+		var row = Data.KAN[v][0] + " (ta-" + v + "-kan-ha?):  "
+		if not who.is_empty(): row += ", ".join(who.map(func(x): return str(x).capitalize())) + "  [ok]"
+		elif v == "fei" and asked.size() >= 3: row += "nobody yet... maybe ask someone with feathers?"
+		else: row += "?" + ("  (asked " + str(asked.size()) + ")" if not asked.is_empty() else "")
+		var l = text_line(row, 17)
+		if not who.is_empty(): l.add_theme_color_override("font_color", Color("2f6b2f"))
+	button("Back", show_notebook, content)
+
+# ---- What do you want? ----
+
+func want_ask(id: String):
+	learn("-vai")
+	clear_panel("Ask " + id.capitalize())
+	add_portrait(id)
+	talk_partner = id
+	var right = "Ti han t-i-nuk-vai-ha?"
+	ask("How do you ask: \"What do you want (to have)?\"", three_forms(right, ["Ti han k-i-nuk-vai-ha?", "Ti han t-i-nuk-vai-da.", "Ti hal t-i-nuk-vai-ha?"]).slice(0, 3 if level() < 3 else 4), 0,
+		func(): want_answer.call_deferred(id), "", "t-i- means you (do it to) it. han is what; hal is who. -ha asks.", ask_menu.bind(id))
+
+func want_answer(id: String):
+	var pp: Dictionary = Data.PEOPLE[id]
+	var tt: String = pp["trait"]
+	var likes: Array = pp["likes"]
+	var said = "Ti han t-i-nuk-vai-ha?"
+	var said_en = "What do you want?"
+	log_event("want_ask", id)
+	if randf() < 0.3 or likes.is_empty():
+		var odd = {"sleepy": ["Na-sul-vai-da... zzz", "I want to sleep... zzz", "sleepy"], "grumpy": ["Sela na-an-vai-da!", "I want to be alone!", "angry"],
+			"giggly": ["Anke ti k-ta-hiri-vai-da! Ha!", "I want to prank you! Ha!", "laugh"], "dramatic": ["Na-fei-vai-da! ...Dan ma-na-fei-kan-ki-da.", "I want to fly! ...But I can't fly.", "sad"],
+			"proud": ["Na-u-gao-vai-da!", "I want to be taller! (u- more, gao tall)", "proud"], "cheerful": ["Fiyesta! Na-kachaka-vai-da!", "A party! I want to dance!", "happy"]}
+		var o: Array = odd.get(tt, odd["cheerful"])
+		react(id, said, said_en, o[0], o[1], o[2], 1 if not mastered.has("want:" + id) else 0)
+	else:
+		var g: String = likes[randi() % likes.size()]
+		learn(g)
+		react(id, said, said_en, "Anke " + g + " k-i-nuk-vai-da!", "I want " + Data.GIFT_WORDS[g] + "!", "love", 1 if not mastered.has("want:" + id) else 0)
+		var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy"), "ret-gor": inventory.has("hotdog")}
+		if have.get(g, false): button("Give it: Ki " + g + " ti-ru!", give_gift.bind(id, g), content)
+		else: text_line("You don't have any " + g + " right now. Ketu sells most things at the market.", 16)
+		buttons_to_end(["Keep chatting", "Return"])
+	master("want:" + id)
+
+# ---- Where is...? ----
+
+func where_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel("Ask " + id.capitalize() + ": Where is...?")
+	add_portrait(id)
+	learn("hama")
+	text_line("Ask about a person or a place. The answer uses bei north, nam south, dong east, sai west.", 16)
+	for p in ["neri", "ketu", "suri", "pomo", "vira", "yalo", "desh", "oku", "gav", "tamu", "tor", "mira", "oren", "lira"]:
+		if p != id: button(p.capitalize(), where_say.bind(id, p), content)
+	for w in Data.WHERE_PLACES.keys():
+		button(w + " (" + Data.WHERE_PLACES[w][0] + ")", where_say.bind(id, w), content)
+	button("Back", ask_menu.bind(id), content)
+
+func where_target_pos(t: String) -> Vector3:
+	if Data.WHERE_PLACES.has(t): return Data.WHERE_PLACES[t][1]
+	var e = entity_by_id(t)
+	return (e["node"] as Node3D).position if not e.is_empty() else Vector3.ZERO
+
+func where_say(id: String, t: String):
+	clear_panel("Ask " + id.capitalize())
+	add_portrait(id)
+	talk_partner = id
+	var nm = t if Data.WHERE_PLACES.has(t) else t.capitalize()
+	var en = Data.WHERE_PLACES[t][0] if Data.WHERE_PLACES.has(t) else t.capitalize()
+	var right = nm.capitalize() + " hama i-esh-ha?"
+	ask("How do you ask: \"Where is " + en + "?\"", three_forms(right, [nm.capitalize() + "-ma hama i-esh-ha?", nm.capitalize() + " hama i-esh-da.", nm.capitalize() + " hal i-esh-ha?"]).slice(0, 3 if level() < 3 else 4), 0,
+		func(): where_answer.call_deferred(id, t), "", "hama is where; the thing you ask about takes no ending; -ha asks.", where_menu.bind(id))
+
+func where_answer(id: String, t: String):
+	var me = (entity_by_id(id)["node"] as Node3D).position
+	var tp = where_target_pos(t)
+	var d = tp - me
+	var nm = t if Data.WHERE_PLACES.has(t) else t.capitalize()
+	var en = Data.WHERE_PLACES[t][0] if Data.WHERE_PLACES.has(t) else t.capitalize()
+	var said = nm.capitalize() + " hama i-esh-ha?"
+	var reply = ""
+	var reply_en = ""
+	var dir = ""
+	var person = not Data.WHERE_PLACES.has(t)
+	var ev = "da"
+	if person and d.length() > 40.0: ev = "nu"
+	if person and npc_following(t) :
+		reply = nm + " ti-su i-esh-da! Ha!"
+		reply_en = nm + " is with you! Ha!"
+		dir = "with you"
+	elif Vector2(d.x, d.z).length() < 12.0:
+		reply = nm.capitalize() + " anni dalma i-esh-da!"
+		reply_en = en.capitalize() + " is right next to me! (I can see it.)"
+		dir = "next to them"
+	else:
+		dir = ("dong" if d.x > 0 else "sai") if absf(d.x) > absf(d.z) else ("bei" if d.z < 0 else "nam")
+		learn(dir)
+		reply = nm.capitalize() + " " + dir + "-ma i-esh-" + ev + "."
+		reply_en = en.capitalize() + " is in the " + Data.DIRS[dir] + (". I can see it." if ev == "da" else ". That's what people say.")
+	log_event("where_ask", {"npc": id, "target": t, "answer": dir})
+	react(id, said, "Where is " + en + "?", reply, "(Tap Show meaning below if you need it.)", "happy", 1 if not mastered.has("hama:" + t) else 0)
+	var opts: Array = ["north", "south", "east", "west", "next to them"]
+	var correct = Data.DIRS.get(dir, dir)
+	if dir == "with you": opts = ["with you", "north", "south"]
+	var mean = text_line("", 16)
+	button("Show meaning", func(): mean.text = reply_en, content)
+	var ord: Array = [correct]
+	for o in opts:
+		if o != correct: ord.append(o)
+	ask("So where is " + en + "?", ord, 0, func():
+		master("hama:" + t)
+		save_game(), reply_en, "Listen again: bei-ma north, nam-ma south, dong-ma east, sai-ma west, and dal-ma at the side.", where_menu.bind(id),
+		func():
+			button("Ask about somewhere else", where_menu.bind(id), content)
+			buttons_to_end(["Keep chatting", "Return"]))
+	buttons_to_end(["Keep chatting", "Return"])
+
+# ---- Commands: ask them to do something ----
+
+var acts: Dictionary = {}
+
+func npc_following(id: String) -> bool:
+	return acts.has(id) and acts[id].get("kind", "") == "follow"
+
+func command_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel("Ask " + id.capitalize() + " to do something")
+	add_portrait(id)
+	text_line("Commands end in -o. Add -ye to be polite. Some people only listen when you're polite!", 16)
+	for v in Data.COMMANDS.keys():
+		button(Data.COMMANDS[v][0], command_say.bind(id, v), content)
+	if level() >= 2: button("Jump and then sing! (-ka)", command_say.bind(id, "pul+ning"), content)
+	button("Come with me!", command_say.bind(id, "kar"), content)
+	button("Back", ask_menu.bind(id), content)
+
+func command_forms(v: String) -> Dictionary:
+	# meaning key -> Varnak. The player picks one; the villager reacts to what was actually said.
+	if v == "kar":
+		return {"plain": "Ansu ta-kar-o!", "polite": "Ansu ta-kar-o-ye!", "statement": "Ansu ta-kar-da.", "me": "Ansu na-kar-o!", "dont": "Ansu ma-ta-kar-o-ki!"}
+	if v == "pul+ning":
+		return {"plain": "Ta-pul-o-ka ta-ning-o!", "polite": "Ta-pul-o-ka ta-ning-o-ye!", "statement": "Ta-pul-ka ta-ning-da.", "me": "Na-pul-o-ka na-ning-o!", "dont": "Ma-ta-pul-o-ki!"}
+	return {"plain": "Ta-" + v + "-o!", "polite": "Ta-" + v + "-o-ye!", "statement": "Ta-" + v + "-da.", "me": "Na-" + v + "-o!", "dont": "Ma-ta-" + v + "-o-ki!"}
+
+func command_say(id: String, v: String):
+	compact_buttons.call_deferred()
+	clear_panel("Tell " + id.capitalize())
+	add_portrait(id)
+	talk_partner = id
+	var en = "Come with me!" if v == "kar" else ("Jump and then sing!" if v == "pul+ning" else Data.COMMANDS[v][0])
+	text_line("You want to say: \"" + en + "\" Choose what you say. " + id.capitalize() + " will react to whatever you actually say!", 17)
+	var f = command_forms(v)
+	var keys: Array = ["plain", "polite", "statement", "me"]
+	if level() >= 2: keys.append("dont")
+	keys.shuffle()
+	for k in keys:
+		button(f[k], command_do.bind(id, v, k), content)
+	button("Back", command_menu.bind(id), content)
+
+func command_do(id: String, v: String, k: String):
+	var f = command_forms(v)
+	var said: String = f[k]
+	var pp: Dictionary = Data.PEOPLE[id]
+	var tt: String = pp["trait"]
+	var fr: int = int(friend.get(id, 0))
+	var md: int = int(mood.get(id, 0))
+	var ok_meaning = k == "plain" or k == "polite"
+	log_event("answer", {"activity": "Commands", "item": "Tell " + id + ": " + v, "chose": said, "correct": f["polite"]}, ok_meaning)
+	var en = "Come with me!" if v == "kar" else ("Jump and then sing!" if v == "pul+ning" else Data.COMMANDS[v][0])
+	match k:
+		"statement":
+			react(id, said, "(You told them they " + en.to_lower().trim_suffix("!") + ", like a fact.)", "Han? Maki, ma-na-" + v.split("+")[0] + "-im-ki-da.", "What? No, I'm not doing that. (-da describes; a command needs -o.)", "confused", 0)
+		"me":
+			react(id, said, "(na- means I: you just told yourself to do it!)", "Ha! Ho, ti! Ta-" + v.split("+")[0] + "-o!", "Ha! Yes, YOU! You do it! (na- is I; ta- is you.)", "laugh", 0)
+			emote_player_hint()
+		"dont":
+			react(id, said, "(Don't!)", "...Ho. Ma-na-" + v.split("+")[0] + "-im-ki-da.", "...OK. I'm not doing it. (ma- ... -ki means don't.)", "confused", 0)
+		_:
+			var polite = k == "polite"
+			var refuse = false
+			if md < 0: refuse = true
+			elif not polite and (tt == "grumpy" or tt == "proud") and fr < 6: refuse = true
+			if v == "kar" and npc_following(id): refuse = false
+			if refuse:
+				add_friend(id, 0)
+				react(id, said, en, "Maki!" + (" ...-ye?" if not polite else ""), ("No! (" + id.capitalize() + " wants you to be polite: add -ye.)" if not polite else "No! (" + id.capitalize() + " is still upset with you. Try a gift or a compliment.)"), "angry", 0)
+				button("Try again politely", command_say.bind(id, v), content)
+				buttons_to_end(["Keep chatting", "Return"])
+				return
+			var first = not mastered.has("cmd:" + v)
+			master("cmd:" + v)
+			if v == "kar":
+				start_follow(id)
+				react(id, said, en, "Ho! Ansu... ti-su na-kar-fu-da!", "OK! With you... I'll come with you! (" + id.capitalize() + " follows you around. Ask them to go home any time.)", "happy", 1 if polite else 0)
+				return
+			var parts: Array = v.split("+")
+			var acts_list: Array = []
+			for p in parts: acts_list.append(Data.COMMANDS[p][1])
+			npc_act(id, acts_list)
+			var reply = {"sing": "La la... Ning-ning!", "dance": "Kachaka! Kachaka!", "jump": "Hop! Hop!", "sit": "Uf.", "run": "Pav-pav-pav!", "sleep": "Kororo... zzz", "look": "Hama...? Han...?"}
+			var r = ""
+			for a in acts_list: r += reply.get(a, "Ho!") + " "
+			var kind = {"sing": "happy", "dance": "laugh", "jump": "happy", "sit": "happy", "run": "laugh", "sleep": "sleepy", "look": "confused"}.get(acts_list[-1], "happy")
+			if tt == "proud" and polite: kind = "proud"
+			react(id, said, en, r.strip_edges(), id.capitalize() + " does it!" + (" Being polite (-ye) made " + id.capitalize() + " happy." if polite else ""), kind, (1 if polite else 0) + (1 if first else 0))
+			button("Ask them to do something else", command_menu.bind(id), content)
+			buttons_to_end(["Keep chatting", "Return"])
+
+func emote_player_hint():
+	toast("na- is I, ta- is you. Try again!")
+
+func npc_act(id: String, list: Array):
+	var e = entity_by_id(id)
+	if e.is_empty(): return
+	var node = e["node"] as Node3D
+	acts[id] = {"kind": "seq", "list": list, "i": 0, "t0": clock, "base": node.position, "yaw": node.rotation.y}
+
+func start_follow(id: String):
+	acts[id] = {"kind": "follow", "t0": clock}
+	toast(id.capitalize() + " is following you. Ansu! (with me)")
+
+func send_home(id: String):
+	acts[id] = {"kind": "home"}
+	react(id, "Ti-ni dom-ru ta-lum-o-ye.", "Please go home.", "Ho! Chau!", "OK! Bye!", "happy", 0)
+
+func update_acts(delta: float):
+	for id in acts.keys():
+		var a: Dictionary = acts[id]
+		var e = entity_by_id(id)
+		if e.is_empty():
+			acts.erase(id)
+			continue
+		var node = e["node"] as Node3D
+		var home: Vector3 = e["home"]
+		match a["kind"]:
+			"follow":
+				var to = player.position - node.position
+				to.y = 0.0
+				if clock - float(a["t0"]) > 180.0 or to.length() > 70.0:
+					a["kind"] = "home"
+					continue
+				if to.length() > 2.4:
+					var step = to.normalized() * minf(5.5 * delta, to.length() - 2.4)
+					node.position += step
+					node.rotation.y = atan2(to.x, to.z)
+				node.position.y = gy(node.position.x, node.position.z)
+			"home":
+				var to = home - node.position
+				to.y = 0.0
+				if to.length() < 0.2 or to.length() > 120.0:
+					node.position = home
+					acts.erase(id)
+					continue
+				var step = to.normalized() * minf(4.0 * delta, to.length())
+				node.position += step
+				node.position.y = gy(node.position.x, node.position.z)
+				node.rotation.y = atan2(to.x, to.z)
+			"seq":
+				var list: Array = a["list"]
+				var t = clock - float(a["t0"])
+				var dur = 3.2
+				var i = int(t / dur)
+				if i >= list.size():
+					node.position = a["base"]
+					(node.get_meta("body") as Node3D).position = Vector3.ZERO
+					for arm in node.get_meta("arms"): (arm as Node3D).rotation.z = 0.0
+					(node.get_meta("head") as Node3D).rotation.y = 0.0
+					acts.erase(id)
+					continue
+				var u = fmod(t, dur)
+				var base: Vector3 = a["base"]
+				var arms: Array = node.get_meta("arms")
+				var body = node.get_meta("body") as Node3D
+				body.position = Vector3.ZERO
+				node.position = base
+				for arm in arms: (arm as Node3D).rotation.z = 0.0
+				(node.get_meta("head") as Node3D).rotation.y = 0.0
+				match list[i]:
+					"jump":
+						node.position.y = base.y + absf(sin(u * 5.0)) * 0.6
+						(arms[0] as Node3D).rotation.z = -2.4
+						(arms[1] as Node3D).rotation.z = 2.4
+					"dance":
+						node.rotation.y += delta * 6.0
+						(arms[0] as Node3D).rotation.z = -1.8 + sin(u * 9.0) * 0.6
+						(arms[1] as Node3D).rotation.z = 1.8 + sin(u * 9.0 + 1.0) * 0.6
+						node.position.y = base.y + absf(sin(u * 9.0)) * 0.12
+					"sing":
+						(arms[0] as Node3D).rotation.z = -1.1
+						(arms[1] as Node3D).rotation.z = 1.1
+						e["say"] = ["La la la... Ning!", clock + 0.5]
+					"sit":
+						body.position.y = -0.35
+						(arms[0] as Node3D).rotation.x = -0.6
+						(arms[1] as Node3D).rotation.x = -0.6
+					"run":
+						var ang = u / dur * TAU
+						node.position = base + Vector3(sin(ang) * 1.4, 0, cos(ang) * 1.4 - 1.4)
+						node.position.y = gy(node.position.x, node.position.z)
+						node.rotation.y = ang + PI * 0.5
+						(arms[0] as Node3D).rotation.x = sin(clock * 14.0) * 0.9
+						(arms[1] as Node3D).rotation.x = -sin(clock * 14.0) * 0.9
+					"sleep":
+						(node.get_meta("head") as Node3D).rotation.z = 0.5
+						e["say"] = ["Kororo... zzz", clock + 0.5]
+					"look":
+						(node.get_meta("head") as Node3D).rotation.y = sin(u * 3.0) * 1.0
+
+
+func buttons_to_end(labels: Array):
+	for c in content.get_children():
+		if c is Button and labels.has((c as Button).text) and not c.is_queued_for_deletion(): content.move_child(c, -1)

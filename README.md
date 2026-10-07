@@ -107,6 +107,9 @@ Representative forms: anni kel (my bag); nalum (I go); talumo (Go!); tnaveno (Gi
 The arrival phrases use da, shi and nu for direct, inferred and reported evidence.
 Residents' names are identifiers rather than vocabulary lessons.
 
+## Talking to villagers
+When a menu belongs to a villager, a second camera frames their face and upper body in the top half of the screen and the menu moves to the bottom half, so reactions (emotes, actions) stay visible. Drag-and-drop puzzles keep the full-height menu. Every menu has a round X button at its top right; Escape also closes menus on a keyboard.
+
 ## Learning data
 The game keeps a local learning log (user://varnak_log.json, in the browser's storage on the web): sessions, words found, items mastered, every answer and built sentence with what the player chose and the target, quests, errands, overheard conversations, letters and mystery guesses. More > My learning and data export (also Notebook > My learning) shows a summary, accuracy by activity and words in missed questions, and exports everything as JSON (summary, words, phrases, events) or CSV (one row per event). Nothing is sent anywhere. Reset progress keeps the log and records a reset event.
 
