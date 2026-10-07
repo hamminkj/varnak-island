@@ -34,6 +34,7 @@ var status: Label
 var prompt: Label
 var toast_label: Label
 var panel: PanelContainer
+var close_x: Button
 var content: VBoxContainer
 var interact_button: Button
 var marker: MeshInstance3D
@@ -1399,6 +1400,19 @@ func build_ui():
 	content.add_theme_constant_override("separation",8)
 	scroll.add_child(content)
 	panel.hide()
+	close_x = Button.new()
+	close_x.name = "CloseX"
+	close_x.text = "X"
+	close_x.add_theme_font_size_override("font_size", 22)
+	close_x.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	close_x.offset_left = -76
+	close_x.offset_right = -24
+	close_x.offset_top = 232
+	close_x.offset_bottom = 280
+	close_x.pressed.connect(close_panel)
+	close_x.hide()
+	ui.add_child(close_x)
+	panel.visibility_changed.connect(func(): close_x.visible = panel.visible)
 	marker = MeshInstance3D.new()
 	var ring = CylinderMesh.new()
 	ring.top_radius = 0.6
@@ -4529,7 +4543,8 @@ func show_games():
 		["Market rush", market_rush, completed.has("market"), "Serve Ketu's customers. Unlocks after Ketu's quest."],
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
 		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
-		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."]
+		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
+		["Review rusty words", review_rusty, discovered.size() >= 3, "Words you have found but not yet mastered."]
 	]
 	for g in games:
 		var b = button(g[0] + ("" if g[2] else "  (locked)"), g[1], content)
@@ -5322,6 +5337,7 @@ func chat_menu(id: String):
 	button("Play a prank", prank_menu.bind(id), content)
 	button("Tell a joke", joke_menu.bind(id), content)
 	button("Give a gift", gift_menu.bind(id), content)
+	button("Ask for an errand", errand_menu.bind(id), content)
 	button("Ask: Ti ta-seng-ha?", feel.bind(id), content)
 	if int(friend.get(id, 0)) >= 5:
 		button("Ask about a secret" + ("  [ok]" if mastered.has("sec:" + id) else ""), secret.bind(id), content)
@@ -5532,6 +5548,79 @@ func give_gift(id: String, g: String):
 		react(id, sv, se, "Maki! " + g.capitalize() + " i-wai!", "No! " + Data.GIFT_WORDS[g].capitalize() + " is bad!", "disgust", -1)
 	else:
 		react(id, sv, se, "K-ta-har-da.", "Thank you.", "happy", 1)
+
+var errand: Dictionary = {}
+
+func errands_done() -> int:
+	var n = 0
+	for m in mastered:
+		if str(m).begins_with("errand:"): n += 1
+	return n
+
+func errand_have(g: String) -> int:
+	match g:
+		"tari": return fish_caught
+		"panak": return inventory.count("bread")
+		"cha": return inventory.count("tea")
+		"bombom": return inventory.count("candy")
+		"ret-gor": return inventory.count("hotdog")
+	return 0
+
+func errand_take(g: String, n: int):
+	for i in range(n):
+		match g:
+			"tari": fish_caught -= 1
+			"panak": inventory.erase("bread")
+			"cha": inventory.erase("tea")
+			"bombom": inventory.erase("candy")
+			"ret-gor": inventory.erase("hotdog")
+
+func errand_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel(id.capitalize() + "'s errand")
+	add_portrait(id)
+	var nums = ["", "yan", "vel", "mur"]
+	if errand.is_empty() or errand.get("npc", "") != id:
+		var pp: Dictionary = Data.PEOPLE[id]
+		var pool: Array = []
+		for g in ["tari", "panak", "cha", "bombom", "ret-gor"]:
+			if not pp["hates"].has(g): pool.append(g)
+		var lv = level()
+		var maxn = 1 if lv < 2 else (2 if lv < 3 else 3)
+		errand = {"npc": id, "item": pool[randi() % pool.size()], "n": 1 + randi() % maxn}
+	var g: String = errand["item"]
+	var n: int = errand["n"]
+	for w in ["yan", "vel", "mur", "tnaveno", g]: learn(w)
+	text_line(id.capitalize() + " has a request. Listen carefully:", 17)
+	varnak_banner(nums[n].capitalize() + " " + g + " t-na-ven-o-ye.")
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = "(" + str(n) + " " + Data.GIFT_WORDS[g].trim_prefix("a ") + ", I need.)", content)
+	text_line("You have " + str(errand_have(g)) + " " + g + ". Ketu sells panak, cha, bombom and ret-gor for one gin each. Fish come from the river.", 16)
+	var b = button("Deliver: " + nums[n] + " " + g, errand_deliver.bind(id), content)
+	b.disabled = errand_have(g) < n
+	button("Not now", chat_menu.bind(id), content)
+
+func errand_deliver(id: String):
+	var g: String = errand["item"]
+	var n: int = errand["n"]
+	if errand_have(g) < n: return
+	errand_take(g, n)
+	errand = {}
+	var nums = ["", "yan", "vel", "mur"]
+	var reward = n
+	gin += reward
+	master("errand:" + str(errands_done() + 1))
+	react(id, nums[n] + " " + g + " ki-ru!", str(n) + " " + Data.GIFT_WORDS[g].trim_prefix("a ") + ", here!", "K-ta-har-da! " + nums[n].capitalize() + " " + g + "! I-ho!", "Thank you! Exactly what I asked for! (+" + str(reward) + " gin, errands done: " + str(errands_done()) + ")", "happy", 2)
+
+func review_rusty():
+	var pool: Array = []
+	for w in discovered:
+		if words.has(w) and not mastered.has("w:" + w): pool.append(w)
+	if pool.is_empty():
+		message("Nothing rusty", "Every word you have found is mastered. Explore for new ones, or try Practice for phrases.")
+		return
+	practice_word(pool)
 
 func feel(id: String):
 	learn("-ha")

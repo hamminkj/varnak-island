@@ -961,6 +961,27 @@ func run():
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")
 	print("PASS: fifth expansion: gossip, evidentials, replies, strange things, rumors, news, parrot, fish rain, rolling fruit")
 	print("PASS: fourth expansion: drag and drop, gap fill, forge, match, challenges, memory, market rush, speed round, levels")
+	# ninth: close X, errands, review
+	game.talk("mira")
+	assert(game.close_x.visible and game.panel.visible)
+	game.close_x.pressed.emit()
+	assert(not game.panel.visible and not game.close_x.visible)
+	game.inventory.clear()
+	game.gin = 0
+	game.friend["mira"] = 0
+	game.errand = {"npc": "mira", "item": "panak", "n": 2}
+	game.errand_menu("mira")
+	assert(has_any("Vel panak t-na-ven-o-ye"))
+	game.inventory.append_array(["bread", "bread"])
+	game.errand_deliver("mira")
+	assert(game.gin == 2 and not game.inventory.has("bread") and game.errands_done() == 1 and game.errand.is_empty())
+	game.errand_menu("ketu")
+	assert(not game.errand.is_empty())
+	game.errand = {}
+	game.discovered.append_array(["wak", "guro", "kor"])
+	game.review_rusty()
+	assert(game.panel.visible)
+	print("PASS: ninth expansion: close X, errands, review")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
