@@ -367,3 +367,27 @@ Key sentences:
 New gossip: Gav's chonies swimming (-shi), Yalo and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Pomo's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Vira's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
 
 Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
+
+## Ninth expansion: errands, overheard talk, mystery letters, Teach Neri
+
+Errands use the attested request pattern from Ketu's quest: number + noun + t-na-ven-o-ye (Vel panak t-na-ven-o-ye, please give me two bread).
+
+New words: par-yir (feather, a calque: bird + clothing, a bird's clothes), kraa (a parrot squawk, not really Varnak). monarma and yeshma are noun + -ma.
+
+Overheard conversations (data.gd OVERHEAR) are all composed. Examples:
+- Anni pai hama i-esh-ha? Ma-k-i-pal-ak-pa-ki-da. Halke pai i-nuk-pa-ha? (Where is my paper? I didn't see it. Who took the paper?)
+- Yeshma sair i-mel-pa-da: "Kraa! Ti-ni palar!" (Last night someone said: "Kraa! Your friend!")
+- Monarma pai-ir kel-ma ri-esh-ur-da. Hal-ta? Ma-na-zen-ki-da. (In the morning there are usually letters in the bag. From whom? I don't know.)
+- Senakma par-yir i-esh-da! ... Ki par-yir Suri-ni pai-ni dalma i-esh-pa-da. (There's a feather in the school! ... This feather was next to Suri's paper.)
+- Sanu, ti ta-sul-im-ha? Ma-na-sul-im-ki-da... kororo... (Are you sleeping? I'm not sleeping... snore...)
+
+Mystery letters (data.gd LETTERS), all composed, for example:
+- An ti-ni palar na-an-da. Ti tekama ta-esh-da. K-ta-pal-ur-da. (I am your friend. You are in the village. I see you all the time.)
+- Anke polu-ni tovu k-i-zen-da. Sela na-an-ur-da. (I know everyone's stories. I am usually alone.)
+- Ti t-na-sir-im-shi! Anke Suri-ni pai k-i-nuk-ur-da. Ti-ru pai k-i-ven-ur-da. (Apparently you are looking for me! I usually take Suri's paper. I give the paper to you.)
+- The solution: Par ti-ni palar i-an-shi. (Apparently the parrot is your friend.) The game accepts only -shi, because the player infers it from clues.
+Reply sentences the player builds include Hal ti ta-an-ha? (Who are you?), Tovu t-na-gao-o-ye. (Please tell me a story.), Panak ma-t-i-nuk-o-ki! (Don't take the bread!) and Anke ti k-ta-sir-fu-da. (I will find you.)
+
+Teach Neri builds a mistake from each Sentence builder item: one tile is swapped for one of its decoys (or an automatic wrong ending), or the verb is moved out of final position.
+
+Things to check: 26. Wh-questions with an object and -ke (Halke pai i-nuk-pa-ha?) follow the existing Halke puka pattern. 27. Transitive negative commands (Panak ma-t-i-nuk-o-ki!) extend the intransitive ma-ta-X-o-ki pattern. 28. sela as a predicate with the copula an (Sela na-an-ur-da) and sair as an indefinite "someone" are composed. 29. gao (tell) with a recipient prefix (t-na-gao, you tell me) follows t-na-ven.

@@ -107,6 +107,9 @@ Representative forms: anni kel (my bag); nalum (I go); talumo (Go!); tnaveno (Gi
 The arrival phrases use da, shi and nu for direct, inferred and reported evidence.
 Residents' names are identifiers rather than vocabulary lessons.
 
+## Learning data
+The game keeps a local learning log (user://varnak_log.json, in the browser's storage on the web): sessions, words found, items mastered, every answer and built sentence with what the player chose and the target, quests, errands, overheard conversations, letters and mystery guesses. More > My learning and data export (also Notebook > My learning) shows a summary, accuracy by activity and words in missed questions, and exports everything as JSON (summary, words, phrases, events) or CSV (one row per event). Nothing is sent anywhere. Reset progress keeps the log and records a reset event.
+
 ## Current limits
 This is a playable blockout, with simple models and short encounters. It does not yet include recorded Varnak speech, animated gestures, a broad dialogue generator, advanced sentence building, or a simulated ecology. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Tor repairs it. Click-to-walk heads straight for its target and stops with a hint if something is in the way. Deep water cannot be entered; the river is crossed by the bridge, the stepping stones or the log bridge.
 

@@ -849,3 +849,115 @@ const CHONI_HUNT = [
 	["choni_ghost", -98.0, -15.0, "Poltergaiske choni i-nuk-pa-nu.", "They say the poltergeist took a choni."],
 	["choni_maze", 0.0, 0.0, "Choni lavir-ni kor-ma i-esh-shi.", "Apparently a choni is inside the maze."]
 ]
+
+# ---------------------------------------------------------------- ninth expansion: overheard talk, letters, Teach Neri
+const WORDS9 = {
+	"par-yir": "feather (calque: par bird + yir clothing, so a feather is a bird's clothes)",
+	"kraa": "kraa! (a parrot's squawk; not really a Varnak word, but somebody keeps writing it)",
+	"monarma": "in the morning (monar morning + -ma)", "yeshma": "at night (yesh night + -ma)"
+}
+
+# Overheard conversations. a and b stand near each other; get close and listen in.
+# lines: [speaker, Varnak, English]. q: comprehension question, opts[0] is correct.
+# clue: a story clue for the mystery letters (see LETTER_CLUES).
+const OVERHEAR = [
+	{"id": "ov_paper", "a": "suri", "b": "ketu", "clue": "paper", "words": ["pai", "hama", "hal", "nuk"],
+		"lines": [["suri", "Anni pai hama i-esh-ha?", "Where is my paper?"], ["ketu", "Ma-k-i-pal-ak-pa-ki-da.", "I didn't see it."], ["suri", "Halke pai i-nuk-pa-ha?", "Who took the paper?"], ["ketu", "Parke...? Maki. Ha!", "The bird...? No. Ha!"]],
+		"q": "What is Suri looking for?", "opts": ["Her paper", "Her bag", "Ketu's fish"]},
+	{"id": "ov_kraa", "a": "ila", "b": "vira", "clue": "kraa", "words": ["yeshma", "sair", "mel", "kraa"],
+		"lines": [["ila", "Yeshma sair i-mel-pa-da: “Kraa! Ti-ni palar!”", "Last night someone said: “Kraa! Your friend!” I heard it."], ["vira", "Poltergais i-an-shi.", "Apparently it's the poltergeist."], ["ila", "Maki! Poltergais “kraa” ma-i-mel-ur-ki-da.", "No! The poltergeist doesn't usually say “kraa.”"]],
+		"q": "What did Ila hear at night?", "opts": ["Someone saying “Kraa! Your friend!”", "Desh singing in the sea", "The poltergeist laughing"]},
+	{"id": "ov_bread", "a": "mira", "b": "lira", "clue": "bread", "words": ["panak", "lum", "tab", "pai", "har"],
+		"lines": [["mira", "Anni panak i-lum-pa-shi!", "Apparently my bread went away!"], ["lira", "Gavke panak i-yam-pa-nu.", "People say Gav ate the bread."], ["mira", "Maki. Tabma pai i-esh-pa-da. Pai-ma: “K-ta-har-da!”", "No. There was a paper on the table. On the paper: “Thank you!”"]],
+		"q": "What did Mira find on the table?", "opts": ["A paper that says “Thank you!”", "Gav's bag", "A pair of chonies"]},
+	{"id": "ov_mailbag", "a": "ena", "b": "gav", "clue": "post", "words": ["monarma", "kel", "var-var", "zen"],
+		"lines": [["ena", "Gav, ti-ni kel i-var-var!", "Gav, your bag is huge!"], ["gav", "Ho. Monarma pai-ir kel-ma ri-esh-ur-da. Hal-ta? Ma-na-zen-ki-da.", "Yes. In the morning there are usually letters in the bag. From whom? I don't know."], ["ena", "Hiri! Poltergais i-an-shi!", "A prank! Apparently it's the poltergeist!"]],
+		"q": "When do the mystery letters show up in Gav's bag?", "opts": ["In the morning", "At night", "After lunch at the market"]},
+	{"id": "ov_boat", "a": "tamu", "b": "ena", "words": ["sena", "kaput", "haku", "par"],
+		"lines": [["tamu", "Sena i-kaput-da.", "The boat is broken."], ["ena", "Haku?", "Why?"], ["tamu", "Desh senama i-ning-pa-da. Sena i-par-pa-shi.", "Desh sang in the boat. Apparently the boat got scared."]],
+		"q": "Why is the boat broken, according to Tamu?", "opts": ["Desh sang in it", "A whale bumped it", "Tor built it"]},
+	{"id": "ov_habibi", "a": "oren", "b": "tor", "words": ["gira", "har", "habibi", "ups"],
+		"lines": [["oren", "Ti-ni gira i-ho-da.", "Your bridge is good."], ["tor", "K-ta-har-da! ...Ti ta-seng-ha?", "Thank you! ...Are you happy?"], ["oren", "Maki. Ti anni mar-ru “habibi” ta-mel-ur-nu!", "No. People say you call my horse “habibi”!"], ["tor", "...Ups.", "...Oops."]],
+		"q": "Why is Oren upset with Tor?", "opts": ["Tor calls Oren's horse “habibi”", "The bridge is broken", "Tor ate Oren's bread"]},
+	{"id": "ov_sleep", "a": "lira", "b": "sanu", "words": ["sul", "zen", "kororo"],
+		"lines": [["lira", "Sanu, ti ta-sul-im-ha?", "Sanu, are you sleeping?"], ["sanu", "Ma-na-sul-im-ki-da... kororo... kororo...", "I'm not sleeping... snore... snore..."], ["lira", "Sanu i-sul-im-da. I-zen-da.", "Sanu is sleeping. I can see it. It's true."]],
+		"q": "Is Sanu asleep?", "opts": ["Yes, even though Sanu says no", "No, Sanu is reading", "No, Sanu is swimming"]},
+	{"id": "ov_feather", "a": "rin", "b": "suri", "clue": "feather", "words": ["par-yir", "senak", "var-var"],
+		"lines": [["rin", "Senakma par-yir i-esh-da! I-var-var!", "There's a feather in the school! It's huge!"], ["suri", "Par-yir i-var-var? Par i-var-shi.", "A huge feather? Then apparently the bird is big."], ["rin", "Ki par-yir Suri-ni pai-ni dalma i-esh-pa-da.", "This feather was next to Suri's paper."]],
+		"q": "What did Rin find at the school?", "opts": ["A huge feather", "A huge fish", "Suri's selfies"]},
+	{"id": "ov_fruit", "a": "ketu", "b": "ola", "words": ["mal", "guro-guro", "han"],
+		"lines": [["ketu", "Ola! Ti-ni malma han i-esh-ha?", "Ola! What's in your hand?"], ["ola", "Han? Maki... guro ma-i-esh-ki-da.", "What? No... there's no fruit."], ["ketu", "Ti-ni malma guro-guro i-esh-da!", "There are all kinds of fruit in your hand!"]],
+		"q": "What is Ola hiding?", "opts": ["Fruit", "A fish", "A book"]},
+	{"id": "ov_concert", "a": "desh", "b": "yalo", "words": ["yeshma", "fardom", "ning", "-fu"],
+		"lines": [["desh", "Yalo! Yeshma fardom-ma na-ning-fu-da!", "Yalo! Tonight I will sing at the lighthouse!"], ["yalo", "Maki! Tari-ir ri-par-fu! Sena-ir ri-par-fu!", "No! The fish will get scared! The boats will get scared!"], ["desh", "Tarara! Tarara!", "Toot! Toot!"]],
+		"q": "What does Desh want to do?", "opts": ["Sing at the lighthouse tonight", "Swim in the sea", "Fix the boat"]},
+	{"id": "ov_night", "a": "ola", "b": "rin", "clue": "night", "words": ["yeshma", "lum", "hama", "zen"],
+		"lines": [["rin", "Ketu-ni par yeshma hama i-esh-ha?", "Where is Ketu's parrot at night?"], ["ola", "Yeshma par kurma ma-i-esh-ki-da. Par i-lum-ur-da.", "At night the parrot is not at the market. It usually goes away."], ["rin", "Hama-ru?", "To where?"], ["ola", "Ma-na-zen-ki-da!", "I don't know!"]],
+		"q": "Where is Ketu's parrot at night?", "opts": ["Gone from the market; nobody knows where", "Asleep at the market", "At the lighthouse with Yalo"]},
+	{"id": "ov_horse", "a": "oren", "b": "neri", "words": ["mel", "dap", "dan"],
+		"lines": [["neri", "Oren, ti ti-ni mar-ru ta-mel-ur-ha?", "Oren, do you talk to your horse?"], ["oren", "Ho. Dan mar ma-i-dap-ur-ki-da.", "Yes. But the horse doesn't usually answer."], ["neri", "Tari-ir ri-dap-ur-nu.", "People say fish answer."], ["oren", "...Ketu i-an-shi.", "...That must be Ketu talking."]],
+		"q": "What does Oren say about his horse?", "opts": ["It doesn't answer", "It sings", "It's afraid of the night"]}
+]
+
+# Story clues about the mystery letter writer, shown in the Letters page.
+const LETTER_CLUES = {
+	"paper": "Someone keeps taking paper from Suri's school.",
+	"kraa": "At night, somebody says “Kraa! Your friend!” (Ila heard it.)",
+	"bread": "Mira's bread vanished. A thank-you note was left on the table.",
+	"post": "The letters show up in Gav's bag every morning. Gav doesn't know who brings them.",
+	"feather": "A huge feather turned up at the school, right next to Suri's paper.",
+	"night": "Ketu's parrot leaves the market every night. Nobody knows where it goes."
+}
+
+# Mystery letters. Each needs the one before it answered, and (from letter 2 on) one more clue.
+# replies: what you can write back. You choose the meaning, then build it with tiles.
+const LETTERS = [
+	{"v": "Aloha! An ti-ni palar na-an-da. Ti tekama ta-esh-da. K-ta-pal-ur-da. Chau!\n\nTi-ni palar",
+		"en": "Hello! I am your friend. You are in the village. I see you all the time. Bye!\n\nYour friend",
+		"words": ["aloha", "palar", "chau"],
+		"q": "What does the writer say?", "opts": ["They see you all the time", "They are on the small island", "They are Neri"],
+		"replies": [
+			{"en": "Who are you?", "tiles": ["Hal", "ti", "ta-an-ha?"], "decoys": ["Han", "na-an-ha?"], "tip": "hal is who. You are is ta-an, and -ha makes a question."},
+			{"en": "Hello, friend! I am happy.", "tiles": ["Aloha,", "palar!", "Na-seng-da."], "decoys": ["Chau,", "Ta-seng-da."], "tip": "na- is I and seng is happy."},
+			{"en": "Where are you?", "tiles": ["Ti", "hama", "ta-esh-ha?"], "decoys": ["Hal", "na-esh-ha?"], "tip": "hama is where; esh is be located; you is ta-."}]},
+	{"v": "Ti-ni pai i-ho-da! Anke polu-ni tovu k-i-zen-da. Sela na-an-ur-da. Kraa! ...Ups.\n\nTi-ni palar",
+		"en": "Your letter is good! I know everyone's stories. I am usually alone. Kraa! ...Oops.\n\nYour friend",
+		"words": ["tovu", "sela", "kraa", "ups"],
+		"q": "What does the writer know?", "opts": ["Everyone's stories", "Where the treasure is", "How to fix the boat"],
+		"replies": [
+			{"en": "Why are you alone?", "tiles": ["Haku", "ti", "sela", "ta-an-ur-ha?"], "decoys": ["Hama", "na-an-ur-ha?"], "tip": "haku is why; you usually are is ta-an-ur, and -ha asks."},
+			{"en": "What is “kraa”?", "tiles": ["Kraa", "han", "i-an-ha?"], "decoys": ["hal", "ta-an-ha?"], "tip": "han is what; it is is i-an."},
+			{"en": "Please tell me a story.", "tiles": ["Tovu", "t-na-gao-o-ye."], "decoys": ["Tovuke", "k-ta-gao-o-ye."], "tip": "You tell me is t-na-gao, and please is -o-ye."}]},
+	{"v": "Monarma Mira-ni panak k-i-yam-pa-da. Panak i-ho-ho-pa-da! Mira-ru “K-ta-har-da” k-i-gao-pa-da.\n\nTi-ni palar",
+		"en": "This morning I ate Mira's bread. The bread was super good! I said “Thank you” to Mira.\n\nYour friend",
+		"words": ["monarma", "yam", "ho-ho", "har"],
+		"q": "What did the writer do this morning?", "opts": ["Ate Mira's bread", "Cooked fish for Ketu", "Sang at the lighthouse"],
+		"replies": [
+			{"en": "Don't take the bread!", "tiles": ["Panak", "ma-t-i-nuk-o-ki!"], "decoys": ["Panakke", "t-i-nuk-o!"], "tip": "Don't: ma- in front, -o for the command, -ki after it. t-i- means you act on it."},
+			{"en": "Was the bread good?", "tiles": ["Panak", "i-ho-pa-ha?"], "decoys": ["Panakke", "i-ho-pa-da."], "tip": "-pa is past; -ha replaces -da to ask."},
+			{"en": "Mira is not happy.", "tiles": ["Mira", "ma-i-seng-ki-da."], "decoys": ["Mirake", "i-seng-ki-da."], "tip": "Not wraps the verb: ma- ... -ki."}]},
+	{"v": "Yeshma na-pav-ur-da. Ti-ni dom-ma na-tal-ur-da. Ti ta-sul-ur-da... kororo! Ha!\n\nTi-ni palar",
+		"en": "At night I usually run around. I come to your house. You are asleep... snore! Ha!\n\nYour friend",
+		"words": ["yeshma", "pav", "dom", "tal", "kororo"],
+		"q": "When is the writer out and about?", "opts": ["At night", "In the morning", "At lunchtime"],
+		"replies": [
+			{"en": "Don't come to my house!", "tiles": ["Anni", "dom-ru", "ma-ta-kar-o-ki!"], "decoys": ["dom-ma", "ta-kar-o!"], "tip": "To my house is anni dom-ru. Don't: ma- ... -o-ki."},
+			{"en": "Do you sleep at night?", "tiles": ["Ti", "yeshma", "ta-sul-ur-ha?"], "decoys": ["yeshru", "na-sul-ur-ha?"], "tip": "At night is yesh-ma. You usually sleep is ta-sul-ur."},
+			{"en": "I will find you.", "tiles": ["Anke", "ti", "k-ta-sir-fu-da."], "decoys": ["Tike", "k-i-sir-fu-da."], "tip": "I act on you: k-ta-. sir is look for, -fu is the future."}]},
+	{"v": "Ti t-na-sir-im-shi! Ha! Anke Suri-ni pai k-i-nuk-ur-da. Ti-ru pai k-i-ven-ur-da. Kraa!\n\nTi-ni palar",
+		"en": "Apparently you are looking for me! Ha! I usually take Suri's paper. I give the paper to you. Kraa!\n\nYour friend",
+		"words": ["sir", "nuk", "ven"],
+		"q": "Where does the writer get the paper?", "opts": ["From Suri", "From Gav", "From Oku"],
+		"replies": [
+			{"en": "Give Suri the paper!", "tiles": ["Pai", "Suri-ru", "t-i-ven-o!"], "decoys": ["Suri-ma", "k-i-ven-o!"], "tip": "To Suri is Suri-ru. You give it is t-i-ven, and -o makes a command."},
+			{"en": "Are you a bird?", "tiles": ["Ti", "par", "ta-an-ha?"], "decoys": ["Parke", "na-an-ha?"], "tip": "You are is ta-an. Being something takes no -ke."},
+			{"en": "Your letters are good.", "tiles": ["Ti-ni", "pai-ir", "ri-ho-da."], "decoys": ["Anni", "i-ho-da."], "tip": "Many letters are they, so the verb takes ri-."}]},
+	{"v": "Hal na-an-ha? Ti ta-zen-ha? Kraa! Kraa! ...Ups. Ups.\n\nTi-ni palar",
+		"en": "Who am I? Do you know? Kraa! Kraa! ...Oops. Oops.\n\nYour friend",
+		"words": ["hal", "zen"],
+		"q": "What does the writer ask?", "opts": ["Who am I? Do you know?", "Where is Neri?", "Was the bread good?"],
+		"replies": []}
+]
+
+# Who could the writer be? The answer is "par" (Ketu's parrot).
+const SUSPECTS = [["Par", "Ketu's parrot"], ["Gav", "Gav the mail carrier"], ["Poltergais", "the poltergeist"], ["Oku", "Oku at the ruins"]]

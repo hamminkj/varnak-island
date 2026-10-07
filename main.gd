@@ -177,6 +177,7 @@ var side_quests = [
 	["friends","","Make five friends. Chat with people (compliment them, tell jokes, give gifts) until they call you palar, friend."],
 	["chonies","gav","Gav has lost six chonies all over the island! Ask Gav for clues (Ask about the lost chonies) and find them all."],
 	["hirimara","","Explore Hirimara, the prank field, far to the west past the market. Find its five secrets."],
+	["letters","gav","Mystery letters! Someone keeps writing to you. Gav at the harbor delivers them. Write back, listen in when villagers whisper, and work out who it is."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -296,10 +297,13 @@ var central = {
 
 func _ready():
 	words.merge(Data.WORDS)
+	words.merge(Data.WORDS9)
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
 	build_ui()
 	load_game()
+	load_log()
+	log_event("session", {"level": level(), "words": discovered.size(), "web": OS.has_feature("web")})
 	refresh_world()
 	last_level = level()
 	show_intro()
@@ -1412,6 +1416,22 @@ func build_ui():
 	close_x.pressed.connect(close_panel)
 	close_x.hide()
 	ui.add_child(close_x)
+	listen_button = button("Listen in", listen_in, ui)
+	listen_button.name = "ListenButton"
+	listen_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	listen_button.offset_left = -176
+	listen_button.offset_right = -20
+	listen_button.offset_top = -160
+	listen_button.offset_bottom = -96
+	listen_button.add_theme_font_size_override("font_size", 20)
+	var lsb = StyleBoxFlat.new()
+	lsb.bg_color = Color("7a1f3d")
+	lsb.set_corner_radius_all(10)
+	lsb.set_border_width_all(2)
+	lsb.border_color = Color("e9c46a")
+	listen_button.add_theme_stylebox_override("normal", lsb)
+	listen_button.add_theme_color_override("font_color", Color.WHITE)
+	listen_button.hide()
 	panel.visibility_changed.connect(func(): close_x.visible = panel.visible)
 	marker = MeshInstance3D.new()
 	var ring = CylinderMesh.new()
@@ -1454,6 +1474,7 @@ func clear_panel(title: String, keep_game: bool = false):
 		c.queue_free()
 	panel.show()
 	portrait_id = ""
+	cur_title = title
 	panel_title = text_line(title,23)
 
 func text_line(text: String, font_size: int = 20) -> Control:
@@ -1486,12 +1507,14 @@ func show_intro():
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
 		discovered.append(word)
+		log_event("word_found", word)
 		toast("New word: " + word)
 		if talk_partner != "" and ext_kind(word) != "" and not pending_ext.has(word): pending_ext.append(word)
 
 func complete(id: String):
 	if not completed.has(id):
 		completed.append(id)
+		log_event("quest", id)
 		var giver = {"belongings": "ena", "meal": "mira", "bag": "sanu", "bridge": "tor", "evidence": "tor", "cove": "neri"}.get(id, "")
 		for s in side_quests:
 			if s[0] == id: giver = s[1]
@@ -1629,6 +1652,7 @@ func _process(delta):
 	update_hirimara(delta)
 	update_portrait()
 	update_ambient(delta)
+	update_overhear(delta)
 
 func animate_people(delta: float):
 	var idx = 0
@@ -2135,7 +2159,10 @@ func observe(e: Dictionary):
 			sentence_card("fish_river", close_panel)
 			button("Try fishing", fishing, content)
 
+var cur_item: String = ""
+
 func ask(situation: String, options: Array, correct: int, on_right: Callable, right_text: String, wrong_text: String, back: Callable = Callable(), extra: Callable = Callable()):
+	cur_item = situation.substr(0, 160)
 	text_line(situation)
 	var answer: String = options[correct]
 	var order: Array = options.duplicate()
@@ -2151,6 +2178,7 @@ func ask(situation: String, options: Array, correct: int, on_right: Callable, ri
 	last_skip = button("Skip", back if back.is_valid() else close_panel, content)
 
 func _answer(opt: String, answer: String, buttons: Array, feedback: Label, on_right: Callable, right_text: String, wrong_text: String, back: Callable, extra: Callable):
+	log_event("answer", {"activity": cur_title, "item": cur_item, "chose": opt, "correct": answer}, opt == answer)
 	if opt == answer:
 		for b in buttons: b.disabled = true
 		feedback.text = "Correct. " + right_text
@@ -2172,6 +2200,7 @@ func choice_puzzle(title: String, situation: String, options: Array, correct: in
 func master(key: String):
 	if not mastered.has(key):
 		mastered.append(key)
+		log_event("mastered", key)
 		save_game()
 
 func sentence_card(sid: String, back: Callable = Callable()):
@@ -2397,6 +2426,7 @@ func add_topics(id: String):
 				button("Ask Neri for a story", neri_story, content)
 				button("Practice with Neri", show_practice, content)
 			topic("Ask about the campfire", "fire_pops", id)
+			button("Teach Neri some Varnak", teach_neri.bind(talk.bind("neri")), content)
 		"ketu":
 			topic("Ask what Ketu sells", "ketu_sells", id)
 			topic("Ask about the well", "well_full", id)
@@ -2445,6 +2475,7 @@ func topic(label: String, sid: String, npc: String):
 
 func talk(id: String):
 	compact_buttons.call_deferred()
+	if talk_partner != id: log_event("talk", id)
 	talk_partner = id
 	match id:
 		"ena":
@@ -2661,6 +2692,10 @@ func talk(id: String):
 		"gav":
 			clear_panel("Gav the mail carrier")
 			for w in ["kel", "-ru", "tar"]: learn(w)
+			var nlt = next_letter()
+			if nlt >= 0:
+				text_line("Gav waves an envelope. “Ti-ru pai! Hal-ta? Ma-na-zen-ki-da.” A letter for you! From whom? He doesn't know.", 17)
+				button("Read the mystery letter", letter_panel.bind(nlt), content)
 			if completed.has("mail"):
 				text_line("Gav tips his cap. “K-ta-har-da!” You were a great help.")
 			elif not solved.has("mail_start"):
@@ -2706,7 +2741,7 @@ func talk(id: String):
 		button("Chat with " + id.capitalize(), chat_menu.bind(id), content)
 		add_portrait(id)
 	gossip_buttons(id)
-	if level() >= 2 and Data.CHALLENGES.has(id):
+	if Data.CHALLENGES.has(id):
 		button("Say it yourself" + ("  [ok]" if mastered.has("c:" + id) else ""), challenge.bind(id), content)
 	for p in Data.PARCELS.keys():
 		if inventory.has(p) and id != "gav":
@@ -2798,6 +2833,13 @@ func show_notebook():
 	var b6 = button("Poems", show_poems, row2)
 	b6.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button("Word play: borrowings, calques, false friends, doubling", show_loans, content)
+	var row3 = HBoxContainer.new()
+	row3.add_theme_constant_override("separation", 8)
+	content.add_child(row3)
+	var b7 = button("Letters" + (" (new!)" if next_letter() >= 0 else ""), show_letters, row3)
+	var b8 = button("Overheard", show_overheard, row3)
+	var b9 = button("My learning", show_progress, row3)
+	for b in [b7, b8, b9]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
 	for word in discovered:
@@ -3069,6 +3111,7 @@ func confirm_reset():
 	text_line("This clears the saved inventory, notebook and quest progress.")
 	button("Keep current game",show_map,content)
 	button("Start fresh",func():
+		log_event("reset", "")
 		inventory.clear()
 		guesses.clear()
 		discovered.clear()
@@ -3105,6 +3148,7 @@ func save_game():
 	if file:
 		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
+	save_log()
 
 func load_game():
 	if not FileAccess.file_exists(SAVE): return
@@ -3845,6 +3889,7 @@ func show_more():
 			show_more(), row)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button("Games and activities", show_games, content)
+	button("My learning and data export", show_progress, content)
 	button("How to play", show_intro, content)
 	button("About the Varnak language", show_varnak, content)
 	button("Credits", show_credits, content)
@@ -4115,6 +4160,7 @@ func dnd(cfg: Dictionary):
 			feedback.text = "Fill every box first."
 			feedback.add_theme_color_override("font_color", Color("8a2f1f"))
 			return
+		log_event("build", {"activity": cfg["title"], "key": cfg.get("key", ""), "item": str(cfg["prompt"]).substr(0, 160), "built": dd_join(got), "target": dd_join(answers)}, got == answers)
 		if got == answers:
 			feedback.text = "Correct!  " + dd_join(answers)
 			feedback.add_theme_color_override("font_color", Color("2f6b2f"))
@@ -4544,6 +4590,7 @@ func show_games():
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
 		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
 		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
+		["Teach Neri", teach_neri.bind(show_games), true, "Neri makes a mistake in Varnak. Find it and fix it."],
 		["Review rusty words", review_rusty, discovered.size() >= 3, "Words you have found but not yet mastered."]
 	]
 	for g in games:
@@ -4982,6 +5029,8 @@ func parrot_panel():
 	text_line("A big red parrot on a crate tilts its head at you. Type something in Varnak and it will say it back.")
 	var input = text_field("Type Varnak here")
 	var out = text_line("", 20)
+	if mastered.has("lt:solved") and not completed.has("letters"):
+		button("Show the parrot one of its letters", parrot_reveal, content)
 	button("Say it to the parrot", func():
 		var t = input.text.strip_edges()
 		if t == "":
@@ -5595,7 +5644,7 @@ func errand_menu(id: String):
 	text_line(id.capitalize() + " has a request. Listen carefully:", 17)
 	varnak_banner(nums[n].capitalize() + " " + g + " t-na-ven-o-ye.")
 	var en = text_line("(Tap Show meaning if you need it.)", 16)
-	button("Show meaning", func(): en.text = "(" + str(n) + " " + Data.GIFT_WORDS[g].trim_prefix("a ") + ", I need.)", content)
+	button("Show meaning", func(): en.text = "(Please give me " + str(n) + " " + Data.GIFT_WORDS[g].trim_prefix("a ") + ".)", content)
 	text_line("You have " + str(errand_have(g)) + " " + g + ". Ketu sells panak, cha, bombom and ret-gor for one gin each. Fish come from the river.", 16)
 	var b = button("Deliver: " + nums[n] + " " + g, errand_deliver.bind(id), content)
 	b.disabled = errand_have(g) < n
@@ -5606,6 +5655,7 @@ func errand_deliver(id: String):
 	var n: int = errand["n"]
 	if errand_have(g) < n: return
 	errand_take(g, n)
+	log_event("errand", {"npc": id, "item": g, "n": n})
 	errand = {}
 	var nums = ["", "yan", "vel", "mur"]
 	var reward = n
@@ -6523,3 +6573,518 @@ func choni_kind_pick(e: Dictionary):
 	varnak_banner("Yureka! Choni!", 28)
 	text_line("A pair of Gav's spotted chonies, right here. How did they get here? Nobody knows. Everyone suspects the poltergeist.", 17)
 	button("Return", close_panel, content)
+
+# ------------------------------------------------------------ ninth expansion: learning log, overheard talk, letters, Teach Neri
+
+const LOG_FILE = "user://varnak_log.json"
+var events: Array = []
+var log_dirty: bool = false
+var cur_title: String = ""
+var listen_button: Button
+var overhear_now: Dictionary = {}
+var overhear_cd: float = 30.0
+
+func log_event(kind: String, detail, ok = null):
+	var e = {"t": int(Time.get_unix_time_from_system()), "k": kind, "d": detail}
+	if ok != null: e["ok"] = ok
+	events.append(e)
+	if events.size() > 5000: events = events.slice(events.size() - 5000)
+	log_dirty = true
+
+func save_log():
+	if not log_dirty: return
+	var f = FileAccess.open(LOG_FILE, FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(events))
+		log_dirty = false
+
+func load_log():
+	if not FileAccess.file_exists(LOG_FILE): return
+	var d = JSON.parse_string(FileAccess.get_file_as_string(LOG_FILE))
+	if d is Array: events = d
+
+func iso(t: int) -> String:
+	return Time.get_datetime_string_from_unix_time(t).replace("T", " ")
+
+func accuracy_by_activity() -> Dictionary:
+	var out = {}
+	for e in events:
+		if not (e["k"] in ["answer", "build"]) or not e.has("ok"): continue
+		var a = str(e["d"].get("activity", "?")) if e["d"] is Dictionary else "?"
+		if not out.has(a): out[a] = [0, 0]
+		if e["ok"]: out[a][0] += 1
+		else: out[a][1] += 1
+	return out
+
+func missed_words() -> Dictionary:
+	# words that appear in items the player got wrong
+	var out = {}
+	for e in events:
+		if e["k"] in ["answer", "build"] and e.has("ok") and not e["ok"] and e["d"] is Dictionary:
+			var txt = (str(e["d"].get("item", "")) + " " + str(e["d"].get("target", ""))).to_lower()
+			for w in discovered:
+				if str(w).length() >= 3 and not str(w).begins_with("-") and txt.contains(str(w)):
+					out[w] = int(out.get(w, 0)) + 1
+	return out
+
+func learning_summary() -> Dictionary:
+	var wm = 0
+	for w in discovered:
+		if mastered.has("w:" + w): wm += 1
+	var pm = 0
+	for p in phrases:
+		if mastered.has("s:" + p): pm += 1
+	var right = 0
+	var wrong = 0
+	var sessions = 0
+	for e in events:
+		if e["k"] == "session": sessions += 1
+		if e.has("ok"):
+			if e["ok"]: right += 1
+			else: wrong += 1
+	return {"words_found": discovered.size(), "words_mastered": wm, "phrases_found": phrases.size(), "phrases_mastered": pm,
+		"answers_right": right, "answers_wrong": wrong, "sessions": sessions, "quests_done": quests_done(),
+		"level": level(), "overheard": overheard_count(), "letters_answered": letters_answered(), "errands": errands_done(),
+		"neri_corrections": count_mastered("tn:"), "first_played": iso(int(events[0]["t"])) if not events.is_empty() else ""}
+
+func count_mastered(prefix: String) -> int:
+	var n = 0
+	for m in mastered:
+		if str(m).begins_with(prefix): n += 1
+	return n
+
+func show_progress():
+	compact_buttons.call_deferred()
+	clear_panel("My learning")
+	var s = learning_summary()
+	text_line("Words: " + str(s["words_found"]) + " found, " + str(s["words_mastered"]) + " mastered.  Phrases: " + str(s["phrases_found"]) + " found, " + str(s["phrases_mastered"]) + " mastered.", 18)
+	var tot = int(s["answers_right"]) + int(s["answers_wrong"])
+	text_line("Answers and sentences: " + str(s["answers_right"]) + " right, " + str(s["answers_wrong"]) + " not yet" + ((" (" + str(int(round(100.0 * s["answers_right"] / tot))) + "% right)") if tot > 0 else "") + ".", 18)
+	text_line("Quests: " + str(s["quests_done"]) + ".  Conversations overheard: " + str(s["overheard"]) + ".  Letters answered: " + str(s["letters_answered"]) + ".  Errands: " + str(s["errands"]) + ".  Neri's mistakes fixed: " + str(s["neri_corrections"]) + ".  Play sessions: " + str(s["sessions"]) + ".", 17)
+	var acc = accuracy_by_activity()
+	if not acc.is_empty():
+		text_line("By activity", 21)
+		var keys = acc.keys()
+		keys.sort_custom(func(x, y): return acc[x][0] + acc[x][1] > acc[y][0] + acc[y][1])
+		for k in keys.slice(0, 10):
+			var r: int = acc[k][0]
+			var w: int = acc[k][1]
+			var l = text_line(str(k) + ": " + str(r) + " of " + str(r + w) + " right", 16)
+			l.add_theme_color_override("font_color", Color("2f6b2f") if r >= w * 3 else Color("8a2f1f") if w > r else Color("6b4a2e"))
+	var mw = missed_words()
+	if not mw.is_empty():
+		var ks = mw.keys()
+		ks.sort_custom(func(x, y): return mw[x] > mw[y])
+		text_line("Words in questions you missed most: " + ", ".join(ks.slice(0, 8)), 16)
+	button("Review rusty words", review_rusty, content)
+	text_line("Your data stays on this device. Export it to keep a record or share it with a teacher.", 16)
+	button("Export data (JSON)", export_data.bind("json"), content)
+	button("Export data (CSV)", export_data.bind("csv"), content)
+	button("Return", close_panel, content)
+
+func export_payload(fmt: String) -> String:
+	if fmt == "csv":
+		var rows: PackedStringArray = ["time_utc,kind,activity,item,answer,target,ok"]
+		for e in events:
+			var d = e["d"]
+			var act = ""
+			var item = ""
+			var ans = ""
+			var tgt = ""
+			if d is Dictionary:
+				act = str(d.get("activity", ""))
+				item = str(d.get("item", d.get("key", d.get("id", ""))))
+				ans = str(d.get("chose", d.get("built", "")))
+				tgt = str(d.get("correct", d.get("target", "")))
+			else: item = str(d)
+			var okv = ""
+			if e.has("ok"): okv = "1" if e["ok"] else "0"
+			var cells = [iso(int(e["t"])), str(e["k"]), act, item, ans, tgt, okv]
+			for i in range(cells.size()): cells[i] = "\"" + str(cells[i]).replace("\"", "\"\"").replace("\n", " ") + "\""
+			rows.append(",".join(cells))
+		return "\n".join(rows)
+	var wl: Array = []
+	for w in discovered: wl.append({"word": w, "meaning": short_gloss(w), "mastered": mastered.has("w:" + w)})
+	var pl: Array = []
+	for p in phrases: pl.append({"phrase": Data.SENTENCES[p]["v"], "meaning": Data.SENTENCES[p]["en"], "mastered": mastered.has("s:" + p)})
+	return JSON.stringify({"game": "Varnak Island", "exported_utc": iso(int(Time.get_unix_time_from_system())), "summary": learning_summary(),
+		"accuracy_by_activity": accuracy_by_activity(), "words": wl, "phrases": pl, "quests_done": completed, "mastered_keys": mastered, "events": events}, "  ")
+
+func export_data(fmt: String):
+	log_event("export", fmt)
+	var text = export_payload(fmt)
+	var stamp = Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
+	var fname = "varnak-learning-" + stamp + "." + fmt
+	if OS.has_feature("web"):
+		JavaScriptBridge.download_buffer(text.to_utf8_buffer(), fname, "text/csv" if fmt == "csv" else "application/json")
+		toast("Downloading " + fname)
+	else:
+		var path = "user://" + fname
+		var f = FileAccess.open(path, FileAccess.WRITE)
+		if f:
+			f.store_string(text)
+			f.close()
+		message("Data exported", "Saved to:\n" + ProjectSettings.globalize_path(path))
+	last_export = text
+
+var last_export: String = ""
+
+# ---- overheard conversations ----
+
+func overheard_count() -> int:
+	return count_mastered("ov:")
+
+func update_overhear(delta: float):
+	if listen_button == null: return
+	if not overhear_now.is_empty():
+		var o: Dictionary = overhear_now["o"]
+		var ea = entity_by_id(o["a"])
+		var far = ea.is_empty() or (ea["node"] as Node3D).position.distance_to(player.position) > 30.0
+		if clock > float(overhear_now["until"]) or far:
+			overhear_now = {}
+		listen_button.visible = not overhear_now.is_empty() and not panel.visible
+		return
+	listen_button.visible = false
+	overhear_cd -= delta
+	if overhear_cd > 0.0 or panel.visible or riding: return
+	overhear_cd = 5.0
+	for o in Data.OVERHEAR:
+		if mastered.has("ov:" + o["id"]): continue
+		var ea = entity_by_id(o["a"])
+		var eb = entity_by_id(o["b"])
+		if ea.is_empty() or eb.is_empty(): continue
+		var na = ea["node"] as Node3D
+		var nb = eb["node"] as Node3D
+		if not na.visible or not nb.visible: continue
+		var mid = (na.position + nb.position) * 0.5
+		if player.position.distance_to(mid) < 18.0 and na.position.distance_to(nb.position) < 32.0:
+			start_overhear(o)
+			return
+
+func start_overhear(o: Dictionary):
+	overhear_now = {"o": o, "until": clock + 40.0}
+	overhear_cd = 45.0
+	var ea = entity_by_id(o["a"])
+	var eb = entity_by_id(o["b"])
+	ea["say"] = ["Psst... psst...", clock + 40.0]
+	eb["say"] = ["...ho? ho!", clock + 40.0]
+	emote(o["a"], "embarrassed", 4.0)
+	toast(str(o["a"]).capitalize() + " and " + str(o["b"]).capitalize() + " are whispering. Tap Listen in!")
+	listen_button.show()
+
+func listen_in():
+	if overhear_now.is_empty(): return
+	var o: Dictionary = overhear_now["o"]
+	overhear_now = {}
+	listen_button.hide()
+	overhear_panel(o, true)
+
+func overhear_panel(o: Dictionary, live: bool):
+	compact_buttons.call_deferred()
+	for w in o["words"]: learn(w)
+	clear_panel("Listening in: " + str(o["a"]).capitalize() + " and " + str(o["b"]).capitalize())
+	talk_partner = ""
+	var t = text_line("You stand nearby and pretend to admire a tree. They don't notice you." if live else "You remember what you overheard.", 16)
+	t.add_theme_color_override("font_color", Color("6b4a2e"))
+	var ens: Array = []
+	for ln in o["lines"]:
+		text_line(str(ln[0]).capitalize() + ":  " + str(ln[1]), 21)
+		var e = text_line("(" + str(ln[2]) + ")", 15)
+		e.add_theme_color_override("font_color", Color("6b4a2e"))
+		e.visible = false
+		ens.append(e)
+	var shown = [false]
+	var sb = button("Show what they meant", func():
+		shown[0] = true
+		for e in ens: e.visible = true, content)
+	var first = not mastered.has("ov:" + o["id"])
+	log_event("overheard", {"id": o["id"], "live": live})
+	ask(o["q"], o["opts"], 0, func():
+		sb.disabled = true
+		if first:
+			master("ov:" + o["id"])
+			var bonus = 1 if shown[0] else 2
+			gin += bonus
+			toast("You understood! +" + str(bonus) + " gin" + ("" if shown[0] else " (bonus: no peeking)"))
+			if o.has("clue"): toast("New clue for the mystery letters! (Notebook, Letters)")
+			check_letter_ready()
+			save_game(), "You followed the whole conversation.", "Listen again: look for the question words and the endings.", show_overheard if not live else close_panel)
+
+func show_overheard():
+	compact_buttons.call_deferred()
+	clear_panel("Overheard")
+	text_line("Conversations you listened in on. Walk near two villagers standing close together and wait: sometimes they whisper.", 16)
+	var any = false
+	for o in Data.OVERHEAR:
+		if mastered.has("ov:" + o["id"]):
+			any = true
+			button(str(o["a"]).capitalize() + " and " + str(o["b"]).capitalize() + ": " + str(o["lines"][0][1]), overhear_panel.bind(o, false), content)
+	if not any: text_line("Nothing yet. Try the market, the school, the harbor or the village center.", 17)
+	text_line(str(overheard_count()) + " of " + str(Data.OVERHEAR.size()) + " conversations heard.", 16)
+	button("Back", show_notebook, content)
+
+# ---- mystery letters ----
+
+func clue_list() -> Array:
+	var out: Array = []
+	for o in Data.OVERHEAR:
+		if o.has("clue") and mastered.has("ov:" + o["id"]): out.append(o["clue"])
+	return out
+
+func letters_answered() -> int:
+	return count_mastered("lt:reply:")
+
+func letter_available(k: int) -> bool:
+	if k >= Data.LETTERS.size(): return false
+	if k == 0: return discovered.size() >= 8
+	return mastered.has("lt:reply:" + str(k - 1)) and clue_list().size() >= k
+
+func next_letter() -> int:
+	# the letter Gav should hand over now, or -1
+	for k in range(Data.LETTERS.size()):
+		if not mastered.has("lt:read:" + str(k)):
+			return k if letter_available(k) else -1
+	return -1
+
+func check_letter_ready():
+	if next_letter() >= 0: toast("Gav has a letter for you at the harbor!")
+
+func letter_panel(k: int):
+	compact_buttons.call_deferred()
+	var lt: Dictionary = Data.LETTERS[k]
+	if not mastered.has("lt:read:" + str(k)):
+		master("lt:read:" + str(k))
+		log_event("letter_read", k)
+	for w in lt["words"]: learn(w)
+	clear_panel("Letter " + str(k + 1) + " of " + str(Data.LETTERS.size()))
+	talk_partner = ""
+	var t = text_line("No name on the envelope. The handwriting is very scratchy." + (" A small feather is stuck to the paper." if k >= 3 else ""), 16)
+	t.add_theme_color_override("font_color", Color("6b4a2e"))
+	if k > 0:
+		var said = ""
+		for m in mastered:
+			if str(m).begins_with("lt:said:" + str(k - 1) + ":"): said = str(m).split(":")[3]
+		if said != "":
+			var y = text_line("You wrote: " + said, 16)
+			y.add_theme_color_override("font_color", Color("6b4a2e"))
+	varnak_banner(lt["v"], 22)
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = lt["en"], content)
+	var after = func():
+		if not lt["replies"].is_empty():
+			if mastered.has("lt:reply:" + str(k)): text_line("You already answered this letter.", 16)
+			else: button("Write back", reply_menu.bind(k), content)
+		elif not completed.has("letters"):
+			button("Who is it? Solve the mystery", solve_mystery, content)
+		button("Letters", show_letters, content)
+	ask(lt["q"], lt["opts"], 0, func(): master("lt:q:" + str(k)), "", "Read it again, slowly. Show meaning can help.", show_letters, after)
+
+func reply_menu(k: int):
+	compact_buttons.call_deferred()
+	var lt: Dictionary = Data.LETTERS[k]
+	clear_panel("Write back")
+	text_line("What do you want to say? Then build it in Varnak.", 17)
+	for i in range(lt["replies"].size()):
+		var r: Dictionary = lt["replies"][i]
+		button(r["en"], reply_build.bind(k, i), content)
+	button("Back", letter_panel.bind(k), content)
+
+func reply_build(k: int, i: int):
+	var r: Dictionary = Data.LETTERS[k]["replies"][i]
+	dnd({"title": "Write back", "prompt": "Write in Varnak:\n\"" + r["en"] + "\"", "answers": r["tiles"], "pool": r["decoys"], "tip": r["tip"], "key": "lt:b:" + str(k) + ":" + str(i),
+		"back": show_letters, "on_right": func():
+			if not mastered.has("lt:reply:" + str(k)):
+				master("lt:said:" + str(k) + ":" + " ".join(r["tiles"]))
+				master("lt:reply:" + str(k))
+				gin += 1
+				log_event("letter_reply", {"letter": k, "reply": " ".join(r["tiles"])})
+				toast("You fold the letter and drop it in Gav's bag. +1 gin")
+				save_game()
+				if next_letter() >= 0: check_letter_ready()
+				elif k + 1 < Data.LETTERS.size(): toast("The next letter will come when you know more. Listen in on villagers for clues.")})
+
+func show_letters():
+	compact_buttons.call_deferred()
+	clear_panel("Mystery letters")
+	if not mastered.has("lt:read:0"):
+		text_line("No letters yet. " + ("Gav at the harbor has one for you!" if letter_available(0) else "Collect a few more words first."), 17)
+	else:
+		text_line("Someone keeps writing to you and signing “Ti-ni palar,” your friend. Who is it?", 17)
+	for k in range(Data.LETTERS.size()):
+		if mastered.has("lt:read:" + str(k)):
+			var done = mastered.has("lt:reply:" + str(k)) or Data.LETTERS[k]["replies"].is_empty()
+			button("Letter " + str(k + 1) + ("  [ok]" if done else "  (answer it)"), letter_panel.bind(k), content)
+	var nl = next_letter()
+	if nl >= 0: text_line("A new letter is waiting with Gav at the harbor.", 17)
+	elif mastered.has("lt:read:0") and not mastered.has("lt:read:" + str(Data.LETTERS.size() - 1)):
+		var lastk = 0
+		for k in range(Data.LETTERS.size()):
+			if mastered.has("lt:read:" + str(k)): lastk = k
+		if mastered.has("lt:reply:" + str(lastk)): text_line("The next letter comes when you have found more clues. Listen in on villagers who are whispering.", 16)
+	var cl = clue_list()
+	text_line("Clues (" + str(cl.size()) + " of " + str(Data.LETTER_CLUES.size()) + ")", 21)
+	if cl.is_empty(): text_line("None yet. Listen in when villagers whisper.", 16)
+	for c in cl: text_line("• " + Data.LETTER_CLUES[c], 16)
+	if completed.has("letters"): text_line("Solved: Ketu's parrot wrote them all. Kraa!", 17)
+	elif mastered.has("lt:solved"): text_line("You worked it out. Go tell the parrot at the market!", 17)
+	elif mastered.has("lt:read:" + str(Data.LETTERS.size() - 1)): button("Who is it? Solve the mystery", solve_mystery, content)
+	button("Overheard conversations", show_overheard, content)
+	button("Back", show_notebook, content)
+
+func solve_mystery():
+	compact_buttons.call_deferred()
+	clear_panel("Who writes the letters?")
+	text_line("Think about your clues:", 17)
+	for c in clue_list(): text_line("• " + Data.LETTER_CLUES[c], 15)
+	text_line("Who is “Ti-ni palar”?", 19)
+	for s in Data.SUSPECTS:
+		button(s[0] + " (" + s[1] + ")", solve_how.bind(s), content)
+	button("Back", show_letters, content)
+
+func solve_how(s: Array):
+	compact_buttons.call_deferred()
+	clear_panel("How do you know?")
+	text_line("Say it in Varnak. Which ending fits how you know?", 17)
+	var base = s[0] + " ti-ni palar i-an-"
+	for ev in [["da", "I saw it with my own eyes"], ["shi", "The clues show it"], ["nu", "Somebody told me"]]:
+		button(base + ev[0] + ".  (" + ev[1] + ")", solve_check.bind(s[0], ev[0]), content)
+	button("Back", solve_mystery, content)
+
+func solve_check(who: String, ev: String):
+	log_event("mystery_guess", {"who": who, "ending": ev}, who == "Par" and ev == "shi")
+	if who != "Par":
+		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Ena asked.", "Poltergais": "Ila says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
+		message("Hmm, not quite", why + " Look at your clues again: feathers, kraa, and someone who goes out at night.")
+		button("Try again", solve_mystery, content)
+		return
+	if ev == "da":
+		message("Right suspect, wrong ending", "You never saw the parrot write anything! You worked it out from clues, so use the inferred ending, -shi.")
+		button("Try again", solve_how.bind(Data.SUSPECTS[0]), content)
+		return
+	if ev == "nu":
+		message("Right suspect, wrong ending", "Nobody told you this. You figured it out yourself from clues, so use -shi: apparently.")
+		button("Try again", solve_how.bind(Data.SUSPECTS[0]), content)
+		return
+	master("lt:solved")
+	learn("par-yir")
+	message("Par ti-ni palar i-an-shi!", "Apparently the parrot is your secret friend! Feathers, paper, “kraa” and nights away from the market. Go to Ketu's market and show the parrot one of its letters.")
+
+func parrot_reveal():
+	complete("letters")
+	gin += 5
+	inventory.append("feather")
+	log_event("mystery_solved", "par")
+	clear_panel("Par: your secret friend")
+	text_line("You hold up a letter. The parrot freezes. Then it puffs up every feather it has.", 17)
+	varnak_banner("Kraa! Ti-ni palar! Ti-ni palar! ...Hiri!", 24)
+	text_line("(Your friend! Your friend! ...Gotcha!)", 16)
+	text_line("The parrot pulls a huge red feather from under its wing and drops it in your hand: a par-yir, a bird's clothes. Then it says, very clearly, “K-ta-har-da.” Thank you. Kraa. (+5 gin)", 17)
+	button("Return", close_panel, content)
+
+# ---- Teach Neri: spot and fix the mistake ----
+
+func common_prefix(a: String, b: String) -> int:
+	var x = a.to_lower()
+	var y = b.to_lower()
+	var n = 0
+	while n < mini(x.length(), y.length()) and x[n] == y[n]: n += 1
+	return n
+
+func neri_mistake(tp: Dictionary) -> Dictionary:
+	var tiles: Array = tp["tiles"]
+	var cands: Array = []
+	for d in tp["decoys"]:
+		var best = -1
+		var bl = 1
+		for i in range(tiles.size()):
+			var cp = common_prefix(d, tiles[i])
+			if cp > bl and d != tiles[i]:
+				bl = cp
+				best = i
+		if best >= 0 and not tiles.has(d): cands.append({"slot": best, "wrong": d})
+	for i in range(tiles.size()):
+		var ad = auto_decoys([tiles[i]], 1)
+		if not ad.is_empty() and not tiles.has(ad[0]): cands.append({"slot": i, "wrong": ad[0]})
+	if tiles.size() >= 3:
+		cands.append({"slot": tiles.size() - 1, "swap": true})
+	if cands.is_empty(): return {}
+	return cands[randi() % cands.size()]
+
+func teach_neri(back: Callable = Callable()):
+	if not back.is_valid(): back = show_games
+	var tries = 0
+	var i = pick_tile_index()
+	var m = neri_mistake(Data.TILES[i])
+	while m.is_empty() and tries < 10:
+		i = pick_tile_index()
+		m = neri_mistake(Data.TILES[i])
+		tries += 1
+	var tp: Dictionary = Data.TILES[i]
+	var tiles: Array = tp["tiles"]
+	var said: Array = tiles.duplicate()
+	if m.get("swap", false):
+		var v = said.pop_back()
+		said.insert(said.size() - 1, v)
+	else:
+		said[m["slot"]] = m["wrong"]
+	compact_buttons.call_deferred()
+	clear_panel("Teach Neri")
+	talk_partner = "neri"
+	learn("senar")
+	text_line("Neri is practicing Varnak and wants to say:\n\"" + tp["en"] + "\"", 18)
+	text_line("Neri says:", 17)
+	varnak_banner(" ".join(said), 24)
+	var fb = text_line("Tap the word Neri got wrong.", 17)
+	var grid = HFlowContainer.new()
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	content.add_child(grid)
+	var bad_idx: Array = []
+	if m.get("swap", false): bad_idx = [said.size() - 2, said.size() - 1]
+	else: bad_idx = [m["slot"]]
+	for k in range(said.size()):
+		var b = button(said[k], func():
+			if bad_idx.has(k):
+				log_event("answer", {"activity": "Teach Neri: spot", "item": " ".join(said), "chose": said[k], "correct": said[bad_idx[0]]}, true)
+				teach_fix(i, said, m, back)
+			else:
+				log_event("answer", {"activity": "Teach Neri: spot", "item": " ".join(said), "chose": said[k], "correct": said[bad_idx[0]]}, false)
+				fb.text = "That one is fine. Look at the endings, or where the verb is."
+				fb.add_theme_color_override("font_color", Color("8a2f1f")), grid)
+		b.custom_minimum_size.x = 90
+	button("Skip", teach_neri.bind(back), content)
+	button("Back", back, content)
+
+func teach_fix(i: int, said: Array, m: Dictionary, back: Callable):
+	var tp: Dictionary = Data.TILES[i]
+	var good = " ".join(tp["tiles"])
+	clear_panel("Teach Neri")
+	var first = not mastered.has("tn:" + str(i))
+	var done = func():
+		if first:
+			gin += 1
+			toast("Neri: K-ta-har-da, senar! (Thank you, teacher!) +1 gin")
+			save_game()
+		master("tn:" + str(i))
+	if m.get("swap", false):
+		text_line("Yes! Neri: “" + " ".join(said) + "”", 17)
+		var opts: Array = [good, " ".join(said)]
+		var alt: Array = tp["tiles"].duplicate()
+		var f = alt.pop_front()
+		alt.append(f)
+		if not opts.has(" ".join(alt)): opts.append(" ".join(alt))
+		ask("Which order is right?", opts, 0, done, "In Varnak the verb comes last.", "Think about where the verb goes.", back, func():
+			button("Another one", teach_neri.bind(back), content))
+		return
+	var wrong: String = m["wrong"]
+	var right: String = tp["tiles"][m["slot"]]
+	text_line("Yes! Neri said “" + wrong + "”. What should it be?", 17)
+	var opts: Array = [right]
+	for d in auto_decoys([right], 2):
+		if d != wrong and not opts.has(d): opts.append(d)
+	if opts.size() < 3:
+		for d in tp["decoys"]:
+			if d != wrong and not opts.has(d) and opts.size() < 3: opts.append(d)
+	if opts.size() < 2: opts.append(wrong)
+	ask("Fix it:", opts, 0, done, good + "  " + tp["tip"], "Not quite. " + tp["tip"], back, func():
+		button("Another one", teach_neri.bind(back), content))

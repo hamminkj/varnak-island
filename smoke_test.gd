@@ -982,6 +982,96 @@ func run():
 	game.review_rusty()
 	assert(game.panel.visible)
 	print("PASS: ninth expansion: close X, errands, review")
+	# ninth b: overheard talk, mystery letters, Teach Neri, learning log
+	game.close_panel()
+	game.mastered = game.mastered.filter(func(m): return not (str(m).begins_with("ov:") or str(m).begins_with("lt:") or str(m).begins_with("tn:")))
+	game.completed.erase("letters")
+	var ov0: Dictionary = Data.OVERHEAR[0]
+	var nna = game.entity_by_id(ov0["a"])["node"]
+	var nnb = game.entity_by_id(ov0["b"])["node"]
+	game.player.position = (nna.position + nnb.position) * 0.5 + Vector3(1.5, 0.1, 1.5)
+	game.overhear_now = {}
+	game.overhear_cd = 0.0
+	game.update_overhear(0.1)
+	assert(not game.overhear_now.is_empty() and game.overhear_now["o"]["id"] == ov0["id"], "overhear starts near the pair")
+	game.update_overhear(0.1)
+	assert(game.listen_button.visible)
+	var gv0 = game.gin
+	game.listen_in()
+	assert(game.panel.visible and has_any(ov0["lines"][0][1]))
+	press(ov0["opts"][0])
+	assert(game.mastered.has("ov:" + ov0["id"]) and game.gin == gv0 + 2 and game.clue_list().has("paper"))
+	game.show_overheard()
+	assert(has_any("1 of " + str(Data.OVERHEAR.size())))
+	# every conversation renders and can be answered
+	for o in Data.OVERHEAR:
+		game.overhear_panel(o, false)
+		press(o["opts"][0])
+		assert(game.mastered.has("ov:" + o["id"]), o["id"])
+	assert(game.clue_list().size() == Data.LETTER_CLUES.size())
+	# letters
+	for w in ["wak", "guro", "kor", "kel", "anni", "tekaru", "tari", "gin", "cha"]: game.learn(w)
+	assert(game.next_letter() == 0)
+	game.talk("gav")
+	press("Read the mystery letter")
+	assert(game.mastered.has("lt:read:0") and game.next_letter() == -1)
+	for k in range(Data.LETTERS.size()):
+		var ltr: Dictionary = Data.LETTERS[k]
+		if k > 0:
+			assert(game.next_letter() == k, "letter " + str(k) + " ready")
+			game.letter_panel(k)
+		press(ltr["opts"][0])
+		assert(game.mastered.has("lt:q:" + str(k)))
+		if ltr["replies"].is_empty(): break
+		press("Write back")
+		var rr: Dictionary = ltr["replies"][k % ltr["replies"].size()]
+		press(rr["en"])
+		for w in rr["tiles"]: game.tile_tapped(tray_tile(w))
+		press("Check")
+		assert(game.mastered.has("lt:reply:" + str(k)), "reply " + str(k))
+	game.show_letters()
+	press("Who is it? Solve the mystery")
+	press("Gav (Gav the mail carrier)")
+	press("Gav ti-ni palar i-an-shi.  (The clues show it)")
+	assert(not game.mastered.has("lt:solved"))
+	game.solve_how(Data.SUSPECTS[0])
+	press("Par ti-ni palar i-an-da.  (I saw it with my own eyes)")
+	assert(not game.mastered.has("lt:solved"))
+	game.solve_how(Data.SUSPECTS[0])
+	press("Par ti-ni palar i-an-shi.  (The clues show it)")
+	assert(game.mastered.has("lt:solved"))
+	game.parrot_panel()
+	press("Show the parrot one of its letters")
+	assert(game.completed.has("letters") and game.inventory.has("feather"))
+	# Teach Neri: every tile sentence makes a findable mistake with a fix
+	for i in range(Data.TILES.size()):
+		var nm = game.neri_mistake(Data.TILES[i])
+		assert(not nm.is_empty() or Data.TILES[i]["tiles"].size() < 2, "mistake for tile " + str(i))
+	for rep9 in range(12):
+		game.teach_neri()
+		assert(game.panel.visible and has_any("Neri says:"))
+	# say it yourself is open at level 1
+	game.diff_bias = -1
+	game.talk("mira")
+	assert(find_button(game.content, "Say it yourself") != null or find_button(game.content, "Say it yourself  [ok]") != null)
+	game.diff_bias = 0
+	# learning log and export
+	assert(game.events.size() > 10)
+	var kinds9 = {}
+	for e in game.events: kinds9[e["k"]] = true
+	for k in ["session", "word_found", "mastered", "answer", "build", "overheard", "letter_read", "letter_reply", "quest"]:
+		assert(kinds9.has(k), "log has " + k)
+	game.show_progress()
+	assert(has_any("Words:") and find_button(game.content, "Export data (CSV)") != null)
+	var csv9 = game.export_payload("csv")
+	assert(csv9.begins_with("time_utc,kind,activity") and csv9.split("\n").size() > 10)
+	var js9 = JSON.parse_string(game.export_payload("json"))
+	assert(js9 is Dictionary and js9["summary"]["letters_answered"] == 5 and js9["events"].size() == game.events.size())
+	game.export_data("json")
+	assert(game.last_export != "")
+	game.show_notebook()
+	assert(find_button(game.content, "Letters") != null and find_button(game.content, "My learning") != null)
+	print("PASS: ninth expansion b: overheard talk, mystery letters, Teach Neri, learning log and export")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
