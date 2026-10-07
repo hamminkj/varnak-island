@@ -3,7 +3,7 @@ extends RefCounted
 # Everything else (coast, river channel, west hill, hot spring, lagoon, harbor inlet) is
 # carved or raised from that flat base, so older positions keep working.
 
-const X0 = -100.0
+const X0 = -150.0
 const X1 = 100.0
 const Z0 = -90.0
 const Z1 = 100.0
@@ -17,8 +17,10 @@ const RIDGE = Vector3(66.0, 8.0, -44.0)   # x, peak height, z (north-east ridge 
 const RIDGE_R = 12.0
 const FALLS_POOL = Vector2(64.0, -32.4)
 const ISLET = Vector2(50.0, 82.0)
-# Extra land beyond the main oval: south-west peninsula (ruins) and north-east headland (ridge).
-const LOBES = [Vector3(-62.0, 40.0, 16.0), Vector3(66.0, -48.0, 14.0)]
+# Extra land beyond the main oval: south-west peninsula (ruins), north-east headland (ridge)
+# and the far-west peninsula, Hirimara (the prank field).
+const LOBES = [Vector3(-62.0, 40.0, 16.0), Vector3(66.0, -48.0, 14.0), Vector3(-110.0, 0.0, 30.0)]
+const HIRIMARA = Vector2(-110.0, 0.0)
 # The river runs from the hot spring east to the sea.
 const RIVER = [Vector2(-44, -22), Vector2(-30, -23), Vector2(0, -23), Vector2(30, -23), Vector2(55, -27), Vector2(75, -31), Vector2(98, -35)]
 

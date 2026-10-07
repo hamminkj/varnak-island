@@ -281,7 +281,7 @@ func run():
 		head += 1
 		for d in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
 			var n = c2 + d
-			if walk.has(n) or abs(n.x) > 95 or n.y < -80 or n.y > 99: continue
+			if walk.has(n) or n.x < -142 or n.x > 95 or n.y < -80 or n.y > 99: continue
 			var crossing = (abs(n.x) <= 1 and n.y > -27 and n.y < -19) or (n.x == -30 and n.y > -27 and n.y < -19) or (n.x == 52 and n.y > -33 and n.y < -20) or (abs(n.x) <= 3 and n.y >= 30 and n.y <= 42) or (n.x == 48 and n.y >= 66 and n.y <= 74)
 			if T.deep(n.x, n.y) and not crossing: continue
 			if game.is_blocked(n.x, n.y, -0.6): continue
@@ -762,7 +762,7 @@ func run():
 	game.shrooms = 3
 	game.berries = 2
 	game.gift_menu("tor")
-	press("“Ki ning-guro ti-ru!”  (A song-berry, for you!)")
+	press("ning-guro (song-berry)")
 	assert(game.poems.size() == 2 and game.poems[-1]["by"] == "tor")
 	game.villager_poem("lira", "sao-dau")
 	game.eat_poem("sao-dau")
@@ -842,6 +842,78 @@ func run():
 	assert(game.ui.find_child("MovePad", true, false) != null)
 	game.show_varnak()
 	assert(has_any("Evidentials") and has_any("Doubling") and has_any("Ma-k-i-pal-pa-ki-da"))
+	# ---- eighth expansion: Hirimara, pranks, choni hunt, compact menus ----
+	var T8 = load("res://terrain.gd")
+	for pt in [Vector2(-110, 0), Vector2(-96, 16), Vector2(-100, -14), Vector2(-127, 14), Vector2(-86, 2), Vector2(-92, -6)]:
+		assert(T8.height(pt.x, pt.y) > -0.1, "Hirimara should be land at " + str(pt))
+	assert(not T8.deep(-84, 0) and not T8.deep(-84, 5), "the neck to Hirimara is walkable")
+	for id in ["maze_chest", "lavir", "karaoke", "ghost_hut", "scarecrow", "dopel", "choni_hill", "choni_falls", "choni_islet", "choni_ruins"]:
+		assert(not game.entity_by_id(id).is_empty(), "missing entity " + id)
+	for c in Data.CHONI_HUNT:
+		if c[0] in ["choni_ghost", "choni_maze"]: continue
+		assert(T8.height(c[1], c[2]) > -0.3, "choni reachable: " + c[0])
+	game.examine(game.entity_by_id("karaoke"))
+	press("Sing it! (Ta-ning-o!)")
+	assert(has_any("Bravo"))
+	game.examine(game.entity_by_id("scarecrow"))
+	game.examine(game.entity_by_id("dopel"))
+	press("Ask: Ti hal ta-an-ha? (Who are you?)")
+	press("Say: Ti Pomo ma-ta-an-ki-da! (You are not Pomo!)")
+	game.examine(game.entity_by_id("ghost_hut"))
+	press("Ta-sul-o-ye!")
+	assert(not game.solved.has("ch:choni_ghost"))
+	press("T-na-ven-o-ye!")
+	assert(game.solved.has("ch:choni_ghost"))
+	game.examine(game.entity_by_id("maze_chest"))
+	assert(game.solved.has("ch:choni_maze") and game.inventory.has("chochke"))
+	assert(game.completed.has("hirimara"), "five secrets of Hirimara")
+	for id in ["choni_hill", "choni_falls", "choni_islet", "choni_ruins"]:
+		game.target = game.entity_by_id(id)
+		game.interact()
+	assert(game.chonies_found() == 6)
+	game.choni_hints()
+	press("Give Gav the chonies")
+	assert(game.completed.has("chonies") and game.choni_line.visible)
+	for id in Data.PEOPLE.keys():
+		game.prank_menu(id)
+		for pk in Data.PRANKS:
+			press(pk["label"])
+			assert(game.panel.visible)
+			game.prank_menu(id)
+	seed(11)
+	for k in range(20): game.tease("oren")
+	for g in Data.GOSSIP:
+		game.gossip_card(g, 0)
+		press(g["en"])
+		game.gossip_reply(g)
+	var prng2 = RandomNumberGenerator.new()
+	for t in [11, 12, 13, 14]:
+		for k in range(10):
+			prng2.seed = k * 7 + t
+			var ln = game.poem_line(t, prng2)
+			assert(ln[0] != "" and ln[1] != "")
+	game.choni_rain_t = 0.5
+	game.update_hirimara(0.1)
+	assert(game.choni_fx.emitting)
+	game.update_hirimara(1.0)
+	game.chat_menu("gav")
+	await process_frame
+	var grid_found = false
+	for c in game.content.get_children():
+		if c is GridContainer: grid_found = true
+	assert(grid_found, "chat buttons are in a compact grid")
+	game.show_map()
+	game.message("Same old", "This happened before.")
+	game.examine(game.entity_by_id("deshavu"))
+	assert(has_any("This happened before") and has_any("Deshavu"))
+	var poems_before = game.poems.size()
+	for k in range(40):
+		game.ambient_cd = 0.0
+		game.close_panel()
+		game.player.position = Vector3(-4, 0.1, 13)
+		game.update_ambient(0.1)
+	assert(game.poems.size() >= poems_before)
+	print("PASS: eighth expansion: Hirimara (maze, karaoke, poltergeist, doppelganger, scarecrow), choni hunt, pranks, teases, new gossip, poems, choni rain, compact menus")
 	print("PASS: word play: habibi and putz, calques, false friends game, doubling, Guarani sound words, move pad icon")
 	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
 	print("PASS: sixth expansion: chat, compliments, teasing, jokes, gifts, moods, secrets, friends quest, reactions, portrait")

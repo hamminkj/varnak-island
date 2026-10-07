@@ -12,14 +12,15 @@ const PATHS = [
 	Vector4(-30, -29, -46, -33), Vector4(-46, -33, -59, -37), Vector4(2, -10, 44, -10), Vector4(44, -10, 52, -7),
 	Vector4(52, -7, 73, -7), Vector4(50, -7, 46, 14), Vector4(46, 14, 62, 20), Vector4(44, -10, 52, -19),
 	Vector4(52, -19, 52, -33), Vector4(52, -33, 34, -40), Vector4(34, -40, 7, -36),
-	Vector4(-50, 20, -60, 33), Vector4(52, -33, 61, -33.5)
+	Vector4(-50, 20, -60, 33), Vector4(52, -33, 61, -33.5),
+	Vector4(-56, 9, -88, 3), Vector4(-88, 3, -101, 2), Vector4(-101, 2, -98, 14), Vector4(-101, 2, -99, -16)
 ]
 const DAY_LEN = 480.0
 const FERRY_HARBOR = Vector3(1.8, 0, 44.6)
 const FERRY_ISLET = Vector3(49.8, 0, 66.0)
-const STARS = [Vector3(-14, 0, -46), Vector3(-30, 0, -45), Vector3(66, 0, 31), Vector3(55, 0, 86), Vector3(-30, 0, 41), Vector3(30, 0, 40), Vector3(-76, 0, -6), Vector3(-71, 0, 47)]
+const STARS = [Vector3(-14, 0, -46), Vector3(-30, 0, -45), Vector3(66, 0, 31), Vector3(55, 0, 86), Vector3(-30, 0, 41), Vector3(30, 0, 40), Vector3(-134, 0, 6), Vector3(-71, 0, 47)]
 const HIDE_SPOTS = {"rin": Vector3(-50.5, 0, -13.4), "ola": Vector3(-42.4, 0, 19.9)}
-const MAP_X0 = -90.0
+const MAP_X0 = -143.0
 const MAP_X1 = 90.0
 const MAP_Z0 = -56.0
 const MAP_Z1 = 94.0
@@ -170,6 +171,8 @@ var side_quests = [
 	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
 	["poems","","Find glowing ning-guro berries and sao-dau mushrooms. Eat them or give them to people, and collect five poems."],
 	["friends","","Make five friends. Chat with people (compliment them, tell jokes, give gifts) until they call you palar, friend."],
+	["chonies","gav","Gav has lost six chonies all over the island! Ask Gav for clues (Ask about the lost chonies) and find them all."],
+	["hirimara","","Explore Hirimara, the prank field, far to the west past the market. Find its five secrets."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -179,6 +182,12 @@ var guro_node: Node3D
 var guro_t: float = -1.0
 var guro_cd: float = 140.0
 var fish_rain_t: float = -1.0
+var choni_rain_t: float = -1.0
+var choni_fx: CPUParticles3D
+var choni_line: Node3D
+var maze_chest: Node3D
+var ghost_things: Array = []
+var last_msg: Array = []
 var fish_fx: CPUParticles3D
 var odd_nodes: Dictionary = {}
 var friend: Dictionary = {}
@@ -204,7 +213,8 @@ const PLANTS = [
 	["berry4", "ning-guro", Vector3(57, 0, 13)], ["berry5", "ning-guro", Vector3(-56, 0, -29)], ["berry6", "ning-guro", Vector3(46.5, 0, 79)],
 	["berry7", "ning-guro", Vector3(-67, 0, 36)], ["berry8", "ning-guro", Vector3(18, 0, -37)],
 	["shroom1", "sao-dau", Vector3(12, 0, -15.5)], ["shroom2", "sao-dau", Vector3(-17, 0, -11)], ["shroom3", "sao-dau", Vector3(-38, 0, -29)],
-	["shroom4", "sao-dau", Vector3(58, 0, -36.5)], ["shroom5", "sao-dau", Vector3(70, 0, -15)], ["shroom6", "sao-dau", Vector3(-66, 0, 27.5)]
+	["shroom4", "sao-dau", Vector3(58, 0, -36.5)], ["shroom5", "sao-dau", Vector3(70, 0, -15)], ["shroom6", "sao-dau", Vector3(-66, 0, 27.5)],
+	["berry9", "ning-guro", Vector3(-120, 0, 17)], ["shroom7", "sao-dau", Vector3(-106, 0, -24)]
 ]
 # skin, hair, hair style, accent
 var looks = {
@@ -246,7 +256,8 @@ var regions = [
 	["lighthouse", "fardom: the lighthouse", Vector2(75, -7), 9.0, Vector3(70, 0, -7)],
 	["ruins", "The old ruins", Vector2(-62, 40), 11.0, Vector3(-58, 0, 32)],
 	["falls", "The waterfall", Vector2(63, -34), 7.0, Vector3(60, 0, -33.5)],
-	["islet", "Sendor: the small island", Vector2(50, 80), 13.0, Vector3(48, 0, 71)]
+	["islet", "Sendor: the small island", Vector2(50, 80), 13.0, Vector3(48, 0, 71)],
+	["hirimara", "Hirimara: the prank field", Vector2(-108, 0), 22.0, Vector3(-96, 0, 3)]
 ]
 var central = {
 	"harbor": ["The harbor", Vector3(0, 0, 33)], "village": ["teka: the village", Vector3(0, 0, 16)],
@@ -353,6 +364,7 @@ func build_world():
 	build_places3()
 	build_places5()
 	build_entities()
+	build_hirimara()
 	build_forest()
 	build_scatter()
 	build_sky_life()
@@ -721,6 +733,35 @@ func build_scatter():
 				stem_colors.append(Color("4f8b3c"))
 				heads.append(Transform3D(Basis.IDENTITY, Vector3(x, y + h + 0.02, z)))
 				head_colors.append(col.lightened(rs.randf() * 0.15))
+	# Hirimara, the far-west peninsula
+	tries = 0
+	var hiri_tufts = 0
+	while hiri_tufts < 1400 and tries < 5000:
+		tries += 1
+		var x = rs.randf_range(-140, -82)
+		var z = rs.randf_range(-30, 30)
+		if not grass_ok(x, z): continue
+		if x > MAZE_O.x - 0.5 and x < MAZE_O.x + MAZE_N * MAZE_CELL + 0.5 and z > MAZE_O.y - 0.5 and z < MAZE_O.y + MAZE_N * MAZE_CELL + 0.5: continue
+		var s = rs.randf_range(0.6, 1.3)
+		var tilt = Basis.from_euler(Vector3(rs.randf_range(-0.25, 0.25), rs.randf() * TAU, rs.randf_range(-0.25, 0.25)))
+		tufts.append(Transform3D(tilt.scaled(Vector3(s, s, s)), Vector3(x, T.height(x, z) + 0.13 * s, z)))
+		tuft_colors.append(Color("2f6a2a").lerp(Color("86b84a"), rs.randf()))
+		hiri_tufts += 1
+	for c in range(26):
+		var cx = rs.randf_range(-138, -86)
+		var cz = rs.randf_range(-28, 28)
+		if cx > MAZE_O.x - 1.0 and cx < MAZE_O.x + MAZE_N * MAZE_CELL + 1.0 and cz > MAZE_O.y - 1.0 and cz < MAZE_O.y + MAZE_N * MAZE_CELL + 1.0: continue
+		var col: Color = palette[rs.randi() % palette.size()]
+		for k in range(rs.randi_range(4, 8)):
+			var x = cx + rs.randf_range(-1.3, 1.3)
+			var z = cz + rs.randf_range(-1.3, 1.3)
+			if grass_ok(x, z):
+				var h = rs.randf_range(0.28, 0.42)
+				var y = T.height(x, z)
+				stems.append(Transform3D(Basis.from_scale(Vector3(1, h, 1)), Vector3(x, y + h * 0.5, z)))
+				stem_colors.append(Color("4f8b3c"))
+				heads.append(Transform3D(Basis.IDENTITY, Vector3(x, y + h + 0.02, z)))
+				head_colors.append(col.lightened(rs.randf() * 0.15))
 	for i in range(160):
 		var x = rs.randf_range(-84, 84)
 		var z = rs.randf_range(-54, 48)
@@ -1067,6 +1108,8 @@ func refresh_world():
 		(chest_node.get_meta("lid") as Node3D).rotation_degrees.x = -110.0 if completed.has("treasure") else 0.0
 	for a in animals:
 		if a["e"]["id"] == "dog": a["follow"] = completed.has("dog")
+	if choni_line: choni_line.visible = completed.has("chonies")
+	if maze_chest: (maze_chest.get_meta("lid") as Node3D).rotation_degrees.x = -110.0 if solved.has("ch:choni_maze") else 0.0
 	update_marks()
 
 # Yellow marks the next step of the main story; blue marks side quests not yet done.
@@ -1127,13 +1170,13 @@ func button_style(color: Color) -> StyleBoxFlat:
 	sb.set_corner_radius_all(10)
 	sb.content_margin_left = 14
 	sb.content_margin_right = 14
-	sb.content_margin_top = 9
-	sb.content_margin_bottom = 9
+	sb.content_margin_top = 7
+	sb.content_margin_bottom = 7
 	return sb
 
 func make_theme() -> Theme:
 	var theme = Theme.new()
-	theme.default_font_size = 19
+	theme.default_font_size = 18
 	theme.set_stylebox("normal", "Button", button_style(Color("e0b676")))
 	theme.set_stylebox("hover", "Button", button_style(Color("ebc78e")))
 	theme.set_stylebox("pressed", "Button", button_style(Color("c99a58")))
@@ -1150,7 +1193,7 @@ func make_theme() -> Theme:
 func button(text: String, callback: Callable, parent: Node) -> Button:
 	var b = Button.new()
 	b.text = text
-	b.custom_minimum_size.y = 52
+	b.custom_minimum_size.y = 46
 	if parent == content: b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.pressed.connect(callback)
 	parent.add_child(b)
@@ -1260,7 +1303,7 @@ func build_ui():
 	margin.add_child(scroll)
 	content = VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation",12)
+	content.add_theme_constant_override("separation",8)
 	scroll.add_child(content)
 	panel.hide()
 	marker = MeshInstance3D.new()
@@ -1303,7 +1346,7 @@ func clear_panel(title: String, keep_game: bool = false):
 		c.queue_free()
 	panel.show()
 	portrait_id = ""
-	panel_title = text_line(title,26)
+	panel_title = text_line(title,23)
 
 func text_line(text: String, font_size: int = 20) -> Control:
 	if text.contains("“"): return rich_line(text, font_size)
@@ -1475,6 +1518,7 @@ func _process(delta):
 	update_bubbles()
 	update_minigame(delta)
 	update_silly(delta)
+	update_hirimara(delta)
 	update_portrait()
 	update_ambient(delta)
 
@@ -1641,7 +1685,7 @@ func _physics_process(delta):
 	player.velocity.y -= 18 * delta
 	if player.is_on_floor(): player.velocity.y = minf(player.velocity.y, 0.0)
 	player.move_and_slide()
-	player.position.x = clampf(player.position.x,-95,95)
+	player.position.x = clampf(player.position.x,-142,95)
 	player.position.z = clampf(player.position.z,-80,98)
 	if T.deep(player.position.x, player.position.z) and player.position.y < -0.05:
 		player.position = last_safe
@@ -1835,6 +1879,7 @@ func interact():
 		"observe": observe(e)
 		"star": collect_star(e)
 		"plant": pick_plant(entity_by_id(e["id"]))
+		"choni": choni_kind_pick(e)
 		_: examine(e)
 
 func examine(e: Dictionary):
@@ -1842,6 +1887,29 @@ func examine(e: Dictionary):
 	if id.begins_with("house"):
 		door_puzzle(id)
 		return
+	if id == "scarecrow": hiri_secret("scarecrow")
+	match id:
+		"karaoke":
+			karaoke_panel()
+			return
+		"ghost_hut":
+			ghost_panel()
+			return
+		"dopel":
+			dopel_panel()
+			return
+		"maze_chest":
+			maze_chest_panel()
+			return
+		"lavir":
+			sentence_card("maze_hedge")
+			return
+		"deshavu":
+			learn("deshavu")
+			learn("deshavu-sek")
+			if last_msg.is_empty(): message("Deshavu!", "You touch the purple stone and feel as if you have been here before... (deshavu is borrowed from French deja vu, already seen)")
+			else: message("Deshavu! " + str(last_msg[0]), str(last_msg[1]) + "\n\n(Deshavu! You touch the purple stone and that moment happens all over again. Deshavu is borrowed from French deja vu, already seen.)")
+			return
 	if id in ["sign1", "sign2", "sign3"]:
 		sentence_card("sign_north")
 		return
@@ -2215,7 +2283,9 @@ func add_topics(id: String):
 			topic("Ask about the ruins", "ruins_old", id)
 			topic("Ask why Oku's hair is a mess", "oku_brainstorm", id)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
-		"gav": topic("Ask Gav about his work", "gav_mail", id)
+		"gav":
+			topic("Ask Gav about his work", "gav_mail", id)
+			button("Ask about the lost chonies" + ("  [ok]" if completed.has("chonies") else ""), choni_hints, content)
 		"tamu":
 			topic("Ask Tamu about the boat", "tamu_ferry", id)
 			topic("Ask about the small island", "islet_small", id)
@@ -2224,6 +2294,7 @@ func topic(label: String, sid: String, npc: String):
 	button(label, func(): sentence_card(sid, talk.bind(npc)), content)
 
 func talk(id: String):
+	compact_buttons.call_deferred()
 	talk_partner = id
 	match id:
 		"ena":
@@ -2548,6 +2619,7 @@ func offer_help(items: Array):
 	message("The request is repeated", "Still needed: " + ", ".join(missing) + ". Look for glowing columns of light beside the main path. You can reveal meanings in the notebook.")
 
 func message(title: String, body: String):
+	if not title.begins_with("Deshavu"): last_msg = [title, body]
 	clear_panel(title)
 	text_line(body)
 	button("Return",close_panel,content)
@@ -2558,6 +2630,7 @@ func short_gloss(word: String) -> String:
 	return str(words.get(word, "")).split(" (")[0]
 
 func show_notebook():
+	compact_buttons.call_deferred()
 	clear_panel("Field notebook")
 	text_line("Collected forms. Tap a word to reveal its meaning and parts. [ok] marks forms you have mastered.  Words: " + str(discovered.size()) + "   Phrases: " + str(phrases.size()))
 	var row = HBoxContainer.new()
@@ -2780,7 +2853,7 @@ func draw_map_overlay(ov: Control):
 	ov.draw_rect(rect, Color("5b3d28"), false, 2.0)
 	var font = ThemeDB.fallback_font
 	var labels = [["teka", 0, 8], ["kur", -50, 4], ["senak", -48, -14], ["sang", -60, -47], ["harbor", 0, 46], ["mora", 22, -18],
-		["fardom", 72, -15], ["hai", 72, 32], ["cove", 0, -48], ["ruins", -62, 50], ["falls", 64, -27], ["Sendor", 50, 93], ["stones", 32, -50], ["orchard", 45, 30]]
+		["fardom", 72, -15], ["hai", 72, 32], ["cove", 0, -48], ["ruins", -62, 50], ["falls", 64, -27], ["Sendor", 50, 93], ["stones", 32, -50], ["orchard", 45, 30], ["Hirimara", -110, 26], ["lavir", -114, -16]]
 	for l in labels:
 		var p = map_point(l[1], l[2], rect)
 		ov.draw_string_outline(font, p + Vector2(-40, 4), l[0], HORIZONTAL_ALIGNMENT_CENTER, 80, 12, 4, Color(1, 1, 1, 0.85))
@@ -2929,7 +3002,7 @@ func load_game():
 	if completed.has("healer"): used.append("herb")
 	if completed.has("lighthouse"): used.append("torch")
 	for e in entities:
-		if inventory.has(e["id"]) or used.has(e["id"]) or (e["kind"] == "star" and solved.has(e["id"])): e["node"].hide()
+		if inventory.has(e["id"]) or used.has(e["id"]) or (e["kind"] == "star" and solved.has(e["id"])) or (e["kind"] == "choni" and solved.has("ch:" + e["id"])): e["node"].hide()
 		elif e["kind"] == "item" or e["kind"] == "star": e["node"].show()
 	if player.position.z > 60.0: (ferry_node.get_parent() as Node3D).position = Vector3(FERRY_ISLET.x, -0.08, FERRY_ISLET.z)
 	if ui: layout_hud()
@@ -3153,7 +3226,9 @@ func update_weather(delta: float):
 func start_rain():
 	raining = randf_range(30.0, 45.0)
 	rain_fx.emitting = true
-	if randf() < 0.35: fish_rain_t = 12.0
+	var rr = randf()
+	if rr < 0.25: fish_rain_t = 12.0
+	elif rr < 0.42: choni_rain_t = 14.0
 	learn("ser")
 	learn("-ng")
 	if not phrases.has("rain_starts"): phrases.append("rain_starts")
@@ -3596,6 +3671,7 @@ func level_note(lv: int) -> String:
 	return "Elder: the hardest sentences, the most decoys and the shortest timers."
 
 func show_more():
+	compact_buttons.call_deferred()
 	clear_panel("More")
 	var lv = level()
 	text_line("Your level: " + str(lv) + ", " + Data.LEVEL_NAMES[lv] + ". Points: " + str(level_points()) + ". You earn points by finishing quests and mastering words, phrases and games. The game gets harder as you level up.")
@@ -3628,6 +3704,7 @@ func greeting(id: String) -> String:
 	var e = entity_by_id(id)
 	if e.has("say") and clock < float(e["say"][1]): return e["say"][0]
 	if mood.get(id, 0) <= -2: return "Hmph!"
+	if completed.has("chonies") and Data.PEOPLE.has(id) and (day_count + id.length()) % 3 == 1: return "Choni-na! Bravo!"
 	if Data.PEOPLE.has(id) and int(friend.get(id, 0)) >= 8 and (day_count + id.length()) % 2 == 0:
 		return Data.ENDEAR[Data.PEOPLE[id]["trait"]]
 	match id:
@@ -4294,6 +4371,7 @@ func speed_end():
 	message("Time!", "You scored " + str(s) + "." + (" A new best!" if best else " Best: " + str(best_speed) + ".") + (" Suri gives you vel gin for a great round." if s >= 15 else ""))
 
 func show_games():
+	compact_buttons.call_deferred()
 	clear_panel("Games and activities")
 	var lv = level()
 	text_line("Level " + str(lv) + ": " + Data.LEVEL_NAMES[lv] + ". Games get harder as your level rises. You have " + str(gin) + " gin.", 17)
@@ -4529,7 +4607,7 @@ func gossip_reply(g: Dictionary):
 	clear_panel(str(g["about"]).capitalize() + " hears the gossip")
 	add_portrait(g["about"])
 	var gk = {"oren_horse": "angry", "tor_bridge": "proud", "mira_food": "embarrassed", "ketu_fish": "happy", "yalo_night": "shocked", "desh_sea": "laugh",
-		"pomo_sleep": "sleepy", "oku_stones": "dizzy", "gav_food": "embarrassed", "sanu_bag": "confused", "ola_fruit": "embarrassed", "vira_medicine": "happy", "lira_story": "laugh"}.get(g["id"], "shocked")
+		"pomo_sleep": "sleepy", "oku_stones": "dizzy", "gav_food": "embarrassed", "sanu_bag": "confused", "ola_fruit": "embarrassed", "vira_medicine": "happy", "lira_story": "laugh"}.get(g["id"], g.get("emote", "shocked"))
 	emote(g["about"], gk, 3.5)
 	text_line("You repeat what " + str(g["by"]).capitalize() + " said: “" + g["v"] + "”")
 	text_line(reaction_text(g["about"], gk), 17)
@@ -4757,47 +4835,89 @@ func add_portrait(id: String):
 	var e = entity_by_id(id)
 	if e.is_empty(): return
 	portrait_id = id
+	if is_instance_valid(panel_title) and panel_title.get_parent() != content:
+		portrait_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		return
+	var head = HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
 	var frame = PanelContainer.new()
 	frame.add_theme_stylebox_override("panel", tile_box(Color("24495a"), Color("e9c46a")))
 	var tr = TextureRect.new()
 	tr.texture = portrait_vp.get_texture()
-	tr.custom_minimum_size = Vector2(0, 168)
+	tr.custom_minimum_size = Vector2(118, 104)
 	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(tr)
-	content.add_child(frame)
-	var at = (panel_title.get_index() + 1) if is_instance_valid(panel_title) else 1
-	content.move_child(frame, at)
+	head.add_child(frame)
+	var side = VBoxContainer.new()
+	side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	side.alignment = BoxContainer.ALIGNMENT_CENTER
+	side.add_theme_constant_override("separation", 4)
+	head.add_child(side)
+	var at = panel_title.get_index() if is_instance_valid(panel_title) else 0
+	content.add_child(head)
+	content.move_child(head, at)
+	if is_instance_valid(panel_title):
+		content.remove_child(panel_title)
+		side.add_child(panel_title)
+		panel_title.add_theme_font_size_override("font_size", 21)
+		panel_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if Data.PEOPLE.has(id):
-		var hr = hearts_row(id)
-		content.add_child(hr)
-		content.move_child(hr, at + 1)
+		for c in hearts_row(id): side.add_child(c)
 	portrait_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
-func hearts_row(id: String) -> Control:
+func hearts_row(id: String) -> Array:
 	var row = HBoxContainer.new()
-	row.add_theme_constant_override("separation", 4)
+	row.add_theme_constant_override("separation", 3)
 	var f: int = friend.get(id, 0)
-	var l = Label.new()
-	l.text = "Friendship "
-	l.add_theme_font_size_override("font_size", 16)
-	row.add_child(l)
 	for i in range(10):
 		var c = Panel.new()
 		var sb = StyleBoxFlat.new()
 		sb.bg_color = Color("ff4f81") if i < f else Color("e6d8bf")
-		sb.set_corner_radius_all(9)
+		sb.set_corner_radius_all(7)
 		c.add_theme_stylebox_override("panel", sb)
-		c.custom_minimum_size = Vector2(16, 16)
+		c.custom_minimum_size = Vector2(12, 12)
 		c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(c)
 	var md = Label.new()
 	var mv: int = mood.get(id, 0)
-	md.text = "  Mood: " + ("seng (happy)" if mv >= 1 else ("grumpy" if mv <= -1 else "fine"))
-	md.add_theme_font_size_override("font_size", 16)
-	row.add_child(md)
-	return row
+	md.text = "Friendship " + str(f) + "/10.  Mood: " + ("seng (happy)" if mv >= 1 else ("grumpy" if mv <= -1 else "fine"))
+	md.add_theme_font_size_override("font_size", 14)
+	md.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return [row, md]
+
+# Regroup runs of plain buttons in the panel into a compact two-column grid (phones).
+func compact_buttons():
+	var run: Array = []
+	var groups: Array = []
+	for c in content.get_children():
+		if c.is_queued_for_deletion(): continue
+		if c is Button and c != last_skip and c.visible:
+			run.append(c)
+		else:
+			if run.size() > 0: groups.append(run)
+			run = []
+	if run.size() > 0: groups.append(run)
+	for g in groups:
+		for b in g:
+			b.custom_minimum_size.y = 42
+			b.add_theme_font_size_override("font_size", 16)
+		var plain = g.filter(func(b): return not b.text.contains("“") and b.text.length() <= 44)
+		if g.size() < 2 or plain.size() != g.size(): continue
+		var grid = GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 6)
+		grid.add_theme_constant_override("v_separation", 6)
+		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var at = (g[0] as Node).get_index()
+		content.add_child(grid)
+		content.move_child(grid, at)
+		for b in g:
+			content.remove_child(b)
+			grid.add_child(b)
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func update_portrait():
 	if portrait_id == "" or not panel.visible:
@@ -5022,6 +5142,7 @@ func once_today(id: String, what: String) -> bool:
 	return true
 
 func chat_menu(id: String):
+	compact_buttons.call_deferred()
 	talk_partner = id
 	var pp: Dictionary = Data.PEOPLE[id]
 	clear_panel("Chat with " + id.capitalize())
@@ -5029,15 +5150,17 @@ func chat_menu(id: String):
 	text_line(id.capitalize() + " is " + {"cheerful": "cheerful", "dramatic": "very dramatic", "sleepy": "always sleepy", "proud": "rather proud", "giggly": "giggly", "grumpy": "grumpy"}[pp["trait"]] + ". What do you say?", 17)
 	button("Compliment", compliment.bind(id), content)
 	button("Tease", tease.bind(id), content)
-	button("Call them a putz (playfully)", putz.bind(id), content)
+	button("Call them a putz", putz.bind(id), content)
+	button("Play a prank", prank_menu.bind(id), content)
 	button("Tell a joke", joke_menu.bind(id), content)
 	button("Give a gift", gift_menu.bind(id), content)
-	button("Ask: Ti ta-seng-ha? (Are you happy?)", feel.bind(id), content)
+	button("Ask: Ti ta-seng-ha?", feel.bind(id), content)
 	if int(friend.get(id, 0)) >= 5:
 		button("Ask about a secret" + ("  [ok]" if mastered.has("sec:" + id) else ""), secret.bind(id), content)
 	button("Back", talk.bind(id), content)
 
 func react(id: String, said_v: String, said_en: String, reply_v: String, reply_en: String, kind: String, gain: int):
+	compact_buttons.call_deferred()
 	talk_partner = id
 	clear_panel(id.capitalize())
 	add_friend(id, gain)
@@ -5058,6 +5181,7 @@ func react(id: String, said_v: String, said_en: String, reply_v: String, reply_e
 	button("Return", close_panel, content)
 
 func compliment(id: String):
+	compact_buttons.call_deferred()
 	var pp: Dictionary = Data.PEOPLE[id]
 	var thing: Array = pp["thing"]
 	for w in ["ti-ni", "ho", "dau", "var", thing[0]]: learn(w)
@@ -5118,7 +5242,20 @@ func tease(id: String):
 	learn("wai")
 	var sv = "Ti-ni " + thing[0] + " i-wai!"
 	var se = "Your " + thing[1] + " is bad!"
-	if randf() < 0.4:
+	var tr = randf()
+	if tr >= 0.3 and tr < 0.65:
+		var ts: Array = Data.TEASES[randi() % Data.TEASES.size()]
+		learn(ts[2])
+		var ttr: String = Data.PEOPLE[id]["trait"]
+		match ttr:
+			"dramatic": react(id, ts[0], ts[1], "Maki... maki... MAKI!", "No... no... NO!", "sad", -1)
+			"proud": react(id, ts[0], ts[1], "Maki! " + ts[0], "No! YOU are! (They say it right back.)", "angry", -1)
+			"grumpy": react(id, ts[0], ts[1], "Hmph! " + ts[0], "Hmph! Same to you!", "angry", -1)
+			"giggly": react(id, ts[0], ts[1], "Ha! Ha! I-zen-da!", "Ha ha! It's true!", "laugh", 1)
+			"sleepy": react(id, ts[0], ts[1], "Han...? zzz", "What...? zzz", "sleepy", 0)
+			_: react(id, ts[0], ts[1], "Ha! Ups... i-zen-da.", "Ha! Oops... it's true.", "embarrassed", 0)
+		return
+	if tr < 0.3:
 		learn("choni")
 		learn("kawai")
 		sv = "Ti-ni choni i-kawai!"
@@ -5170,6 +5307,7 @@ func putz(id: String):
 				react(id, sv, se, "Han? ...Baka!", "What? ...You silly!", "confused", 0)
 
 func joke_menu(id: String):
+	compact_buttons.call_deferred()
 	clear_panel("Tell " + id.capitalize() + " a joke")
 	add_portrait(id)
 	text_line("Pick a silly sentence to say.", 17)
@@ -5194,15 +5332,17 @@ func do_joke(id: String, j: Dictionary):
 		_: react(id, j["v"], j["en"], "Ha! Ha! I-ho-da!", "Ha ha! That's good!", "laugh", g)
 
 func gift_menu(id: String):
+	compact_buttons.call_deferred()
 	clear_panel("Give " + id.capitalize() + " a gift")
 	add_portrait(id)
 	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(inventory.count("hotdog")) + " ret-gor, " + str(gin) + " gin. (Ketu sells panak, cha, bombom and ret-gor.)", 17)
 	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy"), "ret-gor": inventory.has("hotdog")}
+	text_line("You will say “Ki tari ti-ru!” (This fish, for you!) with the gift you choose.", 16)
 	for g in ["tari", "panak", "cha", "bombom", "ret-gor", "gin"]:
-		var b = button("“Ki " + g + " ti-ru!”  (This " + Data.GIFT_WORDS[g] + ", for you!)", give_gift.bind(id, g), content)
+		var b = button(g + " (" + Data.GIFT_WORDS[g].trim_prefix("a ") + ")", give_gift.bind(id, g), content)
 		b.disabled = not have[g]
-	if berries > 0: button("“Ki ning-guro ti-ru!”  (A song-berry, for you!)", villager_poem.bind(id, "ning-guro"), content)
-	if shrooms > 0: button("“Ki sao-dau ti-ru!”  (A star-head mushroom, for you!)", villager_poem.bind(id, "sao-dau"), content)
+	if berries > 0: button("ning-guro (song-berry)", villager_poem.bind(id, "ning-guro"), content)
+	if shrooms > 0: button("sao-dau (mushroom)", villager_poem.bind(id, "sao-dau"), content)
 	button("Back", chat_menu.bind(id), content)
 
 func give_gift(id: String, g: String):
@@ -5243,6 +5383,7 @@ func feel(id: String):
 		else: react(id, "Ti ta-seng-ha?", "Are you happy?", "Na-seng... shi.", "I'm happy... apparently.", "confused", 0)
 
 func secret(id: String):
+	compact_buttons.call_deferred()
 	var sc: Dictionary = Data.PEOPLE[id]["secret"]
 	talk_partner = id
 	clear_panel(id.capitalize() + "'s secret")
@@ -5290,6 +5431,18 @@ func update_ambient(delta: float):
 	elif tt == "grumpy" and r < 0.5: pick = ["angry", "Hmph!"]
 	elif tt == "proud" and r < 0.5: pick = ["proud", "Ho!"]
 	elif r < 0.5: pick = ["happy", "Ho! Ho!"]
+	if randf() < 0.07:
+		var lines = make_poem("ning-guro" if randf() < 0.5 else "sao-dau", e["id"])
+		emote(e["id"], "love", 4.0)
+		e["say"] = [lines[0][0], clock + 6.0]
+		record_poem(lines, e["id"])
+		toast(str(e["id"]).capitalize() + " suddenly recites a poem! (It is in your Poem book.)")
+		return
+	if tt in ["giggly", "cheerful", "dramatic"] and randf() < 0.14:
+		pick = ["laugh", "Ti-ni dau-ma sipu i-esh-da! ...Hiri!"]
+		learn("sipu")
+		learn("hiri")
+		toast(str(e["id"]).capitalize() + ": There's a spider on your head! ...Hiri! (Gotcha!)")
 	emote(e["id"], pick[0], 2.6)
 	e["say"] = [pick[1], clock + 2.6]
 	for sw in ["tarara", "chiriri", "kororo", "kachaka"]:
@@ -5493,13 +5646,21 @@ func poem_line(t: int, rng: RandomNumberGenerator, force_noun: String = "") -> A
 			return ["An " + pl + "-ma na-" + v + "-fu, " + n + "-su.", "I will " + fv[0] + " " + Data.POEM_PLACES[pl] + ", with " + ns[0] + ".", "na- is I; -su is together with."]
 		9:
 			return [cap(n) + ", ta-" + v + "-o-ye!", cap(ns[0].trim_prefix("the ").trim_prefix("a ")) + ", please " + fv[0] + "!", "Talking to " + ns[0] + ": ta- (you), -o (command), -ye (please)."]
+		11:
+			return [cap(n) + " i-" + v + "-" + v + "-ur-da.", cap(ns[0] + " " + s3(fv[0]) + " and " + s3(fv[0]) + " and " + s3(fv[0]) + "."), "Doubling the verb root (" + v + "-" + v + ") means again and again."]
+		12:
+			return ["Haku " + n + " " + pl + "-ma i-" + v + "-im-ha?", "Why is " + ns[0] + " " + fv[2] + " " + Data.POEM_PLACES[pl] + "?", "Haku means why; -ha turns the line into a question."]
+		13:
+			return ["Bravo, " + n + "! Ti ta-" + v + "-pa-da!", cap("bravo, " + ns[0].trim_prefix("the ").trim_prefix("a ") + "! You " + fv[1] + "!"), "Bravo is borrowed from Italian; ta- means you."]
+		14:
+			return ["Choni-ir " + pl + "-ma ri-" + v + "-im-shi!", cap("apparently the chonies are " + fv[2] + " " + Data.POEM_PLACES[pl] + "!"), "Every poet on this island mentions chonies eventually. -shi means apparently."]
 		_:
 			return [cap(n) + "-ir " + pl + "-ma ri-esh-shi!", cap("apparently " + ns[1] + " are " + Data.POEM_PLACES[pl] + "!"), "Plural subject: ri-. Apparently: -shi."]
 
 func make_poem(kind: String, who: String = "") -> Array:
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-	var pool = [0, 1, 3, 4, 5, 9] if kind == "ning-guro" else [2, 6, 7, 8, 10, 4]
+	var pool = [0, 1, 3, 4, 5, 9, 11, 13] if kind == "ning-guro" else [2, 6, 7, 8, 10, 4, 12, 14]
 	pool.shuffle()
 	var lines: Array = []
 	var thing = ""
@@ -5556,6 +5717,7 @@ func eat_poem(kind: String):
 	button("Return", close_panel, content)
 
 func villager_poem(id: String, kind: String):
+	compact_buttons.call_deferred()
 	if kind == "ning-guro": berries -= 1
 	else: shrooms -= 1
 	talk_partner = id
@@ -5566,6 +5728,7 @@ func villager_poem(id: String, kind: String):
 	var e = entity_by_id(id)
 	e["say"] = [lines[0][0], clock + 10.0]
 	add_friend(id, 1)
+	text_line("You say: “Ki " + kind + " ti-ru!” (This " + ("song-berry" if kind == "ning-guro" else "mushroom") + ", for you!)", 17)
 	text_line(id.capitalize() + "'s eyes go swirly. " + id.capitalize() + " climbs onto an imaginary stage and recites:", 17)
 	show_poem_lines(lines)
 	record_poem(lines, id)
@@ -5719,3 +5882,387 @@ func show_loans():
 	button("Sound words from Guarani", show_sounds, content)
 	button("Play False friends", false_friends.bind(true), content)
 	button("Notebook", show_notebook, content)
+
+# ------------------------------------------------------------ eighth expansion: Hirimara, pranks, the great choni hunt
+
+const MAZE_O = Vector2(-125.0, -13.0)
+const MAZE_N = 6
+const MAZE_CELL = 3.6
+const HIRI_SECRETS = ["karaoke", "ghost", "dopel", "maze", "scarecrow"]
+
+func build_hirimara():
+	Art.signpost(self, Vector3(-84.5, gy(-84.5, 6.5), 6.5), "Hirimara", 90)
+	# ---- the hedge maze (a perfect maze from a fixed seed) ----
+	var rng = RandomNumberGenerator.new()
+	rng.seed = 4242
+	var open: Dictionary = {}
+	var seen: Dictionary = {Vector2i(0, 0): true}
+	var stack: Array = [Vector2i(0, 0)]
+	while not stack.is_empty():
+		var c: Vector2i = stack[-1]
+		var nb: Array = []
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if n.x >= 0 and n.y >= 0 and n.x < MAZE_N and n.y < MAZE_N and not seen.has(n): nb.append(n)
+		if nb.is_empty():
+			stack.pop_back()
+			continue
+		var n2: Vector2i = nb[rng.randi() % nb.size()]
+		seen[n2] = true
+		open[maze_key(c, n2)] = true
+		stack.append(n2)
+	var entrance = Vector2i(MAZE_N - 1, 3)
+	var hedge = Color("3f7d3a")
+	var wall = func(x: float, z: float, along_x: bool):
+		var wl = MAZE_CELL + 0.6
+		var size = Vector3(wl, 2.5, 0.7) if along_x else Vector3(0.7, 2.5, wl)
+		var y = gy(x, z)
+		var hc = hedge.lerp(Color("2f6a2c"), rng.randf() * 0.6)
+		Art.box(self, Vector3(x, y + 1.15, z), size, hc)
+		Art.box(self, Vector3(x, y + 2.45, z), size * Vector3(0.96, 0.05, 0.96) + Vector3(0, 0.05, 0), hc.lightened(0.25))
+		solid(Vector3(x, y + 1.15, z), size)
+	for i in range(MAZE_N):
+		for j in range(MAZE_N):
+			var cx = MAZE_O.x + (i + 0.5) * MAZE_CELL
+			var cz = MAZE_O.y + (j + 0.5) * MAZE_CELL
+			# wall to the east of this cell
+			if i < MAZE_N - 1:
+				if not open.has(maze_key(Vector2i(i, j), Vector2i(i + 1, j))): wall.call(cx + MAZE_CELL * 0.5, cz, false)
+			elif Vector2i(i, j) != entrance:
+				wall.call(cx + MAZE_CELL * 0.5, cz, false)
+			# wall to the south of this cell
+			if j < MAZE_N - 1:
+				if not open.has(maze_key(Vector2i(i, j), Vector2i(i, j + 1))): wall.call(cx, cz + MAZE_CELL * 0.5, true)
+			else:
+				wall.call(cx, cz + MAZE_CELL * 0.5, true)
+			if i == 0: wall.call(cx - MAZE_CELL * 0.5, cz, false)
+			if j == 0: wall.call(cx, cz - MAZE_CELL * 0.5, true)
+	# the chest goes in the cell farthest from the entrance
+	var dist: Dictionary = {entrance: 0}
+	var q: Array = [entrance]
+	var far = entrance
+	while not q.is_empty():
+		var c: Vector2i = q.pop_front()
+		if dist[c] > dist[far]: far = c
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if n.x < 0 or n.y < 0 or n.x >= MAZE_N or n.y >= MAZE_N or dist.has(n): continue
+			if open.has(maze_key(c, n)):
+				dist[n] = dist[c] + 1
+				q.append(n)
+	var cp = Vector3(MAZE_O.x + (far.x + 0.5) * MAZE_CELL, 0, MAZE_O.y + (far.y + 0.5) * MAZE_CELL)
+	maze_chest = Art.chest(self, Vector3(cp.x, gy(cp.x, cp.z), cp.z))
+	entity("maze_chest", "object", "lavir", cp, Color.WHITE, 1.3, Vector2(0.9, 1.0))
+	var ent = Vector3(MAZE_O.x + MAZE_N * MAZE_CELL + 1.6, 0, MAZE_O.y + (entrance.y + 0.5) * MAZE_CELL)
+	Art.signpost(self, Vector3(ent.x + 0.6, gy(ent.x, ent.z - 2.4), ent.z - 2.4), "lavir", 90)
+	entity("lavir", "object", "lavir", Vector3(ent.x + 0.6, 0, ent.z - 2.4), Color.WHITE, 2.4, Vector2(1.0, 2.2))
+	# ---- karaoke stage ----
+	var ks = Vector3(-96.0, gy(-96.0, 16.0), 16.0)
+	Art.box(self, ks + Vector3(0, 0.2, 0), Vector3(4.0, 0.4, 2.6), Color("8a5a3c"))
+	Art.box(self, ks + Vector3(0, 1.6, 1.2), Vector3(4.0, 2.8, 0.2), Color("6a2c70"))
+	for k in range(6):
+		Art.sph(self, ks + Vector3(-1.7 + k * 0.68, 3.05, 1.05), 0.12, [Color("ff5d5d"), Color("ffd34d"), Color("6de0ff"), Color("b38bff"), Color("7dff8a"), Color("ff8ad8")][k], Vector3.ONE, 8, 1.5)
+	Art.cyl(self, ks + Vector3(0, 0.95, -0.2), 0.03, 0.03, 1.1, Color("333333"))
+	Art.sph(self, ks + Vector3(0, 1.55, -0.2), 0.11, Color("f2e6c8"), Vector3(1, 1.2, 1), 10)
+	for sx in [-1.6, 1.6]:
+		Art.box(self, ks + Vector3(sx, 0.85, 0.6), Vector3(0.6, 0.9, 0.5), Color("222222"))
+		Art.cyl(self, ks + Vector3(sx, 0.95, 0.34), 0.18, 0.18, 0.04, Color("555555"), Vector3(90, 0, 0))
+	solid(ks + Vector3(0, 0.2, 0), Vector3(4.0, 0.4, 2.6))
+	entity("karaoke", "object", "karaoke", ks + Vector3(0, 0, -1.8), Color.WHITE, 2.0, Vector2(1.6, 2.0))
+	# ---- the poltergeist's bungalow ----
+	var hp = Vector3(-100.0, 0, -19.0)
+	Art.hut(self, hp, face(hp, Vector3(-100, 0, -10)))
+	solid(hp + Vector3(0, 1.3, 0), Vector3(4.6, 2.6, 4.6))
+	block(hp.x, hp.z, 3.4)
+	ghost_things.clear()
+	for k in range(3):
+		var g = Node3D.new()
+		add_child(g)
+		if k == 0:
+			Art.sph(g, Vector3.ZERO, 0.28, Color("2a9d8f"), Vector3(1, 0.8, 1), 10)
+			Art.cyl(g, Vector3(0.3, 0.05, 0), 0.04, 0.06, 0.3, Color("2a9d8f"), Vector3(0, 0, -50))
+		elif k == 1:
+			Art.box(g, Vector3.ZERO, Vector3(0.5, 0.08, 0.5), Color("8a5a3c"))
+			Art.box(g, Vector3(0, 0.3, -0.22), Vector3(0.5, 0.6, 0.08), Color("8a5a3c"))
+		else:
+			Art.box(g, Vector3(0, 0, 0), Vector3(0.5, 0.3, 0.04), Color("f2f2f2"))
+			for d in range(3): Art.sph(g, Vector3(-0.14 + d * 0.14, 0.02, 0.025), 0.04, Color("e76f51"), Vector3(1, 1, 0.3), 5)
+		ghost_things.append(g)
+	entity("ghost_hut", "object", "bungalo", Vector3(-100, 0, -15.6), Color.WHITE, 2.8, Vector2(1.6, 2.4))
+	# ---- the scarecrow with chonies on its head ----
+	var sc = Node3D.new()
+	sc.position = Vector3(-92.0, gy(-92.0, -7.0), -7.0)
+	sc.rotation_degrees.y = 70
+	add_child(sc)
+	Art.cyl(sc, Vector3(0, 1.0, 0), 0.06, 0.07, 2.0, Color("6b4f36"))
+	Art.cyl(sc, Vector3(0, 1.45, 0), 0.04, 0.04, 1.6, Color("6b4f36"), Vector3(0, 0, 90))
+	Art.box(sc, Vector3(0, 1.3, 0), Vector3(0.7, 0.7, 0.3), Color("c0392b"))
+	Art.sph(sc, Vector3(0, 1.95, 0), 0.25, Color("e9c46a"), Vector3.ONE, 10)
+	Art.box(sc, Vector3(0, 2.22, 0), Vector3(0.52, 0.22, 0.4), Color("f2f2f2"))
+	for d in range(4): Art.sph(sc, Vector3(-0.18 + d * 0.12, 2.24, 0.205), 0.04, Color("e76f51"), Vector3(1, 1, 0.3), 5)
+	solid(sc.position + Vector3(0, 1.0, 0), Vector3(0.4, 2.0, 0.4))
+	entity("scarecrow", "object", "choni", Vector3(-92.0, 0, -5.8), Color.WHITE, 2.7, Vector2(1.0, 2.4))
+	# ---- Pomo's doppelganger, standing very still on a rock ----
+	var dp = Vector3(-127.0, gy(-127.0, 14.0), 14.0)
+	Art.sph(self, dp + Vector3(0, 0.2, 0), 1.0, Color("8d9394"), Vector3(1.3, 0.5, 1.1), 9)
+	var dopel = Art.person(Color("4f7ca8"), Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b"))
+	dopel.position = dp + Vector3(0, 0.45, 0)
+	dopel.rotation_degrees.y = 90
+	add_child(dopel)
+	entity("dopel", "object", "Pomo?", Vector3(-126.0, 0, 14.0), Color.WHITE, 2.7, Vector2(1.0, 2.6))
+	# ---- the deja vu stone in the stone circle ----
+	var dv = Vector3(34.6, 0, -44.2)
+	Art.sph(self, Vector3(dv.x, gy(dv.x, dv.z) + 0.45, dv.z), 0.55, Color("8f5fd0"), Vector3(0.8, 1.3, 0.8), 10, 0.6)
+	entity("deshavu", "object", "deshavu-sek", dv, Color.WHITE, 1.6, Vector2(0.8, 1.4))
+	# ---- a few palms and stones so the peninsula feels lived-in ----
+	for p in [Vector3(-131, 0, 20), Vector3(-136, 0, -6), Vector3(-118, 0, 24), Vector3(-90, 0, 18), Vector3(-108, 0, -26), Vector3(-123, 0, -20)]:
+		if T.coast(p.x, p.z) > 3.0: Art.palm(self, Vector3(p.x, gy(p.x, p.z), p.z), randf_range(-8, 8))
+	# ---- the lost chonies (four lie around the island; two are won) ----
+	for c in Data.CHONI_HUNT:
+		if c[0] in ["choni_ghost", "choni_maze"]: continue
+		var ce = entity(c[0], "choni", "choni", Vector3(c[1], 0, c[2]), Color.WHITE, 0.7, Vector2(0.8, 0.8))
+		var n = ce["node"] as Node3D
+		var cm = Node3D.new()
+		cm.position = Vector3(0, 0.15, 0)
+		cm.rotation_degrees = Vector3(-70, randf() * 360.0, 0)
+		cm.scale = Vector3.ONE * 1.5
+		n.add_child(cm)
+		Art.box(cm, Vector3(0, 0, 0), Vector3(0.5, 0.3, 0.04), Color("f2f2f2"))
+		Art.box(cm, Vector3(0, -0.2, 0), Vector3(0.2, 0.14, 0.04), Color("f2f2f2"))
+		for d in range(5): Art.sph(cm, Vector3(-0.16 + (d % 3) * 0.16, -0.06 + (d / 3) * 0.14, 0.025), 0.04, Color("ff5d8f"), Vector3(1, 1, 0.3), 5)
+	# ---- Gav's clothesline (fills up when the chonies come home) ----
+	choni_line = Node3D.new()
+	choni_line.position = Vector3(8.6, gy(8.6, 36.6), 36.6)
+	add_child(choni_line)
+	for sx in [-2.2, 2.2]: Art.cyl(choni_line, Vector3(sx, 1.0, 0), 0.04, 0.05, 2.0, Color("6b4f36"))
+	Art.cyl(choni_line, Vector3(0, 1.9, 0), 0.01, 0.01, 4.4, Color("ddd5c4"), Vector3(0, 0, 90))
+	for k in range(6):
+		var cc = Node3D.new()
+		cc.position = Vector3(-1.75 + k * 0.7, 1.72, 0)
+		choni_line.add_child(cc)
+		Art.box(cc, Vector3.ZERO, Vector3(0.45, 0.28, 0.03), [Color("f2f2f2"), Color("ffd6e0"), Color("cde7f0")][k % 3])
+		for d in range(3): Art.sph(cc, Vector3(-0.12 + d * 0.12, 0.02, 0.02), 0.035, Color("e76f51"), Vector3(1, 1, 0.3), 5)
+	choni_line.visible = false
+	# ---- choni rain (a rare kind of rain) ----
+	choni_fx = CPUParticles3D.new()
+	choni_fx.amount = 30
+	choni_fx.lifetime = 2.6
+	choni_fx.emitting = false
+	choni_fx.local_coords = false
+	choni_fx.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	choni_fx.emission_box_extents = Vector3(12, 0.5, 12)
+	choni_fx.direction = Vector3(0, -1, 0)
+	choni_fx.initial_velocity_min = 1.0
+	choni_fx.initial_velocity_max = 2.5
+	choni_fx.angular_velocity_min = -200.0
+	choni_fx.angular_velocity_max = 200.0
+	choni_fx.gravity = Vector3(0, -2.5, 0)
+	var bm = BoxMesh.new()
+	bm.size = Vector3(0.4, 0.26, 0.03)
+	choni_fx.mesh = bm
+	choni_fx.material_override = Art.mat(Color("ffd6e0"), 0.6)
+	choni_fx.position = Vector3(0, 12, 0)
+
+func maze_key(a: Vector2i, b: Vector2i) -> String:
+	if a.x > b.x or (a.x == b.x and a.y > b.y):
+		var t = a
+		a = b
+		b = t
+	return str(a) + "|" + str(b)
+
+func update_hirimara(delta: float):
+	if choni_fx and choni_fx.get_parent() == null and player: player.add_child(choni_fx)
+	var hp = Vector3(-100.0, 0, -19.0)
+	for k in range(ghost_things.size()):
+		var g = ghost_things[k] as Node3D
+		var a = clock * (0.7 + k * 0.25) + k * 2.1
+		g.position = hp + Vector3(cos(a) * 3.4, gy(hp.x, hp.z) + 1.6 + sin(clock * 1.6 + k) * 0.5, sin(a) * 3.4)
+		g.rotation.y = clock * (1.0 + k)
+	if choni_rain_t > 0.0:
+		if not choni_fx.emitting:
+			choni_fx.emitting = true
+			learn("choni")
+			learn("kar")
+			hiri_secret("rain")
+			toast("Buruhaha! Choni-ir hen-ta ri-kar-im-da! It is raining chonies!")
+		choni_rain_t -= delta
+		if choni_rain_t <= 0.0:
+			choni_fx.emitting = false
+			var g = entity_by_id("gav")
+			if not g.is_empty(): g["say"] = ["Anni choni-ir?! Hen-ta?!", clock + 6.0]
+			toast("Somewhere, Gav shouts: Anni choni-ir?! Hen-ta?! (My chonies?! From the sky?!)")
+
+func hiri_secret(k: String):
+	if solved.has("hs:" + k): return
+	solved.append("hs:" + k)
+	var n = 0
+	for s in HIRI_SECRETS:
+		if solved.has("hs:" + s): n += 1
+	if HIRI_SECRETS.has(k):
+		toast("Secret of Hirimara: " + str(n) + " of " + str(HIRI_SECRETS.size()) + "!")
+		if n >= HIRI_SECRETS.size(): complete("hirimara")
+	save_game()
+
+func chonies_found() -> int:
+	var n = 0
+	for c in Data.CHONI_HUNT:
+		if solved.has("ch:" + c[0]): n += 1
+	return n
+
+func find_choni(id: String):
+	if solved.has("ch:" + id): return
+	solved.append("ch:" + id)
+	var e = entity_by_id(id)
+	if not e.is_empty(): (e["node"] as Node3D).hide()
+	var n = chonies_found()
+	learn("choni")
+	learn("yureka")
+	learn("-ve")
+	toast("Yureka! " + str(Data.ORDINALS[n - 1]).capitalize() + " choni! (" + str(n) + " of " + str(Data.CHONI_HUNT.size()) + ")")
+	if n >= Data.CHONI_HUNT.size(): toast("Yureka! All six chonies! Take them back to Gav at the harbor.")
+	save_game()
+
+func choni_hints():
+	talk_partner = "gav"
+	clear_panel("Gav's lost chonies")
+	add_portrait("gav")
+	emote("gav", "sad" if chonies_found() < Data.CHONI_HUNT.size() else "love", 4.0)
+	learn("choni")
+	learn("-shi")
+	learn("-nu")
+	var n = chonies_found()
+	text_line("Gav sniffles. " + str(n) + " of " + str(Data.CHONI_HUNT.size()) + " found. His clues (how does Gav know each one?):", 16)
+	var ens: Array = []
+	for c in Data.CHONI_HUNT:
+		if solved.has("ch:" + c[0]):
+			text_line("[found]  " + c[3], 14)
+			continue
+		text_line("“" + c[3] + "”", 15)
+		var en = text_line(c[4], 14)
+		en.add_theme_color_override("font_color", Color("6b4a2e"))
+		en.visible = false
+		ens.append(en)
+	if not ens.is_empty():
+		button("Show or hide meanings", func():
+			for e in ens: e.visible = not e.visible, content)
+	if n >= Data.CHONI_HUNT.size() and not completed.has("chonies"):
+		button("Give Gav the chonies", func():
+			complete("chonies")
+			gin += 5
+			for w in ["choni-na", "-na", "yureka", "bravo"]: learn(w)
+			choni_line.visible = true
+			react("gav", "Ki choni-ir ti-ru!", "These chonies, for you!", "Choni-ir! Anni choni-ir!! Bravo! Ti choni-na ta-an-da!", "My chonies! My CHONIES!! Bravo! You are a choni-na, a choni person! (-na makes a person word. +5 gin)", "love", 3), content)
+	elif completed.has("chonies"):
+		text_line("All six chonies flap proudly on Gav's clothesline by the harbor. You are officially a choni-na.", 16)
+	button("Back", talk.bind("gav"), content)
+
+# ---- pranks ----
+
+func prank_menu(id: String):
+	compact_buttons.call_deferred()
+	talk_partner = id
+	clear_panel("Prank " + id.capitalize())
+	add_portrait(id)
+	learn("hiri")
+	text_line("Choose a prank. Then shout “Hiri!” (Gotcha!)", 16)
+	for p in Data.PRANKS:
+		button(p["label"], do_prank.bind(id, p), content)
+	button("Back", chat_menu.bind(id), content)
+
+func do_prank(id: String, p: Dictionary):
+	var pp: Dictionary = Data.PEOPLE[id]
+	var tt: String = pp["trait"]
+	var thing: Array = pp["thing"]
+	var sv = str(p["v"]).replace("{thing}", thing[0])
+	var se = str(p["en"]).replace("{thing_en}", thing[1])
+	for w in p["words"]: learn(w)
+	learn("hiri")
+	var act = str(p["act"]).replace("{name}", id.capitalize())
+	if not once_today(id, "prank"):
+		if tt in ["giggly", "cheerful"]:
+			learn("hiri-hiri")
+			react(id, sv, se, "Hiri-hiri! Ha! Ha!", "Prank after prank! Ha ha! (doubling: hiri-hiri)", "laugh", 0)
+		else:
+			react(id, sv, se, "Ma-ta-hiri-o-ki!", "Don't prank me! (ma- ... -o-ki makes a don't-command)", "angry", -1)
+		return
+	if id == "gav" and p["id"] == "choni":
+		react(id, sv, se, "Anni choni?! Hama?! HAMA?! ...Hiri? Ha! Ha!", "(" + act + ") My chonies?! Where?! WHERE?! ...A prank? Ha ha!", "shocked", 1)
+		return
+	if id == "yalo" and p["id"] == "ghost":
+		react(id, sv, se, "AAAH! Poltergais! ...Ti?! Hiri?! Maki...", "(Yalo hides under his own coat.) AAAH! A poltergeist! ...You?! A prank?! No...", "faint", 0)
+		return
+	var r: Array = Data.PRANKED[tt]
+	react(id, sv + "  ...Hiri!", se + " ...Gotcha!", r[0], "(" + act + ") " + r[1], r[2], r[3])
+
+# ---- Hirimara places ----
+
+func karaoke_panel():
+	for w in ["karaoke", "bravo", "ning"]: learn(w)
+	hiri_secret("karaoke")
+	clear_panel("karaoke")
+	varnak_banner("Ta-ning-o! Bravo!", 26)
+	text_line("A seashell microphone on a tiny stage. The scarecrow is your audience. Here is tonight's song:", 17)
+	var lines = make_poem("ning-guro")
+	show_poem_lines(lines)
+	button("Sing it! (Ta-ning-o!)", func():
+		record_poem(lines, "you")
+		var cheer: Array = []
+		for e in entities:
+			if e["kind"] == "npc" and (e["node"] as Node3D).position.distance_to(player.position) < 30.0:
+				e["say"] = ["Bravo! Bravo!", clock + 5.0]
+				cheer.append(e["id"])
+		message("Bravo! Bravo!", "You sing with all your heart. " + ("The scarecrow's chonies flap in applause." if cheer.is_empty() else ", ".join(cheer.map(func(x): return x.capitalize())) + " cheer: Bravo! Bravo!") + "\n\nThe song is saved in your Poem book."), content)
+	button("About this stage", sentence_card.bind("karaoke_stage"), content)
+	button("Return", close_panel, content)
+
+func ghost_panel():
+	for w in ["poltergais", "bungalo", "ven", "-o", "-ye"]: learn(w)
+	hiri_secret("ghost")
+	clear_panel("The poltergeist's bungalo")
+	text_line("A teapot, a chair and something spotted circle the little house. A voice giggles from inside:", 17)
+	if solved.has("ch:choni_ghost"):
+		varnak_banner("Uuuu... Hiri! Hiri!", 26)
+		text_line("(Woooo... Gotcha! Gotcha!) The poltergeist has nothing left to steal. For now.", 16)
+		button("About this house", sentence_card.bind("ghost_hut"), content)
+		button("Return", close_panel, content)
+		return
+	varnak_banner("Uuuu... Anke Gav-ni choni k-i-nuk-pa-da! Hi hi!", 24)
+	ask("What do you say to get the choni back?", ["T-na-ven-o-ye!", "Ta-sul-o-ye!", "K-i-nuk-pa-da.", "Ti poltergais ta-an-da."], 0, func():
+		find_choni("choni_ghost"), "T-na-ven-o-ye! means Please give it to me! The poltergeist sighs, “Uuuu... ho,” and a spotted choni floats down into your hands.",
+		"The poltergeist just giggles. You want it to GIVE (ven) the choni to YOU: t- (you act), na- (to me), -o (command), -ye (please).", close_panel)
+
+func dopel_panel():
+	for w in ["dopelgenger", "hal", "an", "-ha"]: learn(w)
+	hiri_secret("dopel")
+	clear_panel("Pomo...?")
+	text_line("It looks exactly like Pomo. It is wide awake, and it has not blinked once. It says Pomo's directions backwards:", 17)
+	varnak_banner("Sai, dong, nam, bei.", 28)
+	button("Ask: Ti hal ta-an-ha? (Who are you?)", func():
+		clear_panel("The doppelganger")
+		varnak_banner("An dopelgenger na-an-da! Pomo i-sul-im-da. An ma-na-sul-ur-ki-da!", 24)
+		var en = text_line("(Tap Show meaning if you need it.)", 16)
+		button("Show meaning", func(): en.text = "I am the doppelganger! Pomo is sleeping. I never sleep! (dopelgenger is borrowed from German Doppelganger, double-goer)", content)
+		button("Say: Ti Pomo ma-ta-an-ki-da! (You are not Pomo!)", func():
+			message("Hiri!", "The doppelganger grins: “Hiri!” (Gotcha!) Then it stands perfectly still again, pretending to be a statue. Somewhere on the west hill, the real Pomo snores."), content)
+		button("Return", close_panel, content), content)
+	button("Return", close_panel, content)
+
+func maze_chest_panel():
+	for w in ["lavir", "yureka", "chochke"]: learn(w)
+	hiri_secret("maze")
+	if solved.has("ch:choni_maze"):
+		message("lavir", "The chest is empty except for a note: “Hiri!” Someone was here before you. (It was you.)")
+		return
+	(maze_chest.get_meta("lid") as Node3D).rotation_degrees.x = -110.0
+	find_choni("choni_maze")
+	inventory.append("chochke")
+	gin += 3
+	save_game()
+	message("Yureka!", "You reach the middle of the lavir (maze). Inside the chest: one of Gav's chonies, a chochke (a little trinket, from Yiddish tchotchke) and vel e yan gin, three coins. Oku would want to talk to that trinket.")
+
+func choni_kind_pick(e: Dictionary):
+	find_choni(e["id"])
+	clear_panel("choni")
+	varnak_banner("Yureka! Choni!", 28)
+	text_line("A pair of Gav's spotted chonies, right here. How did they get here? Nobody knows. Everyone suspects the poltergeist.", 17)
+	button("Return", close_panel, content)

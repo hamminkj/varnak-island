@@ -99,6 +99,20 @@ const WORDS = {
 	"vava": "sway, wobble (borrowed from Guarani vava, to sway)",
 	"sununu": "a rumbling uproar (borrowed from Guarani sununu, an uprising or revolt)",
 	"kachaka": "bouncy dance music (borrowed from Paraguayan kachaka, a cumbia style named after a Colombian song)",
+	# eighth expansion: pranks, Hirimara, more borrowings
+	"hiri": "prank, trick (as a verb root: k-ta-hiri, I prank you; Hiri! means Gotcha!)", "hiri-hiri": "prank after prank (doubled)",
+	"sipu": "spider", "dop": "hide (transitive root: k-i-dop, I hide it)", "lavir": "maze", "hirimara": "the prank field (a compound: hiri prank + mara field)",
+	"-na": "person who (a derivation ending: choni-na, choni person; teka-na, villager)", "choni-na": "choni person, a title of great honor (choni + -na)",
+	"karaoke": "karaoke (borrowed from Japanese karaoke, empty orchestra)", "bravo": "well done! (borrowed from Italian bravo)",
+	"ups": "oops (borrowed from English oops)", "pitsa": "pizza (borrowed from Italian pizza)", "selfi": "selfie photo (borrowed from English selfie)",
+	"robot": "robot (borrowed from Czech robot, from robota, hard work)", "safari": "a long trip, an expedition (borrowed from Swahili safari, journey)",
+	"tabu": "forbidden (borrowed through English taboo from Tongan tapu; a describing root: i-tabu)", "kudos": "praise, well done (borrowed from Greek kudos, glory)",
+	"chochke": "a little trinket, a knickknack (borrowed from Yiddish tchotchke)", "kluts": "a clumsy person (borrowed from Yiddish klutz)",
+	"poltergais": "a noisy prank ghost (borrowed from German Poltergeist, noisy ghost)", "dopelgenger": "a double who looks just like you (borrowed from German Doppelganger, double-goer)",
+	"deshavu": "the feeling it happened before (borrowed from French deja vu, already seen)", "gobeldigok": "nonsense talk, gibberish (borrowed from English gobbledygook)",
+	"ninkompup": "a silly fool (borrowed from English nincompoop)", "karinyo": "darling (borrowed from Spanish carino)",
+	"wai-dau": "a dummy, an airhead (calque of German Dummkopf: wai bad + dau head)", "shampu": "shampoo (borrowed from Hindi champo, press or massage)",
+	"yureka": "I found it! (borrowed from Greek eureka)", "deshavu-sek": "the deja vu stone (deshavu + sek stone)", "bungalo": "a small house (borrowed from Hindi bangla, a Bengal-style house)", "kabum": "boom! (borrowed from English kaboom)",
 	"-en": "who / that (relative clause ending: i-ning-im-en par, the bird that is singing)",
 	"-ka": "and then (same subject keeps going)", "shi (if)": "if (after the clause)"
 }
@@ -377,6 +391,18 @@ const SENTENCES = {
 	"desh_toot": {"v": "Fiyesta-ma Desh i-tarara-tarara-pa-nu!", "parts": "fiyesta-ma  Desh  i-tarara-tarara-pa-nu\nparty-LOC  Desh  3S-toot~REDUP-PST-REP", "en": "They say Desh tooted and tooted like a trumpet at the party!",
 		"gesture": "Desh puffs out both cheeks and plays an imaginary trumpet. Tarara is the Guarani sound of a trumpet.",
 		"words": ["fiyesta", "tarara", "-nu"], "wrong": ["Desh slept at the party.", "Desh will play the drum."]},
+	"karaoke_stage": {"v": "Ki karaoke-ma polu ri-ning-ur-da!", "parts": "ki  karaoke-ma  polu  ri-ning-ur-da\nthis  karaoke-LOC  everyone  3PL-sing-HAB-DIR", "en": "Everyone sings at this karaoke!",
+		"gesture": "A tiny stage with a seashell microphone. A painted sign says Bravo! Karaoke is borrowed from Japanese.",
+		"words": ["karaoke", "polu", "ning"], "wrong": ["Nobody sings here.", "The stage is broken."]},
+	"maze_hedge": {"v": "Lavir i-var-da. Ups... an hama na-esh-ha?", "parts": "lavir  i-var-da.  ups...  an  hama  na-esh-ha\nmaze  3S-big-DIR.  oops  I  where  1S-be.located-Q", "en": "The maze is big. Oops... where am I?",
+		"gesture": "Tall green hedges in every direction. Ups is borrowed from English oops.",
+		"words": ["lavir", "hama", "ups"], "wrong": ["The maze is small. I know the way.", "The house is big."]},
+	"ghost_hut": {"v": "Ki bungalo-ma poltergais i-esh-nu.", "parts": "ki  bungalo-ma  poltergais  i-esh-nu\nthis  small.house-LOC  poltergeist  3S-be.located-REP", "en": "They say a poltergeist lives in this little house.",
+		"gesture": "A teapot floats past the window. A chair spins on its own. Bungalo comes from Hindi, poltergais from German.",
+		"words": ["bungalo", "poltergais", "-nu"], "wrong": ["I saw a cat in the house.", "The house is empty and quiet."]},
+	"scarecrow": {"v": "Choni dau-ma i-esh-da!", "parts": "choni  dau-ma  i-esh-da\nunderwear  head-LOC  3S-be.located-DIR", "en": "There is a choni on its head!",
+		"gesture": "A scarecrow guards the prank field, wearing a pair of spotted chonies as a hat.",
+		"words": ["choni", "dau", "esh"], "wrong": ["The scarecrow has a hat.", "There is a bird on its head."]},
 	"party_noise": {"v": "Fiyesta-ma buruhaha i-esh-pa-nu.", "parts": "fiyesta-ma  buruhaha  i-esh-pa-nu\nparty-LOC  uproar  3S-exist-PST-REP", "en": "They say there was an uproar at the party.",
 		"gesture": "Desh grins and mimes a crowd going wild. Fiyesta and buruhaha are both borrowed words.",
 		"words": ["fiyesta", "buruhaha", "-nu"], "wrong": ["The party was quiet.", "There will be a party tomorrow."]}
@@ -433,6 +459,39 @@ const GOSSIP = [
 	{"id": "tor_habibi", "by": "oren", "about": "tor", "ev": "nu", "v": "Tor mar-ru habibi i-mel-ur-nu.", "en": "They say Tor calls the horse habibi (darling).",
 		"gesture": "Oren glares toward the bridge and pats his horse protectively.",
 		"reply": {"v": "Ho! Mar i-kawai-kawai-da!", "en": "Yes! The horse is so, so cute!", "gesture": "Tor clasps his hands and swoons a little."}},
+	{"id": "gav_choni_sea", "by": "mira", "about": "gav", "ev": "shi", "emote": "proud", "v": "Gav-ni choni-ir haima ri-sum-im-shi.", "en": "Apparently Gav's chonies are swimming in the sea.",
+		"gesture": "Mira shades her eyes and points dramatically at something spotted, floating far out.",
+		"reply": {"v": "Ho! Choni-ir ri-sum-ur-da. Ri-sava-da!", "en": "Yes! The chonies usually swim. They are safe!", "gesture": "Gav waves at the sea like a proud parent."}},
+	{"id": "yalo_ghost", "by": "sanu", "about": "yalo", "ev": "nu", "emote": "shocked", "v": "Yalo poltergais-ta i-par-ur-nu.", "en": "They say Yalo is afraid of a poltergeist.",
+		"gesture": "Sanu yawns, then whispers and wiggles spooky fingers.",
+		"reply": {"v": "Ho! Poltergais Hirimara-ma i-esh-da! I-zen-da!", "en": "Yes! The poltergeist is in Hirimara, the prank field! It's true!", "gesture": "Yalo hides behind his own hands and peeks out."}},
+	{"id": "desh_karaoke", "by": "oren", "about": "desh", "ev": "da", "emote": "laugh", "v": "Desh karaoke-ma i-ning-pa-da.", "en": "I saw Desh sing at karaoke.",
+		"gesture": "Oren covers his ears and scowls. Then he mimes every fish in the sea swimming away.",
+		"reply": {"v": "Bravo! Bravo! An na-ning-fu!", "en": "Bravo! Bravo! I will sing again!", "gesture": "Desh bows deeply to an invisible crowd."}},
+	{"id": "suri_selfi", "by": "rin", "about": "suri", "ev": "shi", "emote": "embarrassed", "v": "Suri-ni puka-ma selfi-ir ri-esh-shi.", "en": "Apparently there are selfies inside Suri's book.",
+		"gesture": "Rin giggles and makes a duck face.",
+		"reply": {"v": "Tabu! Ki puka i-tabu-da!", "en": "Forbidden! This book is forbidden!", "gesture": "Suri snaps the book shut and hugs it."}},
+	{"id": "ketu_pitsa", "by": "gav", "about": "ketu", "ev": "nu", "emote": "proud", "v": "Ketuke tari-pitsa i-dar-ur-nu.", "en": "They say Ketu makes fish pizza.",
+		"gesture": "Gav licks his lips, then looks unsure.",
+		"reply": {"v": "Ho! Tari-pitsa i-ho-ho-da! Bravo!", "en": "Yes! Fish pizza is super good! Bravo!", "gesture": "Ketu kisses his fingertips."}},
+	{"id": "pomo_dopel", "by": "ola", "about": "pomo", "ev": "shi", "emote": "confused", "v": "Pomo-ni dopelgenger Hirimara-ma i-esh-shi.", "en": "Apparently Pomo's double is in Hirimara, the prank field.",
+		"gesture": "Ola points at Pomo, then far to the west, then back at Pomo.",
+		"reply": {"v": "Han?! An yan na-an-da! ...zzz", "en": "What?! There is only one of me! ...zzz", "gesture": "Pomo counts himself on his fingers and falls asleep halfway."}},
+	{"id": "tor_kluts", "by": "lira", "about": "tor", "ev": "da", "emote": "embarrassed", "v": "Kluts! Tor gira-ta mora-ru i-lum-pa-da.", "en": "Klutz! I saw Tor go from the bridge into the river.",
+		"gesture": "Lira mimes a wobble, a slip and a big splash.",
+		"reply": {"v": "Ups. ...An na-sum-pa-da. I-zen-da.", "en": "Oops. ...I went swimming. It's true.", "gesture": "Tor wrings out his shirt with great dignity."}},
+	{"id": "oku_chochke", "by": "tamu", "about": "oku", "ev": "nu", "emote": "proud", "v": "Oku chochke-ir-ru i-mel-ur-nu.", "en": "They say Oku talks to trinkets.",
+		"gesture": "Tamu taps his head and rolls his eyes.",
+		"reply": {"v": "Ho! Chochke-ir ri-mel-ur-da!", "en": "Yes! The trinkets talk back!", "gesture": "Oku holds a trinket to one ear and nods seriously."}},
+	{"id": "vira_shampu", "by": "yalo", "about": "vira", "ev": "shi", "emote": "happy", "v": "Virake guro-ta shampu i-varn-ur-shi.", "en": "Apparently Vira makes shampoo out of fruit.",
+		"gesture": "Yalo sniffs the air dramatically. Fruity!",
+		"reply": {"v": "Ho! Ti-ni dau-ru, karinyo?", "en": "Yes! For your head, darling?", "gesture": "Vira offers you a bottle that smells like a fruit salad."}},
+	{"id": "gav_robot", "by": "neri", "about": "gav", "ev": "shi", "emote": "laugh", "v": "Gav ma-i-sul-ur-ki-shi. Robot i-an-shi.", "en": "Apparently Gav never sleeps. Apparently he is a robot.",
+		"gesture": "Neri walks with stiff robot arms.",
+		"reply": {"v": "Bip. Bup. ...Ha! Maki!", "en": "Beep. Boop. ...Ha! No!", "gesture": "Gav does the robot, badly."}},
+	{"id": "sanu_choni", "by": "vira", "about": "sanu", "ev": "da", "emote": "sleepy", "v": "Sanu choni-ir-ma i-sul-pa-da.", "en": "I saw Sanu sleeping in a pile of chonies!",
+		"gesture": "Vira shakes with silent laughter.",
+		"reply": {"v": "Choni-ir ri-nav-da... zzz", "en": "The chonies are warm... zzz", "gesture": "Sanu curls up as if the pile were still there."}},
 	{"id": "lira_story", "by": "pomo", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
 		"gesture": "Pomo points down the hill at the village and mimes a chattering mouth.",
 		"reply": {"v": "Ho! Ki tovu i-ho!", "en": "Ha! This story is good!", "gesture": "Lira is already telling someone else."}}
@@ -440,14 +499,15 @@ const GOSSIP = [
 
 # Rumor composer: pieces for open-ended sentences.
 const RUMOR_PLACES = [["", "", ""], ["tekama", "in the village", ""], ["haima", "in the sea", ""], ["kurma", "at the market", ""], ["sang-ma", "on the hill", ""],
-	["wak-korma", "in the well", "silly"], ["sulumma", "in bed", ""], ["girama", "on the bridge", ""], ["murakma", "in a tree", "silly"], ["fardomma", "in the lighthouse", ""], ["guro-ma", "inside a fruit", "silly"], ["fiyesta-ma", "at the party", ""], ["pajama-ma", "in pajamas", "silly"]]
+	["wak-korma", "in the well", "silly"], ["sulumma", "in bed", ""], ["girama", "on the bridge", ""], ["murakma", "in a tree", "silly"], ["fardomma", "in the lighthouse", ""], ["guro-ma", "inside a fruit", "silly"], ["fiyesta-ma", "at the party", ""], ["pajama-ma", "in pajamas", "silly"],
+	["karaoke-ma", "at karaoke", ""], ["lavir-ma", "in the maze", ""], ["pitsa-ma", "on a pizza", "silly"]]
 # root: [base, -ing, past, he/she form]
 const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["swim", "swimming", "swam", "swims"], "ning": ["sing", "singing", "sang", "sings"],
 	"pav": ["run", "running", "ran", "runs"], "nang": ["walk", "walking", "walked", "walks"], "mel": ["talk", "talking", "talked", "talks"],
 	"tal": ["arrive", "arriving", "arrived", "arrives"], "sir": ["search", "searching", "searched", "searches"],
 	"kororo": ["snore", "snoring", "snored", "snores"], "tarara": ["toot like a trumpet", "tooting like a trumpet", "tooted like a trumpet", "toots like a trumpet"], "vava": ["wobble", "wobbling", "wobbled", "wobbles"]}
-const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Vira", "Yalo", "Desh", "Oku", "Gav", "Tamu", "Neri", "Gor", "Mar", "Par"]
-const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird"}
+const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Vira", "Yalo", "Desh", "Oku", "Gav", "Tamu", "Neri", "Gor", "Mar", "Par", "Poltergais", "Robot"]
+const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird", "Poltergais": "The poltergeist", "Robot": "The robot"}
 
 # Door puzzles, one per house. situation is a gesture; options are Varnak commands.
 const DOORS = {
@@ -675,7 +735,17 @@ const JOKES = [
 	{"v": "Dar ten!", "en": "Ten feet! (dar is ten and ten is foot. Confused yet?)"},
 	{"v": "Hai-mar ma-i-pav-ki-da! I-sum-ur-da.", "en": "The seahorse doesn't run! It swims."},
 	{"v": "Hen hen-ma i-esh-da!", "en": "The sky is in the sky! (hen means sky, not chicken)"},
-	{"v": "Gor i-pav-pav-im-da!", "en": "The dog is running around and around!"}
+	{"v": "Gor i-pav-pav-im-da!", "en": "The dog is running around and around!"},
+	{"v": "Choni-ir ri-pav-pav-im-da!", "en": "The chonies are running around and around!"},
+	{"v": "Gor karaoke i-ning-im-da. Bravo!", "en": "The dog is singing karaoke. Bravo!"},
+	{"v": "Yue pitsa i-an-da!", "en": "The moon is a pizza!"},
+	{"v": "Poltergaiske anni choni i-nuk-pa-shi!", "en": "Apparently the poltergeist took my chonies!"},
+	{"v": "Robot i-sul-im-da. Bip... zzz", "en": "The robot is sleeping. Beep... zzz"},
+	{"v": "Tari sena-li safari-ru i-kel-im-da!", "en": "The fish is going on safari by boat!"},
+	{"v": "Gobeldigok! Gobeldigok!", "en": "Gibberish! Gibberish! (gobeldigok means nonsense)"},
+	{"v": "Deshavu! ...Deshavu!", "en": "Deja vu! ...Deja vu! (Didn't I just say that?)"},
+	{"v": "Marke selfi i-varn-pa-da!", "en": "The horse made a selfie!"},
+	{"v": "Sipu choni-ma i-sul-im-da!", "en": "A spider is sleeping in the chonies!"}
 ]
 const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin", "bombom": "candy", "ret-gor": "hot dog"}
 
@@ -709,15 +779,18 @@ const EXT_VERBS_I = {"lum": ["go", "went", "going"], "pav": ["run", "ran", "runn
 	"piriri": ["sparkle", "sparkled", "sparkling"], "vava": ["sway", "swayed", "swaying"]}
 # Transitive verbs: [base, past]
 const EXT_VERBS_T = {"pal": ["see", "saw"], "nuk": ["take", "took"], "rav": ["read", "read"], "por": ["open", "opened"], "hep": ["close", "closed"],
-	"dar": ["cook", "cooked"], "varn": ["build", "built"], "sir": ["look for", "looked for"], "mai": ["buy", "bought"], "ven": ["give", "gave"], "tar": ["bring", "brought"]}
+	"dar": ["cook", "cooked"], "varn": ["build", "built"], "sir": ["look for", "looked for"], "mai": ["buy", "bought"], "ven": ["give", "gave"], "tar": ["bring", "brought"],
+	"dop": ["hide", "hid"], "hiri": ["prank", "pranked"]}
 const EXT_STATIVES = {"var": "big", "sen": "small", "nav": "warm", "ret": "hot", "len": "cold", "gao": "tall", "ho": "good", "wai": "bad", "seng": "happy",
-	"sava": "safe", "ling": "bright", "dam": "dark", "dun": "short", "shora": "old", "nava": "new", "lei": "tired", "mar": "full", "hala": "fast", "kawai": "cute", "kaput": "broken"}
+	"sava": "safe", "ling": "bright", "dam": "dark", "dun": "short", "shora": "old", "nava": "new", "lei": "tired", "mar": "full", "hala": "fast", "kawai": "cute", "kaput": "broken", "tabu": "forbidden"}
 const EXT_NOUNS_EXTRA = {"kel": ["bag", "bags"], "sek": ["stone", "stones"], "lin": ["rope", "ropes"], "yamat": ["food", "food"], "cha": ["tea", "tea"],
 	"yok": ["herb", "herbs"], "ket": ["chair", "chairs"], "yir": ["shirt", "shirts"], "gin": ["coin", "coins"], "sao": ["star", "stars"], "yue": ["moon", "moons"],
 	"riya": ["sun", "suns"], "hen": ["sky", "skies"], "tovu": ["story", "stories"], "palar": ["friend", "friends"], "ruk": ["path", "paths"], "pai": ["paper", "papers"],
 	"senar": ["teacher", "teachers"], "ravar": ["student", "students"], "kelar": ["traveler", "travelers"], "dor": ["land", "lands"], "gan": ["room", "rooms"],
 	"choni": ["pair of chonies", "chonies"], "bombom": ["candy", "candies"], "pajama": ["pajamas", "pajamas"], "fiyesta": ["party", "parties"],
-	"buruhaha": ["uproar", "uproars"], "kafufel": ["fuss", "fusses"], "halabalu": ["racket", "rackets"], "shenani": ["trick", "tricks"]}
+	"buruhaha": ["uproar", "uproars"], "kafufel": ["fuss", "fusses"], "halabalu": ["racket", "rackets"], "shenani": ["trick", "tricks"],
+	"pitsa": ["pizza", "pizzas"], "robot": ["robot", "robots"], "chochke": ["trinket", "trinkets"], "selfi": ["selfie", "selfies"], "sipu": ["spider", "spiders"],
+	"poltergais": ["poltergeist", "poltergeists"], "bungalo": ["small house", "small houses"], "lavir": ["maze", "mazes"]}
 
 # ---- poems from ning-guro berries and sao-dau mushrooms ----
 # Poem nouns: [singular, plural]
@@ -726,8 +799,53 @@ const POEM_NOUNS = {"yue": ["the moon", "moons"], "riya": ["the sun", "suns"], "
 	"sek": ["the stone", "the stones"], "sang": ["the hill", "the hills"], "far": ["the fire", "the fires"], "dom": ["the house", "the houses"], "sena": ["the boat", "the boats"],
 	"puka": ["the book", "the books"], "panak": ["the bread", "the loaves"], "gor": ["the dog", "the dogs"], "mar": ["the horse", "the horses"], "ket": ["the chair", "the chairs"],
 	"gira": ["the bridge", "the bridges"], "yamat": ["the food", "the meals"], "choni": ["a pair of chonies", "the chonies"], "bombom": ["the candy", "the candies"],
-	"pajama": ["the pajama shirt", "the pajamas"], "fiyesta": ["the party", "the parties"]}
+	"pajama": ["the pajama shirt", "the pajamas"], "fiyesta": ["the party", "the parties"],
+	"pitsa": ["the pizza", "the pizzas"], "robot": ["the robot", "the robots"], "chochke": ["the trinket", "the trinkets"], "poltergais": ["the poltergeist", "the poltergeists"],
+	"selfi": ["the selfie", "the selfies"], "sipu": ["the spider", "the spiders"]}
 const POEM_PLACES = {"hen": "in the sky", "hai": "in the sea", "mora": "in the river", "yesh": "in the night", "salma": "at dawn", "teka": "in the village",
-	"sang": "on the hill", "guro": "inside a fruit", "dau": "in my head", "kel": "in a bag", "fiyesta": "at the party", "pajama": "in pajamas"}
+	"sang": "on the hill", "guro": "inside a fruit", "dau": "in my head", "kel": "in a bag", "fiyesta": "at the party", "pajama": "in pajamas",
+	"karaoke": "at karaoke", "safari": "on safari", "lavir": "in the maze", "pitsa": "on a pizza"}
 const POEM_INC = [["wak-ta", "drinks water", "drink water"], ["yamat-dar", "cooks food", "cook food"], ["puka-rav", "reads books", "read books"],
 	["tari-nuk", "goes fishing", "go fishing"], ["mara-vun", "works the fields", "work the fields"]]
+
+# ---- eighth expansion: pranks, teases, the great choni hunt, Hirimara ----
+
+# Pranks you can play on villagers. {thing} and {thing_en} are filled with the person's favorite thing.
+const PRANKS = [
+	{"id": "spider", "label": "Fake spider", "v": "Ti-ni dau-ma sipu i-esh-da!", "en": "There's a spider on your head!", "words": ["sipu", "dau", "esh"],
+		"act": "{name} slaps at their own head like a windmill."},
+	{"id": "hide", "label": "Hide their thing", "v": "Ti-ni {thing} hama i-esh-ha? ...Anke k-i-dop-pa-da!", "en": "Where is your {thing_en}? ...I hid it!", "words": ["dop", "hama"],
+		"act": "{name} searches under rocks, behind trees and inside their own pockets."},
+	{"id": "choni", "label": "Look! Chonies!", "v": "Ti-ni choni fardom-ni tarma i-esh-da!", "en": "Your chonies are on top of the lighthouse!", "words": ["choni", "fardom", "tar"],
+		"act": "{name} spins around and stares at the lighthouse. Nothing there... this time."},
+	{"id": "ghost", "label": "Be a poltergeist", "v": "Uuuu... An poltergais na-an-da!", "en": "Woooo... I am a poltergeist!", "words": ["poltergais", "an"],
+		"act": "{name} jumps straight up into the air."},
+	{"id": "robot", "label": "Be a robot", "v": "Bip. Bup. An robot na-an-da. Ti-ni bombom t-na-ven-o!", "en": "Beep. Boop. I am a robot. Give me your candy!", "words": ["robot", "bombom", "ven"],
+		"act": "{name} slowly starts to hand over an imaginary candy... then stops."}
+]
+# How each personality reacts to being pranked: [Varnak, English, emote, friendship]
+const PRANKED = {
+	"dramatic": ["Aaah! AAAH!! ...Ho.", "Aaah! AAAH!! ...(faints, then gets up) Oh.", "faint", 0],
+	"giggly": ["Ha! Ha! Hiri! Ti ta-ho-da!", "Ha ha! A prank! You're good!", "laugh", 1],
+	"grumpy": ["Hmph! Ti puts ta-an-da!", "Hmph! You're a putz!", "angry", -1],
+	"proud": ["Ma-na-par-ki-da. ...Ups.", "I was not scared. ...Oops.", "embarrassed", 0],
+	"sleepy": ["Han...? Hiri...? zzz", "What...? A prank...? zzz", "sleepy", 0],
+	"cheerful": ["Ha! Hiri! Kudos!", "Ha! A prank! Kudos to you!", "laugh", 1]
+}
+# Extra teases: [Varnak, English, new word]
+const TEASES = [
+	["Ti kluts ta-an-da!", "You're a klutz! (kluts is borrowed from Yiddish klutz)", "kluts"],
+	["Ti-ni dau i-var-var!", "Your head is HUGE! (doubling makes var stronger)", "var-var"],
+	["Ti ninkompup ta-an-da!", "You're a nincompoop! (borrowed from English)", "ninkompup"],
+	["Ti wai-dau ta-an-da!", "You're a dummy! (wai-dau, bad-head, is a calque of German Dummkopf)", "wai-dau"],
+	["Ti-ni mel gobeldigok i-an-da!", "Your talk is gibberish! (gobeldigok is borrowed from English gobbledygook)", "gobeldigok"]
+]
+# Gav's six lost chonies: [id, position x, z, Varnak hint, English hint]
+const CHONI_HUNT = [
+	["choni_hill", -56.5, -38.6, "Choni sang-ni tarma i-esh-shi.", "Apparently a choni is on top of the hill."],
+	["choni_falls", 60.3, -35.6, "Choni wak hala i-lum-im-en mora-ni dalma i-esh-shi.", "Apparently a choni is beside the river where the water goes fast (near the waterfall)."],
+	["choni_islet", 54.2, 86.2, "Choni Sendor-ma i-esh-nu.", "They say a choni is on Sendor, the small island."],
+	["choni_ruins", -66.0, 43.5, "Choni shora sek-ir-ma i-esh-shi.", "Apparently a choni is among the old stones."],
+	["choni_ghost", -98.0, -15.0, "Poltergaiske choni i-nuk-pa-nu.", "They say the poltergeist took a choni."],
+	["choni_maze", 0.0, 0.0, "Choni lavir-ni kor-ma i-esh-shi.", "Apparently a choni is inside the maze."]
+]

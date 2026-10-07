@@ -346,3 +346,24 @@ Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeat
 The paradigm in Varnak: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Desh i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
 
 Things to check: 19. Doubling is a game addition, not in the handoff document. 20. Whether sound words should be their own word class or ordinary verb roots (the game treats them as intransitive roots). 21. Whether the hyphen in doubled forms (var-var) is the right spelling.
+
+
+## Eighth expansion: pranks, Hirimara and the choni hunt
+
+New native words: hiri (prank; Hiri! = Gotcha!), hiri-hiri (prank after prank), sipu (spider), dop (hide, transitive), lavir (maze), Hirimara (hiri + mara, the prank field), deshavu-sek (the deja vu stone). The derivation ending -na (person who), from the handoff document's teka-na, is used for choni-na, a choni person.
+
+New borrowings, respelled with Varnak sounds: karaoke (Japanese), bravo (Italian), ups (English oops), pitsa (Italian pizza), selfi (English), robot (Czech), safari (Swahili), tabu (Tongan tapu, through English; a describing root), kudos (Greek), chochke (Yiddish tchotchke), kluts (Yiddish klutz), poltergais (German Poltergeist), dopelgenger (German Doppelganger), deshavu (French deja vu), gobeldigok (English gobbledygook), ninkompup (English nincompoop), karinyo (Spanish carino), shampu (Hindi champo), yureka (Greek eureka), bungalo (Hindi bangla), kabum (English kaboom). New calque: wai-dau (bad-head, from German Dummkopf), with the modifier first as in Varnak compounds.
+
+Key sentences:
+- Ti-ni dau-ma sipu i-esh-da! (There's a spider on your head!)
+- Ti-ni X hama i-esh-ha? ...Anke k-i-dop-pa-da! (Where is your X? ...I hid it!)
+- Ma-ta-hiri-o-ki! (Don't prank me!)
+- Uuuu... Anke Gav-ni choni k-i-nuk-pa-da! (Woooo... I took Gav's choni!), answered with T-na-ven-o-ye! (Please give it to me!)
+- An dopelgenger na-an-da! Pomo i-sul-im-da. An ma-na-sul-ur-ki-da! (I am the doppelganger! Pomo is sleeping. I never sleep!)
+- Choni sang-ni tarma i-esh-shi. Choni Sendor-ma i-esh-nu. Poltergaiske choni i-nuk-pa-nu. (Gav's clues use -shi and -nu.)
+- Ti choni-na ta-an-da! (You are a choni person!)
+- Choni-ir hen-ta ri-kar-im-da! (Chonies are coming from the sky!)
+
+New gossip: Gav's chonies swimming (-shi), Yalo and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Pomo's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Vira's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
+
+Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
