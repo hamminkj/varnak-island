@@ -227,19 +227,44 @@ var looks = {
 	"neri": [Color("d9a679"), Color("2e2a5a"), 2, Color("f4a261")],
 	"ketu": [Color("b07a52"), Color("2b1d14"), 3, Color("e9c46a")],
 	"suri": [Color("e8bf98"), Color("1d1d1d"), 1, Color("f2e6c8")],
-	"rin": [Color("c68e66"), Color("3b2418"), 2, Color("e76f51")],
-	"ola": [Color("9a6a48"), Color("1d1d1d"), 0, Color("a8dadc")],
+	"rin": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
+	"ola": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
 	"pomo": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
 	"vira": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
 	"ila": [Color("f0c9a0"), Color("7a4a22"), 2, Color("f4a261")],
 	"yalo": [Color("c68e66"), Color("2e2a5a"), 4, Color("f4f1e8")],
-	"desh": [Color("7a4a32"), Color("1d1d1d"), 4, Color("2a9d8f")],
+	"desh": [Color("7a4a32"), Color("1d1d1d"), 5, Color("2a9d8f")],
 	"sair1": [Color("e3b98f"), Color("4a3020"), 1, Color("a78bda")],
 	"sair2": [Color("a87650"), Color("1d1d1d"), 0, Color("e9c46a")],
 	"sair3": [Color("d9a679"), Color("5a4030"), 3, Color("4f7ca8")],
-	"oku": [Color("c68e66"), Color("e6e1d6"), 0, Color("8f5a48")],
+	"oku": [Color("c68e66"), Color("e6e1d6"), 7, Color("8f5a48")],
 	"gav": [Color("e3b98f"), Color("8a3a1a"), 3, Color("2a6f97")],
 	"tamu": [Color("8d5a3b"), Color("1d1d1d"), 1, Color("e9c46a")]
+}
+# Extra features so every villager has their own silhouette.
+var person_ex = {
+	"ena": {"hat": "cap", "hat_color": Color("1d3557"), "pants": Color("2b3a55"), "cheeks": true},
+	"mira": {"apron": Color("f4f1e8"), "hat": "flower", "hat_color": Color("e76f51"), "w": 1.12, "h": 0.96},
+	"sanu": {"hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.86, "cheeks": true},
+	"tor": {"w": 1.22, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("c0392b"), "pants": Color("5a4632")},
+	"lira": {"face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a")},
+	"oren": {"mustache": Color("4a4a4a"), "hat": "straw", "hat_color": Color("8c5a3c"), "w": 1.08, "h": 1.04},
+	"neri": {"backpack": Color("c0392b"), "scarf": Color("f4a261")},
+	"ketu": {"w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14")},
+	"suri": {"h": 1.12, "w": 0.92, "face": "glasses", "earrings": true},
+	"rin": {"cheeks": true},
+	"ola": {"cheeks": true},
+	"pomo": {"beard": Color("d9d9d9"), "h": 0.98, "w": 1.12},
+	"vira": {"face": "glasses", "frame": Color("6b4f36"), "apron": Color("9bd06a")},
+	"ila": {"hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true},
+	"yalo": {"h": 1.16, "w": 0.86, "hat": "captain", "mustache": Color("2e2a5a")},
+	"desh": {"face": "sunglasses", "stripe": Color("f4f1e8")},
+	"sair1": {"h": 0.93, "scarf": Color("a78bda")},
+	"sair2": {"w": 1.2, "hat": "beanie", "hat_color": Color("e9c46a")},
+	"sair3": {"h": 1.07, "face": "glasses"},
+	"oku": {"beard": Color("e6e1d6"), "face": "glasses", "h": 0.93, "w": 0.9},
+	"gav": {"hat": "cap", "hat_color": Color("2a6f97"), "bag": Color("8c5a3c")},
+	"tamu": {"hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.16}
 }
 var names = {"sair1": "sair", "sair2": "sair", "sair3": "sair"}
 var house_centers = [Vector3(-9,0,12), Vector3(10,0,7), Vector3(-11,0,1), Vector3(12,0,-4)]
@@ -304,8 +329,9 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 	match kind:
 		"npc":
 			var look = looks[id]
-			node = Art.person(color, look[0], look[1], look[2], look[3])
-			label_y = 2.15
+			var pex: Dictionary = person_ex.get(id, {})
+			node = Art.person(color, look[0], look[1], look[2], look[3], pex)
+			label_y = 2.15 * maxf(1.0, float(pex.get("h", 1.0)))
 			pr = 0.6
 			ph = 1.95
 		"item":
@@ -1230,10 +1256,23 @@ func build_ui():
 	top_row = HBoxContainer.new()
 	top_row.position = Vector2(14,124)
 	ui.add_child(top_row)
-	button("Notebook",show_notebook,top_row)
-	button("Bag",show_inventory,top_row)
-	button("Map",show_map,top_row)
-	button("More",show_more,top_row)
+	top_row.add_theme_constant_override("separation", 6)
+	for tb in [["Notebook", show_notebook], ["Bag", show_inventory], ["Map", show_map], ["", show_more]]:
+		var b = button(tb[0], tb[1], top_row)
+		b.custom_minimum_size = Vector2(44, 38)
+		b.add_theme_font_size_override("font_size", 15)
+		for st in ["normal", "hover", "pressed", "focus"]:
+			var sb = (b.get_theme_stylebox(st) as StyleBoxFlat).duplicate()
+			sb.content_margin_left = 9
+			sb.content_margin_right = 9
+			sb.content_margin_top = 4
+			sb.content_margin_bottom = 4
+			b.add_theme_stylebox_override(st, sb)
+		if tb[0] == "":
+			b.name = "MoreButton"
+			b.tooltip_text = "More"
+			b.icon = menu_icon()
+			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt = Label.new()
 	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	prompt.position = Vector2(-160,40)
@@ -1373,7 +1412,7 @@ func show_intro():
 	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
 	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact.")
-	text_line("Tap the quest box to fold it. The More button has games, difficulty and Reset progress.")
+	text_line("Tap the quest box to fold it. The menu button (three lines, top row) has games, difficulty, About Varnak and Reset progress.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
@@ -3355,6 +3394,17 @@ func _on_status_input(ev: InputEvent):
 		layout_hud()
 		save_game()
 		status.accept_event()
+
+# Three short lines, drawn in code (the font has no menu symbol).
+func menu_icon() -> ImageTexture:
+	var img = Image.create(22, 18, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	for k in range(3):
+		for y in range(3):
+			for x in range(22):
+				var edge = (x == 0 or x == 21) and (y == 0 or y == 2)
+				if not edge: img.set_pixel(x, k * 7 + y, Color("2e1c0c"))
+	return ImageTexture.create_from_image(img)
 
 func layout_hud():
 	update_status()
@@ -6005,7 +6055,7 @@ func build_hirimara():
 	# ---- Pomo's doppelganger, standing very still on a rock ----
 	var dp = Vector3(-127.0, gy(-127.0, 14.0), 14.0)
 	Art.sph(self, dp + Vector3(0, 0.2, 0), 1.0, Color("8d9394"), Vector3(1.3, 0.5, 1.1), 9)
-	var dopel = Art.person(Color("4f7ca8"), Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b"))
+	var dopel = Art.person(Color("4f7ca8"), Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b"), person_ex["pomo"])
 	dopel.position = dp + Vector3(0, 0.45, 0)
 	dopel.rotation_degrees.y = 90
 	add_child(dopel)

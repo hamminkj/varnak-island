@@ -244,22 +244,41 @@ static func cyl_mesh(radius: float, height: float, seg: int = 7) -> CylinderMesh
 
 # ---------- people ----------
 
-static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accent: Color = Color("f2e6c8")) -> Node3D:
+static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accent: Color = Color("f2e6c8"), ex: Dictionary = {}) -> Node3D:
 	var n = Node3D.new()
-	var pants = shirt.darkened(0.45)
-	box(n, Vector3(-0.11, 0.3, 0), Vector3(0.17, 0.6, 0.2), pants)
-	box(n, Vector3(0.11, 0.3, 0), Vector3(0.17, 0.6, 0.2), pants)
-	box(n, Vector3(-0.11, 0.04, 0.05), Vector3(0.19, 0.09, 0.32), Color("3b2d25"))
-	box(n, Vector3(0.11, 0.04, 0.05), Vector3(0.19, 0.09, 0.32), Color("3b2d25"))
+	var rig = Node3D.new()
+	var h: float = ex.get("h", 1.0)
+	var w: float = ex.get("w", 1.0)
+	rig.scale = Vector3.ONE * h
+	n.add_child(rig)
+	n.set_meta("h", h)
+	var pants: Color = ex.get("pants", shirt.darkened(0.45))
+	var shoes: Color = ex.get("shoes", Color("3b2d25"))
+	for side in [-1.0, 1.0]:
+		box(rig, Vector3(side * 0.11 * w, 0.3, 0), Vector3(0.17 * w, 0.6, 0.2), pants)
+		box(rig, Vector3(side * 0.11 * w, 0.04, 0.05), Vector3(0.19 * w, 0.09, 0.32), shoes)
 	var body = Node3D.new()
-	n.add_child(body)
-	cyl(body, Vector3(0, 0.95, 0), 0.22, 0.28, 0.78, shirt, Vector3.ZERO, 14)
-	cyl(body, Vector3(0, 0.62, 0), 0.285, 0.285, 0.07, accent.darkened(0.2), Vector3.ZERO, 14)
+	rig.add_child(body)
+	cyl(body, Vector3(0, 0.95, 0), 0.22, 0.28, 0.78, shirt, Vector3.ZERO, 14).scale = Vector3(w, 1, w)
+	cyl(body, Vector3(0, 0.62, 0), 0.285, 0.285, 0.07, accent.darkened(0.2), Vector3.ZERO, 14).scale = Vector3(w, 1, w)
 	torus(body, Vector3(0, 1.36, 0), 0.07, 0.18, accent, Vector3.ZERO)
+	if ex.has("apron"):
+		box(body, Vector3(0, 0.84, 0.25 * w + 0.01), Vector3(0.34 * w, 0.52, 0.02), ex["apron"])
+		box(body, Vector3(0, 1.16, 0.2 * w + 0.01), Vector3(0.2, 0.16, 0.02), ex["apron"])
+	if ex.has("stripe"):
+		for k in range(3): cyl(body, Vector3(0, 0.75 + k * 0.17, 0), 0.226 + 0.03 * (2 - k), 0.235 + 0.03 * (2 - k), 0.045, ex["stripe"], Vector3.ZERO, 14).scale = Vector3(w * 1.02, 1, w * 1.02)
+	if ex.has("bag"):
+		box(body, Vector3(0.3 * w, 0.72, 0.05), Vector3(0.1, 0.28, 0.3), ex["bag"])
+		box(body, Vector3(0, 1.0, 0.05), Vector3(0.6 * w, 0.04, 0.05), ex["bag"].darkened(0.2), Vector3(0, 0, -38))
+	if ex.has("backpack"):
+		box(body, Vector3(0, 0.98, -0.3 * w), Vector3(0.36, 0.44, 0.18), ex["backpack"])
+	if ex.has("scarf"):
+		torus(body, Vector3(0, 1.33, 0), 0.12, 0.23, ex["scarf"], Vector3.ZERO)
+		box(body, Vector3(0.1, 1.12, 0.22 * w), Vector3(0.09, 0.32, 0.03), ex["scarf"])
 	var arms = []
 	for side in [-1.0, 1.0]:
 		var pivot = Node3D.new()
-		pivot.position = Vector3(side * 0.3, 1.28, 0)
+		pivot.position = Vector3(side * 0.3 * w, 1.28, 0)
 		body.add_child(pivot)
 		cyl(pivot, Vector3(0, -0.28, 0), 0.065, 0.075, 0.58, shirt.lightened(0.05), Vector3.ZERO, 8)
 		sph(pivot, Vector3(0, -0.6, 0), 0.075, skin, Vector3.ONE, 8)
@@ -267,11 +286,14 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	var head = Node3D.new()
 	head.position = Vector3(0, 1.62, 0)
 	body.add_child(head)
-	sph(head, Vector3.ZERO, 0.21, skin, Vector3.ONE, 14)
-	sph(head, Vector3(0, -0.02, 0.2), 0.04, skin.darkened(0.08), Vector3.ONE, 6)
-	sph(head, Vector3(-0.08, 0.03, 0.185), 0.04, Color("1a120e"), Vector3(1, 1.25, 0.7), 6)
-	sph(head, Vector3(0.08, 0.03, 0.185), 0.04, Color("1a120e"), Vector3(1, 1.25, 0.7), 6)
+	sph(head, Vector3.ZERO, 0.21, skin, Vector3(ex.get("head_w", 1.0), ex.get("head_h", 1.0), 1.0), 14)
+	sph(head, Vector3(0, -0.02, 0.2), ex.get("nose", 0.04), skin.darkened(0.08), Vector3.ONE, 6)
+	var eye: Color = ex.get("eyes", Color("1a120e"))
+	sph(head, Vector3(-0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
+	sph(head, Vector3(0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
 	box(head, Vector3(0, -0.1, 0.19), Vector3(0.09, 0.015, 0.02), skin.darkened(0.35))
+	if ex.get("cheeks", false):
+		for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.12, -0.05, 0.16), 0.045, Color("f08a8a"), Vector3(1, 0.7, 0.4), 6)
 	match style:
 		0:
 			sph(head, Vector3(0, 0.07, -0.02), 0.225, hair, Vector3(1, 0.7, 1.02), 12)
@@ -287,6 +309,57 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 			sph(head, Vector3(0, 0.05, -0.02), 0.215, hair, Vector3(1, 0.6, 1.0), 10)
 		4:
 			sph(head, Vector3(0, 0.0, -0.06), 0.215, hair, Vector3(1, 1, 0.85), 10)
+		5:
+			# spiky
+			sph(head, Vector3(0, 0.07, -0.02), 0.22, hair, Vector3(1, 0.65, 1.0), 10)
+			for k in range(5): cyl(head, Vector3(-0.14 + k * 0.07, 0.24, -0.02 + (k % 2) * 0.04), 0.0, 0.05, 0.16, hair, Vector3(0, 0, (k - 2) * 12.0), 6)
+		6:
+			# pigtails
+			sph(head, Vector3(0, 0.07, -0.02), 0.225, hair, Vector3(1, 0.7, 1.02), 12)
+			for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.25, -0.02, -0.06), 0.09, hair, Vector3(0.8, 1.3, 0.8), 8)
+		7:
+			# bald with a fringe
+			box(head, Vector3(0, -0.02, -0.17), Vector3(0.36, 0.14, 0.08), hair)
+	var hat: String = ex.get("hat", "")
+	var hc: Color = ex.get("hat_color", accent.darkened(0.2))
+	match hat:
+		"cap":
+			sph(head, Vector3(0, 0.09, -0.01), 0.225, hc, Vector3(1, 0.62, 1.02), 12)
+			box(head, Vector3(0, 0.08, 0.2), Vector3(0.26, 0.025, 0.18), hc.darkened(0.2))
+		"captain":
+			cyl(head, Vector3(0, 0.2, 0), 0.25, 0.22, 0.14, Color("f4f1e8"), Vector3.ZERO, 14)
+			cyl(head, Vector3(0, 0.13, 0), 0.23, 0.23, 0.05, Color("1d2a44"), Vector3.ZERO, 14)
+			box(head, Vector3(0, 0.11, 0.21), Vector3(0.26, 0.025, 0.14), Color("1d2a44"))
+			sph(head, Vector3(0, 0.2, 0.24), 0.03, Color("e9c46a"), Vector3.ONE, 6, 0.4)
+		"beanie":
+			sph(head, Vector3(0, 0.1, -0.01), 0.235, hc, Vector3(1, 0.72, 1.02), 12)
+			sph(head, Vector3(0, 0.29, -0.01), 0.06, hc.lightened(0.3), Vector3.ONE, 6)
+		"nightcap":
+			cyl(head, Vector3(0, 0.25, -0.06), 0.02, 0.23, 0.42, hc, Vector3(-35, 0, 0), 10)
+			sph(head, Vector3(0, 0.36, -0.3), 0.06, Color("f4f1e8"), Vector3.ONE, 6)
+		"straw":
+			cyl(head, Vector3(0, 0.15, 0), 0.42, 0.42, 0.025, Color("e2c46b"), Vector3.ZERO, 16)
+			cyl(head, Vector3(0, 0.23, 0), 0.17, 0.21, 0.16, Color("e2c46b"), Vector3.ZERO, 14)
+			cyl(head, Vector3(0, 0.18, 0), 0.215, 0.215, 0.04, hc, Vector3.ZERO, 14)
+		"band":
+			torus(head, Vector3(0, 0.1, 0), 0.2, 0.235, hc, Vector3.ZERO)
+		"flower":
+			for k in range(5): sph(head, Vector3(0.17 + cos(k * 1.26) * 0.05, 0.14 + sin(k * 1.26) * 0.05, 0.08), 0.035, hc, Vector3.ONE, 6)
+			sph(head, Vector3(0.17, 0.14, 0.09), 0.025, Color("ffd34d"), Vector3.ONE, 6)
+	match str(ex.get("face", "")):
+		"glasses", "sunglasses":
+			var dark = ex["face"] == "sunglasses"
+			for side in [-1.0, 1.0]:
+				if dark: sph(head, Vector3(side * 0.08, 0.03, 0.2), 0.06, Color("15151a"), Vector3(1, 0.8, 0.3), 8)
+				else: torus(head, Vector3(side * 0.08, 0.03, 0.2), 0.042, 0.058, ex.get("frame", Color("2b1d14")), Vector3(90, 0, 0))
+			box(head, Vector3(0, 0.04, 0.21), Vector3(0.06, 0.015, 0.015), Color("15151a") if dark else ex.get("frame", Color("2b1d14")))
+	if ex.has("beard"):
+		sph(head, Vector3(0, -0.13, 0.08), 0.17, ex["beard"], Vector3(1, 0.9, 0.75), 10)
+	if ex.has("mustache"):
+		box(head, Vector3(-0.05, -0.065, 0.205), Vector3(0.1, 0.035, 0.04), ex["mustache"], Vector3(0, 0, 12))
+		box(head, Vector3(0.05, -0.065, 0.205), Vector3(0.1, 0.035, 0.04), ex["mustache"], Vector3(0, 0, -12))
+	if ex.get("earrings", false):
+		for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.21, -0.08, 0.0), 0.03, Color("ffd34d"), Vector3.ONE, 6, 0.3)
 	var small: Array = [head]
 	small.append_array(arms)
 	for part in small:
@@ -598,7 +671,25 @@ static func signpost(parent: Node3D, pos: Vector3, text: String, face_yaw: float
 	cyl(s, Vector3(0, 0.8, 0), 0.07, 0.09, 1.6, Color("6d4a33"), Vector3.ZERO, 6)
 	box(s, Vector3(0, 1.55, 0.07), Vector3(1.15, 0.6, 0.08), Color("b8935f"))
 	box(s, Vector3(0, 1.55, 0.05), Vector3(1.25, 0.7, 0.05), Color("6d4a33"))
-	label3(s, text, Vector3(0, 1.57, 0.2), 38)
+	# The name is painted flat on the board, sized so the longest line fits.
+	var lines = text.split("\n")
+	var longest = 1
+	for l in lines: longest = maxi(longest, l.length())
+	var fs = mini(30, int(1.0 / (longest * 0.55 * 0.006)))
+	fs = mini(fs, int(0.5 / (lines.size() * 1.15 * 0.006)))
+	for back in [false, true]:
+		var lb = Label3D.new()
+		lb.text = text
+		lb.font_size = fs
+		lb.pixel_size = 0.006
+		lb.outline_size = 8
+		lb.outline_modulate = Color(0.16, 0.1, 0.05, 0.9)
+		lb.modulate = Color("fff3d6")
+		lb.double_sided = false
+		lb.position = Vector3(0, 1.55, 0.116 if not back else 0.02)
+		if back: lb.rotation_degrees.y = 180
+		lb.visibility_range_end = 30.0
+		s.add_child(lb)
 
 # ---------- expansion: markers ----------
 

@@ -913,6 +913,10 @@ func run():
 		game.player.position = Vector3(-4, 0.1, 13)
 		game.update_ambient(0.1)
 	assert(game.poems.size() >= poems_before)
+	var mb = game.top_row.get_node("MoreButton") as Button
+	assert(mb != null and mb.icon != null and mb.text == "")
+	mb.pressed.emit()
+	assert(has_any("Difficulty"))
 	print("PASS: eighth expansion: Hirimara (maze, karaoke, poltergeist, doppelganger, scarecrow), choni hunt, pranks, teases, new gossip, poems, choni rain, compact menus")
 	print("PASS: word play: habibi and putz, calques, false friends game, doubling, Guarani sound words, move pad icon")
 	print("PASS: seventh expansion: ferry landing, new-word practice for every class, poem plants, poems, poem book")
