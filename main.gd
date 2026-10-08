@@ -311,6 +311,7 @@ func _ready():
 	build_world()
 	build_ui()
 	load_game()
+	setup_audio()
 	load_log()
 	log_event("session", {"level": level(), "words": discovered.size(), "web": OS.has_feature("web")})
 	refresh_world()
@@ -1480,6 +1481,7 @@ func build_ui():
 func toast(text: String):
 	if toast_label == null: return
 	toast_label.text = text
+	if text.contains("gin") and text.contains("+"): play_sfx("coin", -6.0)
 	toast_label.reset_size()
 	toast_label.modulate.a = 1.0
 	toast_label.position.y = 180.0
@@ -1530,12 +1532,14 @@ func show_intro():
 	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
 	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact.")
+	text_line("Tap the speaker button, or any dark red Varnak words, to hear them read aloud by your device's voice.", 16)
 	text_line("Tap the quest box to fold it. The menu button (three lines, top row) has games, difficulty, About Varnak and Reset progress.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
 		discovered.append(word)
 		log_event("word_found", word)
+		play_sfx("newword", -10.0)
 		toast("New word: " + word)
 		if talk_partner != "" and ext_kind(word) != "" and not pending_ext.has(word): pending_ext.append(word)
 
@@ -1543,6 +1547,7 @@ func complete(id: String):
 	if not completed.has(id):
 		completed.append(id)
 		log_event("quest", id)
+		play_sfx("fanfare", -4.0)
 		var giver = {"belongings": "ena", "meal": "mira", "bag": "sanu", "bridge": "tor", "evidence": "tor", "cove": "neri"}.get(id, "")
 		for s in side_quests:
 			if s[0] == id: giver = s[1]
@@ -1681,6 +1686,7 @@ func _process(delta):
 	update_portrait()
 	update_ambient(delta)
 	update_overhear(delta)
+	update_audio(delta)
 	update_acts(delta)
 	if not wand_pending.is_empty(): wand_tick()
 	update_talk_view(delta)
@@ -2213,6 +2219,7 @@ func ask(situation: String, options: Array, correct: int, on_right: Callable, ri
 
 func _answer(opt: String, answer: String, buttons: Array, feedback: Label, on_right: Callable, right_text: String, wrong_text: String, back: Callable, extra: Callable):
 	log_event("answer", {"activity": cur_title, "item": cur_item, "chose": opt, "correct": answer}, opt == answer)
+	play_sfx("correct" if opt == answer else "wrong", -4.0)
 	if opt == answer:
 		for b in buttons: b.disabled = true
 		feedback.text = "Correct. " + right_text
@@ -2316,6 +2323,7 @@ func catch_fish():
 		["Anke tari k-i-nuk-ak-pa-da.", "Na-tari-nuk-ak-pa-da.", "Tari na-nuk-ak-pa-da."], 0,
 		func():
 			fish_caught += 1
+			play_sfx("splash", -4.0)
 			master("w:nuk")
 			save_game(),
 		"Anke tari k-i-nuk-ak-pa-da: anke is you acting on something (ergative -ke), k- is I the agent and i- is the fish as patient. A specific fish is not incorporated.",
@@ -3183,7 +3191,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"sound":sound_on,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 	save_log()
 
@@ -3203,6 +3211,7 @@ func load_game():
 	gin = int(data.get("gin", 0))
 	day_t = float(data.get("day", 0.12))
 	hud_small = bool(data.get("hud_small", false))
+	sound_on = bool(data.get("sound", true))
 	whale_seen = bool(data.get("whale", false))
 	diff_bias = int(data.get("bias", 0))
 	rumors = data.get("rumors", [])
@@ -3853,7 +3862,9 @@ func rich_line(text: String, font_size: int = 20) -> RichTextLabel:
 	r.add_theme_font_size_override("bold_font_size", font_size + 7)
 	r.add_theme_color_override("default_color", Color("2e1c0c"))
 	var safe = text.replace("[", "[lb]")
-	r.text = quote_re.sub(safe, "[bgcolor=#f3d9a0][b][color=#7a1f3d] $1 [/color][/b][/bgcolor]", true)
+	r.text = quote_re.sub(safe, "[bgcolor=#f3d9a0][b][color=#7a1f3d][url]$1[/url][/color][/b][/bgcolor]", true)
+	r.meta_underlined = false
+	r.meta_clicked.connect(func(m): speak(str(m)))
 	content.add_child(r)
 	return r
 
@@ -3876,6 +3887,13 @@ func varnak_banner(text: String, size: int = 30) -> PanelContainer:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	pc.add_child(l)
+	sb.content_margin_right = 56
+	var spk = speaker_button()
+	spk.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	spk.position = Vector2(0, -20)
+	l.add_child(spk)
+	l.resized.connect(func(): spk.position = Vector2(l.size.x + 6, l.size.y * 0.5 - 20))
+	spk.pressed.connect(func(): speak(l.text))
 	content.add_child(pc)
 	return pc
 
@@ -3894,6 +3912,7 @@ func check_level():
 	var lv = level()
 	if last_level != 0 and lv > last_level:
 		toast("Wala! Level up! " + Data.LEVEL_NAMES[lv])
+		play_sfx("fanfare", 0.0, 1.12)
 		for i in range(2):
 			var fw: CPUParticles3D = fireworks[i]
 			fw.position = player.position + Vector3(randf_range(-4, 4), 9, randf_range(-6, -2)).rotated(Vector3.UP, player.rotation.y)
@@ -3930,6 +3949,11 @@ func show_more():
 	button("How to play", show_intro, content)
 	button("About the Varnak language", show_varnak, content)
 	button("Credits", show_credits, content)
+	button("Sound: on" if sound_on else "Sound: off", func():
+		sound_on = not sound_on
+		apply_sound_setting()
+		save_game()
+		show_more(), content)
 	button("Fold the quest box" if not hud_small else "Unfold the quest box", func():
 		hud_small = not hud_small
 		layout_hud()
@@ -4198,6 +4222,7 @@ func dnd(cfg: Dictionary):
 			feedback.text = "Fill every box first."
 			feedback.add_theme_color_override("font_color", Color("8a2f1f"))
 			return
+		play_sfx("correct" if got == answers else "wrong", -4.0)
 		log_event("build", {"activity": cfg["title"], "key": cfg.get("key", ""), "item": str(cfg["prompt"]).substr(0, 160), "built": dd_join(got), "target": dd_join(answers)}, got == answers)
 		if got == answers:
 			feedback.text = "Correct!  " + dd_join(answers)
@@ -5231,6 +5256,9 @@ func ensure_fx(e: Dictionary):
 	e["base_scale"] = node.scale.x
 
 func emote(id: String, kind: String, dur: float = 2.8):
+	if near_player(id, 18.0):
+		var snd = {"sleepy": ["kororo", -12.0], "shocked": ["pop", -6.0], "love": ["piriri", -10.0], "faint": ["vava", -6.0], "angry": ["guarara", -16.0], "embarrassed": ["pop", -10.0]}
+		if snd.has(kind): play_sfx(snd[kind][0], snd[kind][1])
 	var e = entity_by_id(id)
 	if e.is_empty() or e["kind"] != "npc": return
 	ensure_fx(e)
@@ -5808,7 +5836,9 @@ func update_ambient(delta: float):
 	emote(e["id"], pick[0], 2.6)
 	e["say"] = [pick[1], clock + 2.6]
 	for sw in ["tarara", "chiriri", "kororo", "kachaka"]:
-		if pick[1].to_lower().begins_with(sw): learn(sw)
+		if pick[1].to_lower().begins_with(sw):
+			learn(sw)
+			play_sfx(sw, -8.0)
 	if pick[0] == "sneeze":
 		for o in near:
 			if o != e:
@@ -6155,10 +6185,13 @@ func sound_game(start: bool = true):
 	var opts: Array = [f[0]]
 	opts.append_array(f[2])
 	for o in opts: learn(o)
+	play_sfx(str(f[0]), 0.0)
 	choice_puzzle("What's that sound? " + str(ff_i + 1) + " of " + str(ff_order.size()), f[1] + "\n\nWhich sound word fits?", opts, 0, func():
 		master("snd:" + f[0])
 		ff_i += 1, f[0] + ": " + short_gloss(f[0]) + ".", "Listen again. Check the sound words page in the notebook.", show_games,
 		func(): button("Next sound", sound_game.bind(false), content))
+	var hb = button("Hear it again", func(): play_sfx(str(f[0]), 0.0), content)
+	content.move_child(hb, 1)
 
 func show_sounds():
 	clear_panel("Sound words")
@@ -6564,6 +6597,7 @@ func do_prank(id: String, p: Dictionary):
 func karaoke_panel():
 	for w in ["karaoke", "bravo", "ning"]: learn(w)
 	hiri_secret("karaoke")
+	play_sfx("kachaka", -2.0)
 	clear_panel("karaoke")
 	varnak_banner("Ta-ning-o! Bravo!", 26)
 	text_line("A seashell microphone on a tiny stage. The scarecrow is your audience. Here is tonight's song:", 17)
@@ -6827,6 +6861,7 @@ func start_overhear(o: Dictionary):
 	ea["say"] = ["Psst... psst...", clock + 40.0]
 	eb["say"] = ["...ho? ho!", clock + 40.0]
 	emote(o["a"], "embarrassed", 4.0)
+	play_sfx("piriri", -8.0)
 	toast(str(o["a"]).capitalize() + " and " + str(o["b"]).capitalize() + " are whispering. Tap Listen in!")
 	listen_button.show()
 
@@ -6908,6 +6943,7 @@ func check_letter_ready():
 	if next_letter() >= 0: toast("Gav has a letter for you at the harbor!")
 
 func letter_panel(k: int):
+	play_sfx("page", -4.0)
 	compact_buttons.call_deferred()
 	var lt: Dictionary = Data.LETTERS[k]
 	if not mastered.has("lt:read:" + str(k)):
@@ -7758,12 +7794,14 @@ func wand_cast():
 	clear_panel("Kabum!" if not ok_grammar else "The wand glows")
 	varnak_banner(s, 22)
 	if not ok_grammar:
+		play_sfx("kabum", -2.0)
 		var who_en = Data.WAND_WHO[who][0]
 		text_line("The wand sputters and goes kabum! The person prefix does not match: " + who_en + " needs " + need + "-, not " + str(wand["pre"]) + "-. (na- I, ta- you, i- he or she, ri- they)", 17)
 		button("Fix it", wand_panel, content)
 		button("Return", close_panel, content)
 		return
 	learn(vb)
+	play_sfx("sununu" if who == "Polu" and wand["tense"] != "pa" and wand["ev"] != "nu" else "whoosh", -2.0)
 	var pos = wand_place_pos(wand["where"])
 	var watcher = ""
 	if wand["tense"] == "pa":
@@ -8323,6 +8361,8 @@ func yesen_crowd(frac: float):
 	var sc: Dictionary = Data.YESEN[ys["i"]]
 	var who: String = ys["who"]
 	var aud: Array = ys["audience"]
+	if frac >= 0.999: play_sfx("applause_small", -4.0 + minf(aud.size(), 6) * 0.8)
+	elif frac < 0.34: play_sfx("cricket", -8.0)
 	# the crowd reacts
 	for a in aud:
 		var kind = "laugh" if frac >= 0.999 else ("happy" if frac >= 0.5 else "confused")
@@ -8370,18 +8410,23 @@ func yesen_end():
 	var reward = 0
 	var kind = "happy"
 	if frac >= 0.9 and ys["blocks"] == 0:
+		play_sfx("applause_huge", 0.0)
 		level_text = "A standing ovation! Everyone shouts “Bravo! Kudos! Yesen!” and throws imaginary chonies onto the stage."
 		reward = 5
 		kind = "love"
 	elif frac >= 0.7:
+		play_sfx("applause_big", -2.0)
 		level_text = "Big applause! Cheers and whistles. Somebody yells “Bravo!”"
 		reward = 3
 		kind = "laugh"
 	elif frac >= 0.45:
+		play_sfx("applause_small", -8.0)
 		level_text = "Polite clapping. Clap. Clap. Clap."
 		reward = 1
 		kind = "happy"
 	else:
+		play_sfx("slowclap", -4.0)
+		play_sfx("cricket", -6.0)
 		level_text = "Silence. Somewhere, a cricket goes chiriri. Then one person claps, very slowly."
 		reward = 0
 		kind = "confused"
@@ -8422,3 +8467,161 @@ func show_yesen_list():
 		var sc: Dictionary = Data.YESEN[i]
 		button("“" + str(sc["sug"][0]).capitalize() + "”: " + str(sc["title"]) + " (" + str(sc["who"]).capitalize() + ")" + ("  [ok]" if mastered.has("yesen:" + str(sc["id"])) else ""), yesen_start.bind(i, str(sc["who"])), content)
 	button("Back", show_games, content)
+
+# ------------------------------------------------------------ sound: effects, ambience, Desh's music, spoken Varnak
+
+const SFX_NAMES = ["correct", "wrong", "coin", "fanfare", "newword", "pop", "whoosh", "kabum", "page", "splash", "step0", "step1",
+	"applause_small", "applause_big", "applause_huge", "slowclap", "cricket", "pororo", "piriri", "chiriri", "guarara", "kororo",
+	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2"]
+var sfx: Dictionary = {}
+var sfx_pool: Array = []
+var amb: Dictionary = {}
+var desh_music: AudioStreamPlayer3D
+var sound_on: bool = true
+var sfx_last: Dictionary = {}
+var amb_cd: float = 0.0
+var step_t: float = 0.0
+var bird_cd: float = 5.0
+var last_spoken: String = ""
+
+func setup_audio():
+	for n in SFX_NAMES:
+		var s = load("res://sfx/" + n + ".ogg")
+		if s: sfx[n] = s
+	for i in range(8):
+		var p = AudioStreamPlayer.new()
+		add_child(p)
+		sfx_pool.append(p)
+	for n in ["waves", "rain", "wind"]:
+		var s = load("res://sfx/" + n + ".ogg") as AudioStreamOggVorbis
+		if s == null: continue
+		s.loop = true
+		var p = AudioStreamPlayer.new()
+		p.stream = s
+		p.volume_db = -60.0
+		add_child(p)
+		p.play()
+		amb[n] = p
+	var song = load("res://sfx/desh_song.ogg") as AudioStreamOggVorbis
+	var de = entity_by_id("desh")
+	if song and not de.is_empty():
+		song.loop = true
+		desh_music = AudioStreamPlayer3D.new()
+		desh_music.stream = song
+		desh_music.unit_size = 6.0
+		desh_music.max_distance = 30.0
+		desh_music.volume_db = -6.0
+		desh_music.position = Vector3(0, 1.2, 0)
+		(de["node"] as Node3D).add_child(desh_music)
+		desh_music.play()
+	apply_sound_setting()
+
+func apply_sound_setting():
+	AudioServer.set_bus_mute(0, not sound_on)
+
+func play_sfx(n: String, db: float = 0.0, pitch: float = 1.0):
+	if not sound_on or not sfx.has(n): return
+	if clock - float(sfx_last.get(n, -9.0)) < 0.12: return
+	sfx_last[n] = clock
+	for p in sfx_pool:
+		if not p.playing:
+			p.stream = sfx[n]
+			p.volume_db = db
+			p.pitch_scale = pitch
+			p.play()
+			return
+	var p0 = sfx_pool[0] as AudioStreamPlayer
+	p0.stream = sfx[n]
+	p0.volume_db = db
+	p0.play()
+
+func near_player(id: String, r: float = 22.0) -> bool:
+	var e = entity_by_id(id)
+	if e.is_empty(): return false
+	return (e["node"] as Node3D).position.distance_to(player.position) < r or talk_view_id == id
+
+func update_audio(delta: float):
+	if sfx_pool.is_empty(): return
+	# footsteps while walking
+	var moving = Vector2(player.velocity.x, player.velocity.z).length() > 1.0 and player.is_on_floor() and not riding
+	if moving:
+		step_t -= delta
+		if step_t <= 0.0:
+			step_t = 0.42
+			play_sfx("step" + str(randi() % 2), -14.0, randf_range(0.9, 1.1))
+	amb_cd -= delta
+	if amb_cd > 0.0: return
+	amb_cd = 0.5
+	var p = player.position
+	var wet = 0
+	for k in range(8):
+		var a = k * TAU / 8.0
+		for r in [8.0, 18.0]:
+			if T.height(p.x + cos(a) * r, p.z + sin(a) * r) < -0.2: wet += 1
+	set_amb("waves", -40.0 + 30.0 * clampf(wet / 9.0, 0.0, 1.0) if wet > 0 else -60.0)
+	set_amb("rain", -10.0 if raining > 0.0 else -60.0)
+	set_amb("wind", -18.0 if p.y > 6.0 or p.x < -95.0 else -60.0)
+	# birds by day, crickets by night
+	bird_cd -= 0.5
+	if bird_cd <= 0.0:
+		bird_cd = randf_range(4.0, 11.0)
+		var night = day_t > 0.72 or day_t < 0.05
+		if night: play_sfx("cricket", -16.0)
+		elif wet < 6: play_sfx("bird" + str(randi() % 3), -12.0, randf_range(0.9, 1.2))
+	# Desh plays louder when he is performing
+	if desh_music:
+		var perf = acts.has("desh") or (panel.visible and talk_partner == "desh")
+		desh_music.volume_db = lerpf(desh_music.volume_db, 2.0 if perf else -6.0, 0.5)
+
+func set_amb(n: String, db: float):
+	if not amb.has(n): return
+	var p = amb[n] as AudioStreamPlayer
+	p.volume_db = lerpf(p.volume_db, db, 0.4)
+
+# ---- the phone's voice reads Varnak aloud ----
+
+func speak(text: String):
+	var t = text.replace("“", "").replace("”", "").replace("\"", "").replace("-", "").replace("\n", " ")
+	t = t.replace("...", ", ").strip_edges()
+	last_spoken = t
+	log_event("speak", t)
+	if OS.has_feature("web"):
+		var js = "(function(t){try{var s=window.speechSynthesis;if(!s)return 'none';s.cancel();var u=new SpeechSynthesisUtterance(t);var vs=s.getVoices()||[];" + \
+			"function f(p){for(var i=0;i<vs.length;i++){if((vs[i].lang||'').toLowerCase().indexOf(p)==0)return vs[i];}return null;}" + \
+			"var v=f('es-mx')||f('es-us')||f('es')||f('it');if(v){u.voice=v;u.lang=v.lang;}else{u.lang='es-MX';}u.rate=0.85;s.speak(u);return v?v.lang:'default';}catch(e){return 'err';}})(" + JSON.stringify(t) + ")"
+		var res = JavaScriptBridge.eval(js, true)
+		if str(res) == "none": toast("This browser can't read aloud.")
+		return
+	var voices = DisplayServer.tts_get_voices_for_language("es")
+	if voices.is_empty(): voices = DisplayServer.tts_get_voices_for_language("it")
+	if voices.is_empty():
+		toast("No voice is available on this device.")
+		return
+	DisplayServer.tts_stop()
+	DisplayServer.tts_speak(t, voices[0], 50, 1.0, 0.85)
+
+func speaker_button() -> Button:
+	var b = Button.new()
+	b.name = "Speaker"
+	b.tooltip_text = "Listen"
+	b.custom_minimum_size = Vector2(40, 40)
+	b.focus_mode = Control.FOCUS_NONE
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = Color("e9c46a")
+	sb.set_corner_radius_all(20)
+	b.add_theme_stylebox_override("normal", sb)
+	b.add_theme_stylebox_override("hover", sb)
+	var sb2 = sb.duplicate()
+	sb2.bg_color = Color("f4a261")
+	b.add_theme_stylebox_override("pressed", sb2)
+	var icon = Control.new()
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	icon.draw.connect(func():
+		var c = Color("24495a")
+		var o = Vector2(9, 20)
+		icon.draw_colored_polygon(PackedVector2Array([o + Vector2(0, -5), o + Vector2(6, -5), o + Vector2(13, -11), o + Vector2(13, 11), o + Vector2(6, 5), o + Vector2(0, 5)]), c)
+		icon.draw_arc(o + Vector2(13, 0), 7.0, -0.9, 0.9, 10, c, 2.4)
+		icon.draw_arc(o + Vector2(13, 0), 12.0, -0.9, 0.9, 12, c, 2.4))
+	b.add_child(icon)
+	return b

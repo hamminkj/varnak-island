@@ -110,6 +110,10 @@ Residents' names are identifiers rather than vocabulary lessons.
 ## Talking to villagers
 When a menu belongs to a villager, a second camera frames their face and upper body in the top half of the screen and the menu moves to the bottom half, so reactions (emotes, actions) stay visible. Drag-and-drop puzzles keep the full-height menu. Every menu has a round X button at its top right; Escape also closes menus on a keyboard.
 
+## Sound
+Every sound is generated from code by tools/make_sounds.py (numpy + ffmpeg), which writes small Ogg files to sfx/ (about 0.6 MB). There are no outside recordings, so there is nothing to license. Effects: right and wrong answers, coins, quests, new words, the word wand, splashes, footsteps, applause at three sizes, a slow clap and crickets for yesen, and the Guarani sound words (pororo, chiriri, kororo, tarara and the rest), which the "What's that sound?" game now plays. Ambience: waves near water, wind on high ground and in Hirimara, rain, birds by day and crickets at night. The only music is Desh's cumbia loop, which plays from Desh himself (positional, so it is louder near him and when he performs). More > Sound turns everything on or off.
+Spoken Varnak uses the device's own text-to-speech: on the web, the browser's speechSynthesis with a Mexican Spanish voice if one is installed (then any Spanish, then Italian). Hyphens are removed before speaking. Every Varnak banner has a speaker button, and the highlighted Varnak in text can be tapped. Voices differ by device.
+
 ## Learning data
 The game keeps a local learning log (user://varnak_log.json, in the browser's storage on the web): sessions, words found, items mastered, every answer and built sentence with what the player chose and the target, quests, errands, overheard conversations, letters and mystery guesses. More > My learning and data export (also Notebook > My learning) shows a summary, accuracy by activity and words in missed questions, and exports everything as JSON (summary, words, phrases, events) or CSV (one row per event). Nothing is sent anywhere. Reset progress keeps the log and records a reset event.
 
