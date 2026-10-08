@@ -1288,6 +1288,112 @@ func run():
 		game.mastered.append("guess:x" + str(round))
 	assert(game.completed.has("guesswho"))
 	print("PASS: eleventh expansion: word wand, pass it on, guess who")
+	# twelfth: yesen improv scenes
+	game.close_panel()
+	game.diff_bias = -3
+	game.chat_menu("mira")
+	press("Yesen! (improv)  (level 2)")
+	assert(has_any("unlock at level 2"))
+	game.diff_bias = 3
+	# every tile that can be wrong has a plausible wrong version that is different
+	var fixed_tiles = 0
+	for sc in Data.YESEN:
+		assert(Data.PEOPLE.has(sc["who"]) and sc["rounds"].size() >= 3, sc["id"])
+		for r in sc["rounds"]:
+			assert(r[2].size() == 2)
+			for idea in r[2]:
+				var wrongs_n = 0
+				for t in idea[1]:
+					var ws = game.yesen_wrongs(t)
+					assert(not ws.has(t), t)
+					if ws.is_empty(): fixed_tiles += 1
+					else: wrongs_n += 1
+				assert(wrongs_n >= 2, "idea needs choices: " + str(idea[1]))
+	assert(Data.YESEN.size() >= 15)
+	# a perfect scene draws a crowd and a standing ovation
+	game.completed.erase("yesen")
+	game.gin = 0
+	var m0 = game.entity_by_id("mira")["node"]
+	game.player.position = m0.position + Vector3(0, 0.1, 3.0)
+	game.chat_menu("mira")
+	press("Yesen! (improv)")
+	assert(has_any("suggestion"))
+	var sug_buttons = 0
+	for sc in Data.YESEN:
+		if find_button(game.content, "“" + str(sc["sug"][0]).capitalize() + "!”  (" + str(sc["sug"][1]) + ")") != null: sug_buttons += 1
+	assert(sug_buttons == 3, "three suggestions")
+	# any villager can play any suggestion
+	game.chat_menu("desh")
+	press("Yesen! (improv)")
+	var s3 = Data.YESEN[3]
+	var b3 = find_button(game.content, "“" + str(s3["sug"][0]).capitalize() + "!”  (" + str(s3["sug"][1]) + ")")
+	if b3 == null:
+		game.yesen_start(5, "desh")
+	else: b3.pressed.emit()
+	assert(game.ys["who"] == "desh" and has_any("Suggestion:"))
+	game.chat_menu("mira")
+	game.yesen_start(0, "mira")
+	assert(game.ys["i"] == 0 and game.ys["who"] == "mira")
+	press("Start the scene")
+	game.update_talk_view(0.016)
+	for rn in range(3):
+		var rr: Array = Data.YESEN[0]["rounds"][rn]
+		assert(has_any(rr[0]))
+		press("Ho, e... " + str(rr[2][0][0]))
+		for t in rr[2][0][1]:
+			if game.yesen_wrongs(t).is_empty(): continue
+			press(t)
+		press("Say it!")
+		assert(has_any("Perfect Varnak"))
+		press("Next")
+	assert(has_any("standing ovation") and game.gin == 5 and game.mastered.has("yesen:soup"))
+	var aud = 0
+	for id in game.acts.keys():
+		if game.acts[id].get("kind", "") == "watch": aud += 1
+	assert(aud >= 4, "a crowd gathered")
+	for f in range(1200):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	assert(game.acts.is_empty(), "the crowd goes home")
+	# a scene full of mistakes and a block gets crickets, and people leave
+	game.yesen_start(1)
+	game.yesen_round()
+	game.yesen_build(0)
+	var r0: Array = Data.YESEN[1]["rounds"][0][2][0][1]
+	var bad: Array = []
+	for t in r0:
+		var ws = game.yesen_wrongs(t)
+		bad.append(ws[0] if not ws.is_empty() else t)
+	game.yesen_said(r0, bad)
+	assert(has_any("confused"))
+	game.yesen_next()
+	press("Maki! (No! Block the idea)")
+	assert(has_any("blocking"))
+	press("Keep going")
+	game.yesen_build(1)
+	var r2: Array = Data.YESEN[1]["rounds"][2][2][1][1]
+	game.yesen_said(r2, r2)
+	game.yesen_next()
+	assert(not has_any("standing ovation") and not game.mastered.has("yesen:moonbridge"))
+	# every scene can be finished
+	for k in range(Data.YESEN.size()):
+		game.yesen_start(k)
+		for rn in range(Data.YESEN[k]["rounds"].size()):
+			game.yesen_round()
+			game.yesen_build(rn % 2)
+			var tl: Array = Data.YESEN[k]["rounds"][rn][2][rn % 2][1]
+			game.yesen_said(tl, tl)
+			game.yesen_next()
+		assert(game.mastered.has("yesen:" + str(Data.YESEN[k]["id"])), Data.YESEN[k]["id"])
+	assert(game.completed.has("yesen"))
+	for f in range(1200):
+		game.clock += 0.05
+		game.update_acts(0.05)
+	game.diff_bias = 0
+	game.show_yesen_list()
+	press("Get three suggestions")
+	assert(has_any("suggestion"))
+	print("PASS: twelfth expansion: yesen improv scenes, " + str(Data.YESEN.size()) + " scenes")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

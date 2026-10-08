@@ -1063,3 +1063,100 @@ const GUESS_Q = {
 	"happy": ["Sa i-seng-ur-ha?", "Are they usually happy?"]
 }
 const GUESS_PEOPLE = ["ena", "mira", "sanu", "tor", "lira", "oren", "ketu", "suri", "rin", "ola", "pomo", "vira", "ila", "yalo", "desh", "oku", "gav", "tamu"]
+
+# ---------------------------------------------------------------- twelfth expansion: yesen (improv scenes)
+const WORDS12 = {
+	"yesen": "an improv scene where you accept what your partner says and add to it (borrowed from English yes, and, the first rule of improv)",
+	"ho, e": "yes, and... (a calque of English yes, and: ho yes + e and)",
+	"kudos": "praise, well done (borrowed from Greek kudos, glory)"
+}
+
+# Each scene: the villager starts, you answer with Ho, e... (yes, and...) plus a sentence you assemble.
+# rounds: [villager Varnak, English, ideas]; each idea: [English, tiles]. end: the villager's last line.
+const YESEN = [
+	{"id": "soup", "sug": ["chiriri", "sizzle"], "who": "mira", "title": "The runaway soup", "rounds": [
+		["Yamat i-pav-im-da!", "The food is running!", [["the food is swimming in the river!", ["Yamat", "morama", "i-sum-im-da."]], ["I can see the food!", ["Anke", "yamat", "k-i-pal-da."]]]],
+		["Yamat ti-ru i-mel-im-da!", "The food is talking to you!", [["I am talking to the food.", ["An", "yamat-ru", "na-mel-im-da."]], ["the food is my friend.", ["Yamat", "anni palar", "i-an-da."]]]],
+		["Yamat ti-su i-kachaka-vai-da!", "The food wants to dance with you!", [["I dance with the food!", ["An", "yamat-su", "na-kachaka-im-da."]], ["everyone is dancing!", ["Polu", "ri-kachaka-im-da."]]]]],
+		"end": ["Bravo! Yamat i-seng-da! ...Dan anni yamat hama i-esh-ha?", "Bravo! The food is happy! ...But where is my food?"]},
+	{"id": "moonbridge", "sug": ["sao", "star"], "who": "tor", "title": "A bridge to the moon", "rounds": [
+		["Anke yue-ru gira k-i-varn-pa-da!", "I built a bridge to the moon!", [["I will walk to the moon!", ["An", "yue-ru", "na-nang-fu-da."]], ["the moon is happy!", ["Yue", "i-seng-da."]]]],
+		["Yue-ma tari-ir ri-esh-da!", "There are fish on the moon!", [["the fish are singing!", ["Tari-ir", "ri-ning-im-da."]], ["Ketu sells the fish!", ["Ketuke", "tari", "i-mai-ai-ur-da."]]]],
+		["Ups! Gira i-kaput-da!", "Oops! The bridge is broken!", [["I will swim home!", ["An", "dom-ru", "na-sum-fu-da."]], ["the moon has a boat!", ["Yue-su", "sena", "i-esh-da."]]]]],
+		"end": ["Ha! Tor-ni gira i-ho-ho... shi.", "Ha! Tor's bridge is super good... apparently."]},
+	{"id": "singfish", "sug": ["bravo", "well done!"], "who": "ketu", "title": "The singing fish", "rounds": [
+		["Ki tari i-ning-kan-da!", "This fish can sing!", [["the fish sings karaoke!", ["Tari", "karaoke-ma", "i-ning-im-da."]], ["I am the fish's friend.", ["An", "tari-ni palar", "na-an-da."]]]],
+		["Tarike gin i-nuk-vai-da!", "The fish wants money!", [["I give one coin to the fish.", ["Anke", "yan gin", "tari-ru", "k-i-ven-im-da."]], ["the fish buys bread!", ["Tarike", "panak", "i-mai-im-da."]]]],
+		["Tari Desh-su i-ning-fu-da!", "The fish will sing with Desh!", [["everyone is dancing!", ["Polu", "ri-kachaka-im-da."]], ["Yalo is scared!", ["Yalo", "i-par-im-da."]]]]],
+		"end": ["Bravo! Tari i-seng-da! Tari-pitsa... maki, maki!", "Bravo! The fish is happy! Fish pizza... no, no!"]},
+	{"id": "bigsong", "sug": ["guarara", "a roar"], "who": "desh", "title": "The enormous song", "rounds": [
+		["Anni ning i-var-var-da!", "My song is huge!", [["the song is in the sky!", ["Ning", "hen-ma", "i-esh-da."]], ["the fish are dancing!", ["Tari-ir", "ri-kachaka-im-da."]]]],
+		["Ning sena-ru i-lum-im-da!", "The song is going to the boat!", [["Tamu is sleeping in the boat!", ["Tamu", "sena-ma", "i-sul-im-da."]], ["the boat is singing!", ["Sena", "i-ning-im-da."]]]],
+		["Ti ta-ning-o-ye! Tarara!", "Please sing! Toot!", [["I sing with you!", ["An", "ti-su", "na-ning-im-da."]], ["I sing to the moon!", ["An", "yue-ru", "na-ning-im-da."]]]]],
+		"end": ["Wala! Hai i-seng-da! Bravo!", "Ta-da! The sea is happy! Bravo!"]},
+	{"id": "notsleeping", "sug": ["kororo", "snore"], "who": "pomo", "title": "Pomo is NOT sleeping", "rounds": [
+		["Ma-na-sul-im-ki-da... kororo...", "I'm not sleeping... snore...", [["you are sleeping on the hill.", ["Ti", "sang-ma", "ta-sul-im-da."]], ["the stars are sleeping too.", ["Sao-ir", "ri-sul-im-da."]]]],
+		["Sang-ma par i-esh-da... par i-fei-kan-da...", "There's a bird on the hill... the bird can fly...", [["I can fly too!", ["An", "na-fei-kan-da."]], ["the bird is sleeping!", ["Par", "i-sul-im-da."]]]],
+		["Han? Ti hal ta-an-ha?", "What? Who are you?", [["I am your friend!", ["An", "ti-ni palar", "na-an-da."]], ["I am a bird!", ["An", "par", "na-an-da."]]]]],
+		"end": ["Ho... palar... par... zzz", "Yes... friend... bird... zzz"]},
+	{"id": "horsehead", "sug": ["dau-yir", "hat"], "who": "oren", "title": "The horse on my head", "rounds": [
+		["Mar anni dau-ma i-esh-da!", "The horse is on my head!", [["the horse is singing!", ["Mar", "i-ning-im-da."]], ["the horse has a hat!", ["Mar-su", "dau-yir", "i-esh-da."]]]],
+		["Mar ti-ru “puts” i-mel-pa-da!", "The horse called you a putz!", [["I am a putz!", ["An", "puts", "na-an-da."]], ["the horse is a putz!", ["Mar", "puts", "i-an-da."]]]],
+		["Mar sela i-an-vai-da.", "The horse wants to be alone.", [["I will go home.", ["An", "dom-ru", "na-lum-fu-da."]], ["the horse is going to Hirimara.", ["Mar", "Hirimara-ru", "i-lum-im-da."]]]]],
+		"end": ["Hmph. ...Ha! Ti ta-ho-da.", "Hmph. ...Ha! You're good."]},
+	{"id": "treeletter", "sug": ["pai", "paper"], "who": "gav", "title": "A letter for a tree", "rounds": [
+		["Murak-ru pai i-esh-da!", "There's a letter for the tree!", [["the tree is reading the letter!", ["Murakke", "pai", "i-rav-im-da."]], ["I am bringing the letter.", ["Anke", "pai", "k-i-tar-im-da."]]]],
+		["Murak i-par-im-da! Pai i-var-var!", "The tree is scared! The letter is huge!", [["the letter came from Hirimara!", ["Pai", "Hirimara-ta", "i-tal-pa-da."]], ["the letter is a poltergeist!", ["Pai", "poltergais", "i-an-da."]]]],
+		["Pai ti-su i-mel-vai-da!", "The letter wants to talk with you!", [["I am talking with the letter!", ["An", "pai-su", "na-mel-im-da."]], ["the tree is happy now!", ["Murak", "i-seng-da."]]]]],
+		"end": ["Kel-ir i-seng-da! Bravo!", "The bags are happy! Bravo!"]},
+	{"id": "dogteacher", "sug": ["ravar", "student"], "who": "suri", "title": "The dog who reads", "rounds": [
+		["Senak-ma gor i-rav-im-da!", "A dog is reading in the school!", [["the dog is reading a book!", ["Gorke", "puka", "i-rav-im-da."]], ["the dog is the teacher!", ["Gor", "senar", "i-an-da."]]]],
+		["Gor-su ravar-ir ri-esh-da: mar, par, tari!", "The dog has students: a horse, a bird, a fish!", [["the fish is swimming in the school!", ["Tari", "senak-ma", "i-sum-im-da."]], ["the bird can read!", ["Par", "i-rav-kan-da."]]]],
+		["Ti ravar ta-an-ha?", "Are you a student?", [["I am the dog's student!", ["An", "gor-ni ravar", "na-an-da."]], ["I am a horse!", ["An", "mar", "na-an-da."]]]]],
+		"end": ["Ho! Ti ta-ho-da! ...Gor i-seng-da.", "Yes! You are good! ...The dog is happy."]},
+	{"id": "sleepysun", "sug": ["pajama", "pajamas"], "who": "lira", "title": "The sun's pajamas", "rounds": [
+		["Riya yeshma i-sul-ur-nu!", "They say the sun sleeps at night!", [["the moon sings at night.", ["Yue", "yeshma", "i-ning-ur-da."]], ["the sun sleeps in my bed!", ["Riya", "anni sulum-ma", "i-sul-ur-da."]]]],
+		["Riya-su pajama i-esh-da!", "The sun has pajamas!", [["the pajamas are hot!", ["Pajama", "i-ret-da."]], ["the moon has chonies!", ["Yue-su", "choni", "i-esh-da."]]]],
+		["Ki tovu polu-ru ta-gao-o-ye!", "Please tell everyone this story!", [["I will tell Gav the story.", ["Anke", "tovu", "Gav-ru", "k-i-gao-fu-da."]], ["the parrot is telling everyone!", ["Parke", "polu-ru", "i-gao-im-da."]]]]],
+		"end": ["Ha! Ha! Tovu i-ho-ho!", "Ha! Ha! The story is super good!"]},
+	{"id": "spider", "sug": ["far", "fire"], "who": "yalo", "title": "The lighthouse spider", "rounds": [
+		["Fardom-ma sipu i-esh-da!", "There's a spider in the lighthouse!", [["the spider is huge!", ["Sipu", "i-var-var-da."]], ["the spider is reading a book!", ["Sipuke", "puka", "i-rav-im-da."]]]],
+		["Sipu an-ru i-mel-im-da: “Aloha!”", "The spider says to me: “Hello!”", [["the spider is your friend.", ["Sipu", "ti-ni palar", "i-an-da."]], ["I say “Bye!” to the spider.", ["An", "sipu-ru", "“Chau!”", "na-mel-im-da."]]]],
+		["Sipu fardom-ma i-sul-vai-da...", "The spider wants to sleep in the lighthouse...", [["you will sleep with the spider!", ["Ti", "sipu-su", "ta-sul-fu-da."]], ["the spider will sleep in your hat!", ["Sipu", "ti-ni dau-yir-ma", "i-sul-fu-da."]]]]],
+		"end": ["Aaa! ...Ho. Sipu i-kawai... shi.", "Aaa! ...OK. The spider is cute... apparently."]},
+	{"id": "footflower", "sug": ["mara", "field"], "who": "vira", "title": "A flower on your foot", "rounds": [
+		["Ti-ni ten-ma fal i-esh-da!", "There's a flower on your foot!", [["the flower is singing!", ["Fal", "i-ning-im-da."]], ["my foot is happy.", ["Anni", "ten", "i-seng-da."]]]],
+		["Fal i-var-im-da! Fal i-var-var!", "The flower is growing! It's huge!", [["the flower is eating bread!", ["Falke", "panak", "i-yam-im-da."]], ["Ila is in the flower!", ["Ila", "fal-ma", "i-esh-da."]]]],
+		["Anke ti-ru yok k-i-ven-fu-da.", "I will give you medicine.", [["the medicine is bad!", ["Yok", "i-wai-da."]], ["I give the medicine to the flower.", ["Anke", "yok", "fal-ru", "k-i-ven-im-da."]]]]],
+		"end": ["Ho! Fal i-seng-da, ti ta-seng-da!", "Yes! The flower is happy, you are happy!"]},
+	{"id": "talkstone", "sug": ["shora", "old"], "who": "oku", "title": "The talking stone", "rounds": [
+		["Ki sek i-mel-kan-da!", "This stone can talk!", [["the stone is singing!", ["Sek", "i-ning-im-da."]], ["the stone is very old.", ["Sek", "i-shora-da."]]]],
+		["Sekke ti-ru tovu i-gao-im-da.", "The stone is telling you a story.", [["the story has chonies in it.", ["Tovu-su", "choni", "i-esh-da."]], ["I am falling asleep.", ["An", "na-sul-im-da."]]]],
+		["Sek ti-ni palar i-an-vai-da.", "The stone wants to be your friend.", [["I will take the stone home.", ["Anke", "sek", "dom-ru", "k-i-tar-fu-da."]], ["I dance with the stone.", ["An", "sek-su", "na-kachaka-im-da."]]]]],
+		"end": ["Sek i-seng-da. Ho.", "The stone is happy. Yes."]},
+	{"id": "flyboat", "sug": ["fong", "wind"], "who": "tamu", "title": "The flying boat", "rounds": [
+		["Anni sena i-fei-kan-da!", "My boat can fly!", [["the boat flies to the moon!", ["Sena", "yue-ru", "i-fei-im-da."]], ["the fish are scared!", ["Tari-ir", "ri-par-im-da."]]]],
+		["Hen-ma sena-ir ri-esh-da!", "There are boats in the sky!", [["the birds are swimming!", ["Par-ir", "ri-sum-im-da."]], ["Gav brings the letters by boat.", ["Gavke", "pai-ir", "sena-li", "i-tar-im-da."]]]],
+		["Ti sena-ma ta-kar-o-ye!", "Please come into the boat!", [["I will bring bread!", ["Anke", "panak", "k-i-tar-fu-da."]], ["I am sitting in the boat!", ["An", "sena-ma", "na-tum-im-da."]]]]],
+		"end": ["Hmph... Ha! Sena i-ho-da!", "Hmph... Ha! The boat is good!"]},
+	{"id": "fruitchoni", "sug": ["shenani", "mischief"], "who": "ola", "title": "A choni in the fruit", "rounds": [
+		["Guro-ma choni i-esh-da!", "There's a choni in the fruit!", [["the choni is tiny!", ["Choni", "i-sen-sen-da."]], ["Gav is happy!", ["Gav", "i-seng-da."]]]],
+		["Choni guro-ta i-pav-pa-da!", "The choni ran out of the fruit!", [["the choni is running to the market!", ["Choni", "kur-ru", "i-pav-im-da."]], ["I caught the choni!", ["Anke", "choni", "k-i-nuk-pa-da."]]]],
+		["Ti choni-na ta-an-da!", "You are a choni person!", [["I am happy!", ["An", "na-seng-da."]], ["you are a choni person!", ["Ti", "choni-na", "ta-an-da."]]]]],
+		"end": ["Ha! Ha! Choni-na! Bravo!", "Ha! Ha! Choni people! Bravo!"]},
+	{"id": "inthebook", "sug": ["tovu", "story"], "who": "neri", "title": "You are in my book", "rounds": [
+		["Ki puka-ma ti ta-esh-da!", "You are in this book!", [["I am reading the book!", ["Anke", "puka", "k-i-rav-im-da."]], ["the book is huge!", ["Puka", "i-var-var-da."]]]],
+		["Puka-ma ti mar-su ta-sum-pa-da!", "In the book, you swam with a horse!", [["the horse can sing!", ["Mar", "i-ning-kan-da."]], ["I swam with the fish too.", ["An", "tari-ir-su", "na-sum-pa-da."]]]],
+		["Ti han ta-mel-vai-ha?", "What do you want to say?", [["I want to be in Hirimara!", ["An", "Hirimara-ma", "na-esh-vai-da."]], ["I want to sleep!", ["An", "na-sul-vai-da."]]]]],
+		"end": ["Ha! Tovu i-ho-ho-da!", "Ha! The story is super good!"]},
+	{"id": "bagfish", "sug": ["hai", "sea"], "who": "ena", "title": "The fish who wants your bag", "rounds": [
+		["Haima var-var tari i-esh-da!", "There's a huge fish in the sea!", [["the fish has a hat!", ["Tari-su", "dau-yir", "i-esh-da."]], ["the fish is coming to the village!", ["Tari", "tekaru", "i-kar-im-da."]]]],
+		["Tari an-ru i-mel-im-da: “Ti-ni kel t-na-ven-o-ye!”", "The fish says to me: “Please give me your bag!”", [["I give the bag to the fish.", ["Anke", "kel", "tari-ru", "k-i-ven-im-da."]], ["the fish wants chonies.", ["Tarike", "choni", "i-nuk-vai-da."]]]],
+		["Tari kel-su i-sum-im-da...", "The fish is swimming away with the bag...", [["the bag is happy!", ["Kel", "i-seng-da."]], ["I am sleeping by the sea.", ["An", "hai-ni dal-ma", "na-sul-im-da."]]]]],
+		"end": ["Ha! Kel-ir i-sum-ur-shi!", "Ha! Apparently bags usually swim!"]},
+	{"id": "dogbook", "sug": ["yamat", "food"], "who": "rin", "title": "The dog ate my book", "rounds": [
+		["Gorke anni puka i-yam-pa-da!", "The dog ate my book!", [["the dog is reading in its belly!", ["Gor", "i-rav-im-da."]], ["the book is in the dog!", ["Puka", "gor-ma", "i-esh-da."]]]],
+		["Gor i-mel-im-da: “Puka i-ho!”", "The dog says: “The book is good!”", [["the dog is a teacher!", ["Gor", "senar", "i-an-da."]], ["I will give the dog a book.", ["Anke", "puka", "gor-ru", "k-i-ven-fu-da."]]]],
+		["Suri ma-i-seng-ki-da...", "Suri is not happy...", [["Suri is reading the dog!", ["Surike", "gor", "i-rav-im-da."]], ["everyone is happy now!", ["Polu", "ri-seng-da."]]]]],
+		"end": ["Ha! Ha! Gor ravar i-an-da!", "Ha! Ha! The dog is a student!"]}
+]

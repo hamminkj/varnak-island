@@ -182,6 +182,7 @@ var side_quests = [
 	["wand","oku","Oku at the old ruins has an old stick that makes sentences come true. Make five different sentences come true with it."],
 	["relay","","Pass it on! Lira, Gav and Desh have news. Pass each story to two people without changing it (you heard it, so: -nu)."],
 	["guesswho","neri","Play Guess who with Neri and win three times."],
+	["yesen","","Yesen! Do improv scenes with villagers (Chat, then Yesen) and get big applause in five of them. Level 2 and up."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -304,6 +305,7 @@ func _ready():
 	words.merge(Data.WORDS9)
 	words.merge(Data.WORDS10)
 	words.merge(Data.WORDS11)
+	words.merge(Data.WORDS12)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -4626,6 +4628,7 @@ func show_games():
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
 		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
 		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
+		["Yesen! (improv)", show_yesen_list, level() >= YESEN_LEVEL, "Short, silly improv scenes. Say yes, and... in Varnak and win over a crowd. Level 2 and up."],
 		["Word wand", wand_panel, solved.has("wand"), "Say a sentence and it comes true. Get the wand from Oku at the old ruins."],
 		["Guess who", guess_start, true, "Ask Neri yes or no questions and work out who they are thinking of."],
 		["Teach Neri", teach_neri.bind(show_games), true, "Neri makes a mistake in Varnak. Find it and fix it."],
@@ -5437,6 +5440,9 @@ func chat_menu(id: String):
 	button("Ask for an errand", errand_menu.bind(id), content)
 	button("Ask: Ti ta-seng-ha?", feel.bind(id), content)
 	button("Ask or tell...", ask_menu.bind(id), content)
+	if true:
+		var yb = button("Yesen! (improv)" + ("" if level() >= YESEN_LEVEL else "  (level 2)"), yesen_open.bind(id), content)
+		if level() < YESEN_LEVEL: yb.modulate.a = 0.6
 	if int(friend.get(id, 0)) >= 5:
 		button("Ask about a secret" + ("  [ok]" if mastered.has("sec:" + id) else ""), secret.bind(id), content)
 	button("Back", talk.bind(id), content)
@@ -7570,6 +7576,24 @@ func update_acts(delta: float):
 					node.position += step
 					node.rotation.y = atan2(to.x, to.z)
 				node.position.y = gy(node.position.x, node.position.z)
+			"watch":
+				var tp: Vector3 = a["pos"]
+				var to = tp - node.position
+				to.y = 0.0
+				if clock > float(a["until"]):
+					if a.get("tele", false):
+						node.position = home
+						acts.erase(id)
+					else: a["kind"] = "home"
+					continue
+				if to.length() > 0.15:
+					var step = to.normalized() * minf(6.0 * delta, to.length())
+					node.position += step
+					node.position.y = gy(node.position.x, node.position.z)
+					node.rotation.y = atan2(to.x, to.z)
+				else:
+					var f: Vector3 = a["face"]
+					node.rotation.y = lerp_angle(node.rotation.y, atan2(f.x - node.position.x, f.z - node.position.z), minf(delta * 5.0, 1.0))
 			"home":
 				var to = home - node.position
 				to.y = 0.0
@@ -8036,3 +8060,365 @@ func oku_wand():
 		button("Return", close_panel, content)
 		return
 	wand_panel()
+
+# ------------------------------------------------------------ twelfth expansion: yesen (improv scenes with an audience)
+
+var ys: Dictionary = {}
+const YESEN_LEVEL = 2
+
+func yesen_for(id: String) -> Array:
+	var out: Array = []
+	for i in range(Data.YESEN.size()):
+		if Data.YESEN[i]["who"] == id: out.append(i)
+	return out
+
+func yesen_known_base(b: String) -> bool:
+	var l = b.to_lower().trim_suffix("-").trim_suffix("-ir")
+	if l == "": return false
+	return words.has(l) or Data.PEOPLE.has(l) or l in ["an", "ti", "sa", "polu", "hirimara", "tekaru", "karaoke", "yue", "riya", "sipu", "pajama", "puts", "poltergais", "senar", "ravar", "palar", "choni-na", "dau-yir", "sena", "sek", "pai"]
+
+func yesen_wrongs(tile: String) -> Array:
+	# Plausible learner errors: wrong person prefix, wrong case ending, a missing or extra -ke.
+	var out: Array = []
+	var punct = ""
+	var core = tile
+	while core.length() > 0 and core[-1] in [".", "!", "?", ","]:
+		punct = core[-1] + punct
+		core = core.substr(0, core.length() - 1)
+	if core.begins_with("“") or core == "": return out
+	var words_in = core.split(" ")
+	var last: String = words_in[-1]
+	var head = " ".join(words_in.slice(0, words_in.size() - 1))
+	var pre = head + " " if head != "" else ""
+	var is_verb = last.contains("-") and (last.to_lower().begins_with("na-") or last.to_lower().begins_with("ta-") or last.to_lower().begins_with("i-") or last.to_lower().begins_with("ri-") or last.to_lower().begins_with("k-") or last.to_lower().begins_with("t-") or last.to_lower().begins_with("ma-"))
+	if is_verb and words_in.size() == 1:
+		var neg = last.begins_with("ma-")
+		var body = last.substr(3) if neg else last
+		var swaps = [["k-i-", "t-i-"], ["t-i-", "k-i-"], ["k-ta-", "t-na-"], ["t-na-", "k-ta-"], ["na-", "ta-"], ["ta-", "na-"], ["ri-", "i-"], ["i-", "ri-"]]
+		for sw in swaps:
+			if body.begins_with(sw[0]):
+				out.append(("ma-" if neg else "") + sw[1] + body.substr(sw[0].length()) + punct)
+				break
+		# a wrong second choice: the question ending instead of a statement, or the wrong evidential
+		for ev in ["-da", "-shi", "-nu"]:
+			if body.ends_with(ev):
+				out.append(("ma-" if neg else "") + body.substr(0, body.length() - ev.length()) + ("-ha" if ev == "-da" else "-da") + ("?" if ev == "-da" else punct))
+				break
+		return out
+	var pron = {"An": ["Anke", "Anni"], "Anke": ["An", "Anni"], "Ti": ["Tike", "Ti-ni"], "Tike": ["Ti", "Ti-ni"]}
+	if words_in.size() == 1 and pron.has(last):
+		for p in pron[last]: out.append(p + punct)
+		return out
+	var cases = {"ke": "", "ma": "ru", "ru": "ma", "ta": "ma", "su": "ni", "li": "ma", "ni": "su"}
+	for c in cases.keys():
+		if last.to_lower().ends_with(c) and last.length() > c.length() + 1:
+			var base = last.substr(0, last.length() - c.length())
+			if yesen_known_base(base):
+				var nb = base.trim_suffix("-") if cases[c] == "" else base
+				out.append(pre + nb + cases[c] + punct)
+				if c != "ke": out.append(pre + base.trim_suffix("-") + "ke" + punct)
+				else: out.append(pre + base.trim_suffix("-") + "-ma" + punct)
+				return out
+	if last.ends_with("-ir") and yesen_known_base(last.trim_suffix("-ir")):
+		out.append(pre + last.trim_suffix("-ir") + punct)
+		out.append(pre + last + "ke" + punct)
+		return out
+	if words_in.size() == 1 and yesen_known_base(last):
+		out.append(last + "ke" + punct)
+		out.append(last + "-ma" + punct)
+	elif words_in.size() == 2:
+		out.append(last + " " + words_in[0] + punct)
+	return out
+
+func yesen_open(id: String):
+	if level() < YESEN_LEVEL:
+		message("Yesen! (improv)", "Yesen are quick improv scenes for advanced players. They unlock at level 2 (Speaker). Keep playing, or choose Harder in the menu.")
+		return
+	yesen_suggest(id)
+
+func yesen_suggest(id: String = ""):
+	# Improv shows start with a suggestion from the audience. Each word leads to its own scene.
+	compact_buttons.call_deferred()
+	var fresh: Array = []
+	var done: Array = []
+	for i in range(Data.YESEN.size()):
+		if mastered.has("yesen:" + str(Data.YESEN[i]["id"])): done.append(i)
+		else: fresh.append(i)
+	fresh.shuffle()
+	done.shuffle()
+	var picks: Array = []
+	for i in yesen_for(id):
+		if not mastered.has("yesen:" + str(Data.YESEN[i]["id"])): picks.append(i)
+	for i in fresh + done:
+		if picks.size() >= 3: break
+		if not picks.has(i): picks.append(i)
+	picks.shuffle()
+	var partner = id
+	talk_partner = id
+	clear_panel("Yesen! Get a suggestion")
+	if id != "": add_portrait(id)
+	for w in ["yesen", "ho, e"]: learn(w)
+	text_line("Every yesen starts with a suggestion from the audience. Three people shout out words. Pick one, and " + (id.capitalize() if id != "" else "your partner") + " starts a scene inspired by it.", 16)
+	for i in picks:
+		var sg: Array = Data.YESEN[i]["sug"]
+		learn(sg[0])
+		var who = partner if partner != "" else str(Data.YESEN[i]["who"])
+		button("“" + str(sg[0]).capitalize() + "!”  (" + str(sg[1]) + ")", yesen_start.bind(i, who), content)
+	button("Other suggestions", yesen_suggest.bind(id), content)
+	button("Not now", close_panel, content)
+
+func yesen_start(i: int, partner: String = ""):
+	var sc: Dictionary = Data.YESEN[i]
+	if partner == "": partner = sc["who"]
+	for w in ["yesen", "ho, e", "bravo", "kudos"]: learn(w)
+	for e in entities:
+		if acts.has(e["id"]) and acts[e["id"]].get("kind", "") == "watch": acts[e["id"]]["kind"] = "home"
+	ys = {"i": i, "who": partner, "round": 0, "got": 0, "max": 0, "audience": [], "blocks": 0}
+	talk_partner = partner
+	acts.erase(partner)
+	log_event("yesen_start", {"scene": sc["id"], "partner": partner, "suggestion": sc["sug"][0]})
+	clear_panel("Yesen! " + str(sc["title"]))
+	add_portrait(partner)
+	var sg: Array = sc["sug"]
+	text_line("Suggestion: “" + str(sg[0]).capitalize() + "!” (" + str(sg[1]) + ")", 18)
+	text_line(partner.capitalize() + " takes the suggestion and starts a yesen, an improv scene. Yesen is borrowed from English \"yes, and\": always accept what your partner says, then add something.", 16)
+	text_line("Answer each line with Ho, e... (yes, and...) and build your sentence. The better your Varnak, the bigger the crowd.", 16)
+	button("Start the scene", yesen_round, content)
+	button("Not now", close_panel, content)
+
+func yesen_round():
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var r: Array = sc["rounds"][ys["round"]]
+	var who: String = ys["who"]
+	compact_buttons.call_deferred()
+	talk_partner = who
+	clear_panel("Yesen: round " + str(ys["round"] + 1) + " of " + str(sc["rounds"].size()))
+	add_portrait(who)
+	emote(who, "happy" if ys["round"] == 0 else "proud", 2.0)
+	varnak_banner(r[0], 22)
+	var en = text_line("(Tap Show meaning if you need it.)", 15)
+	button("Show meaning", func(): en.text = "(" + r[1] + ")", content)
+	if not ys["audience"].is_empty(): text_line("Watching: " + ", ".join(ys["audience"].map(func(x): return str(x).capitalize())), 15)
+	text_line("What do you add?", 17)
+	for k in range(r[2].size()):
+		button("Ho, e... " + str(r[2][k][0]), yesen_build.bind(k), content)
+	button("Maki! (No! Block the idea)", yesen_block, content)
+
+func yesen_block():
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var who: String = ys["who"]
+	ys["blocks"] += 1
+	ys["max"] += 3
+	log_event("answer", {"activity": "Yesen", "item": sc["id"] + ":" + str(ys["round"]), "chose": "Maki!", "correct": "Ho, e..."}, false)
+	clear_panel("Maki!")
+	add_portrait(who)
+	emote(who, "sad", 3.0)
+	text_line("You said no. " + who.capitalize() + " freezes. The scene has nowhere to go. In improv, blocking your partner stops the fun: say yes, and add something.", 17)
+	yesen_crowd(0.0)
+	button("Keep going", yesen_next, content)
+
+func yesen_build(k: int):
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var r: Array = sc["rounds"][ys["round"]]
+	var idea: Array = r[2][k]
+	var tiles: Array = idea[1]
+	var nw = 1 if level() < 3 else 2
+	compact_buttons.call_deferred()
+	clear_panel("Say it in Varnak")
+	add_portrait(ys["who"])
+	text_line("You want to say: \"Yes, and... " + str(idea[0]) + "\" Choose one piece from each row.", 16)
+	var chosen: Array = []
+	var preview = Label.new()
+	preview.add_theme_font_size_override("font_size", 22)
+	preview.add_theme_color_override("font_color", Color("7a1f3d"))
+	preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_child(preview)
+	var say: Button
+	var refresh = func():
+		var parts: Array = ["Ho, e..."]
+		for c in chosen: parts.append(c if c != "" else "___")
+		preview.text = " ".join(parts)
+		if say: say.disabled = chosen.has("")
+	for t in range(tiles.size()):
+		var opts: Array = [tiles[t]]
+		for w in yesen_wrongs(tiles[t]):
+			if not opts.has(w) and opts.size() < nw + 1: opts.append(w)
+		opts.shuffle()
+		chosen.append(tiles[t] if opts.size() == 1 else "")
+		if opts.size() == 1: continue
+		var row = HFlowContainer.new()
+		row.add_theme_constant_override("h_separation", 6)
+		row.add_theme_constant_override("v_separation", 6)
+		content.add_child(row)
+		var group = ButtonGroup.new()
+		for o in opts:
+			var b = Button.new()
+			b.text = o
+			b.toggle_mode = true
+			b.button_group = group
+			b.custom_minimum_size = Vector2(0, 42)
+			b.add_theme_font_size_override("font_size", 18)
+			b.toggled.connect(func(on):
+				if on:
+					chosen[t] = o
+					refresh.call())
+			row.add_child(b)
+	say = button("Say it!", func(): yesen_said(tiles, chosen.duplicate()), content)
+	refresh.call()
+	button("Back", yesen_round, content)
+
+func yesen_said(tiles: Array, chosen: Array):
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var who: String = ys["who"]
+	var right = 0
+	var total = 0
+	var opts_total = 0
+	for t in range(tiles.size()):
+		if yesen_wrongs(tiles[t]).is_empty(): continue
+		opts_total += 1
+		if chosen[t] == tiles[t]: right += 1
+	total = maxi(opts_total, 1)
+	var frac = float(right) / float(total)
+	ys["got"] += right + 1
+	ys["max"] += total + 1
+	var said = "Ho, e... " + " ".join(chosen)
+	var target = "Ho, e... " + " ".join(tiles)
+	log_event("answer", {"activity": "Yesen", "item": sc["id"] + ":" + str(ys["round"]), "chose": said, "correct": target}, frac >= 0.999)
+	clear_panel("Yesen: round " + str(ys["round"] + 1))
+	add_portrait(who)
+	varnak_banner(said, 20)
+	if frac >= 0.999:
+		emote(who, "laugh", 3.0)
+		text_line("Perfect Varnak! " + who.capitalize() + " cracks up and keeps going.", 17)
+	elif frac >= 0.5:
+		emote(who, "happy", 3.0)
+		text_line("Almost! " + who.capitalize() + " understands and keeps going. The right way: " + target, 17)
+	else:
+		emote(who, "confused", 3.0)
+		text_line("“Han...?” " + who.capitalize() + " is confused but keeps going. The right way: " + target, 17)
+	yesen_crowd(frac)
+	button("Next", yesen_next, content)
+
+func yesen_next():
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	ys["round"] += 1
+	if ys["round"] >= sc["rounds"].size(): yesen_end()
+	else: yesen_round()
+
+func yesen_spot(n: int) -> Vector3:
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var pn = entity_by_id(ys["who"])["node"] as Node3D
+	var d = Vector3(talk_cam.global_position.x - pn.position.x, 0, talk_cam.global_position.z - pn.position.z)
+	if d.length() < 0.1: d = Vector3(0, 0, 1)
+	d = d.normalized()
+	var side = d.cross(Vector3.UP).normalized()
+	var row = n / 4
+	var col = [-1.5, 1.5, -2.6, 2.6][n % 4]
+	var p = pn.position - d * (1.2 + row * 1.5) + side * col * (1.0 + row * 0.35)
+	p.y = gy(p.x, p.z)
+	return p
+
+func yesen_crowd(frac: float):
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var who: String = ys["who"]
+	var aud: Array = ys["audience"]
+	# the crowd reacts
+	for a in aud:
+		var kind = "laugh" if frac >= 0.999 else ("happy" if frac >= 0.5 else "confused")
+		emote(a, kind, 2.6)
+		var e = entity_by_id(a)
+		e["say"] = [["Ha! Ha!", "Bravo!", "Ho! Ho!", "Kudos!"][randi() % 4] if frac >= 0.999 else (["Ho!", "Hm!"][randi() % 2] if frac >= 0.5 else "Han...?"), clock + 3.0]
+	# good rounds draw a bigger crowd; a bad one sends someone home
+	var add = 0
+	if frac >= 0.999: add = 2
+	elif frac >= 0.5: add = 1
+	if frac < 0.34 and not aud.is_empty():
+		var gone: String = aud.pop_back()
+		acts[gone] = {"kind": "home"}
+		toast(gone.capitalize() + " wanders off.")
+	if add == 0: return
+	var cands: Array = []
+	var pn = (entity_by_id(who)["node"] as Node3D).position
+	for e in entities:
+		var id: String = e["id"]
+		if e["kind"] != "npc" or not Data.PEOPLE.has(id) or id == who or aud.has(id) or not (e["node"] as Node3D).visible: continue
+		if npc_following(id): continue
+		cands.append([(e["node"] as Node3D).position.distance_to(pn), id])
+	cands.sort_custom(func(x, y): return x[0] < y[0])
+	for c in cands.slice(0, add):
+		var id: String = c[1]
+		aud.append(id)
+		var p = yesen_spot(aud.size() - 1)
+		var far = float(c[0]) > 45.0
+		acts[id] = {"kind": "watch", "pos": p, "face": pn, "until": clock + 240.0, "tele": far}
+		if far: (entity_by_id(id)["node"] as Node3D).position = p + Vector3(0, 0, 0)
+		toast(id.capitalize() + " comes over to watch!")
+	ys["audience"] = aud
+
+func yesen_end():
+	var sc: Dictionary = Data.YESEN[ys["i"]]
+	var who: String = ys["who"]
+	var frac = float(ys["got"]) / float(maxi(ys["max"], 1))
+	clear_panel("Applause!")
+	add_portrait(who)
+	varnak_banner(sc["end"][0], 20)
+	var en = text_line("(Tap Show meaning if you need it.)", 15)
+	button("Show meaning", func(): en.text = "(" + str(sc["end"][1]) + ")", content)
+	var n = ys["audience"].size()
+	var level_text = ""
+	var reward = 0
+	var kind = "happy"
+	if frac >= 0.9 and ys["blocks"] == 0:
+		level_text = "A standing ovation! Everyone shouts “Bravo! Kudos! Yesen!” and throws imaginary chonies onto the stage."
+		reward = 5
+		kind = "love"
+	elif frac >= 0.7:
+		level_text = "Big applause! Cheers and whistles. Somebody yells “Bravo!”"
+		reward = 3
+		kind = "laugh"
+	elif frac >= 0.45:
+		level_text = "Polite clapping. Clap. Clap. Clap."
+		reward = 1
+		kind = "happy"
+	else:
+		level_text = "Silence. Somewhere, a cricket goes chiriri. Then one person claps, very slowly."
+		reward = 0
+		kind = "confused"
+	text_line(level_text + " (" + str(n) + " watching. Varnak accuracy: " + str(int(round(frac * 100.0))) + "%.)", 17)
+	emote(who, kind, 4.0)
+	for a in ys["audience"]:
+		emote(a, kind, 4.0)
+		entity_by_id(a)["say"] = ["Bravo!" if reward >= 3 else ("Ho." if reward >= 1 else "...chiriri"), clock + 5.0]
+		if acts.has(a) and acts[a].get("kind", "") == "watch": acts[a]["until"] = clock + 12.0
+	gin += reward
+	if reward > 0: toast("+" + str(reward) + " gin")
+	if frac >= 0.7:
+		master("yesen:" + str(sc["id"]))
+		if count_mastered("yesen:") >= 5: complete("yesen")
+	log_event("yesen_end", {"scene": sc["id"], "accuracy": frac, "audience": n, "blocks": ys["blocks"]}, frac >= 0.7)
+	save_game()
+	var si: int = ys["i"]
+	var swho: String = ys["who"]
+	var others: Array = []
+	for i in range(Data.YESEN.size()):
+		if i != ys["i"] and not mastered.has("yesen:" + str(Data.YESEN[i]["id"])): others.append(Data.YESEN[i]["sug"][0])
+	ys = {}
+	button("Another suggestion!", yesen_suggest.bind(swho), content)
+	if not others.is_empty(): text_line("Suggestions you haven't played yet: " + ", ".join(others.slice(0, 6)) + ". Anyone can do a yesen: Chat, then Yesen.", 15)
+	button("Return", close_panel, content)
+
+func show_yesen_list():
+	compact_buttons.call_deferred()
+	clear_panel("Yesen: improv scenes")
+	talk_partner = ""
+	if level() < YESEN_LEVEL:
+		text_line("Yesen unlock at level 2 (Speaker). Keep playing, or choose Harder in the menu.", 17)
+		button("Back", show_games, content)
+		return
+	text_line("Any villager will do a yesen with you (Chat, then Yesen). Or pick a suggestion here and play it with its usual partner. A crowd gathers if your Varnak is good.", 16)
+	button("Get three suggestions", yesen_suggest.bind(""), content)
+	for i in range(Data.YESEN.size()):
+		var sc: Dictionary = Data.YESEN[i]
+		button("“" + str(sc["sug"][0]).capitalize() + "”: " + str(sc["title"]) + " (" + str(sc["who"]).capitalize() + ")" + ("  [ok]" if mastered.has("yesen:" + str(sc["id"])) else ""), yesen_start.bind(i, str(sc["who"])), content)
+	button("Back", show_games, content)

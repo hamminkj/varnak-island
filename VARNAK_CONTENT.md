@@ -428,3 +428,13 @@ Wrong relays (keeping An, keeping -da, or a swapped noun) come back as a changed
 Guess who (with Neri): yes/no questions built on -ha, possession with -su and esh (Sa-su dau-yir i-esh-ha? Do they have a hat?), -kan (Sa i-sum-kan-ha?), -ur (Sa i-sul-ur-ha?) and directions (Sa dong-ma i-esh-ur-ha?).
 
 Things to check: 33. Possession as X-su Y i-esh (Y is with X) is composed from the comitative. 34. Lirake ... i-pal-pa-nu reports someone else's witnessed event with hearsay -nu. 35. Ti ta-gao-fu... sa i-zen-fu (you will say it, it will be true) uses zen as a stative "true".
+
+## Twelfth expansion: yesen (improv scenes)
+
+New words: yesen (an improv scene; borrowed from English "yes, and", the first rule of improv), ho, e (yes, and: a calque, ho yes + e and).
+
+Each yesen starts with a suggestion from the audience: three words are offered (for example kororo, snore; fong, wind; shenani, mischief), and each one leads to its own scene, related in meaning but not always literally (fong, wind, starts the flying boat). Any villager can play any scene.
+
+A scene has three rounds. The villager says a line; the player chooses an idea (or blocks with Maki!) and assembles the sentence by picking one piece per row. Wrong pieces are generated from common learner errors: wrong person prefix (na-/ta-, i-/ri-, k-i-/t-i-), wrong case (-ma/-ru, -su/-ni), a missing or extra -ke, a dropped plural -ir, the question ending -ha instead of -da, and swapped word order in two-word phrases. Good rounds bring villagers over to watch; bad rounds send someone away. The end applause (standing ovation, big applause, polite clapping, or crickets) follows the player's accuracy. 17 scenes, all composed with existing grammar, -kan and -vai.
+
+Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-su dau-yir i-esh-da, the horse has a hat). 37. Sentences with a quoted speech tile (An sipu-ru "Chau!" na-mel-im-da) place the quote before the verb.
