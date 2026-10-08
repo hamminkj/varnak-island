@@ -31,7 +31,9 @@ var player: CharacterBody3D
 var camera: Camera3D
 var ui: Control
 var status: Label
-var prompt: Label
+var prompt: Button
+var prompt_text_since: float = 0.0
+var prompt_last: String = ""
 var toast_label: Label
 var panel: PanelContainer
 var close_x: Button
@@ -1347,15 +1349,23 @@ func build_ui():
 			b.tooltip_text = "More"
 			b.icon = menu_icon()
 			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	prompt = Label.new()
-	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	prompt.position = Vector2(-160,40)
-	prompt.size = Vector2(320,70)
-	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# a small chip in the lower right: what is in reach, and a tap target to use it
+	prompt = Button.new()
+	prompt.name = "TargetChip"
+	prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	prompt.offset_left = -290
+	prompt.offset_right = -16
+	prompt.offset_top = -78
+	prompt.offset_bottom = -26
+	prompt.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	prompt.alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	prompt.add_theme_stylebox_override("normal", chip_style(0.7))
+	prompt.add_theme_font_size_override("font_size", 16)
+	for st in ["normal", "hover", "pressed", "focus"]: prompt.add_theme_stylebox_override(st, chip_style(0.55 if st != "pressed" else 0.8))
 	prompt.add_theme_color_override("font_color", Color("fff6df"))
-	prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prompt.add_theme_color_override("font_hover_color", Color("fff6df"))
+	prompt.focus_mode = Control.FOCUS_NONE
+	prompt.pressed.connect(func(): if not target.is_empty(): interact())
 	prompt.hide()
 	ui.add_child(prompt)
 	var cross = Label.new()
@@ -1531,7 +1541,7 @@ func show_intro():
 	text_line("Varnak Island is a game about how languages work. Everyone here speaks Varnak, an invented language, so you figure it out from gestures, objects and clues, then use it yourself. Along the way you notice patterns, guess meanings and build sentences, and the villagers are silly about all of it.")
 	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
-	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact.")
+	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact. When something is in reach, its name shows in the lower right: tap it to use it.")
 	text_line("Tap the speaker button, or any dark red Varnak words, to hear them read aloud by your device's voice.", 16)
 	text_line("Tap the quest box to fold it. The menu button (three lines, top row) has games, difficulty, About Varnak and Reset progress.")
 
@@ -1805,7 +1815,9 @@ func _physics_process(delta):
 		prompt.visible = false
 		interact_button.disabled = true
 		return
-	if panel.visible: return
+	if panel.visible:
+		prompt.visible = false
+		return
 	var axis = joy
 	var manual = joy != Vector2.ZERO
 	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP): axis.y -= 1
@@ -1905,16 +1917,31 @@ func _physics_process(delta):
 				target = e
 	hint_time -= delta
 	if hint_time > 0.0: pass
-	elif not hover.is_empty(): prompt.text = display_name(hover) + "\n(click to " + verb(hover) + ")"
+	elif not hover.is_empty(): prompt.text = display_name(hover) + "  ·  click to " + verb(hover)
 	elif not walk_to.is_empty(): prompt.text = "Walking to " + display_name(walk_to)
 	elif target.is_empty(): prompt.text = ""
-	else: prompt.text = display_name(target) + "\n(click it, press E, or tap " + verb(target).capitalize() + ")"
-	prompt.visible = prompt.text != ""
+	else: prompt.text = display_name(target) + "  ·  tap to " + verb(target)
+	prompt.visible = prompt.text != "" and not panel.visible
+	if prompt.text != prompt_last:
+		prompt_last = prompt.text
+		prompt_text_since = clock
+		fit_prompt()
+	# fade to a quiet chip once it has been read
+	prompt.modulate.a = 1.0 if clock - prompt_text_since < 2.0 else 0.55
 	interact_button.disabled = target.is_empty()
 	interact_button.text = "Interact" if target.is_empty() else verb(target).capitalize()
 
+func fit_prompt():
+	var long = prompt.text.length() > 34
+	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if long else TextServer.AUTOWRAP_OFF
+	prompt.offset_left = -300 if long else -16
+	prompt.offset_top = -78
+	prompt.offset_bottom = -26
+	prompt.reset_size()
+
 func hint(text: String):
 	prompt.text = text
+	fit_prompt()
 	prompt.show()
 	hint_time = 2.5
 
