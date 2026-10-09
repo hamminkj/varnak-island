@@ -442,3 +442,22 @@ Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-s
 ## The cenote
 
 New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Varnak sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
+
+## Kirmel: the lost writing
+
+New words: kir (carve, write), kirmel (the old writing: kir carve + mel speak), Var Tari (the great fish: var big + tari fish).
+
+Kirmel is a featural syllabary (in the spirit of Canadian Aboriginal syllabics). One mark per syllable. The shape is the consonant; the way it is turned is the vowel: a points right, e is turned a quarter (down), i is turned around, o three quarters (up), u points right with a line under it. A dot marks a voiced consonant (p/b, t/d, k/g, s/z, f/v), a short bar makes sh (from s) and ch (from t). A consonant at the end of a syllable is a small raised mark, and a lone vowel uses an open triangle. kirmel.gd holds the shapes, the syllable splitter and the drawing code; every one of the 110 syllable marks is distinct.
+
+The creation story, carved deeper and deeper in the cenote, is told with hearsay -nu (a myth: what people say):
+1. Yanve yarma hai e yesh sela ri-esh-pa-nu. (On the first day there was only the sea and the night.)
+2. Var tari haima i-sul-pa-nu. Tari-ni dau-ma sao-ir ri-esh-pa-nu. (A great fish slept in the sea. On the fish's head there were stars.)
+3. Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu. (The fish jumped. The stars went up into the sky.)
+4. Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu. (The fish sang a song. Out of the song, the land arrived.)
+5. Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu. (People came to the land. They carved the writing into the stones.)
+6. Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu. (But the days went by. The people forgot the writing.)
+7. Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha? (The fish sleeps in the cenote. The fish knows the writing. Will you bring the writing to the village?)
+
+Var Tari speaks only with evidentials: -da for what it saw (you diving, you reading the stones, the tiny fish beside it), -nu for what it heard from the island above (your yesen, Gav's chonies, the parrot, the lighthouse), and -shi for what it works out (it is night, you came from land, you have been fishing). It has never seen the sky: Anke hen ma-k-i-pal-pa-ki-da.
+
+Things to check: 38. Plural agents with a singular object take ri- (Sair-irke kirmel ri-kir-pa-nu); the handoff document shows ri- for plural subjects, and this extends it to plural agents. 39. hai e yesh sela ri-esh-pa-nu uses sela (alone) for "only". 40. Tarike ning i-ning-pa-nu uses ning as both noun and verb (sing a song). 41. The script itself (shapes, turning for vowels, finals) is a game invention.

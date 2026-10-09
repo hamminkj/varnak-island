@@ -185,6 +185,7 @@ var side_quests = [
 	["relay","","Pass it on! Lira, Gav and Desh have news. Pass each story to two people without changing it (you heard it, so: -nu)."],
 	["guesswho","neri","Play Guess who with Neri and win three times."],
 	["yesen","","Yesen! Do improv scenes with villagers (Chat, then Yesen) and get big applause in five of them. Level 2 and up."],
+	["kirmel","suri","The lost writing. Deep in the cenote in the far north-east there are carvings no one can read. Read them, find the one who remembers, and bring the writing back to the village."],
 	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -309,6 +310,7 @@ func _ready():
 	words.merge(Data.WORDS11)
 	words.merge(Data.WORDS12)
 	words.merge(Data.WORDS13)
+	words.merge(Data.WORDS14)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -317,6 +319,7 @@ func _ready():
 	load_game()
 	setup_audio()
 	load_log()
+	if completed.has("kirmel"): apply_kirmel_signs()
 	log_event("session", {"level": level(), "words": discovered.size(), "web": OS.has_feature("web")})
 	refresh_world()
 	last_level = level()
@@ -1376,7 +1379,7 @@ func build_ui():
 	prompt.add_theme_color_override("font_color", Color("fff6df"))
 	prompt.add_theme_color_override("font_hover_color", Color("fff6df"))
 	prompt.focus_mode = Control.FOCUS_NONE
-	prompt.pressed.connect(func(): if not target.is_empty(): interact())
+	prompt.pressed.connect(chip_pressed)
 	prompt.hide()
 	ui.add_child(prompt)
 	var cross = Label.new()
@@ -1709,6 +1712,7 @@ func _process(delta):
 	update_overhear(delta)
 	update_audio(delta)
 	update_cenote(delta)
+	update_guardian(delta)
 	update_underwater(delta)
 	update_acts(delta)
 	if not wand_pending.is_empty(): wand_tick()
@@ -1892,6 +1896,7 @@ func _physics_process(delta):
 	if in_cenote_water(player.position):
 		swim_physics(delta, axis)
 		return
+	chip_action = Callable()
 	if swimming:
 		swimming = false
 		swim_up_held = false
@@ -2526,6 +2531,7 @@ func add_topics(id: String):
 			topic("Ask who Suri is", "suri_teacher", id)
 			topic("Ask about the students", "students_read", id)
 			topic("Ask why Rin and Ola are giggling", "suri_kinder", id)
+			if mastered.has("kir:taught") and not completed.has("kirmel"): button("Show Suri the old writing", suri_kirmel.bind(0), content)
 		"rin":
 			topic("Ask who Rin is", "rin_student", id)
 			topic("Ask what they are doing", "students_read", id)
@@ -2931,6 +2937,7 @@ func show_notebook():
 	var b8 = button("Overheard", show_overheard, row3)
 	var b9 = button("My learning", show_progress, row3)
 	button("Survey: find someone who can...", show_survey, content)
+	if kir_known_count() > 0: button("Kirmel: the old writing", show_kir_chart, content)
 	for b in [b7, b8, b9]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
@@ -3935,6 +3942,13 @@ func varnak_banner(text: String, size: int = 30) -> PanelContainer:
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	pc.add_child(l)
 	sb.content_margin_right = 56
+	if completed.has("kirmel") and kir_show:
+		var strip = Control.new()
+		var lay = K.layout(K.syllables(text), 22.0, 380.0)
+		strip.custom_minimum_size = Vector2(0, lay["size"].y)
+		strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		strip.draw.connect(func(): K.draw_on(strip, text, Vector2(maxf(0.0, (strip.size.x - lay["size"].x) * 0.5), 0), 22.0, 380.0, Color("2f6f74"), 2.0))
+		content.add_child(strip)
 	var spk = speaker_button()
 	spk.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
 	spk.position = Vector2(0, -20)
@@ -3996,6 +4010,10 @@ func show_more():
 	button("How to play", show_intro, content)
 	button("About the Varnak language", show_varnak, content)
 	button("Credits", show_credits, content)
+	if completed.has("kirmel"):
+		button("Kirmel writing: on" if kir_show else "Kirmel writing: off", func():
+			kir_show = not kir_show
+			show_more(), content)
 	button("Sound: on" if sound_on else "Sound: off", func():
 		sound_on = not sound_on
 		apply_sound_setting()
@@ -8522,7 +8540,7 @@ var amb_w: Dictionary = {}
 var uw_fx: int = -1
 const SFX_NAMES = ["correct", "wrong", "coin", "fanfare", "newword", "pop", "whoosh", "kabum", "page", "splash", "step0", "step1",
 	"applause_small", "applause_big", "applause_huge", "slowclap", "cricket", "pororo", "piriri", "chiriri", "guarara", "kororo",
-	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2"]
+	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2", "hum"]
 var sfx: Dictionary = {}
 var sfx_pool: Array = []
 var amb: Dictionary = {}
@@ -8987,6 +9005,8 @@ func build_cenote():
 	motes.material_override = mmat
 	add_child(motes)
 	build_cenote_jungle()
+	build_carvings()
+	build_guardian()
 
 func build_cenote_jungle():
 	var cx = T.CENOTE.x
@@ -9165,7 +9185,7 @@ func swim_physics(delta: float, axis: Vector2):
 	if not was:
 		player.velocity *= 0.3
 		play_sfx("splash", 0.0)
-		if not cen_seen:
+		if not cen_seen and not discovered.has("sonot"):
 			cen_seen = true
 			for w in ["sonot", "lup", "sum"]: learn(w)
 			toast("Sonot: a cenote! Swim, and dive as deep as you like.")
@@ -9189,6 +9209,22 @@ func swim_physics(delta: float, axis: Vector2):
 		player.position.y = lerpf(player.position.y, fy + sin(clock * 1.4) * 0.05, minf(delta * 4.0, 1.0))
 		if player.velocity.y > 0.0: player.velocity.y = 0.0
 	var depth = maxf(0.0, cen_y_w - camera.global_position.y)
+	chip_action = Callable()
+	var nc = nearest_carving() if under else -1
+	if guardian_near():
+		chip_action = guardian_listen
+		prompt.text = "Var Tari  ·  tap to listen"
+		fit_prompt()
+		prompt.visible = not panel.visible
+		prompt.modulate.a = 1.0
+		return
+	if nc >= 0:
+		chip_action = read_carving.bind(nc)
+		prompt.text = "Carving  ·  tap to read"
+		fit_prompt()
+		prompt.visible = not panel.visible
+		prompt.modulate.a = 1.0
+		return
 	prompt.text = ("Depth " + str(int(round(depth))) + " m" + ("  ·  Up to rise" if depth > 2.0 else "  ·  Dive to go down")) if depth > 0.3 else "Swimming  ·  Dive, or Climb out"
 	fit_prompt()
 	prompt.visible = not panel.visible
@@ -9227,3 +9263,609 @@ func update_underwater(delta: float):
 		uw_overlay.color = Color(0.08, 0.5, 0.52, 0.16).lerp(Color(0.02, 0.18, 0.3, 0.42), depth)
 		env.fog_light_color = Color("3fc4b4").lerp(Color("0b3a52"), depth)
 		env.fog_density = lerpf(0.016, 0.045, depth)
+
+# ------------------------------------------------------------ kirmel: the lost writing, the carvings and Var Tari
+
+const K = preload("res://kirmel.gd")
+var carvings: Array = []   # [node, index]  index -1 is the picture stone
+var guardian: Node3D
+var guardian_tail: Node3D
+var guardian_t: float = 0.0
+var guardian_line: int = -1
+var chip_action: Callable = Callable()
+var kir_show: bool = true
+
+func kir_knows(c: String, v: String) -> bool:
+	return mastered.has("ky:" + c + "|" + v)
+
+func kir_knows_final(c: String) -> bool:
+	return mastered.has("kf:" + c) or kir_shape_known(c)
+
+func kir_shape_known(c: String) -> bool:
+	for v in K.VOWELS:
+		if kir_knows(c, v): return true
+	return false
+
+func kir_vowel_known(v: String) -> bool:
+	for m in mastered:
+		var ms = str(m)
+		if ms.begins_with("ky:") and ms.ends_with("|" + v): return true
+	return false
+
+func kir_learn_syl(syl: Dictionary):
+	if syl.has("p") or syl.has("sp"): return
+	if syl["v"] != "": master("ky:" + str(syl["c"]) + "|" + str(syl["v"]))
+	elif syl["c"] != "": master("kf:" + str(syl["c"]))
+	for f in syl["f"]: master("kf:" + str(f))
+
+func kir_readable(syl: Dictionary) -> bool:
+	if syl.has("p") or syl.has("sp"): return true
+	if syl["v"] == "":
+		if not kir_knows_final(syl["c"]): return false
+	elif not kir_knows(syl["c"], syl["v"]): return false
+	for f in syl["f"]:
+		if not kir_knows_final(f): return false
+	return true
+
+func kir_known_count() -> int:
+	return count_mastered("ky:")
+
+func glyph_cell(syl: Dictionary, label_text: String, hl: bool = false, cell: float = 34.0) -> Control:
+	var vb = VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 0)
+	var g = Control.new()
+	var fw = cell * (1.0 if syl["v"] != "" else 0.5) + cell * 0.4 * syl["f"].size()
+	g.custom_minimum_size = Vector2(fw + 8, cell * 1.35)
+	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	g.draw.connect(func():
+		var ink = Color("7a1f3d") if hl else Color("1d3557")
+		if hl: g.draw_rect(Rect2(Vector2.ZERO, g.size), Color(0.95, 0.85, 0.6, 0.6))
+		var o = Vector2(cell * 0.5 + 4, cell * 0.62)
+		var vv = syl["v"] if syl["v"] != "" else "a"
+		var sc = 0.42 if syl["v"] != "" else 0.2
+		var oo = o if syl["v"] != "" else o + Vector2(-cell * 0.15, -cell * 0.3)
+		for st in K.glyph_strokes(syl["c"], vv):
+			var pts = PackedVector2Array()
+			for p in st: pts.append(oo + (p as Vector2) * cell * sc)
+			g.draw_polyline(pts, ink, 2.2, true)
+		var x = cell + 4 if syl["v"] != "" else cell * 0.5
+		for f in syl["f"]:
+			for st in K.glyph_strokes(f, "a"):
+				var pts2 = PackedVector2Array()
+				for p in st: pts2.append(Vector2(x, cell * 0.3) + (p as Vector2) * cell * 0.18)
+				g.draw_polyline(pts2, ink, 1.8, true)
+			x += cell * 0.4)
+	vb.add_child(g)
+	if label_text != "-":
+		var l = Label.new()
+		l.text = label_text
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_font_size_override("font_size", 13)
+		l.add_theme_color_override("font_color", Color("7a1f3d") if label_text == "?" else Color("5a4632"))
+		vb.add_child(l)
+	return vb
+
+func kir_line_view(text: String, show_labels: bool = true, highlight: int = -1, cell: float = 34.0) -> Control:
+	var flow = HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 2)
+	flow.add_theme_constant_override("v_separation", 6)
+	var sylls = K.syllables(text)
+	for i in range(sylls.size()):
+		var s: Dictionary = sylls[i]
+		if s.has("sp"):
+			var sp = Control.new()
+			sp.custom_minimum_size = Vector2(cell * 0.45, 4)
+			flow.add_child(sp)
+			continue
+		if s.has("p"):
+			var pl = Label.new()
+			pl.text = "◦"
+			pl.add_theme_font_size_override("font_size", 16)
+			pl.add_theme_color_override("font_color", Color("1d3557"))
+			flow.add_child(pl)
+			continue
+		var lab = "-"
+		if show_labels: lab = K.label(s) if kir_readable(s) else "?"
+		flow.add_child(glyph_cell(s, lab, i == highlight, cell))
+	content.add_child(flow)
+	return flow
+
+# ---- the carved stones ----
+
+func carving_spot(depth: float, ang: float) -> Array:
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var y = cen_y_w - depth
+	var rad: float
+	if y > cen_cave_cy + CEN_CAVE_RY * cos(asin(T.CENOTE_R / CEN_CAVE_R)): rad = T.CENOTE_R - 0.25
+	elif y < cen_cave_cy - CEN_CAVE_RY * cos(asin(4.0 / CEN_CAVE_R)) - 0.5: rad = 3.75
+	else:
+		var dy = (y - cen_cave_cy) / CEN_CAVE_RY
+		rad = CEN_CAVE_R * sqrt(maxf(0.02, 1.0 - dy * dy)) * (1.0 + 0.1 * cave_noise(ang, y)) - 0.45
+	return [Vector3(cx + cos(ang) * rad, y, cz + sin(ang) * rad), Vector3(cx, y, cz)]
+
+func carving_texture(i: int) -> ImageTexture:
+	var ink = Color(0.78, 1.0, 0.94, 1.0)
+	var img: Image
+	if i < 0:
+		img = Image.create(640, 300, false, Image.FORMAT_RGBA8)
+		img.fill(Color(0, 0, 0, 0))
+		var pics = Data.KIR_PICTURES
+		for k in range(pics.size()):
+			var cx0 = 64.0 + k * 128.0
+			for st in kir_picture(pics[k][1]):
+				var pts: Array = []
+				for p in st: pts.append(Vector2(cx0, 80.0) + (p as Vector2) * 46.0)
+				paint_poly(img, pts, ink, 4)
+			var sub = K.image(pics[k][0], 128, 120, 34.0, ink, Color(0, 0, 0, 0), 4)
+			img.blend_rect(sub, Rect2i(0, 0, 128, 120), Vector2i(int(cx0) - 64, 160))
+	else:
+		img = K.image(Data.KIR_STORY[i]["v"], 640, 340, 34.0, ink, Color(0, 0, 0, 0), 4)
+	return ImageTexture.create_from_image(img)
+
+func paint_poly(img: Image, pts: Array, ink: Color, thick: int):
+	for k in range(pts.size() - 1):
+		var a: Vector2 = pts[k]
+		var b: Vector2 = pts[k + 1]
+		var steps = int(maxf(a.distance_to(b), 1.0))
+		for s in range(steps + 1):
+			var p = a.lerp(b, float(s) / steps)
+			img.fill_rect(Rect2i(int(p.x) - thick / 2, int(p.y) - thick / 2, thick, thick), ink)
+
+func kir_picture(what: String) -> Array:
+	match what:
+		"fish":
+			return [K.arc(Vector2(-0.1, 0.0), 0.55, 200.0, 520.0, 16), [Vector2(0.45, 0.0), Vector2(0.95, -0.4), Vector2(0.95, 0.4), Vector2(0.45, 0.0)], K.arc(Vector2(-0.4, -0.1), 0.06, 0, 360, 6)]
+		"sun":
+			var out = [K.arc(Vector2.ZERO, 0.4, 0, 360, 16)]
+			for k in range(8):
+				var a = k * TAU / 8.0
+				out.append([Vector2(cos(a), sin(a)) * 0.55, Vector2(cos(a), sin(a)) * 0.85])
+			return out
+		"star":
+			var pts: Array = []
+			for k in range(11):
+				var a = -PI * 0.5 + k * PI / 5.0
+				pts.append(Vector2(cos(a), sin(a)) * (0.85 if k % 2 == 0 else 0.35))
+			return [pts]
+		"bird":
+			return [[Vector2(-0.9, -0.2), Vector2(-0.4, -0.45), Vector2(0.0, 0.0), Vector2(0.4, -0.45), Vector2(0.9, -0.2)], K.arc(Vector2(0.0, 0.15), 0.15, 0, 360, 8)]
+		"water":
+			var w1: Array = []
+			var w2: Array = []
+			for k in range(17):
+				var x = -0.9 + k * 0.1125
+				w1.append(Vector2(x, -0.2 + sin(k * 0.8) * 0.15))
+				w2.append(Vector2(x, 0.3 + sin(k * 0.8 + 1.0) * 0.15))
+			return [w1, w2]
+	return []
+
+func build_carvings():
+	var spots = [[3.2, 0.6]]
+	for i in range(Data.KIR_STORY.size()):
+		spots.append([float(Data.KIR_STORY[i]["depth"]), 1.2 + i * 0.95])
+	for k in range(spots.size()):
+		var idx = k - 1
+		var sp = carving_spot(spots[k][0], spots[k][1])
+		var node = Node3D.new()
+		add_child(node)
+		node.position = sp[0]
+		node.look_at(sp[1], Vector3.UP)
+		var w = 2.6 if idx >= 0 else 2.5
+		var h = 1.4 if idx >= 0 else 1.2
+		Art.box(node, Vector3(0, 0, 0.05), Vector3(w + 0.2, h + 0.2, 0.3), Color("6f8a84"))
+		var q = MeshInstance3D.new()
+		var qm = QuadMesh.new()
+		qm.size = Vector2(w, h * (340.0 / 340.0) if idx >= 0 else h)
+		q.mesh = qm
+		var mat = StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_texture = carving_texture(idx)
+		mat.albedo_color = Color(0.85, 1.0, 0.95, 0.9)
+		mat.disable_fog = true
+		q.material_override = mat
+		q.position = Vector3(0, 0, -0.12)
+		q.rotation.y = PI
+		node.add_child(q)
+		carvings.append([node, idx])
+
+func nearest_carving() -> int:
+	var best = -1
+	var bd = 4.8
+	for k in range(carvings.size()):
+		var d = (carvings[k][0] as Node3D).global_position.distance_to(camera.global_position)
+		if d < bd:
+			bd = d
+			best = k
+	return best
+
+func chip_pressed():
+	if chip_action.is_valid():
+		var c = chip_action
+		c.call()
+		return
+	if not target.is_empty(): interact()
+
+# ---- reading a stone ----
+
+func read_carving(k: int):
+	var idx: int = carvings[k][1]
+	talk_partner = ""
+	if idx < 0:
+		picture_stone(0)
+		return
+	if kir_known_count() == 0:
+		message("Strange marks", "Rows of glowing marks are carved into the stone. You can't read them yet. Maybe the stone with pictures, near the surface, can help.")
+		return
+	decipher(idx)
+
+func picture_stone(step: int):
+	var pics = Data.KIR_PICTURES
+	if step >= pics.size():
+		master("kc:pictures")
+		log_event("kirmel", "picture stone read")
+		clear_panel("The picture stone")
+		text_line("You can read " + str(kir_known_count()) + " syllables now. Each mark is one syllable: a sound like ta or ri.", 17)
+		text_line("Look closely: the shape seems to tell the first sound, and the way it is turned seems to change the vowel. Deeper stones tell a story. Dive down and try to read them.", 17)
+		kir_line_view("tari riya sao par wak")
+		button("Return", close_panel, content)
+		return
+	var p: Array = pics[step]
+	learn(p[0])
+	clear_panel("The picture stone (" + str(step + 1) + " of " + str(pics.size()) + ")")
+	text_line("Under a carving of a " + str(p[1]) + ", there are these marks:", 17)
+	kir_line_view(p[0], false, -1, 46.0)
+	var opts: Array = [p[0]]
+	for q in pics:
+		if q[0] != p[0] and opts.size() < 3: opts.append(q[0])
+	ask("What do the marks say?", opts, 0, func():
+		for syl in K.syllables(p[0]): kir_learn_syl(syl)
+		picture_stone.call_deferred(step + 1), "", "Think of the Varnak word for " + str(p[1]) + ".", close_panel)
+
+func kir_first_unknown(sylls: Array) -> int:
+	for i in range(sylls.size()):
+		if not kir_readable(sylls[i]): return i
+	return -1
+
+func decipher(idx: int):
+	var ch: Dictionary = Data.KIR_STORY[idx]
+	var sylls = K.syllables(ch["v"])
+	# once you have worked out the pattern a few times, marks you can deduce read themselves
+	if count_mastered("kd:") >= 3:
+		var auto = 0
+		for s2 in sylls:
+			if kir_readable(s2) or s2["v"] == "": continue
+			if kir_shape_known(s2["c"]) and kir_vowel_known(s2["v"]):
+				var finals_ok = true
+				for f in s2["f"]:
+					if not kir_knows_final(f): finals_ok = false
+				if finals_ok:
+					kir_learn_syl(s2)
+					auto += 1
+		if auto > 0: toast("You know the pattern now: you work out " + str(auto) + " more mark" + ("s" if auto > 1 else "") + " yourself.")
+	var u = kir_first_unknown(sylls)
+	compact_buttons.call_deferred()
+	clear_panel("Carving " + str(idx + 1) + " of " + str(Data.KIR_STORY.size()))
+	if u < 0:
+		master("kc:" + str(idx))
+		log_event("kirmel", "chapter " + str(idx + 1))
+		text_line("You can read the whole stone:", 17)
+		kir_line_view(ch["v"])
+		varnak_banner(ch["v"], 20)
+		var en = text_line("(Tap Show meaning if you need it.)", 16)
+		button("Show meaning", func(): en.text = ch["en"], content)
+		text_line("The story is told with -nu: this is what people say, not what the carver saw.", 15)
+		if idx == Data.KIR_STORY.size() - 1 and not mastered.has("kir:taught"): text_line("Something large moves slowly in the dark below.", 16)
+		button("Story so far", show_kir_story, content)
+		button("Return", close_panel, content)
+		return
+	var target_syl: Dictionary = sylls[u]
+	text_line("Glowing marks. You can read some of them. Work out the highlighted one from the words around it.", 16)
+	kir_line_view(ch["v"], true, u)
+	var right = K.label(target_syl)
+	var hint = ""
+	var c: String = target_syl["c"]
+	var v: String = target_syl["v"]
+	if v != "" and kir_shape_known(c) and kir_vowel_known(v):
+		hint = "You know this shape, and you know this turn. Shape = first sound, turn = vowel."
+	elif v != "" and kir_shape_known(c):
+		hint = "You know this shape, but not this turn. A new vowel?"
+	elif v != "" and kir_vowel_known(v):
+		hint = "A new shape, turned like a vowel you know."
+	else:
+		hint = "A new mark. Use the words around it."
+	var hl = text_line(hint, 15)
+	hl.add_theme_color_override("font_color", Color("6b4a2e"))
+	var opts: Array = [right]
+	var alts: Array = []
+	for vv in K.VOWELS:
+		if vv != v and v != "": alts.append(c + vv + "".join(target_syl["f"]))
+	for cc in ["p", "t", "k", "m", "n", "l", "r", "s", "y", "h"]:
+		if cc != c and v != "": alts.append(cc + v + "".join(target_syl["f"]))
+	if v == "": alts = ["ng", "sh", "k", "t", "r", "n"]
+	alts.shuffle()
+	for a in alts:
+		if not opts.has(a) and opts.size() < 3: opts.append(a)
+	var deducible = v != "" and kir_shape_known(c) and kir_vowel_known(v)
+	ask("Which syllable is it?", opts, 0, func():
+		if deducible: master("kd:" + c + "|" + v)
+		kir_learn_syl(target_syl)
+		decipher.call_deferred(idx), "", "Read the words around it. Which Varnak word would fit?", close_panel)
+
+func kir_chapters_read() -> int:
+	var n = 0
+	for i in range(Data.KIR_STORY.size()):
+		if mastered.has("kc:" + str(i)): n += 1
+	return n
+
+func show_kir_story():
+	compact_buttons.call_deferred()
+	clear_panel("The story on the stones")
+	talk_partner = ""
+	if kir_chapters_read() == 0: text_line("You haven't read any of the story yet. The carved stones are deep in the cenote.", 17)
+	for i in range(Data.KIR_STORY.size()):
+		if not mastered.has("kc:" + str(i)): continue
+		var ch: Dictionary = Data.KIR_STORY[i]
+		kir_line_view(ch["v"], false, -1, 26.0)
+		varnak_banner(ch["v"], 18)
+		var e = text_line("(" + str(ch["en"]) + ")", 15)
+		e.add_theme_color_override("font_color", Color("6b4a2e"))
+	button("Kirmel chart", show_kir_chart, content)
+	button("Back", show_notebook, content)
+
+func show_kir_chart():
+	compact_buttons.call_deferred()
+	clear_panel("Kirmel: the old writing")
+	talk_partner = ""
+	text_line("Every mark is a syllable. The shape is the first sound; the turn is the vowel (a right, e down, i left, o up, u with a line). A dot makes a sound voiced: p to b, t to d, k to g. You know " + str(kir_known_count()) + " of " + str(kir_all_keys().size()) + ".", 15)
+	var grid = GridContainer.new()
+	grid.columns = 6
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 2)
+	content.add_child(grid)
+	var head = Label.new()
+	grid.add_child(head)
+	for v in K.VOWELS:
+		var l = Label.new()
+		l.text = v
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		grid.add_child(l)
+	for c in ["", "p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
+		var rl = Label.new()
+		rl.text = c if c != "" else "(vowel)"
+		rl.add_theme_font_size_override("font_size", 14)
+		grid.add_child(rl)
+		for v in K.VOWELS:
+			if kir_knows(c, v): grid.add_child(glyph_cell({"c": c, "v": v, "f": []}, c + v, false, 28.0))
+			else:
+				var e = Label.new()
+				e.text = "·"
+				e.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				grid.add_child(e)
+	button("The story", show_kir_story, content)
+	button("Back", show_notebook, content)
+
+func kir_all_keys() -> Array:
+	var out: Array = []
+	for c in ["", "p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
+		for v in K.VOWELS: out.append(c + "|" + v)
+	return out
+
+# ---- Var Tari ----
+
+func build_guardian():
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	guardian = Node3D.new()
+	guardian.position = Vector3(cx, cen_y_w - 47.0, cz)
+	add_child(guardian)
+	var body_c = Color("2f6f7a")
+	var belly = Color("9fd9cf")
+	var b = Art.sph(guardian, Vector3.ZERO, 0.75, body_c, Vector3(0.9, 0.85, 2.3), 16)
+	b.material_override = Art.mat(body_c, 0.6, 0.25)
+	var bl = Art.sph(guardian, Vector3(0, -0.28, 0.1), 0.6, belly, Vector3(0.8, 0.5, 2.0), 12)
+	bl.material_override = Art.mat(belly, 0.7, 0.3)
+	guardian_tail = Node3D.new()
+	guardian_tail.position = Vector3(0, 0, -1.6)
+	guardian.add_child(guardian_tail)
+	var tail = Art.prism(guardian_tail, Vector3(0, 0, -0.45), Vector3(0.08, 1.3, 0.9), Color("3f8f96"))
+	tail.material_override = Art.mat(Color("3f8f96"), 0.6, 0.35)
+	var dorsal = Art.prism(guardian, Vector3(0, 0.7, -0.2), Vector3(0.06, 0.6, 1.2), Color("3f8f96"))
+	dorsal.material_override = Art.mat(Color("3f8f96"), 0.6, 0.35)
+	for sd in [-1.0, 1.0]:
+		var fin = Art.box(guardian, Vector3(sd * 0.7, -0.15, 0.5), Vector3(0.6, 0.04, 0.35), Color("3f8f96"), Vector3(0, 0, sd * 25.0))
+		fin.material_override = Art.mat(Color("3f8f96"), 0.6, 0.35)
+		var eye = Art.sph(guardian, Vector3(sd * 0.42, 0.15, 1.35), 0.12, Color("fff7c8"), Vector3.ONE, 8, 2.0)
+		eye.material_override = Art.mat(Color("fff7c8"), 0.3, 2.0)
+		var pupil = Art.sph(guardian, Vector3(sd * 0.48, 0.15, 1.42), 0.06, Color("10202a"), Vector3.ONE, 6)
+		var barbel = Art.cyl(guardian, Vector3(sd * 0.3, -0.3, 1.65), 0.015, 0.03, 0.8, Color("9fd9cf"), Vector3(70, 0, sd * 30.0), 4)
+	# stars on its head, like the story says
+	var rr = RandomNumberGenerator.new()
+	rr.seed = 77
+	for k in range(14):
+		var a = rr.randf_range(-1.2, 1.2)
+		var z = rr.randf_range(0.4, 1.4)
+		var st = Art.sph(guardian, Vector3(sin(a) * 0.55, 0.45 + cos(a) * 0.15, z), rr.randf_range(0.03, 0.07), Color("fffbe0"), Vector3.ONE, 6, 3.0)
+		st.material_override = Art.mat(Color("fffbe0"), 0.3, 3.0)
+	for c in guardian.get_children():
+		if c is GeometryInstance3D: c.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+func update_guardian(delta: float):
+	if guardian == null: return
+	guardian_t += delta
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var home = Vector3(cx, cen_y_w - 47.0, cz)
+	var p = camera.global_position
+	var near = underwater and p.distance_to(guardian.position) < 14.0
+	var want: Vector3
+	var face: Vector3
+	if near:
+		var d = (p - guardian.position)
+		var hd = Vector3(d.x, 0, d.z)
+		want = p - d.normalized() * 3.6
+		want.x = clampf(want.x, cx - 2.4, cx + 2.4)
+		want.z = clampf(want.z, cz - 2.4, cz + 2.4)
+		want.y = clampf(want.y, cen_bottom + 2.0, cen_y_w - 28.0)
+		face = p
+	else:
+		var a = guardian_t * 0.12
+		want = home + Vector3(cos(a) * 1.6, sin(guardian_t * 0.3) * 1.2, sin(a) * 1.6)
+		face = home + Vector3(cos(a + 0.4) * 1.6, 0, sin(a + 0.4) * 1.6) + Vector3(0, want.y - home.y, 0)
+	guardian.position = guardian.position.lerp(want, minf(delta * 0.35, 1.0))
+	var dir = face - guardian.position
+	if dir.length() > 0.1:
+		var tgt = guardian.global_transform.looking_at(guardian.position - dir, Vector3.UP)
+		guardian.global_transform = guardian.global_transform.interpolate_with(tgt, minf(delta * 0.8, 1.0))
+	guardian_tail.rotation.y = sin(guardian_t * 1.3) * 0.35
+
+func guardian_near() -> bool:
+	return guardian != null and underwater and camera.global_position.distance_to(guardian.global_position) < 9.0
+
+func guardian_lines() -> Array:
+	var out: Array = []
+	for i in range(Data.GUARDIAN_LINES.size()):
+		var l: Array = Data.GUARDIAN_LINES[i]
+		var ok = false
+		match str(l[3]):
+			"always": ok = true
+			"read": ok = kir_chapters_read() > 0
+			"night": ok = night > 0.5
+			"fish": ok = fish_caught > 0 or completed.has("market")
+			"yesen": ok = count_mastered("yesen:") > 0
+			_: ok = completed.has(str(l[3]))
+		if ok: out.append(i)
+	return out
+
+func guardian_listen():
+	talk_partner = ""
+	if not mastered.has("kg:met"):
+		master("kg:met")
+		learn("var tari")
+		log_event("guardian", "met")
+	var lines = guardian_lines()
+	var pick = lines[0]
+	for i in lines:
+		if not mastered.has("kg:" + str(i)):
+			pick = i
+			break
+	if mastered.has("kg:" + str(pick)) and lines.size() > 1:
+		guardian_line = (guardian_line + 1) % lines.size()
+		pick = lines[guardian_line]
+	var l: Array = Data.GUARDIAN_LINES[pick]
+	play_sfx("hum", -4.0)
+	compact_buttons.call_deferred()
+	clear_panel("Var Tari, the great fish")
+	text_line("The great fish turns one huge, gentle eye toward you. The water hums.", 16)
+	varnak_banner(l[0], 22)
+	var en = text_line("(Tap Show meaning if you need it.)", 16)
+	button("Show meaning", func(): en.text = "(" + str(l[1]) + ")", content)
+	var opts = ["It saw it with its own eyes (-da)", "Someone told it (-nu)", "It worked it out (-shi)"]
+	var right = {"da": 0, "nu": 1, "shi": 2}[str(l[2])]
+	var ordered: Array = [opts[right]]
+	for k in range(3):
+		if k != right: ordered.append(opts[k])
+	ask("Var Tari only says what it knows. How does it know this?", ordered, 0, func(): master("kg:" + str(pick)), "", "Listen to the ending of the verb: -da, -nu or -shi.", close_panel, func():
+		button("Listen again", guardian_listen, content)
+		if kir_chapters_read() >= Data.KIR_STORY.size() and not mastered.has("kir:taught"):
+			button("Ask about the writing", guardian_teach, content))
+
+func guardian_teach():
+	for k in kir_all_keys():
+		master("ky:" + str(k))
+	for c in ["p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]: master("kf:" + c)
+	master("kir:taught")
+	log_event("kirmel", "taught by Var Tari")
+	play_sfx("hum", 0.0)
+	clear_panel("Var Tari remembers")
+	varnak_banner("Anke kirmel k-i-zen-da. Ti-ru kirmel k-i-ven-fu-da.", 20)
+	text_line("(I know the writing. I will give the writing to you.)", 15)
+	text_line("The great fish breathes out slowly. Every glowing mark in the cenote brightens at once, and suddenly you can read all of them: every shape, every turn.", 17)
+	text_line("Bring kirmel back to the village. Suri, the teacher at the school, will know what to do.", 17)
+	toast("You can read all of kirmel now!")
+	button("Kirmel chart", show_kir_chart, content)
+	button("Return", close_panel, content)
+
+# ---- bringing the writing home ----
+
+func kir_options(name_text: String) -> Array:
+	var sylls = K.syllables(name_text)
+	var wrong1 = sylls.duplicate(true)
+	var wrong2 = sylls.duplicate(true)
+	for s in wrong1:
+		if s.has("v") and s["v"] != "":
+			s["v"] = {"a": "i", "e": "o", "i": "a", "o": "e", "u": "a"}[s["v"]]
+			break
+	for s in wrong2:
+		if s.has("c") and s["c"] != "":
+			s["c"] = {"t": "p", "p": "t", "k": "m", "m": "k", "s": "r", "r": "s", "n": "l", "l": "n", "v": "f", "y": "w", "w": "y", "g": "k", "d": "t", "sh": "s"}.get(s["c"], "h")
+			break
+	return [sylls, wrong1, wrong2]
+
+func suri_kirmel(step: int):
+	var names = ["Suri", "Ketu", "Varnak"]
+	talk_partner = "suri"
+	if step >= names.size():
+		complete("kirmel")
+		log_event("kirmel", "brought home")
+		apply_kirmel_signs()
+		clear_panel("Kirmel comes home")
+		add_portrait("suri")
+		emote("suri", "love", 4.0)
+		varnak_banner("Kirmel i-ho-ho! Senakma polu kirmel ri-rav-fu-da!", 20)
+		text_line("(The writing is wonderful! At the school, everyone will read the writing!)", 15)
+		text_line("Suri copies your chart onto the big board. By evening the village signs have kirmel on them, and the old writing shows above Varnak sentences everywhere.", 17)
+		button("Return", close_panel, content)
+		return
+	clear_panel("Teach Suri kirmel (" + str(step + 1) + " of " + str(names.size()) + ")")
+	add_portrait("suri")
+	text_line("Suri asks: how do you write “" + names[step] + "”?", 17)
+	var opts = kir_options(names[step])
+	var order = [0, 1, 2]
+	order.shuffle()
+	var fb = text_line("", 16)
+	for k in order:
+		var b = Button.new()
+		b.custom_minimum_size = Vector2(0, 66)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var syl: Array = opts[k]
+		var drawc = Control.new()
+		drawc.set_anchors_preset(Control.PRESET_FULL_RECT)
+		drawc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		drawc.draw.connect(func(): K.draw_on(drawc, syl, Vector2(16, 6), 38.0, 400.0, Color("1d3557"), 2.6))
+		b.add_child(drawc)
+		var kk = k
+		b.pressed.connect(func():
+			log_event("answer", {"activity": "Teach Suri kirmel", "item": names[step], "chose": str(kk), "correct": "0"}, kk == 0)
+			if kk == 0:
+				play_sfx("correct", -4.0)
+				suri_kirmel.call_deferred(step + 1)
+			else:
+				play_sfx("wrong", -4.0)
+				fb.text = "Suri tilts her head. Look at the turn of each mark (the vowel) and its shape (the first sound)."
+				fb.add_theme_color_override("font_color", Color("8a2f1f")))
+		content.add_child(b)
+	button("Back", talk.bind("suri"), content)
+
+func apply_kirmel_signs():
+	for s in Art.signs:
+		var node = s as Node3D
+		if not is_instance_valid(node) or node.has_meta("kir_done"): continue
+		node.set_meta("kir_done", true)
+		var text = str(node.get_meta("text")).replace("\n", " ")
+		var img = K.image(text, 256, 80, 24.0, Color("2b1d14"), Color(0, 0, 0, 0), 3)
+		var tex = ImageTexture.create_from_image(img)
+		Art.box(node, Vector3(0, 1.08, 0.06), Vector3(1.05, 0.34, 0.06), Color("e8d8b0"))
+		for back in [false, true]:
+			var sp = Sprite3D.new()
+			sp.texture = tex
+			sp.pixel_size = 0.004
+			sp.position = Vector3(0, 1.08, 0.095 if not back else 0.025)
+			if back: sp.rotation_degrees.y = 180
+			sp.double_sided = false
+			sp.visibility_range_end = 30.0
+			node.add_child(sp)
+
+func _exit_tree():
+	Art.signs.clear()

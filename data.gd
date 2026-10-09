@@ -1166,3 +1166,40 @@ const WORDS13 = {
 	"sonot": "a cenote, a deep water-filled sinkhole (borrowed from Yucatec Maya ts'ono'ot, through Spanish cenote)",
 	"lup": "dive (root): na-lup-im-da, I am diving"
 }
+
+# ---------------------------------------------------------------- the lost writing (kirmel) and Var Tari
+const WORDS14 = {
+	"kir": "carve, write (root)",
+	"kirmel": "the old Varnak writing, a syllabary (kir carve + mel speak: carved speech)",
+	"var tari": "Var Tari, the great fish who sleeps in the cenote (var big + tari fish)"
+}
+# The picture stone near the surface: a word under each picture.
+const KIR_PICTURES = [["tari", "fish"], ["riya", "sun"], ["sao", "star"], ["par", "bird"], ["wak", "water"]]
+# The creation story, carved deeper and deeper. It is told with -nu: this is what people say.
+const KIR_STORY = [
+	{"depth": 9.0, "v": "Yanve yarma hai e yesh sela ri-esh-pa-nu.", "en": "On the first day, they say, there was only the sea and the night."},
+	{"depth": 15.0, "v": "Var tari haima i-sul-pa-nu. Tari-ni dau-ma sao-ir ri-esh-pa-nu.", "en": "A great fish slept in the sea, they say. On the fish's head there were stars."},
+	{"depth": 21.0, "v": "Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu.", "en": "The fish jumped, they say. The stars went up into the sky."},
+	{"depth": 27.0, "v": "Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu.", "en": "The fish sang a song, they say. Out of the song, the land arrived."},
+	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
+	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
+	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
+]
+# Var Tari speaks only with evidentials: what it saw (-da), what it heard (-nu), what it works out (-shi).
+# [Varnak, English, ending, condition]
+const GUARDIAN_LINES = [
+	["Ti sonot-ma ta-lup-pa-da.", "You dived into the cenote. I saw it.", "da", "always"],
+	["Anke hen ma-k-i-pal-pa-ki-da.", "I have never seen the sky. (I know this myself.)", "da", "always"],
+	["Hen-ma par-ir ri-ning-ur-nu.", "They say birds sing in the sky.", "nu", "always"],
+	["Tari-ir sen-sen anni dal-ma ri-sum-ur-da.", "Tiny fish usually swim beside me. I see it.", "da", "always"],
+	["Ti kirmel ta-rav-pa-da.", "You read the writing. I saw it.", "da", "read"],
+	["Ti-ni ten-ma dor i-esh-pa-shi.", "Apparently there was land on your feet. (You came from the land.)", "shi", "always"],
+	["Yeshma i-an-shi. Ling i-dam-shi.", "Apparently it is night. The light seems dark.", "shi", "night"],
+	["Ti tari-ir ta-nuk-pa-shi... Hm.", "Apparently you caught fish... Hm.", "shi", "fish"],
+	["Ti polu-ru ta-ning-pa-nu. Polu ri-seng-pa-nu.", "They say you sang for everyone. They say everyone was happy.", "nu", "yesen"],
+	["Gav-ni choni-ir ri-tal-ak-pa-nu. Ha... ha.", "They say Gav's chonies came back. Ha... ha.", "nu", "chonies"],
+	["Par ti-ni palar i-an-nu.", "They say a bird is your friend.", "nu", "letters"],
+	["Fardom yeshma i-ling-ur-nu.", "They say the lighthouse is bright at night.", "nu", "lighthouse"],
+	["Ti-su palar-ir ri-esh-nu.", "They say you have many friends.", "nu", "friends"],
+	["Ti-su gao-murak i-esh-nu.", "They say you have the telling stick.", "nu", "wand"]
+]

@@ -1457,6 +1457,71 @@ func run():
 	game.player.position = Vector3(0, 0.3, 36)
 	game.player.velocity = Vector3.ZERO
 	print("PASS: ambient zones, the cenote, swimming and diving")
+	# kirmel: the lost writing, the carvings and Var Tari
+	var Kir = preload("res://kirmel.gd")
+	assert(Kir.syllables("Varnak").map(func(x): return Kir.label(x)) == ["var", "nak"])
+	assert(Kir.syllables("kachaka").map(func(x): return Kir.label(x)) == ["ka", "cha", "ka"])
+	var sigs = {}
+	for c in Kir.BASES + Kir.MARKS.keys():
+		for v in Kir.VOWELS:
+			var sg = str(Kir.glyph_strokes(c, v))
+			assert(not sigs.has(sg), "glyphs must differ: " + c + v)
+			sigs[sg] = true
+	game.mastered = game.mastered.filter(func(m): return not (str(m).begins_with("ky:") or str(m).begins_with("kf:") or str(m).begins_with("kc:") or str(m).begins_with("kg:") or str(m) == "kir:taught"))
+	game.completed.erase("kirmel")
+	assert(game.carvings.size() == Data.KIR_STORY.size() + 1)
+	for k in range(game.carvings.size()):
+		var cn = game.carvings[k][0] as Node3D
+		assert(game.in_cenote_water(cn.global_position), "carving " + str(k) + " is under water")
+	# deeper stones can't be read before the picture stone
+	game.read_carving(1)
+	assert(has_any("can't read them yet"))
+	game.read_carving(0)
+	for p in Data.KIR_PICTURES:
+		assert(has_any(str(p[1])))
+		press(p[0])
+		await process_frame
+	assert(game.mastered.has("kc:pictures") and game.kir_known_count() >= 7)
+	# decipher every chapter by reading the words around each new mark
+	for ci in range(Data.KIR_STORY.size()):
+		game.decipher(ci)
+		var guard = 0
+		while not game.mastered.has("kc:" + str(ci)) and guard < 60:
+			guard += 1
+			var sy = Kir.syllables(Data.KIR_STORY[ci]["v"])
+			var u = game.kir_first_unknown(sy)
+			assert(u >= 0)
+			press(Kir.label(sy[u]))
+			await process_frame
+		assert(game.mastered.has("kc:" + str(ci)), "read chapter " + str(ci))
+	game.show_kir_story()
+	assert(has_any("first day"))
+	# Var Tari
+	game.close_panel()
+	game.guardian_listen()
+	assert(game.mastered.has("kg:met") and has_any("How does it know this?"))
+	var gl: Array = Data.GUARDIAN_LINES[0]
+	press("It saw it with its own eyes (-da)")
+	assert(game.mastered.has("kg:0"))
+	press("Ask about the writing")
+	assert(game.mastered.has("kir:taught") and game.kir_known_count() == game.kir_all_keys().size())
+	for gi in range(Data.GUARDIAN_LINES.size()):
+		var gle: Array = Data.GUARDIAN_LINES[gi]
+		assert(str(gle[0]).ends_with("-da.") or str(gle[0]).contains("-da") or str(gle[0]).contains("-nu") or str(gle[0]).contains("-shi"), "Var Tari speaks with evidentials: " + str(gle[0]))
+	# bring it home to Suri
+	game.talk("suri")
+	press("Show Suri the old writing")
+	assert(has_any("how do you write"))
+	var ko = game.kir_options("Ketu")
+	assert(str(ko[0]) != str(ko[1]) and str(ko[0]) != str(ko[2]))
+	game.suri_kirmel(3)
+	assert(game.completed.has("kirmel"))
+	var marked = 0
+	for sgn in game.Art.signs:
+		if is_instance_valid(sgn) and sgn.has_meta("kir_done"): marked += 1
+	assert(marked >= 8, "village signs show kirmel")
+	game.sentence_card("village_big")
+	print("PASS: kirmel, the carvings, Var Tari and bringing the writing home")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

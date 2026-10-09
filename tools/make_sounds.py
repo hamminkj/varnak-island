@@ -138,6 +138,11 @@ def main():
     for i in range(8): place(x, sweep(90, 45, 0.25) * env(int(SR * 0.25), 0.002, 0.08), i * 0.27)
     save("sununu", fade(x, 0.2, 0.5), 0.7)
     # ambience loops live in make_ambience.py
+    # Var Tari's voice: a deep, soft, ringing hum
+    tt = t(3.2)
+    x = (np.sin(2 * np.pi * 73.4 * tt) + 0.5 * np.sin(2 * np.pi * 110.0 * tt + 0.3) + 0.25 * np.sin(2 * np.pi * 146.8 * tt * (1 + 0.002 * np.sin(2 * np.pi * 0.7 * tt))))
+    x *= np.minimum(1.0, tt / 0.6) * np.exp(-np.maximum(0, tt - 0.6) / 1.4) * (1 + 0.15 * np.sin(2 * np.pi * 4.5 * tt))
+    save("hum", lowpass(x, 900), 0.6)
     for k in range(3):
         x = np.zeros(int(SR * 0.6))
         for i in range(2 + k):

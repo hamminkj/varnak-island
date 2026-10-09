@@ -804,8 +804,12 @@ static func barrel(parent: Node3D, pos: Vector3, color: Color) -> void:
 	cyl(parent, pos + Vector3(0, 0.25, 0), 0.4, 0.4, 0.07, Color("3b2d25"), Vector3.ZERO, 12)
 	cyl(parent, pos + Vector3(0, 0.65, 0), 0.4, 0.4, 0.07, Color("3b2d25"), Vector3.ZERO, 12)
 
+static var signs: Array = []
+
 static func signpost(parent: Node3D, pos: Vector3, text: String, face_yaw: float = 0.0) -> void:
 	var s = Node3D.new()
+	s.set_meta("text", text)
+	signs.append(s)
 	s.position = pos
 	s.rotation_degrees.y = face_yaw
 	parent.add_child(s)
