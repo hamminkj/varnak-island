@@ -5,7 +5,7 @@ import os, subprocess, tempfile, wave
 import numpy as np
 from scipy.signal import lfilter, butter, fftconvolve
 
-SR = 32000
+SR = 24000
 OUT = os.path.join(os.path.dirname(__file__), "..", "sfx")
 rng = np.random.default_rng(2026)
 

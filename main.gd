@@ -8551,6 +8551,7 @@ func setup_audio():
 		p.volume_db = -60.0
 		add_child(p)
 		p.play(randf() * 8.0)
+		p.stream_paused = true
 		amb[n] = p
 	AudioServer.add_bus_effect(0, AudioEffectLowPassFilter.new())
 	uw_fx = AudioServer.get_bus_effect_count(0) - 1
@@ -8619,7 +8620,11 @@ func set_amb(n: String, w: float, delta: float):
 	var p = amb[n] as AudioStreamPlayer
 	var cur = db_to_linear(p.volume_db)
 	var nw = lerpf(cur, clampf(w, 0.0, 1.5), minf(delta * 1.2, 1.0))
+	if p.stream_paused: nw = 0.0005
 	p.volume_db = linear_to_db(maxf(nw, 0.0005))
+	# silent zones stop decoding, which keeps phones cool
+	if w < 0.01 and nw < 0.003 and not p.stream_paused: p.stream_paused = true
+	elif w >= 0.01 and p.stream_paused: p.stream_paused = false
 
 func ambient_weights() -> Dictionary:
 	# Each sound zone fades in and out with where you are, the weather and the time of day.
