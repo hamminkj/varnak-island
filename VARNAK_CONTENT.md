@@ -438,3 +438,7 @@ Each yesen starts with a suggestion from the audience: three words are offered (
 A scene has three rounds. The villager says a line; the player chooses an idea (or blocks with Maki!) and assembles the sentence by picking one piece per row. Wrong pieces are generated from common learner errors: wrong person prefix (na-/ta-, i-/ri-, k-i-/t-i-), wrong case (-ma/-ru, -su/-ni), a missing or extra -ke, a dropped plural -ir, the question ending -ha instead of -da, and swapped word order in two-word phrases. Good rounds bring villagers over to watch; bad rounds send someone away. The end applause (standing ovation, big applause, polite clapping, or crickets) follows the player's accuracy. 17 scenes, all composed with existing grammar, -kan and -vai.
 
 Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-su dau-yir i-esh-da, the horse has a hat). 37. Sentences with a quoted speech tile (An sipu-ru "Chau!" na-mel-im-da) place the quote before the verb.
+
+## The cenote
+
+New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Varnak sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.

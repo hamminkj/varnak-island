@@ -137,14 +137,7 @@ def main():
     x = lowpass(noise(2.2), 150) * 1.2 + applause(2.2, 25) * 0.5
     for i in range(8): place(x, sweep(90, 45, 0.25) * env(int(SR * 0.25), 0.002, 0.08), i * 0.27)
     save("sununu", fade(x, 0.2, 0.5), 0.7)
-    # ambience loops
-    tt = t(8.0); sw = 0.35 + 0.65 * (0.5 + 0.5 * np.sin(2 * np.pi * tt / 8.0)) ** 2
-    x = lowpass(noise(8.0), 700) * sw
-    save("waves", x, 0.5, True)
-    x = lowpass(noise(4.0), 3500) * 0.7 + lowpass(noise(4.0), 600) * 0.6
-    save("rain", x, 0.4, True)
-    tt = t(6.0); x = bandpass(noise(6.0), 200, 900) * (0.5 + 0.5 * np.sin(2 * np.pi * tt / 6.0) ** 2)
-    save("wind", x, 0.35, True)
+    # ambience loops live in make_ambience.py
     for k in range(3):
         x = np.zeros(int(SR * 0.6))
         for i in range(2 + k):

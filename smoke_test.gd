@@ -1396,7 +1396,7 @@ func run():
 	print("PASS: twelfth expansion: yesen improv scenes, " + str(Data.YESEN.size()) + " scenes")
 	# sound: effects, ambience, Desh's music, speaker buttons
 	assert(game.sfx.size() == game.SFX_NAMES.size(), "all sounds load")
-	assert(game.amb.has("waves") and game.amb.has("rain") and game.amb.has("wind"))
+	for an in game.AMB_NAMES: assert(game.amb.has(an), "ambient " + an)
 	assert(game.desh_music != null and game.desh_music.get_parent() == game.entity_by_id("desh")["node"])
 	for n in game.SFX_NAMES: game.play_sfx(n)
 	game.clock += 1.0
@@ -1420,6 +1420,43 @@ func run():
 	game.sound_game(true)
 	assert(find_button(game.content, "Hear it again") != null)
 	print("PASS: sound effects, ambience, Desh's music and spoken Varnak")
+	# ambient zones and the cenote
+	game.close_panel()
+	game.player.position = Vector3(0, 0.3, 40)
+	var aw = game.ambient_weights()
+	assert(float(aw["ocean"]) > 0.4, "the harbor sounds like the sea " + str(aw))
+	game.player.position = Vector3(-10, 0.3, -12)
+	aw = game.ambient_weights()
+	assert(float(aw["forest"]) > float(aw["ocean"]) and float(aw["stream"]) > 0.1, "the forest path " + str(aw))
+	var cc = T.CENOTE
+	assert(game.in_cenote_water(Vector3(cc.x, game.cen_y_w - 1.0, cc.y)))
+	assert(game.in_cenote_water(Vector3(cc.x + 9.0, game.cen_y_w - 15.0, cc.y)))
+	assert(not game.in_cenote_water(Vector3(cc.x + 9.0, T.height(cc.x + 9.0, cc.y) + 0.1, cc.y)), "dry land beside the cenote")
+	assert(not game.in_cenote_water(Vector3(0, -1.0, 40)), "the sea is not swimmable")
+	# fall in, float, dive, rise, climb out
+	game.player.position = Vector3(cc.x, game.cen_y_w + 1.5, cc.y)
+	game.player.velocity = Vector3.ZERO
+	for f in range(150): await physics_frame
+	assert(game.swimming and absf(game.player.position.y - game.float_y()) < 0.4, "floating at the surface " + str(game.player.position))
+	game.swim_down_held = true
+	for f in range(200): await physics_frame
+	game.swim_down_held = false
+	for f in range(3): await process_frame
+	var depth0 = game.cen_y_w - game.camera.global_position.y
+	assert(depth0 > 4.0 and game.underwater and game.uw_overlay.visible, "diving " + str(depth0))
+	assert(float(game.ambient_weights()["underwater"]) > 1.0)
+	game.swim_up_held = true
+	for f in range(400): await physics_frame
+	game.swim_up_held = false
+	for f in range(3): await process_frame
+	assert(not game.underwater and game.swimming, "back at the surface")
+	game.climb_out()
+	for f in range(60): await physics_frame
+	assert(not game.swimming and game.player.position.y > game.cen_y_w + 1.0, "out on the rim " + str(game.player.position))
+	assert(game.discovered.has("sonot"))
+	game.player.position = Vector3(0, 0.3, 36)
+	game.player.velocity = Vector3.ZERO
+	print("PASS: ambient zones, the cenote, swimming and diving")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

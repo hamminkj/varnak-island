@@ -84,6 +84,7 @@ uniform vec4 deep_color : source_color = vec4(0.07, 0.38, 0.52, 1.0);
 uniform vec4 shallow_color : source_color = vec4(0.30, 0.76, 0.80, 1.0);
 uniform float alpha = 0.86;
 uniform float speed = 0.7;
+uniform vec3 hole = vec3(0.0, 0.0, 0.0);
 varying vec3 wp;
 float hf(vec2 p) {
 	float t = TIME * speed;
@@ -93,6 +94,7 @@ void vertex() {
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
 void fragment() {
+	if (hole.z > 0.0 && distance(wp.xz, hole.xy) < hole.z) discard;
 	float e = 0.06;
 	float h0 = hf(wp.xz);
 	float hx = hf(wp.xz + vec2(e, 0.0));
@@ -1469,3 +1471,26 @@ static func mushroom_patch() -> Node3D:
 			sph(fruit, p + Vector3(cos(a) * 0.09, h + 0.07, sin(a) * 0.09), 0.025, Color("ffffff"), Vector3.ONE, 4)
 	n.set_meta("fruit", fruit)
 	return n
+
+
+const FLOOR_SHADER = """
+shader_type spatial;
+uniform vec4 color : source_color = vec4(0.05, 0.27, 0.38, 1.0);
+uniform vec3 hole = vec3(0.0, 0.0, 0.0);
+varying vec3 wp;
+void vertex() { wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	if (hole.z > 0.0 && distance(wp.xz, hole.xy) < hole.z) discard;
+	ALBEDO = color.rgb;
+	ROUGHNESS = 0.9;
+}
+"""
+
+static func floor_material(color: Color, hole: Vector3) -> ShaderMaterial:
+	var sh = Shader.new()
+	sh.code = FLOOR_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = sh
+	m.set_shader_parameter("color", color)
+	m.set_shader_parameter("hole", hole)
+	return m

@@ -308,10 +308,12 @@ func _ready():
 	words.merge(Data.WORDS10)
 	words.merge(Data.WORDS11)
 	words.merge(Data.WORDS12)
+	words.merge(Data.WORDS13)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
 	build_ui()
+	build_swim_ui()
 	load_game()
 	setup_audio()
 	load_log()
@@ -451,8 +453,11 @@ func build_world():
 	build_places5()
 	build_entities()
 	build_hirimara()
+	T.extra_lobe = false
 	build_forest()
 	build_scatter()
+	T.extra_lobe = true
+	build_cenote()
 	build_sky_life()
 	build_player()
 	build_night_and_weather()
@@ -508,9 +513,12 @@ func build_terrain():
 	cs.shape = mesh.create_trimesh_shape()
 	body.add_child(cs)
 	add_child(body)
-	var floor_mi = Art.plane(self, Vector3(0, -3.05, 0), Vector2(1400, 1400), Art.mat(Color("0d4660")))
+	var hole = Vector3(T.CENOTE.x, T.CENOTE.y, 18.5)
+	var floor_mi = Art.plane(self, Vector3(0, -3.05, 0), Vector2(1400, 1400), Art.floor_material(Color("0d4660"), hole))
 	floor_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	Art.plane(self, Vector3(0, -0.08, 0), Vector2(1400, 1400), Art.water_material(Color("0e5a78"), Color("47b9c0"), 0.78))
+	var sea_mat = Art.water_material(Color("0e5a78"), Color("47b9c0"), 0.78).duplicate()
+	sea_mat.set_shader_parameter("hole", hole)
+	Art.plane(self, Vector3(0, -0.08, 0), Vector2(1400, 1400), sea_mat)
 
 func near_path(x: float, z: float, d: float) -> bool:
 	if absf(x) < d and z > -50.0 and z < 44.0: return true
@@ -593,7 +601,10 @@ func near_entity(x: float, z: float, d: float) -> bool:
 		if absf(h.x - x) < d and absf(h.z - z) < d: return true
 	return false
 
+var tree_pts: Array = []
+
 func add_tree(p: Vector3, vary: RandomNumberGenerator, trunks: Array, trunk_colors: Array, pines: Array, pine_colors: Array, oaks: Array, oak_colors: Array):
+	tree_pts.append(Vector2(p.x, p.z))
 	var s = vary.randf_range(0.85, 1.45)
 	var yaw = vary.randf() * TAU
 	var trunk_h = 2.0 * s
@@ -1697,6 +1708,8 @@ func _process(delta):
 	update_ambient(delta)
 	update_overhear(delta)
 	update_audio(delta)
+	update_cenote(delta)
+	update_underwater(delta)
 	update_acts(delta)
 	if not wand_pending.is_empty(): wand_tick()
 	update_talk_view(delta)
@@ -1876,6 +1889,13 @@ func _physics_process(delta):
 				walk_last = d.length()
 				walk_check = 0.8
 	axis = axis.limit_length()
+	if in_cenote_water(player.position):
+		swim_physics(delta, axis)
+		return
+	if swimming:
+		swimming = false
+		swim_up_held = false
+		swim_down_held = false
 	var direction = player.basis * Vector3(axis.x,0,axis.y)
 	player.velocity.x = direction.x * speed
 	player.velocity.z = direction.z * speed
@@ -8497,6 +8517,9 @@ func show_yesen_list():
 
 # ------------------------------------------------------------ sound: effects, ambience, Desh's music, spoken Varnak
 
+const AMB_NAMES = ["ocean", "forest", "rain", "stream", "falls", "night", "wind", "cave", "underwater"]
+var amb_w: Dictionary = {}
+var uw_fx: int = -1
 const SFX_NAMES = ["correct", "wrong", "coin", "fanfare", "newword", "pop", "whoosh", "kabum", "page", "splash", "step0", "step1",
 	"applause_small", "applause_big", "applause_huge", "slowclap", "cricket", "pororo", "piriri", "chiriri", "guarara", "kororo",
 	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2"]
@@ -8519,16 +8542,20 @@ func setup_audio():
 		var p = AudioStreamPlayer.new()
 		add_child(p)
 		sfx_pool.append(p)
-	for n in ["waves", "rain", "wind"]:
-		var s = load("res://sfx/" + n + ".ogg") as AudioStreamOggVorbis
+	for n in AMB_NAMES:
+		var s = load("res://sfx/amb_" + n + ".ogg") as AudioStreamOggVorbis
 		if s == null: continue
 		s.loop = true
 		var p = AudioStreamPlayer.new()
 		p.stream = s
 		p.volume_db = -60.0
 		add_child(p)
-		p.play()
+		p.play(randf() * 8.0)
 		amb[n] = p
+	AudioServer.add_bus_effect(0, AudioEffectLowPassFilter.new())
+	uw_fx = AudioServer.get_bus_effect_count(0) - 1
+	(AudioServer.get_bus_effect(0, uw_fx) as AudioEffectLowPassFilter).cutoff_hz = 650.0
+	AudioServer.set_bus_effect_enabled(0, uw_fx, false)
 	var song = load("res://sfx/desh_song.ogg") as AudioStreamOggVorbis
 	var de = entity_by_id("desh")
 	if song and not de.is_empty():
@@ -8577,33 +8604,52 @@ func update_audio(delta: float):
 			step_t = 0.42
 			play_sfx("step" + str(randi() % 2), -14.0, randf_range(0.9, 1.1))
 	amb_cd -= delta
-	if amb_cd > 0.0: return
-	amb_cd = 0.5
-	var p = player.position
-	var wet = 0
-	for k in range(8):
-		var a = k * TAU / 8.0
-		for r in [8.0, 18.0]:
-			if T.height(p.x + cos(a) * r, p.z + sin(a) * r) < -0.2: wet += 1
-	set_amb("waves", -40.0 + 30.0 * clampf(wet / 9.0, 0.0, 1.0) if wet > 0 else -60.0)
-	set_amb("rain", -10.0 if raining > 0.0 else -60.0)
-	set_amb("wind", -18.0 if p.y > 6.0 or p.x < -95.0 else -60.0)
-	# birds by day, crickets by night
-	bird_cd -= 0.5
-	if bird_cd <= 0.0:
-		bird_cd = randf_range(4.0, 11.0)
-		var night = day_t > 0.72 or day_t < 0.05
-		if night: play_sfx("cricket", -16.0)
-		elif wet < 6: play_sfx("bird" + str(randi() % 3), -12.0, randf_range(0.9, 1.2))
+	if amb_cd <= 0.0:
+		amb_cd = 0.5
+		amb_w = ambient_weights()
+	for n in amb_w.keys():
+		set_amb(n, float(amb_w[n]), delta)
 	# Desh plays louder when he is performing
 	if desh_music:
 		var perf = acts.has("desh") or (panel.visible and talk_partner == "desh")
 		desh_music.volume_db = lerpf(desh_music.volume_db, 2.0 if perf else -6.0, 0.5)
 
-func set_amb(n: String, db: float):
+func set_amb(n: String, w: float, delta: float):
 	if not amb.has(n): return
 	var p = amb[n] as AudioStreamPlayer
-	p.volume_db = lerpf(p.volume_db, db, 0.4)
+	var cur = db_to_linear(p.volume_db)
+	var nw = lerpf(cur, clampf(w, 0.0, 1.5), minf(delta * 1.2, 1.0))
+	p.volume_db = linear_to_db(maxf(nw, 0.0005))
+
+func ambient_weights() -> Dictionary:
+	# Each sound zone fades in and out with where you are, the weather and the time of day.
+	var p = player.position
+	var w = {}
+	var wet = 0
+	for k in range(8):
+		var a = k * TAU / 8.0
+		for r in [7.0, 16.0, 26.0]:
+			if T.height(p.x + cos(a) * r, p.z + sin(a) * r) < -0.25: wet += 1
+	var trees = 0
+	for q in tree_pts:
+		if (q as Vector2).distance_squared_to(Vector2(p.x, p.z)) < 256.0: trees += 1
+	var cen_d = Vector2(p.x, p.z).distance_to(T.CENOTE)
+	var under = camera.global_position.y < cen_y_w and cen_d < 20.0
+	var in_cave = cen_d < 18.0 and p.y < cen_top - 1.0
+	var day = 1.0 - night
+	var land = 1.0 - clampf(wet / 18.0, 0.0, 1.0)
+	w["ocean"] = clampf(wet / 10.0, 0.0, 1.0) * 0.9
+	w["forest"] = day * (0.18 + 0.82 * clampf(trees / 9.0, 0.0, 1.0)) * land
+	w["night"] = night * (0.35 + 0.65 * land)
+	w["rain"] = clampf(raining, 0.0, 1.0) * 1.1
+	w["stream"] = clampf(1.0 - T.river_dist(p.x, p.z) / 14.0, 0.0, 1.0) * 0.8 + clampf(1.0 - Vector2(p.x, p.z).distance_to(T.POND) / 10.0, 0.0, 1.0) * 0.4
+	w["falls"] = clampf(1.0 - Vector2(p.x, p.z).distance_to(T.FALLS_POOL) / 32.0, 0.0, 1.0) * 0.9
+	w["wind"] = clampf((p.y - 4.0) / 4.0, 0.0, 1.0) * 0.7 + (0.25 if p.x < -95.0 else 0.0)
+	w["cave"] = clampf(1.0 - cen_d / 24.0, 0.0, 1.0) * 0.8 + (0.6 if in_cave else 0.0)
+	w["underwater"] = 1.2 if under else 0.0
+	if in_cave or under:
+		for k in ["ocean", "forest", "night", "rain", "wind", "stream", "falls"]: w[k] = float(w[k]) * (0.15 if under else 0.4)
+	return w
 
 # ---- the phone's voice reads Varnak aloud ----
 
@@ -8652,3 +8698,527 @@ func speaker_button() -> Button:
 		icon.draw_arc(o + Vector2(13, 0), 12.0, -0.9, 0.9, 12, c, 2.4))
 	b.add_child(icon)
 	return b
+
+# ------------------------------------------------------------ the cenote (sonot)
+
+const CEN_CAVE_R = 15.0
+const CEN_CAVE_RY = 14.5
+var cen_y_w: float = T.CENOTE_WATER
+var cen_top: float
+var cen_cave_cy: float
+var cen_bottom: float
+var cen_rays: Array = []
+var cen_fish: Array = []
+var cen_seen: bool = false
+
+func cave_noise(a: float, y: float) -> float:
+	return sin(a * 3.0 + y * 0.31) * 0.5 + sin(a * 7.0 - y * 0.57 + 1.7) * 0.3 + sin(a * 13.0 + y * 1.1) * 0.2
+
+func cave_color(y: float, a: float) -> Color:
+	var depth = clampf((cen_y_w - y) / 40.0, 0.0, 1.0)
+	var c = Color("cfc7a8").lerp(Color("8fb7a8"), clampf((cen_y_w + 1.0 - y) / 6.0, 0.0, 1.0)).lerp(Color("2f6f74"), depth)
+	if y > cen_y_w + 0.4: c = Color("b8b09a").lerp(Color("5f8a4a"), clampf((y - cen_y_w) / 2.5, 0.0, 1.0) * (0.5 + 0.5 * sin(a * 5.0)))
+	return c.lerp(Color("e6dcc0"), 0.12 * (0.5 + 0.5 * sin(a * 11.0 + y)))
+
+func cenote_mesh() -> ArrayMesh:
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var seg = 40
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rings: Array = []   # each ring: [y, radius_fn scale array]
+	# shaft: from just above the rim down to the cavern ceiling
+	var phi0 = asin(T.CENOTE_R / CEN_CAVE_R)
+	cen_cave_cy = cen_y_w - 18.0
+	var ceiling = cen_cave_cy + CEN_CAVE_RY * cos(phi0)
+	cen_top = T.height(cx + T.CENOTE_R + 0.5, cz) + 0.6
+	var ys: Array = []
+	var y = cen_top
+	while y > ceiling:
+		ys.append([y, T.CENOTE_R])
+		y -= 0.7
+	# cavern: an uneven ellipsoid
+	var phi_end = PI - asin(4.0 / CEN_CAVE_R)
+	for k in range(1, 25):
+		var phi = lerpf(phi0, phi_end, float(k) / 24.0)
+		ys.append([cen_cave_cy + CEN_CAVE_RY * cos(phi), CEN_CAVE_R * sin(phi)])
+	# the deep pit below
+	var pit_top = cen_cave_cy + CEN_CAVE_RY * cos(phi_end)
+	y = pit_top - 1.2
+	cen_bottom = cen_y_w - 62.0
+	while y > cen_bottom:
+		ys.append([y, 4.0])
+		y -= 1.5
+	ys.append([cen_bottom, 4.0])
+	for r in ys:
+		var ring: Array = []
+		for i in range(seg + 1):
+			var a = TAU * float(i % seg) / seg
+			var rr: float = r[1] * (1.0 + 0.1 * cave_noise(a, r[0])) if r[1] > T.CENOTE_R + 0.1 else r[1] + 0.25 * cave_noise(a, r[0])
+			ring.append(Vector3(cx + cos(a) * rr, r[0], cz + sin(a) * rr))
+		rings.append(ring)
+	for j in range(rings.size() - 1):
+		var r0: Array = rings[j]
+		var r1: Array = rings[j + 1]
+		for i in range(seg):
+			var quad = [r0[i], r1[i], r1[i + 1], r0[i], r1[i + 1], r0[i + 1]]
+			for v in quad:
+				var vv: Vector3 = v
+				var nrm = Vector3(cx - vv.x, 0.0, cz - vv.z).normalized()
+				st.set_normal(nrm)
+				st.set_color(cave_color(vv.y, atan2(vv.z - cz, vv.x - cx)))
+				st.add_vertex(vv)
+	# floor of the pit
+	var last: Array = rings[-1]
+	for i in range(seg):
+		for v in [Vector3(cx, cen_bottom - 0.4, cz), last[i + 1], last[i]]:
+			st.set_normal(Vector3.UP)
+			st.set_color(Color("2a6a6a"))
+			st.add_vertex(v)
+	return st.commit()
+
+func build_cenote():
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var mesh = cenote_mesh()
+	var mat = StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.roughness = 0.85
+	mat.emission_enabled = true
+	mat.emission = Color("1d5a5e")
+	mat.emission_energy_multiplier = 0.35
+	var mi = MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.material_override = mat
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+	var body = StaticBody3D.new()
+	var cs = CollisionShape3D.new()
+	var shape = mesh.create_trimesh_shape() as ConcavePolygonShape3D
+	shape.backface_collision = true
+	cs.shape = shape
+	body.add_child(cs)
+	add_child(body)
+	# a mossy rim that covers the edge of the hole in the ground
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var seg = 40
+	var radii = [T.CENOTE_R - 0.05, T.CENOTE_R + 0.6, T.CENOTE_R + 1.8, T.CENOTE_R + 3.5, T.CENOTE_R + 4.8]
+	var ring_pts: Array = []
+	for ri in range(radii.size()):
+		var ring: Array = []
+		for i in range(seg + 1):
+			var a = TAU * float(i % seg) / seg
+			var rr: float = radii[ri] + (0.25 * cave_noise(a, 0.0) if ri == 0 else 0.0)
+			var x = cx + cos(a) * rr
+			var z = cz + sin(a) * rr
+			var yy = cen_top - 0.55 + (0.12 * sin(a * 7.0) if ri < 2 else 0.0)
+			if ri >= 3: yy = maxf(T.height(x, z) + 0.06, yy - (ri - 2) * 0.35)
+			ring.append(Vector3(x, yy, z))
+		ring_pts.append(ring)
+	for j in range(ring_pts.size() - 1):
+		for i in range(seg):
+			var a: Array = ring_pts[j]
+			var b: Array = ring_pts[j + 1]
+			for v in [a[i], b[i + 1], b[i], a[i], a[i + 1], b[i + 1]]:
+				st.set_normal(Vector3.UP)
+				st.set_color(Color("6f8f4a").lerp(Color("9a9580"), 0.5 + 0.5 * sin(float(i) * 1.3 + j)) if j < 2 else Color("4f7a3a").lerp(Color("6f9a4a"), 0.5 + 0.5 * sin(float(i) * 0.7)))
+				st.add_vertex(v)
+	var rim = st.commit()
+	var rmat = StandardMaterial3D.new()
+	rmat.vertex_color_use_as_albedo = true
+	rmat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	rmat.roughness = 0.95
+	var rmi = MeshInstance3D.new()
+	rmi.mesh = rim
+	rmi.material_override = rmat
+	add_child(rmi)
+	var rb = StaticBody3D.new()
+	var rcs = CollisionShape3D.new()
+	var rshape = rim.create_trimesh_shape() as ConcavePolygonShape3D
+	rshape.backface_collision = true
+	rcs.shape = rshape
+	rb.add_child(rcs)
+	add_child(rb)
+	# the water: only the small round surface shows, the whole cavern below is flooded
+	var wm = MeshInstance3D.new()
+	var disc = CylinderMesh.new()
+	disc.top_radius = T.CENOTE_R + 0.6
+	disc.bottom_radius = T.CENOTE_R + 0.6
+	disc.height = 0.02
+	disc.radial_segments = 40
+	wm.mesh = disc
+	var wmat = Art.water_material(Color("1f8f8a"), Color("7fe3d0"), 0.72)
+	wmat.set_shader_parameter("speed", 0.35)
+	wm.material_override = wmat
+	wm.position = Vector3(cx, cen_y_w, cz)
+	wm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(wm)
+	var under = MeshInstance3D.new()
+	var plane = PlaneMesh.new()
+	plane.size = Vector2((T.CENOTE_R + 0.6) * 2.0, (T.CENOTE_R + 0.6) * 2.0)
+	plane.flip_faces = true
+	under.mesh = plane
+	var umat = StandardMaterial3D.new()
+	umat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	umat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	umat.albedo_color = Color(0.75, 1.0, 0.95, 0.55)
+	under.material_override = umat
+	under.position = Vector3(cx, cen_y_w - 0.02, cz)
+	add_child(under)
+	# light falling through the opening
+	var rays_mat = StandardMaterial3D.new()
+	rays_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	rays_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	rays_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	rays_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	rays_mat.albedo_color = Color(0.55, 0.95, 0.9, 0.07)
+	rays_mat.disable_fog = true
+	var rr = RandomNumberGenerator.new()
+	rr.seed = 5150
+	for k in range(6):
+		var ray = MeshInstance3D.new()
+		var cyl = CylinderMesh.new()
+		cyl.top_radius = rr.randf_range(0.25, 0.7)
+		cyl.bottom_radius = rr.randf_range(1.6, 3.2)
+		cyl.height = rr.randf_range(18.0, 28.0)
+		cyl.radial_segments = 10
+		cyl.cap_top = false
+		cyl.cap_bottom = false
+		ray.mesh = cyl
+		ray.material_override = rays_mat
+		ray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var pivot = Node3D.new()
+		pivot.position = Vector3(cx + rr.randf_range(-1.6, 1.6), cen_y_w - 0.1, cz + rr.randf_range(-1.6, 1.6))
+		pivot.rotation = Vector3(rr.randf_range(-0.25, 0.25), 0, rr.randf_range(-0.25, 0.25))
+		ray.position = Vector3(0, -cyl.height * 0.5, 0)
+		pivot.add_child(ray)
+		add_child(pivot)
+		cen_rays.append([pivot, pivot.rotation, rr.randf() * TAU])
+	# soft glowing algae on the walls, brighter deeper down
+	var glow_t: Array = []
+	var glow_c: Array = []
+	for k in range(260):
+		var a = rr.randf() * TAU
+		var gy2 = rr.randf_range(cen_bottom + 2.0, cen_y_w - 4.0)
+		var rad: float
+		if gy2 < cen_cave_cy - CEN_CAVE_RY + 1.0: rad = 3.75
+		else:
+			var dy = (gy2 - cen_cave_cy) / CEN_CAVE_RY
+			rad = CEN_CAVE_R * sqrt(maxf(0.02, 1.0 - dy * dy)) * (1.0 + 0.1 * cave_noise(a, gy2)) - 0.25
+		var s = rr.randf_range(0.08, 0.3)
+		glow_t.append(Transform3D(Basis.from_scale(Vector3(s, s * 0.6, s)), Vector3(cx + cos(a) * rad, gy2, cz + sin(a) * rad)))
+		glow_c.append(Color("4ff0d0").lerp(Color("a0ff7a"), rr.randf()).lerp(Color("6fa0ff"), clampf((cen_cave_cy - gy2) / 30.0, 0.0, 1.0)))
+	var glow = Art.scatter(self, Art.sphere_mesh(1.0, 6), glow_t, glow_c, false)
+	var gmat = StandardMaterial3D.new()
+	gmat.vertex_color_use_as_albedo = true
+	gmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	gmat.disable_fog = true
+	glow.material_override = gmat
+	# stalactites hanging from the ceiling
+	var stal_t: Array = []
+	var stal_c: Array = []
+	for k in range(40):
+		var a = rr.randf() * TAU
+		var d = rr.randf_range(4.5, 12.0)
+		var dy = sqrt(maxf(0.0, 1.0 - pow(d / CEN_CAVE_R, 2.0)))
+		var top = cen_cave_cy + CEN_CAVE_RY * dy - 0.3
+		var h = rr.randf_range(1.0, 4.0)
+		stal_t.append(Transform3D(Basis.from_scale(Vector3(0.35, h, 0.35)).rotated(Vector3.RIGHT, PI), Vector3(cx + cos(a) * d, top - h * 0.5, cz + sin(a) * d)))
+		stal_c.append(Color("9fb8aa").lerp(Color("5f8f88"), rr.randf()))
+	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 6), stal_t, stal_c, false)
+	# little glowing fish that circle slowly
+	var fmat = StandardMaterial3D.new()
+	fmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	fmat.albedo_color = Color("b8fff0")
+	fmat.disable_fog = true
+	for school in range(3):
+		var center_y = cen_cave_cy + rr.randf_range(-8.0, 6.0)
+		var radius = rr.randf_range(5.0, 10.0)
+		for f in range(9):
+			var fish = MeshInstance3D.new()
+			var sm = SphereMesh.new()
+			sm.radius = 0.09
+			sm.height = 0.18
+			sm.radial_segments = 6
+			sm.rings = 3
+			fish.mesh = sm
+			fish.scale = Vector3(1, 0.8, 2.6)
+			fish.material_override = fmat
+			add_child(fish)
+			cen_fish.append([fish, center_y + rr.randf_range(-0.8, 0.8), radius + rr.randf_range(-0.8, 0.8), rr.randf() * TAU, rr.randf_range(0.18, 0.3) * (1 if school % 2 == 0 else -1)])
+	# something old and carved rests on the cavern floor
+	var stone = Node3D.new()
+	stone.position = Vector3(cx + 3.5, cen_cave_cy - CEN_CAVE_RY + 1.4, cz - 2.0)
+	add_child(stone)
+	Art.cyl(stone, Vector3(0, 0.3, 0), 0.9, 1.0, 0.6, Color("6f8f88"), Vector3.ZERO, 14)
+	for k in range(3):
+		var tor = Art.torus(stone, Vector3(0, 0.61, 0), 0.3 + k * 0.2, 0.35 + k * 0.2, Color("7dffe0"), Vector3.ZERO)
+		tor.material_override = gmat
+	# floating motes in the water
+	var motes = CPUParticles3D.new()
+	motes.amount = 160
+	motes.lifetime = 14.0
+	motes.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	motes.emission_box_extents = Vector3(11, 11, 11)
+	motes.position = Vector3(cx, cen_cave_cy, cz)
+	motes.direction = Vector3(0, 1, 0)
+	motes.spread = 40.0
+	motes.gravity = Vector3.ZERO
+	motes.initial_velocity_min = 0.05
+	motes.initial_velocity_max = 0.2
+	var mm = SphereMesh.new()
+	mm.radius = 0.025
+	mm.height = 0.05
+	mm.radial_segments = 4
+	mm.rings = 2
+	motes.mesh = mm
+	var mmat = StandardMaterial3D.new()
+	mmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mmat.albedo_color = Color(0.8, 1.0, 0.95, 0.6)
+	mmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mmat.disable_fog = true
+	motes.material_override = mmat
+	add_child(motes)
+	build_cenote_jungle()
+
+func build_cenote_jungle():
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var vary = RandomNumberGenerator.new()
+	vary.seed = 8484
+	var trunks: Array = []
+	var trunk_colors: Array = []
+	var pines: Array = []
+	var pine_colors: Array = []
+	var oaks: Array = []
+	var oak_colors: Array = []
+	var placed: Array = []
+	var tries = 0
+	while placed.size() < 120 and tries < 3000:
+		tries += 1
+		var a = vary.randf() * TAU
+		var d = vary.randf_range(8.0, 28.0)
+		var x = cx + cos(a) * d
+		var z = cz + sin(a) * d
+		if T.coast(x, z) < 3.0 or x > 94.0: continue
+		var crowded = false
+		for q in placed:
+			if q.distance_squared_to(Vector2(x, z)) < 7.0:
+				crowded = true
+				break
+		if crowded: continue
+		var y = T.height(x, z)
+		solid(Vector3(x, y + 1.2, z), Vector3(0.5, 2.4, 0.5))
+		add_tree(Vector3(x, y, z), vary, trunks, trunk_colors, pines, pine_colors, oaks, oak_colors)
+		placed.append(Vector2(x, z))
+	Art.scatter(self, Art.cyl_mesh(0.28, 1.0, 7), trunks, trunk_colors)
+	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 8), pines, pine_colors)
+	Art.scatter(self, Art.sphere_mesh(1.0, 9), oaks, oak_colors)
+	# ferns and big leaves around the rim, and vines hanging into the opening
+	var leaf_t: Array = []
+	var leaf_c: Array = []
+	for k in range(260):
+		var a = vary.randf() * TAU
+		var d = vary.randf_range(T.CENOTE_R + 1.6, 16.0)
+		var x = cx + cos(a) * d
+		var z = cz + sin(a) * d
+		if T.coast(x, z) < 2.0: continue
+		var y = T.height(x, z) if d > T.CENOTE_R + 4.6 else cen_top - 0.5
+		var s = vary.randf_range(0.35, 0.9) * (0.55 if d < T.CENOTE_R + 4.0 else 1.0)
+		var b = Basis.from_euler(Vector3(vary.randf_range(-0.6, 0.6), vary.randf() * TAU, vary.randf_range(-0.6, 0.6))).scaled(Vector3(s * 1.6, s * 0.25, s * 0.7))
+		leaf_t.append(Transform3D(b, Vector3(x, y + s * 0.3, z)))
+		leaf_c.append(Color("2f6a2a").lerp(Color("6fb84a"), vary.randf()))
+	Art.scatter(self, Art.sphere_mesh(1.0, 7), leaf_t, leaf_c, false)
+	var vine_t: Array = []
+	var vine_c: Array = []
+	for k in range(34):
+		var a = vary.randf() * TAU
+		var r = T.CENOTE_R + vary.randf_range(-0.1, 0.25)
+		var h = vary.randf_range(1.5, 3.4)
+		vine_t.append(Transform3D(Basis.from_scale(Vector3(1, h, 1)), Vector3(cx + cos(a) * r, cen_top - 0.5 - h * 0.5, cz + sin(a) * r)))
+		vine_c.append(Color("3d7a32").lerp(Color("7fb05a"), vary.randf()))
+	Art.scatter(self, Art.cyl_mesh(0.035, 1.0, 4), vine_t, vine_c, false)
+	# a few flowers
+	for k in range(30):
+		var a = vary.randf() * TAU
+		var d = vary.randf_range(5.0, 14.0)
+		var x = cx + cos(a) * d
+		var z = cz + sin(a) * d
+		if T.coast(x, z) < 2.0: continue
+		Art.sph(self, Vector3(x, T.height(x, z) + 0.35, z), 0.12, [Color("ff7aa8"), Color("ffd34d"), Color("ffffff"), Color("c58aff")][k % 4], Vector3.ONE, 6)
+
+func update_cenote(delta: float):
+	if cen_rays.is_empty(): return
+	var cx = T.CENOTE.x
+	var cz = T.CENOTE.y
+	var near = Vector2(player.position.x, player.position.z).distance_to(T.CENOTE) < 60.0
+	if not near: return
+	for r in cen_rays:
+		var base: Vector3 = r[1]
+		(r[0] as Node3D).rotation = base + Vector3(sin(clock * 0.21 + r[2]) * 0.04, 0, cos(clock * 0.17 + r[2]) * 0.04)
+	for f in cen_fish:
+		f[3] += delta * float(f[4])
+		var a: float = f[3]
+		var n = f[0] as Node3D
+		n.position = Vector3(cx + cos(a) * f[2], f[1] + sin(clock * 0.6 + a * 3.0) * 0.3, cz + sin(a) * f[2])
+		n.rotation.y = -a + (0.0 if f[4] > 0 else PI)
+
+# ---- swimming and diving ----
+
+var swimming: bool = false
+var swim_up_held: bool = false
+var swim_down_held: bool = false
+var swim_ui: Array = []
+var climb_button: Button
+var uw_overlay: ColorRect
+var bubbles: CPUParticles3D
+var underwater: bool = false
+
+func build_swim_ui():
+	uw_overlay = ColorRect.new()
+	uw_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	uw_overlay.color = Color(0.1, 0.55, 0.55, 0.0)
+	uw_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	uw_overlay.hide()
+	ui.add_child(uw_overlay)
+	ui.move_child(uw_overlay, 0)
+	var defs = [["Up", -400.0, func(on): swim_up_held = on], ["Dive", -326.0, func(on): swim_down_held = on]]
+	for d in defs:
+		var b = Button.new()
+		b.name = "Swim" + d[0]
+		b.text = d[0]
+		b.focus_mode = Control.FOCUS_NONE
+		b.add_theme_font_size_override("font_size", 20)
+		b.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+		b.offset_left = -126
+		b.offset_right = -20
+		b.offset_top = d[1]
+		b.offset_bottom = d[1] + 64
+		var sb = StyleBoxFlat.new()
+		sb.bg_color = Color(0.1, 0.45, 0.48, 0.75)
+		sb.set_corner_radius_all(32)
+		sb.set_border_width_all(2)
+		sb.border_color = Color("bff7ea")
+		for st in ["normal", "hover", "pressed"]: b.add_theme_stylebox_override(st, sb)
+		b.add_theme_color_override("font_color", Color.WHITE)
+		var cb: Callable = d[2]
+		b.button_down.connect(func(): cb.call(true))
+		b.button_up.connect(func(): cb.call(false))
+		b.hide()
+		ui.add_child(b)
+		swim_ui.append(b)
+	climb_button = button("Climb out", climb_out, ui)
+	climb_button.name = "ClimbOut"
+	climb_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	climb_button.offset_left = -176
+	climb_button.offset_right = -20
+	climb_button.offset_top = -474
+	climb_button.offset_bottom = -414
+	climb_button.hide()
+	bubbles = CPUParticles3D.new()
+	bubbles.amount = 10
+	bubbles.lifetime = 1.6
+	bubbles.emitting = false
+	bubbles.position = Vector3(0, -0.45, -1.3)
+	bubbles.direction = Vector3(0, 1, 0)
+	bubbles.spread = 18.0
+	bubbles.gravity = Vector3(0, 0.6, 0)
+	bubbles.initial_velocity_min = 0.3
+	bubbles.initial_velocity_max = 0.7
+	bubbles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	bubbles.emission_sphere_radius = 0.15
+	var bm = SphereMesh.new()
+	bm.radius = 0.012
+	bm.height = 0.024
+	bm.radial_segments = 6
+	bm.rings = 3
+	bubbles.mesh = bm
+	var bmat = StandardMaterial3D.new()
+	bmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	bmat.albedo_color = Color(0.9, 1.0, 1.0, 0.7)
+	bmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	bmat.disable_fog = true
+	bubbles.material_override = bmat
+	camera.add_child(bubbles)
+
+func in_cenote_water(p: Vector3) -> bool:
+	var d = Vector2(p.x, p.z).distance_to(T.CENOTE)
+	if d > CEN_CAVE_R + 2.0 or p.y < cen_bottom - 2.0: return false
+	if d < T.CENOTE_R + 0.8: return p.y < cen_y_w - 0.35
+	return p.y < cen_y_w - 3.0
+
+func float_y() -> float:
+	return cen_y_w - 1.45
+
+func swim_physics(delta: float, axis: Vector2):
+	var was = swimming
+	swimming = true
+	walk_to = {}
+	walk_via.clear()
+	if not was:
+		player.velocity *= 0.3
+		play_sfx("splash", 0.0)
+		if not cen_seen:
+			cen_seen = true
+			for w in ["sonot", "lup", "sum"]: learn(w)
+			toast("Sonot: a cenote! Swim, and dive as deep as you like.")
+			log_event("cenote", "first swim")
+	var cb = camera.global_basis
+	var fwd3 = -cb.z
+	var under = camera.global_position.y < cen_y_w
+	var fwd = fwd3 if under else Vector3(fwd3.x, 0.0, fwd3.z).normalized()
+	if not under and fwd3.y < -0.45 and axis.y < -0.3: fwd = fwd3
+	var right = Vector3(cb.x.x, 0.0, cb.x.z).normalized()
+	var want = (fwd * -axis.y + right * axis.x) * 3.2
+	var up = swim_up_held or Input.is_physical_key_pressed(KEY_SPACE)
+	var down = swim_down_held or Input.is_physical_key_pressed(KEY_C) or Input.is_physical_key_pressed(KEY_CTRL)
+	if up: want.y += 2.8
+	if down: want.y -= 2.8
+	if not up and not down and axis == Vector2.ZERO: want.y += 1.0 if player.position.y > float_y() - 4.0 else 0.3
+	player.velocity = player.velocity.lerp(want, minf(delta * 2.5, 1.0))
+	player.move_and_slide()
+	var fy = float_y()
+	if player.position.y > fy:
+		player.position.y = lerpf(player.position.y, fy + sin(clock * 1.4) * 0.05, minf(delta * 4.0, 1.0))
+		if player.velocity.y > 0.0: player.velocity.y = 0.0
+	var depth = maxf(0.0, cen_y_w - camera.global_position.y)
+	prompt.text = ("Depth " + str(int(round(depth))) + " m" + ("  ·  Up to rise" if depth > 2.0 else "  ·  Dive to go down")) if depth > 0.3 else "Swimming  ·  Dive, or Climb out"
+	fit_prompt()
+	prompt.visible = not panel.visible
+	prompt.modulate.a = 0.8
+	interact_button.disabled = true
+
+func climb_out():
+	var d = Vector2(player.position.x - T.CENOTE.x, player.position.z - T.CENOTE.y)
+	if d.length() < 0.1: d = Vector2(0, 1)
+	d = d.normalized()
+	var r = T.CENOTE_R + 2.6
+	player.position = Vector3(T.CENOTE.x + d.x * r, cen_top + 0.4, T.CENOTE.y + d.y * r)
+	player.velocity = Vector3.ZERO
+	swimming = false
+	swim_up_held = false
+	swim_down_held = false
+	play_sfx("splash", -8.0, 1.3)
+
+func update_underwater(delta: float):
+	if uw_overlay == null: return
+	var at_surface = swimming and player.position.y > float_y() - 0.25
+	var show_swim = swimming and not panel.visible
+	for b in swim_ui: b.visible = show_swim
+	climb_button.visible = show_swim and at_surface
+	var cen_d = Vector2(camera.global_position.x, camera.global_position.z).distance_to(T.CENOTE)
+	var under = camera.global_position.y < cen_y_w and cen_d < CEN_CAVE_R + 3.0
+	if under != underwater:
+		underwater = under
+		uw_overlay.visible = under
+		bubbles.emitting = under
+		if uw_fx >= 0: AudioServer.set_bus_effect_enabled(0, uw_fx, under)
+		if not under: env.fog_density = 0.003
+		play_sfx("splash", -10.0, 0.7)
+	if under:
+		var depth = clampf((cen_y_w - camera.global_position.y) / 50.0, 0.0, 1.0)
+		uw_overlay.color = Color(0.08, 0.5, 0.52, 0.16).lerp(Color(0.02, 0.18, 0.3, 0.42), depth)
+		env.fog_light_color = Color("3fc4b4").lerp(Color("0b3a52"), depth)
+		env.fog_density = lerpf(0.016, 0.045, depth)

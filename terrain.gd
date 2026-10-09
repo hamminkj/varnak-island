@@ -21,6 +21,13 @@ const ISLET = Vector2(50.0, 82.0)
 # and the far-west peninsula, Hirimara (the prank field).
 const LOBES = [Vector3(-62.0, 40.0, 16.0), Vector3(66.0, -48.0, 14.0), Vector3(-110.0, 0.0, 30.0)]
 const HIRIMARA = Vector2(-110.0, 0.0)
+# The cenote: a hidden forested lobe in the far north-east, a plateau, and a hole into a deep flooded cavern.
+const CENOTE = Vector2(84.0, -66.0)
+const CENOTE_LOBE = Vector3(87.0, -66.0, 22.0)
+const CENOTE_R = 3.0
+const CENOTE_WATER = 0.5
+# Off while the main forest and scatter are placed, so the old island layout stays exactly the same.
+static var extra_lobe := true
 # The river runs from the hot spring east to the sea.
 const RIVER = [Vector2(-44, -22), Vector2(-30, -23), Vector2(0, -23), Vector2(30, -23), Vector2(55, -27), Vector2(75, -31), Vector2(98, -35)]
 
@@ -36,6 +43,8 @@ static func coast(x: float, z: float) -> float:
 	for l in LOBES:
 		s = maxf(s, l.z - Vector2(x, z).distance_to(Vector2(l.x, l.y)) + wobble(z, x) * 1.5)
 	s = maxf(s, 12.0 - Vector2(x, z).distance_to(ISLET) + wobble(x * 2.0, z) * 0.8)
+	if extra_lobe:
+		s = maxf(s, CENOTE_LOBE.z - Vector2(x, z).distance_to(Vector2(CENOTE_LOBE.x, CENOTE_LOBE.y)) + wobble(z, x) * 1.5)
 	# harbor inlet: open water south of the dock head
 	if absf(x) < 15.0 and z > 31.0:
 		var e = minf(z - 33.0, 15.0 - absf(x))
@@ -81,6 +90,9 @@ static func height(x: float, z: float) -> float:
 	if id < 7.0 and h > -0.2: h += 0.6 * (1.0 - id / 7.0)
 	var pd = Vector2(x, z).distance_to(POND)
 	if pd < 5.5: h = minf(h, lerpf(-0.9, 0.0, smoothstep(3.0, 5.5, pd)))
+	if extra_lobe:
+		var cd = Vector2(x, z).distance_to(CENOTE)
+		if cd < 14.0: h += 1.5 * (1.0 + cos(PI * cd / 14.0))
 	var fd = Vector2(x, z).distance_to(FALLS_POOL)
 	if fd < 3.4: h = minf(h, lerpf(-1.0, 0.0, smoothstep(1.4, 3.4, fd)))
 	return h
@@ -119,6 +131,11 @@ static func build_mesh() -> ArrayMesh:
 			st.add_vertex(Vector3(x, h, z))
 	for iz in range(nz - 1):
 		for ix in range(nx - 1):
+			# leave a hole for the cenote opening
+			if extra_lobe:
+				var hx = X0 + ix * STEP + STEP * 0.5
+				var hz = Z0 + iz * STEP + STEP * 0.5
+				if Vector2(hx, hz).distance_to(CENOTE) < CENOTE_R + 1.6: continue
 			var a = iz * nx + ix
 			var b = a + 1
 			var c = a + nx

@@ -1160,3 +1160,9 @@ const YESEN = [
 		["Suri ma-i-seng-ki-da...", "Suri is not happy...", [["Suri is reading the dog!", ["Surike", "gor", "i-rav-im-da."]], ["everyone is happy now!", ["Polu", "ri-seng-da."]]]]],
 		"end": ["Ha! Ha! Gor ravar i-an-da!", "Ha! Ha! The dog is a student!"]}
 ]
+
+# the cenote
+const WORDS13 = {
+	"sonot": "a cenote, a deep water-filled sinkhole (borrowed from Yucatec Maya ts'ono'ot, through Spanish cenote)",
+	"lup": "dive (root): na-lup-im-da, I am diving"
+}
