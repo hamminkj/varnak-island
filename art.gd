@@ -9,6 +9,9 @@ static func mat(color: Color, rough: float = 0.9, emit: float = 0.0) -> Standard
 	var m = StandardMaterial3D.new()
 	m.albedo_color = color
 	m.roughness = rough
+	# flat, banded light in the spirit of Eyvind Earle: shapes read as clean planes of color
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
+	m.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 	if emit > 0.0:
 		m.emission_enabled = true
 		m.emission = color
@@ -113,7 +116,7 @@ void fragment() {
 
 const GROUND_SHADER = """
 shader_type spatial;
-render_mode specular_disabled;
+render_mode specular_disabled, diffuse_toon;
 uniform vec4 segs[24];
 uniform int seg_count = 0;
 varying vec3 wp;
@@ -138,9 +141,11 @@ void vertex() {
 void fragment() {
 	vec2 p = wp.xz;
 	float n = vnoise(p * 0.3) * 0.55 + vnoise(p * 1.4) * 0.3 + vnoise(p * 6.0) * 0.15;
-	vec3 grass = mix(vec3(0.22, 0.42, 0.18), vec3(0.40, 0.60, 0.24), n);
-	grass = mix(grass, vec3(0.52, 0.60, 0.22), smoothstep(0.62, 0.9, vnoise(p * 0.7)) * 0.45);
-	grass = mix(grass, vec3(0.30, 0.45, 0.20), smoothstep(1.0, 6.0, wp.y) * 0.5);
+	vec3 grass = mix(vec3(0.15, 0.37, 0.24), vec3(0.36, 0.57, 0.27), n);
+	grass = mix(grass, vec3(0.55, 0.58, 0.24), smoothstep(0.62, 0.9, vnoise(p * 0.7)) * 0.4);
+	grass = mix(grass, vec3(0.20, 0.36, 0.30), smoothstep(1.0, 6.0, wp.y) * 0.55);
+	// fine stipple, like a painted background
+	grass *= 0.95 + 0.07 * step(0.55, hash(floor(p * 9.0)));
 	vec3 sand = mix(vec3(0.82, 0.72, 0.50), vec3(0.74, 0.63, 0.42), vnoise(p * 2.2));
 	float smask = smoothstep(0.25, 0.75, mask.r + (vnoise(p * 0.9) - 0.5) * 0.5);
 	vec3 col = mix(grass, sand, smask);
@@ -213,6 +218,8 @@ static func scatter(parent: Node3D, mesh: Mesh, transforms: Array, colors: Array
 	var m = StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true
 	m.roughness = 0.95
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
+	m.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 	mmi.material_override = m
 	if not shadows: mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(mmi)

@@ -178,6 +178,10 @@ const SENTENCES = {
 		"en": "The stork is fishing in the river.",
 		"gesture": "The huge white bird with the black head wades slowly, stirs the mud with one foot, and snaps its giant bill shut on something silver.",
 		"words": ["tujuju", "mora", "-ma", "tari", "nuk", "-im"], "wrong": ["The stork is sleeping in the river.", "The fish is catching the stork."]},
+	"kirkor_build": {"v": "Anke ti-ru kir-kor k-i-varn-fu-da!", "parts": "an-ke  ti-ru  kir-kor  k-i-varn-fu-da\n1SG-ERG  2SG-ALL  write-box  1SG.A-3P-build-FUT-DIR",
+		"en": "I will build you a writing box!",
+		"gesture": "Dofo stares at your Ayvu chart, turns it upside down, turns it back, and starts sketching gears, a round dial and a row of keys.",
+		"words": ["kir", "kor", "varn", "-fu", "-ru"], "wrong": ["You will build me a writing box!", "I built a box for the writing."]},
 	"capy_looks": {"v": "Kapibarake ti i-pal-im-da.", "parts": "kapibara-ke  ti  i-pal-im-da\ncapybara-ERG  2SG  3P-see-IPFV-DIR",
 		"en": "The capybara is looking at you.",
 		"gesture": "The capybara chews slowly, turns its big square head toward you, and blinks. Then it looks down the trail.",
@@ -1183,16 +1187,21 @@ const WORDS13 = {
 	"lup": "dive (root): na-lup-im-da, I am diving"
 }
 
-# ---------------------------------------------------------------- the lost writing (kirmel) and Var Tari
+# ---------------------------------------------------------------- the lost writing (Ayvu) and Var Tari
 const WORDS14 = {
 	"kir": "carve, write (root)",
-	"kirmel": "the old Tujuju writing, a syllabary (kir carve + mel speak: carved speech)",
+	"ayvu": "Ayvu, the old Tujuju writing, a syllabary (borrowed from Guarani ayvu: language, speech)",
 	"var tari": "Var Tari, the great fish who sleeps in the cenote (var big + tari fish)"
 }
 
 # ---------------------------------------------------------------- the capybaras
 # kapibara: from Guarani capii-bara (the RAE's etymology for capibara). A capybara's name is
-# always exactly two vowel sounds and nothing else, so in kirmel it is two lone-vowel marks.
+# always exactly two vowel sounds and nothing else, so in Ayvu it is two lone-vowel marks.
+# The Ayvu typewriter: Dofo builds one once you can read Ayvu.
+const WORDS17 = {
+	"kir-kor": "typewriter, a writing box (kir write + kor box)",
+	"varn": "build (root)"
+}
 const WORDS16 = {
 	"kapibara": "capybara, the biggest rodent, a gentle grass-eater that loves water (from Guarani capii-bara). A capybara's name is always exactly two vowel sounds."
 }
@@ -1215,10 +1224,10 @@ const KIR_STORY = [
 	{"depth": 21.0, "v": "Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu.", "en": "The fish jumped, they say. The stars went up into the sky."},
 	{"depth": 27.0, "v": "Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu.", "en": "The fish sang a song, they say. Out of the song, the land arrived."},
 	{"depth": 30.0, "pic": "stork", "v": "Tujuju-ir hen-ta ri-tal-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu.", "en": "The storks came down from the sky, they say. The people went behind the storks."},
-	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
+	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke ayvu sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
 	{"depth": 36.5, "pic": "capybara", "v": "Kapibara-ir ri-tal-ak-pa-nu. Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu.", "en": "The capybaras came, they say. The capybaras brought the people to the cenote."},
-	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
-	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
+	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke ayvu ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
+	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari ayvu i-zen-nu. Ti ayvu tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
 ]
 # Var Tari speaks only with evidentials: what it saw (-da), what it heard (-nu), what it works out (-shi).
 # [Tujuju, English, ending, condition]
@@ -1227,7 +1236,7 @@ const GUARDIAN_LINES = [
 	["Anke hen ma-k-i-pal-pa-ki-da.", "I have never seen the sky. (I know this myself.)", "da", "always"],
 	["Hen-ma par-ir ri-ning-ur-nu.", "They say birds sing in the sky.", "nu", "always"],
 	["Tari-ir sen-sen anni dal-ma ri-sum-ur-da.", "Tiny fish usually swim beside me. I see it.", "da", "always"],
-	["Ti kirmel ta-rav-pa-da.", "You read the writing. I saw it.", "da", "read"],
+	["Ti ayvu ta-rav-pa-da.", "You read the writing. I saw it.", "da", "read"],
 	["Ti-ni ten-ma dor i-esh-pa-shi.", "Apparently there was land on your feet. (You came from the land.)", "shi", "always"],
 	["Yeshma i-an-shi. Ling i-dam-shi.", "Apparently it is night. The light seems dark.", "shi", "night"],
 	["Ti tari-ir ta-nuk-pa-shi... Hm.", "Apparently you caught fish... Hm.", "shi", "fish"],

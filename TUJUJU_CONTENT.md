@@ -443,24 +443,24 @@ Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-s
 
 New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Tujuju sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
 
-## Kirmel: the lost writing
+## Ayvu: the lost writing
 
-New words: kir (carve, write), kirmel (the old writing: kir carve + mel speak), Var Tari (the great fish: var big + tari fish).
+New words: kir (carve, write), ayvu (the old writing, renamed from kirmel; borrowed from Guarani ayvu, language, speech), Var Tari (the great fish: var big + tari fish).
 
-Kirmel is a featural syllabary (in the spirit of Canadian Aboriginal syllabics). One mark per syllable. The shape is the consonant; the way it is turned is the vowel: a points right, e is turned a quarter (down), i is turned around, o three quarters (up), u points right with a line under it. A dot marks a voiced consonant (p/b, t/d, k/g, s/z, f/v), a short bar makes sh (from s) and ch (from t). A consonant at the end of a syllable is a small raised mark, and a lone vowel uses an open triangle. kirmel.gd holds the shapes, the syllable splitter and the drawing code; every one of the 110 syllable marks is distinct.
+Ayvu is a featural syllabary (in the spirit of Canadian Aboriginal syllabics). One mark per syllable. The shape is the consonant; the way it is turned is the vowel: a points right, e is turned a quarter (down), i is turned around, o three quarters (up), u points right with a line under it. A dot marks a voiced consonant (p/b, t/d, k/g, s/z, f/v), a short bar makes sh (from s) and ch (from t). A consonant at the end of a syllable is a small raised mark, and a lone vowel uses an open triangle. Ayvu.gd holds the shapes, the syllable splitter and the drawing code; every one of the 110 syllable marks is distinct.
 
 The creation story, carved deeper and deeper in the cenote, is told with hearsay -nu (a myth: what people say):
 1. Yanve yarma hai e yesh sela ri-esh-pa-nu. (On the first day there was only the sea and the night.)
 2. Var tari haima i-sul-pa-nu. Tari-ni dau-ma sao-ir ri-esh-pa-nu. (A great fish slept in the sea. On the fish's head there were stars.)
 3. Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu. (The fish jumped. The stars went up into the sky.)
 4. Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu. (The fish sang a song. Out of the song, the land arrived.)
-5. Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu. (People came to the land. They carved the writing into the stones.)
-6. Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu. (But the days went by. The people forgot the writing.)
-7. Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha? (The fish sleeps in the cenote. The fish knows the writing. Will you bring the writing to the village?)
+5. Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke ayvu sek-ir-ma ri-kir-pa-nu. (People came to the land. They carved the writing into the stones.)
+6. Dan yar-ir ri-lum-pa-nu. Sair-irke ayvu ri-mong-ak-pa-nu. (But the days went by. The people forgot the writing.)
+7. Tari sonot-ma i-sul-im-nu. Tari ayvu i-zen-nu. Ti ayvu tekaru ta-tar-fu-ha? (The fish sleeps in the cenote. The fish knows the writing. Will you bring the writing to the village?)
 
 Var Tari speaks only with evidentials: -da for what it saw (you diving, you reading the stones, the tiny fish beside it), -nu for what it heard from the island above (your yesen, Gav's chonies, the parrot, the lighthouse), and -shi for what it works out (it is night, you came from land, you have been fishing). It has never seen the sky: Anke hen ma-k-i-pal-pa-ki-da.
 
-Things to check: 38. Plural agents with a singular object take ri- (Sair-irke kirmel ri-kir-pa-nu); the handoff document shows ri- for plural subjects, and this extends it to plural agents. 39. hai e yesh sela ri-esh-pa-nu uses sela (alone) for "only". 40. Tarike ning i-ning-pa-nu uses ning as both noun and verb (sing a song). 41. The script itself (shapes, turning for vowels, finals) is a game invention.
+Things to check: 38. Plural agents with a singular object take ri- (Sair-irke ayvu ri-kir-pa-nu); the handoff document shows ri- for plural subjects, and this extends it to plural agents. 39. hai e yesh sela ri-esh-pa-nu uses sela (alone) for "only". 40. Tarike ning i-ning-pa-nu uses ning as both noun and verb (sing a song). 41. The script itself (shapes, turning for vowels, finals) is a game invention.
 
 ## The storks (tujuju)
 
@@ -482,8 +482,10 @@ New word: kapibara (capybara), respelled from Guarani capii-bara (the RAE's etym
 | Form | Meaning | Source |
 |---|---|---|
 | Kapibarake ti i-pal-im-da. | The capybara is looking at you. | Composed: ergative -ke, pal (see), -im |
-| Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu. | They say the capybaras brought the people to the cenote. | Composed; tar (bring) as in Ti kirmel tekaru ta-tar-fu-ha? |
+| Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu. | They say the capybaras brought the people to the cenote. | Composed; tar (bring) as in Ti ayvu tekaru ta-tar-fu-ha? |
 | Kapibara-ir ri-tal-ak-pa-nu. Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu. | The capybaras came, they say. The capybaras brought the people to the cenote. | Composed; creation story chapter 7 (depth 36.5) |
 | Kapibara-ir sonot-ma ri-sum-ur-da. | Capybaras swim in the cenote. I see it. | Composed; a Var Tari line |
 
 Things to check: 45. Names made only of vowels (Ai, Eo) are a game invention; Tujuju names otherwise start with a consonant or have consonants inside. 46. Kapibarake ti uses ti (2SG) unmarked as the object, following the ergative pattern.
+
+Things to check: 47. Ayvu (the writing, formerly kirmel) is borrowed from Guarani ayvu (language, speech). Its syllable-final y breaks the rule that only m, n, ng, l, r, s, k or t end a syllable, like the loans puts and kluts. In Ayvu itself it is written a + raised y, vu.

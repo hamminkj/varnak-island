@@ -1587,6 +1587,50 @@ func run():
 	game.close_panel()
 	assert(Data.KIR_STORY.any(func(c): return c.get("pic", "") == "capybara"))
 	print("PASS: capybaras, their names, the trail to the cenote and the myth")
+	# the Ayvu typewriter: Dofo builds it; keys, marks, the dial, the u lever, finals and jams
+	game.close_panel()
+	game.inventory.erase("typewriter")
+	if not game.mastered.has("kir:taught"): game.mastered.append("kir:taught")
+	game.talk("dofo")
+	press("Show Dofo the Ayvu chart")
+	assert(has_any("writing box"))
+	press("Take the Ayvu typewriter")
+	assert(game.inventory.has("typewriter") and has_any("reading appears"))
+	game.tw_text = []
+	for spec in [["t", false, false], ["t", true, true], ["t", true, true]]:
+		game.tw_shape = spec[0]
+		game.tw_dot = spec[1]
+		game.tw_bar = spec[2]
+		game.tw_ulever = true
+		game.tw_dial = 0
+		game.tw_strike()
+	assert(game.tw_label(game.tw_text) == "tujuju", game.tw_label(game.tw_text))
+	game.tw_ulever = false
+	game.tw_shape = "m"
+	game.tw_dot = true
+	game.tw_strike()
+	assert(game.tw_msg.begins_with("Clunk") and game.tw_text.size() == 3, "a dot on m jams")
+	game.tw_dot = false
+	game.tw_ulever = true
+	game.tw_dial = 2
+	game.tw_strike()
+	assert(game.tw_msg.begins_with("Clunk"), "the u lever needs the dial at a")
+	game.tw_ulever = false
+	game.tw_text.append({"sp": true})
+	game.tw_shape = "s"
+	game.tw_dial = 0
+	game.tw_strike()
+	game.tw_final = true
+	game.tw_shape = "n"
+	game.tw_strike()
+	game.tw_final = false
+	assert(game.tw_label(game.tw_text) == "tujuju san", game.tw_label(game.tw_text))
+	game.save_game()
+	game.tw_text = []
+	game.load_game()
+	assert(game.tw_label(game.tw_text) == "tujuju san", "the sheet is saved")
+	game.close_panel()
+	print("PASS: the Ayvu typewriter")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

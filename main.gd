@@ -313,6 +313,7 @@ func _ready():
 	words.merge(Data.WORDS14)
 	words.merge(Data.WORDS15)
 	words.merge(Data.WORDS16)
+	words.merge(Data.WORDS17)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -472,38 +473,48 @@ func build_world():
 	build_night_and_weather()
 	build_portrait()
 
+# palette, nudged toward Eyvind Earle: deep teal sky, pale gold horizon, cool violet distance
+const SKY_TOP = Color("1f6a8c")
+const SKY_HZ = Color("e8e6b2")
+const SKY_LOW = Color("7d97ad")
+const FOG_DAY = Color("a7b6d3")
+const SHADE = Color("7d8fbd")
+
 func build_environment():
 	var we = WorldEnvironment.new()
 	env = Environment.new()
 	env.background_mode = Environment.BG_SKY
 	var sky = Sky.new()
 	psm = ProceduralSkyMaterial.new()
-	psm.sky_top_color = Color("3f86d0")
-	psm.sky_horizon_color = Color("bfe4f2")
-	psm.ground_horizon_color = Color("bfe4f2")
-	psm.ground_bottom_color = Color("86b9c9")
-	psm.sky_curve = 0.18
+	psm.sky_top_color = SKY_TOP
+	psm.sky_horizon_color = SKY_HZ
+	psm.ground_horizon_color = SKY_HZ
+	psm.ground_bottom_color = SKY_LOW
+	psm.sky_curve = 0.32
 	psm.sun_angle_max = 28.0
 	psm.sun_curve = 0.12
 	sky.sky_material = psm
 	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 0.55
+	# cool shadows: the shade side of everything leans blue-violet
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = SHADE
+	env.ambient_light_energy = 0.62
 	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	env.tonemap_exposure = 0.82
 	env.adjustment_enabled = true
-	env.adjustment_saturation = 1.05
-	env.adjustment_contrast = 1.04
+	env.adjustment_saturation = 1.16
+	env.adjustment_contrast = 1.09
+	# distance turns into layers of cool blue-violet, like painted backdrops
 	env.fog_enabled = true
-	env.fog_light_color = Color("c9e7f0")
-	env.fog_density = 0.003
-	env.fog_sky_affect = 0.25
+	env.fog_light_color = FOG_DAY
+	env.fog_density = 0.0052
+	env.fog_sky_affect = 0.12
 	we.environment = env
 	add_child(we)
 	sun = DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-42, -32, 0)
 	sun.light_energy = 0.9
-	sun.light_color = Color("fff0d8")
+	sun.light_color = Color("ffe9be")
 	sun.shadow_enabled = true
 	sun.shadow_bias = 0.04
 	sun.shadow_blur = 1.4
@@ -622,14 +633,15 @@ func add_tree(p: Vector3, vary: RandomNumberGenerator, trunks: Array, trunk_colo
 	trunks.append(Transform3D(Basis.from_scale(Vector3(s, trunk_h, s)), p + Vector3(0, trunk_h * 0.5, 0)))
 	trunk_colors.append(Color("6b4f36").lerp(Color("85623f"), vary.randf()))
 	if vary.randf() < 0.5:
+		# tall, slim, stacked: the stylized pines of a painted forest
 		for layer in range(3):
-			var r = (1.9 - layer * 0.5) * s
-			var h = 1.9 * s
-			var y = trunk_h * 0.7 + layer * 1.15 * s + h * 0.5
+			var r = (1.5 - layer * 0.38) * s
+			var h = 2.35 * s
+			var y = trunk_h * 0.75 + layer * 1.5 * s + h * 0.5
 			pines.append(Transform3D(Basis.from_scale(Vector3(r, h, r)).rotated(Vector3.UP, yaw), p + Vector3(0, y, 0)))
-			pine_colors.append(Color("1f5a3a").lerp(Color("3d8a48"), vary.randf() * 0.8 + layer * 0.1))
+			pine_colors.append(Color("164a40").lerp(Color("2f7a55"), vary.randf() * 0.8 + layer * 0.1))
 	else:
-		var base = Color("4c8f3a").lerp(Color("86b84a"), vary.randf())
+		var base = Color("3c7f45").lerp(Color("8ab456"), vary.randf())
 		if vary.randf() < 0.08: base = Color("d98f3a")
 		var cy = trunk_h + 0.7 * s
 		oaks.append(Transform3D(Basis.from_scale(Vector3(2.0 * s, 1.55 * s, 2.0 * s)), p + Vector3(0, cy, 0)))
@@ -2868,6 +2880,7 @@ func add_topics(id: String):
 			if completed.has("bridge"):
 				topic("Ask about the bridge", "gira_safe", id)
 				topic("Ask who built it", "tor_built", id)
+			if mastered.has("kir:taught") and not inventory.has("typewriter"): button("Show Dofo the Ayvu chart", dofo_typewriter, content)
 		"lira":
 			button("Answer: where are you?", where_puzzle.bind("lira"), content)
 			topic("Ask about the dog", "dog_runs", id)
@@ -3250,6 +3263,7 @@ func item_word(id: String) -> String:
 	if id == "candy": return "bombom"
 	if id == "hotdog": return "ret-gor"
 	if id == "map": return "pai (an old map)"
+	if id == "typewriter": return "kir-kor (the Ayvu typewriter)"
 	if Data.PARCELS.has(id): return "kel: " + str(Data.PARCELS[id]).capitalize() + "-ru"
 	for e in entities:
 		if e["id"] == id: return e["word"]
@@ -3298,7 +3312,8 @@ func show_notebook():
 	var b8 = button("Overheard", show_overheard, row3)
 	var b9 = button("My learning", show_progress, row3)
 	button("Survey: find someone who can...", show_survey, content)
-	if kir_known_count() > 0: button("Kirmel: the old writing", show_kir_chart, content)
+	if kir_known_count() > 0: button("Ayvu: the old writing", show_kir_chart, content)
+	if inventory.has("typewriter"): button("Ayvu typewriter", show_typewriter, content)
 	for b in [b7, b8, b9]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for b in [b4, b5]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if discovered.is_empty(): text_line("Examine objects and talk to residents to collect words.")
@@ -3447,6 +3462,7 @@ func show_inventory():
 		text_line("sao-dau × " + str(shrooms) + "  (star-head mushrooms)")
 		button("Eat a sao-dau", eat_poem.bind("sao-dau"), content)
 	if inventory.has("map"): button("Read the old map", func(): sentence_card("treasure_map", show_inventory), content)
+	if inventory.has("typewriter"): button("Use the Ayvu typewriter", show_typewriter, content)
 	button("Return",close_panel,content)
 
 func map_point(x: float, z: float, rect: Rect2) -> Vector2:
@@ -3606,7 +3622,7 @@ func save_game():
 	var keep = player.position
 	if riding: player.position = ride_dest
 	if file:
-		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"sound":sound_on,"whale":whale_seen,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
+		file.store_string(JSON.stringify({"guesses":guesses,"inventory":inventory,"discovered":discovered,"completed":completed,"mastered":mastered,"phrases":phrases,"solved":solved,"visited":visited,"fish":fish_caught,"gin":gin,"berries":berries,"shrooms":shrooms,"poems":poems,"friend":friend,"mood":mood,"chat_day":chat_day,"day_count":day_count,"rumors":rumors,"rumor_count":rumor_count,"day":day_t,"bias":diff_bias,"best_speed":best_speed,"hud_small":hud_small,"sound":sound_on,"whale":whale_seen,"tw":tw_text,"position":[player.position.x,player.position.y,player.position.z],"yaw":player.rotation.y,"pitch":camera.rotation.x}))
 	player.position = keep
 	save_log()
 
@@ -3621,7 +3637,7 @@ func load_game():
 	if not data is Dictionary: return
 	guesses = data.get("guesses",{})
 	inventory = data.get("inventory",[])
-	discovered = data.get("discovered",[]).filter(func(w): return words.has(w))
+	discovered = data.get("discovered",[]).map(func(w): return "ayvu" if w == "kirmel" else w).filter(func(w): return words.has(w))
 	completed = data.get("completed",[])
 	mastered = data.get("mastered",[])
 	phrases = data.get("phrases",[])
@@ -3633,6 +3649,7 @@ func load_game():
 	hud_small = bool(data.get("hud_small", false))
 	sound_on = bool(data.get("sound", true))
 	whale_seen = bool(data.get("whale", false))
+	tw_text = data.get("tw", [])
 	diff_bias = int(data.get("bias", 0))
 	rumors = data.get("rumors", [])
 	friend = data.get("friend", {})
@@ -3788,16 +3805,17 @@ func update_sky(delta: float):
 	if night > 0.5: el = 48.0
 	sun.rotation_degrees = Vector3(-el, -32.0 - (u - 0.5) * 120.0 if night <= 0.5 else 150.0, 0)
 	sun.light_energy = lerpf(0.9, 0.24, night) * lerpf(1.0, 0.62, rain_amt)
-	sun.light_color = Color("fff0d8").lerp(Color("ffb27a"), warm * 0.8).lerp(Color("a8bcff"), night)
+	sun.light_color = Color("ffe9be").lerp(Color("ffa86e"), warm * 0.8).lerp(Color("a8bcff"), night)
 	sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY if night > 0.5 else DirectionalLight3D.SKY_MODE_LIGHT_AND_SKY
-	psm.sky_top_color = Color("3f86d0").lerp(Color("7c8ca0"), rain_amt * 0.6).lerp(Color("0b1433"), night)
-	var hz = Color("bfe4f2").lerp(Color("f2b27a"), warm * 0.75).lerp(Color("aab4bf"), rain_amt * 0.5).lerp(Color("1d2c4c"), night)
+	psm.sky_top_color = SKY_TOP.lerp(Color("6e7f96"), rain_amt * 0.6).lerp(Color("0b1433"), night)
+	var hz = SKY_HZ.lerp(Color("ee9a6a"), warm * 0.75).lerp(Color("aab4bf"), rain_amt * 0.5).lerp(Color("1d2c4c"), night)
 	psm.sky_horizon_color = hz
 	psm.ground_horizon_color = hz
-	psm.ground_bottom_color = Color("86b9c9").lerp(Color("0d1a30"), night)
-	env.ambient_light_energy = lerpf(0.55, 0.34, night)
+	psm.ground_bottom_color = SKY_LOW.lerp(Color("0d1a30"), night)
+	env.ambient_light_energy = lerpf(0.62, 0.36, night)
+	env.ambient_light_color = SHADE.lerp(Color("c48a8a"), warm * 0.35).lerp(Color("3b4a7a"), night)
 	env.tonemap_exposure = lerpf(0.82, 1.05, night)
-	env.fog_light_color = Color("c9e7f0").lerp(Color("f0c8a0"), warm * 0.5).lerp(Color("aab4bf"), rain_amt * 0.4).lerp(Color("1c2a44"), night)
+	env.fog_light_color = FOG_DAY.lerp(Color("e8b0a0"), warm * 0.5).lerp(Color("aab4bf"), rain_amt * 0.4).lerp(Color("1c2a44"), night)
 	stars_mat.albedo_color.a = clampf(night * 1.2 - 0.1, 0.0, 1.0) * (1.0 - rain_amt)
 	stars_node.position = player.position
 	cloud_mat.albedo_color = Color(1, 1, 1, 0.93).lerp(Color(0.62, 0.66, 0.72, 0.95), rain_amt).lerp(Color(0.2, 0.25, 0.38, 0.85), night)
@@ -4377,7 +4395,7 @@ func show_more():
 	button("About the Tujuju language", show_varnak, content)
 	button("Credits", show_credits, content)
 	if completed.has("kirmel"):
-		button("Kirmel writing: on" if kir_show else "Kirmel writing: off", func():
+		button("Ayvu writing: on" if kir_show else "Ayvu writing: off", func():
 			kir_show = not kir_show
 			show_more(), content)
 	button("Sound: on" if sound_on else "Sound: off", func():
@@ -9641,6 +9659,240 @@ var guardian_line: int = -1
 var chip_action: Callable = Callable()
 var kir_show: bool = true
 
+# ---- the Ayvu typewriter ----
+# Shape keys pick the consonant shape, the dot and bar keys add the inner marks, the dial turns
+# the mark for the vowel (it points the way the mark will face), the u lever adds the line
+# underneath, and the final key types a small raised consonant at the end of a syllable.
+# Marks that do not fit a shape make the key jam.
+var tw_text: Array = []
+var tw_shape: String = "t"
+var tw_dot: bool = false
+var tw_bar: bool = false
+var tw_dial: int = 0          # 0 a (right), 1 e (down), 2 i (left), 3 o (up)
+var tw_ulever: bool = false
+var tw_final: bool = false
+var tw_msg: String = ""
+const TW_SHAPES = ["", "p", "t", "k", "m", "n", "ng", "l", "r", "s", "y", "w", "h", "f"]
+const TW_DIAL = ["a", "e", "i", "o"]
+
+func dofo_typewriter():
+	talk_partner = "dofo"
+	learn("kir-kor")
+	learn("varn")
+	clear_panel("Dofo's writing box")
+	add_portrait("dofo")
+	emote("dofo", "love", 4.0)
+	varnak_banner(Data.SENTENCES["kirkor_build"]["v"], 20)
+	text_line("(I will build you a writing box!)", 15)
+	text_line(Data.SENTENCES["kirkor_build"]["gesture"], 17)
+	text_line("By evening there is a heavy little machine on the workbench: a row of shape keys, two small keys for the dot and the bar, a round dial, a lever and a roll of paper. Dofo pats it proudly. Kir-kor: a writing box.", 17)
+	button("Take the Ayvu typewriter", func():
+		if not inventory.has("typewriter"): inventory.append("typewriter")
+		log_event("kirmel", "typewriter")
+		play_sfx("fanfare", -6.0)
+		toast("In your bag: kir-kor, the Ayvu typewriter")
+		save_game()
+		show_typewriter(), content)
+	button("Return", close_panel, content)
+
+func tw_consonant() -> String:
+	# returns the consonant for the current keys, or "!reason" if the keys jam
+	var s = tw_shape
+	if tw_dot and tw_bar:
+		return "j" if s == "t" else "!A dot and a bar together only fit the t shape (that makes j)."
+	if tw_dot:
+		var v = {"p": "b", "t": "d", "k": "g", "s": "z", "f": "v"}
+		return v[s] if v.has(s) else "!A dot only fits the shapes for p, t, k, s and f."
+	if tw_bar:
+		var b = {"s": "sh", "t": "ch"}
+		return b[s] if b.has(s) else "!A bar only fits the shapes for s and t."
+	return s
+
+func tw_strike():
+	var c = tw_consonant()
+	if c.begins_with("!"):
+		tw_jam(c.substr(1))
+		return
+	if tw_final:
+		if c == "":
+			tw_jam("A lone vowel can't be a final. Finals are consonants.")
+			return
+		var last = tw_text.size() - 1
+		if last < 0 or (tw_text[last] as Dictionary).has("sp") or str(tw_text[last].get("v", "")) == "":
+			tw_jam("A final hangs on the syllable before it. Type a syllable first.")
+			return
+		(tw_text[last]["f"] as Array).append(c)
+	else:
+		if tw_ulever and tw_dial != 0:
+			tw_jam("The u lever only works with the dial pointing right, like a. u is the a turn with a line underneath.")
+			return
+		var v = "u" if tw_ulever else TW_DIAL[tw_dial]
+		tw_text.append({"c": c, "v": v, "f": []})
+	play_sfx("pop", -8.0, randf_range(0.9, 1.1))
+	tw_dot = false
+	tw_bar = false
+	tw_msg = ""
+	save_game()
+	show_typewriter()
+
+func tw_jam(why: String):
+	play_sfx("wrong", -10.0)
+	tw_msg = "Clunk! The key jams. " + why
+	show_typewriter()
+
+func tw_label(t: Array) -> String:
+	var words: Array = []
+	var cur = ""
+	for s in t:
+		if (s as Dictionary).has("sp"):
+			words.append(cur)
+			cur = ""
+		else: cur += K.label(s)
+	words.append(cur)
+	return " ".join(words).strip_edges()
+
+func tw_preview() -> Dictionary:
+	var c = tw_consonant()
+	if c.begins_with("!"): return {}
+	if tw_final: return {"c": c, "v": "", "f": []}
+	return {"c": c, "v": "u" if tw_ulever else TW_DIAL[tw_dial], "f": []}
+
+func show_typewriter():
+	talk_partner = ""
+	portrait_id = ""
+	clear_panel("Ayvu typewriter")
+	# the paper
+	var paper = Control.new()
+	paper.custom_minimum_size = Vector2(0, 120)
+	paper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	paper.draw.connect(func():
+		paper.draw_rect(Rect2(Vector2.ZERO, paper.size), Color("fbf5e4"))
+		paper.draw_rect(Rect2(Vector2.ZERO, paper.size), Color("d9c9a0"), false, 2.0)
+		if tw_text.is_empty():
+			paper.draw_string(ThemeDB.fallback_font, Vector2(14, 30), "(blank sheet)", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("a89a7a"))
+		else:
+			K.draw_on(paper, tw_text, Vector2(6, 6), 30.0, paper.size.x - 20.0, Color("1d3557"), 2.4))
+	content.add_child(paper)
+	var tl = text_line(tw_label(tw_text) if not tw_text.is_empty() else "Type, and the reading appears here.", 15)
+	tl.add_theme_color_override("font_color", Color("6b4a2e"))
+	# what the next strike will type
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	content.add_child(row)
+	var pv = tw_preview()
+	if pv.is_empty():
+		var jl = Label.new()
+		jl.text = "  ?  "
+		jl.add_theme_font_size_override("font_size", 28)
+		row.add_child(jl)
+	else:
+		row.add_child(glyph_cell(pv, K.label(pv) if pv["v"] != "" else K.label(pv) + " (final)", false, 46.0))
+	# the vowel dial: it points where the mark will face
+	var dial = Control.new()
+	dial.custom_minimum_size = Vector2(96, 96)
+	dial.mouse_filter = Control.MOUSE_FILTER_STOP
+	dial.draw.connect(func():
+		var c = Vector2(48, 48)
+		dial.draw_circle(c, 44, Color("3b2f2a"))
+		dial.draw_circle(c, 40, Color("e9dcc0"))
+		for k in range(4):
+			var a = k * PI * 0.5
+			var p = c + Vector2(cos(a), sin(a)) * 30.0
+			dial.draw_string(ThemeDB.fallback_font, p + Vector2(-5, 6), TW_DIAL[k], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("1d3557") if k == tw_dial else Color("8a7a60"))
+		var pa = tw_dial * PI * 0.5
+		dial.draw_line(c, c + Vector2(cos(pa), sin(pa)) * 20.0, Color("a8323a"), 4.0, true)
+		dial.draw_circle(c, 6, Color("a8323a")))
+	dial.gui_input.connect(func(ev):
+		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventScreenTouch and ev.pressed):
+			var back = ev.position.x < 48.0
+			tw_dial = (tw_dial + (3 if back else 1)) % 4
+			play_sfx("pop", -14.0, 0.6)
+			show_typewriter.call_deferred())
+	row.add_child(dial)
+	var levers = VBoxContainer.new()
+	row.add_child(levers)
+	button(("[x] " if tw_ulever else "[ ] ") + "u lever (line under)", func():
+		tw_ulever = not tw_ulever
+		play_sfx("pop", -14.0, 0.5)
+		show_typewriter(), levers)
+	button(("[x] " if tw_final else "[ ] ") + "final (small, raised)", func():
+		tw_final = not tw_final
+		play_sfx("pop", -14.0, 0.5)
+		show_typewriter(), levers)
+	if tw_msg != "":
+		var m = text_line(tw_msg, 15)
+		m.add_theme_color_override("font_color", Color("a8323a"))
+	# shape keys
+	var grid = GridContainer.new()
+	grid.columns = 7
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 4)
+	content.add_child(grid)
+	for sh in TW_SHAPES:
+		var key = Button.new()
+		key.custom_minimum_size = Vector2(52, 56)
+		key.toggle_mode = true
+		key.button_pressed = sh == tw_shape
+		var icon = Control.new()
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+		var shape: String = sh
+		icon.draw.connect(func():
+			var o = icon.size * 0.5 + Vector2(0, -4)
+			for st in K.glyph_strokes(shape, "a"):
+				var pts = PackedVector2Array()
+				for p in st: pts.append(o + (p as Vector2) * 14.0)
+				icon.draw_polyline(pts, Color("1d3557"), 2.0, true)
+			icon.draw_string(ThemeDB.fallback_font, Vector2(4, icon.size.y - 4), shape if shape != "" else "vowel", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("6b4a2e")))
+		key.add_child(icon)
+		key.pressed.connect(func():
+			tw_shape = shape
+			play_sfx("pop", -16.0, 1.3)
+			show_typewriter())
+		grid.add_child(key)
+	var mrow = HBoxContainer.new()
+	mrow.add_theme_constant_override("separation", 6)
+	content.add_child(mrow)
+	var bd = button(("[x] " if tw_dot else "[ ] ") + "dot (voiced)", func():
+		tw_dot = not tw_dot
+		show_typewriter(), mrow)
+	var bb = button(("[x] " if tw_bar else "[ ] ") + "bar", func():
+		tw_bar = not tw_bar
+		show_typewriter(), mrow)
+	for b in [bd, bb]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var srow = HBoxContainer.new()
+	srow.add_theme_constant_override("separation", 6)
+	content.add_child(srow)
+	var strike = button("Type it", tw_strike, srow)
+	strike.add_theme_font_size_override("font_size", 20)
+	var sp = button("Space", func():
+		if not tw_text.is_empty() and not (tw_text[tw_text.size() - 1] as Dictionary).has("sp"): tw_text.append({"sp": true})
+		play_sfx("pop", -12.0, 0.7)
+		save_game()
+		show_typewriter(), srow)
+	var bk = button("Correction tape", func():
+		if not tw_text.is_empty():
+			var last: Dictionary = tw_text[tw_text.size() - 1]
+			if last.has("f") and not (last["f"] as Array).is_empty(): (last["f"] as Array).pop_back()
+			else: tw_text.pop_back()
+		play_sfx("whoosh", -16.0, 1.6)
+		save_game()
+		show_typewriter(), srow)
+	for b in [strike, sp, bk]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var orow = HBoxContainer.new()
+	orow.add_theme_constant_override("separation", 6)
+	content.add_child(orow)
+	var rd = button("Read it aloud", func(): speak(tw_label(tw_text)), orow)
+	var ns = button("New sheet", func():
+		tw_text = []
+		tw_msg = ""
+		play_sfx("page", -6.0)
+		save_game()
+		show_typewriter(), orow)
+	var ch = button("Ayvu chart", show_kir_chart, orow)
+	for b in [rd, ns, ch]: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button("Return", close_panel, content)
+
 func kir_knows(c: String, v: String) -> bool:
 	return mastered.has("ky:" + c + "|" + v)
 
@@ -10002,12 +10254,12 @@ func show_kir_story():
 		varnak_banner(ch["v"], 18)
 		var e = text_line("(" + str(ch["en"]) + ")", 15)
 		e.add_theme_color_override("font_color", Color("6b4a2e"))
-	button("Kirmel chart", show_kir_chart, content)
+	button("Ayvu chart", show_kir_chart, content)
 	button("Back", show_notebook, content)
 
 func show_kir_chart():
 	compact_buttons.call_deferred()
-	clear_panel("Kirmel: the old writing")
+	clear_panel("Ayvu: the old writing")
 	talk_partner = ""
 	text_line("Every mark is a syllable. The shape is the first sound; the turn is the vowel (a right, e down, i left, o up, u with a line). A dot makes a sound voiced: p to b, t to d, k to g. You know " + str(kir_known_count()) + " of " + str(kir_all_keys().size()) + ".", 15)
 	var grid = GridContainer.new()
@@ -10171,12 +10423,12 @@ func guardian_teach():
 	log_event("kirmel", "taught by Var Tari")
 	play_sfx("hum", 0.0)
 	clear_panel("Var Tari remembers")
-	varnak_banner("Anke kirmel k-i-zen-da. Ti-ru kirmel k-i-ven-fu-da.", 20)
+	varnak_banner("Anke ayvu k-i-zen-da. Ti-ru ayvu k-i-ven-fu-da.", 20)
 	text_line("(I know the writing. I will give the writing to you.)", 15)
 	text_line("The great fish breathes out slowly. Every glowing mark in the cenote brightens at once, and suddenly you can read all of them: every shape, every turn.", 17)
-	text_line("Bring kirmel back to the village. Suri, the teacher at the school, will know what to do.", 17)
-	toast("You can read all of kirmel now!")
-	button("Kirmel chart", show_kir_chart, content)
+	text_line("Bring Ayvu back to the village. Suri, the teacher at the school, will know what to do.", 17)
+	toast("You can read all of Ayvu now!")
+	button("Ayvu chart", show_kir_chart, content)
 	button("Return", close_panel, content)
 
 # ---- bringing the writing home ----
@@ -10202,15 +10454,15 @@ func suri_kirmel(step: int):
 		complete("kirmel")
 		log_event("kirmel", "brought home")
 		apply_kirmel_signs()
-		clear_panel("Kirmel comes home")
+		clear_panel("Ayvu comes home")
 		add_portrait("suri")
 		emote("suri", "love", 4.0)
-		varnak_banner("Kirmel i-ho-ho! Senakma polu kirmel ri-rav-fu-da!", 20)
+		varnak_banner("Ayvu i-ho-ho! Senakma polu ayvu ri-rav-fu-da!", 20)
 		text_line("(The writing is wonderful! At the school, everyone will read the writing!)", 15)
-		text_line("Suri copies your chart onto the big board. By evening the village signs have kirmel on them, and the old writing shows above Tujuju sentences everywhere.", 17)
+		text_line("Suri copies your chart onto the big board. By evening the village signs have Ayvu on them, and the old writing shows above Tujuju sentences everywhere.", 17)
 		button("Return", close_panel, content)
 		return
-	clear_panel("Teach Suri kirmel (" + str(step + 1) + " of " + str(names.size()) + ")")
+	clear_panel("Teach Suri Ayvu (" + str(step + 1) + " of " + str(names.size()) + ")")
 	add_portrait("suri")
 	text_line("Suri asks: how do you write “" + names[step] + "”?", 17)
 	var opts = kir_options(names[step])
@@ -10229,7 +10481,7 @@ func suri_kirmel(step: int):
 		b.add_child(drawc)
 		var kk = k
 		b.pressed.connect(func():
-			log_event("answer", {"activity": "Teach Suri kirmel", "item": names[step], "chose": str(kk), "correct": "0"}, kk == 0)
+			log_event("answer", {"activity": "Teach Suri Ayvu", "item": names[step], "chose": str(kk), "correct": "0"}, kk == 0)
 			if kk == 0:
 				play_sfx("correct", -4.0)
 				suri_kirmel.call_deferred(step + 1)
