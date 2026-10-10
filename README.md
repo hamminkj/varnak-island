@@ -20,7 +20,7 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 ## Included
 - A real island: shaped coastline and beaches, a harbor inlet, a river from a hot spring to the east coast, and a west hill with a lookout.
 - The original areas (harbor, village, forest, river crossing, northern cove, farm and paddock) plus a market and school to the west, the hill, a hot spring, stepping stones, a healer's garden, an orchard, a lighthouse, an east lagoon, a log bridge and a stone circle.
-- Old ruins on a south-west peninsula, a waterfall with a hidden room in the north-east, and Sendor, a small island reached by Tamu's boat.
+- Old ruins on a south-west peninsula, a waterfall with a hidden room in the north-east, and Sendor, a small island reached by Lachu's boat.
 - Nineteen named residents and three villagers; six main-story quests, eleven side quests and one secret.
 - Day and night (an eight-minute cycle with dawn, morning, day, evening and night announced in Tujuju), stars, a moon, fireflies, shooting stars, rain showers with rainbows, a whale that breaches offshore, and fireworks at night once Neri is found.
 - A dog that follows you once you share bread with it, a coin economy (sell fish, earn gin, buy panak), and eight hidden sea stars that teach ordinal numbers.
@@ -50,7 +50,7 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 - Four house doors, each a small puzzle in commands: open, please open, do not open, close.
 - Follow-up questions for every resident, a phrasebook of collected sentences, a word workshop for case endings, and practice quizzes.
 - Counting piles with the Tujuju number words one to ten, fishing with noun incorporation (with three fishing spots), signs that teach case endings.
-- Side-quest language: question words (Suri), compass directions with -ma (Pomo), body words and pain (Vira), causative -tir (Yalo), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
+- Side-quest language: question words (Suri), compass directions with -ma (Pomo), body words and pain (Jeli), causative -tir (Asya), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
 - A bridge that is visibly broken until Tor's repair, and a table that is laid after Mira's meal.
 - Notebook with editable meaning guesses, optional meaning reveals and mastery marks.
 - Inventory, island guide, automatic saving, manual restart confirmation.
@@ -70,15 +70,15 @@ Side quests, in any order:
 - Market (Ketu, west): catch three fish (river by the bridge, end of the dock, or the lagoon) and give them to Ketu. Ketu gives you cha (tea).
 - School (Suri, north of the market): answer four questions built on hal, hama, han and hamur.
 - Lookout (Pomo, top of the west hill): answer three direction questions (dongma, namma, saima). The yok herb grows on the hill path.
-- Healer (Vira, east of the village): say where Ila hurts, then bring yok and cha.
-- Lighthouse (Yalo, east coast): bring the far (torch) from Neri's campfire, then understand Fardom t-i-ling-tir-o!
+- Healer (Jeli, east of the village): say where Sije hurts, then bring yok and cha.
+- Lighthouse (Asya, east coast): bring the far (torch) from Neri's campfire, then understand Fardom t-i-ling-tir-o!
 - Lagoon (Desh, east lagoon): follow four drum-game commands.
 - Riddles (Oku, old ruins): five riddles about the sun, moon, stars, fish and trees. The reward is a whispered secret.
-- Mail (Gav, harbor): deliver parcels labeled Ketu-ru, Yalo-ru and Oku-ru, then return to Gav for five coins.
+- Mail (Gav, harbor): deliver parcels labeled Ketu-ru, Asya-ru and Oku-ru, then return to Gav for five coins.
 - Hide and seek (Ola, school): find Rin and Ola and shout K-ta-pal-da! (I see you!).
 - Sea stars: find eight hai-sao on the beaches; each one names its ordinal (yanve, velve, murve...).
 - Dog: sell fish to Ketu or earn coins, buy panak, and share it with the village dog.
-- Secret: behind the waterfall is a hidden room with an old map. Ask Tamu for a ride to Sendor (Sendor-ru t-na-tar-o-ye) and dig where the map says: murak-ni shanma, behind the tree.
+- Secret: behind the waterfall is a hidden room with an old map. Ask Lachu for a ride to Sendor (Sendor-ru t-na-tar-o-ye) and dig where the map says: murak-ni shanma, behind the tree.
 
 ## Playing in a browser
 The game is published at https://hamminkj.github.io/tujuju-island/ from the committed

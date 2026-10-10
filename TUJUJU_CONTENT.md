@@ -132,7 +132,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 
 1. Proper names with -ke (Mirake, Torke). I treated names like ordinary nouns.
 2. sign_river uses Mora-ven (as far as the river). If you prefer a different board text, it is one line in data.gd.
-3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Vira's sleeping child) and the notebook notes that it is also a name.
+3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Jeli's sleeping child) and the notebook notes that it is also a name.
 4. mai-ai (sell) is listed as a verb in the vocabulary, but -ai is also the antipassive suffix. I treated mai-ai as an ordinary transitive root in Ketuke panak i-mai-ai-ur-da. If sell should be read as antipassive, the agent would not take -ke.
 5. Ho! (Good!) is used on its own as an exclamation by Suri, Pomo and Desh, and Tari i-ho (The fish are good) by Ketu. The document only lists ho as a stative root.
 6. Compounds I made with the modifier-first rule: fardom (fire-house, lighthouse) and murak-gira (log bridge). Both are new words, not in the document.
@@ -166,7 +166,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 | Far ma-i-esh-ki-da. | There is no fire. | Composed | Negation circumfix around esh, -ki before -da (21.6) |
 | Yeshma fardom i-ling-ur-da. | At night the lighthouse usually shines. | Composed | Locative on yesh, habitual -ur |
 | I-ser-ng. | It is beginning to rain. | Doc | Section 21.3 |
-| Ila i-seng-da. | Ila is happy. | Composed | Stative seng (happy) |
+| Sije i-seng-da. | Sije is happy. | Composed | Stative seng (happy) |
 | Kur-ru. Senak-ru. Sang-ru. Dong-ru. Fardom-ru. Hai-ru. | To the market, school, hill, east, lighthouse, sea. | Composed | Allative -ru, like Bei-ru |
 | Mora-ni aruma. | Beyond the river. | Doc | Section 25.3 |
 | Mora t-i-kor-o! | Cross the river! | Composed | Imperative 2A-3P (21.7) with kor (cross) |
@@ -236,16 +236,16 @@ New sentence-builder items (unlocked by level):
 | Yok e cha t-na-ven-o-ye. | Please give me medicine and tea. | Composed | As before |
 | Ma-k-ri-pal-ak-pa-ki-da. | I did not see them. | Doc | Section 21.1 |
 
-Market rush orders are built from numbers and goods, for example Mur guro e vel panak t-na-ven-o-ye (please give me three fruit and two breads). Speech bubbles reuse phrases already listed above, plus An na-seng-da (I am happy, composed) for Ila and Sendor-ru? (to Sendor?) for Tamu.
+Market rush orders are built from numbers and goods, for example Mur guro e vel panak t-na-ven-o-ye (please give me three fruit and two breads). Speech bubbles reuse phrases already listed above, plus An na-seng-da (I am happy, composed) for Sije and Sendor-ru? (to Sendor?) for Lachu.
 
 Decoy tiles at higher levels are made automatically by swapping endings (-ke added or removed, -ma to -ru, -ru to -ta, -da to -nu, i- to ri-). They are deliberately wrong and never shown as correct.
 
 
 ## Fifth expansion: gossip, nonsense and rumors
 
-Gossip (all composed): Oren mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Yalo yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Pomo sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olake polu-ni guro i-nuk-ur-shi; Vira-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
+Gossip (all composed): Oren mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Pomo sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olake polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
 
-Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Ila i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
+Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Sije i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
 
 Strange things: Tari wak-korma i-esh-da; Ket dom-ni tarma i-esh-da (tar: top, section 25.3); Ketu-ni yir murakma i-esh-da; Puka haima i-esh-da; Sulum morama i-esh-da; Var guro rukma i-esh-da; Cha-kor girama i-esh-da (cha-kor: teapot, a compound I made). Events: Tari-ir hen-ta ri-kar-im-da (fish are coming from the sky); Var guro hala i-pav-im-da (a giant fruit is running fast; pav for rolling is a joke).
 
@@ -309,7 +309,7 @@ Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds
 | aloha | hello, goodbye | Hawaiian |
 | chau | bye | Italian ciao |
 
-Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Tamu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
+Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Lachu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
 
 Things to check: 17. Whether loans keep ch (as in cha) or should become sh. 18. Stress and long vowels in loans are not marked.
 
@@ -364,7 +364,7 @@ Key sentences:
 - Ti choni-na ta-an-da! (You are a choni person!)
 - Choni-ir hen-ta ri-kar-im-da! (Chonies are coming from the sky!)
 
-New gossip: Gav's chonies swimming (-shi), Yalo and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Pomo's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Vira's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
+New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Pomo's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
 
 Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
 

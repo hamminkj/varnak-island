@@ -164,8 +164,8 @@ var side_quests = [
 	["market","ketu","Ketu at the market (west) wants mur tari: three fish. Fish at the river, the dock or the lagoon."],
 	["school","suri","Answer Suri's four questions at the school, north of the market."],
 	["lookout","pomo","Climb the west hill and answer Pomo's direction questions."],
-	["healer","vira","Help Vira the healer, east of the village. Her patient needs yok and cha."],
-	["lighthouse","yalo","The lighthouse is dark. Bring far (fire) from Neri's campfire to Yalo."],
+	["healer","jeli","Help Jeli the healer, east of the village. Her patient needs yok and cha."],
+	["lighthouse","asya","The lighthouse is dark. Bring far (fire) from Neri's campfire to Asya."],
 	["lagoon","desh","Play Desh's drum game at the east lagoon."],
 	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
 	["mail","gav","Gav at the harbor needs parcels delivered. Read the labels!"],
@@ -186,7 +186,7 @@ var side_quests = [
 	["guesswho","neri","Play Guess who with Neri and win three times."],
 	["yesen","","Yesen! Do improv scenes with villagers (Chat, then Yesen) and get big applause in five of them. Level 2 and up."],
 	["kirmel","suri","The lost writing. Deep in the cenote in the far north-east there are carvings no one can read. Read them, find the one who remembers, and bring the writing back to the village."],
-	["treasure","tamu","Follow the old map: Gin murak-ni shanma i-esh-da. Tamu at the dock can take you to Sendor."]
+	["treasure","lachu","Follow the old map: Gin murak-ni shanma i-esh-da. Lachu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
 var rumors: Array = []
@@ -243,16 +243,16 @@ var looks = {
 	"rin": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
 	"ola": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
 	"pomo": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
-	"vira": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
-	"ila": [Color("f0c9a0"), Color("7a4a22"), 2, Color("f4a261")],
-	"yalo": [Color("c68e66"), Color("2e2a5a"), 4, Color("f4f1e8")],
+	"jeli": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
+	"sije": [Color("f0c9a0"), Color("7a4a22"), 2, Color("f4a261")],
+	"asya": [Color("c68e66"), Color("2e2a5a"), 4, Color("f4f1e8")],
 	"desh": [Color("7a4a32"), Color("1d1d1d"), 5, Color("2a9d8f")],
 	"sair1": [Color("e3b98f"), Color("4a3020"), 1, Color("a78bda")],
 	"sair2": [Color("a87650"), Color("1d1d1d"), 0, Color("e9c46a")],
 	"sair3": [Color("d9a679"), Color("5a4030"), 3, Color("4f7ca8")],
 	"oku": [Color("c68e66"), Color("e6e1d6"), 7, Color("8f5a48")],
 	"gav": [Color("e3b98f"), Color("8a3a1a"), 3, Color("2a6f97")],
-	"tamu": [Color("8d5a3b"), Color("1d1d1d"), 1, Color("e9c46a")]
+	"lachu": [Color("8d5a3b"), Color("1d1d1d"), 1, Color("e9c46a")]
 }
 # Extra features so every villager has their own silhouette.
 var person_ex = {
@@ -268,16 +268,16 @@ var person_ex = {
 	"rin": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
 	"ola": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
 	"pomo": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
-	"vira": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
-	"ila": {"shirt": Color("a78bda"), "scarf": Color("f4f1e8"), "hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true, "prop": "mug", "brows": "worried", "mouth": "o"},
-	"yalo": {"shirt": Color("f2c14e"), "robe": Color("e0ac2a"), "h": 1.18, "w": 0.85, "hat": "captain", "mustache": Color("2e2a5a"), "prop": "lantern", "brows": "worried", "mouth": "o"},
+	"jeli": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
+	"sije": {"shirt": Color("a78bda"), "scarf": Color("f4f1e8"), "hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true, "prop": "mug", "brows": "worried", "mouth": "o"},
+	"asya": {"shirt": Color("f2c14e"), "robe": Color("e0ac2a"), "h": 1.18, "w": 0.85, "hat": "captain", "mustache": Color("2e2a5a"), "prop": "lantern", "brows": "worried", "mouth": "o"},
 	"desh": {"shirt": Color("ff5d8f"), "stripe": Color("f4f1e8"), "face": "sunglasses", "style": 8, "prop": "drum", "mouth": "grin", "w": 1.05},
 	"sair1": {"h": 0.93, "scarf": Color("a78bda")},
 	"sair2": {"w": 1.2, "hat": "beanie", "hat_color": Color("e9c46a")},
 	"sair3": {"h": 1.07, "face": "glasses"},
 	"oku": {"shirt": Color("6b4f36"), "robe": Color("5a4030"), "belt": Color("c9a46d"), "beard": Color("e6e1d6"), "face": "glasses", "h": 0.93, "w": 0.9, "prop": "cane", "brows": "flat", "thick": true, "brow_color": Color("e6e1d6")},
 	"gav": {"shirt": Color("2a6f97"), "hat": "cap", "hat_color": Color("e9c46a"), "bag": Color("8c5a3c"), "style": 0, "prop": "letter", "freckles": true, "mouth": "smile", "brows": "raised"},
-	"tamu": {"shirt": Color("f4f1e8"), "stripe": Color("c0392b"), "vest": Color("1d3557"), "hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.18, "build": "round", "prop": "oar", "brows": "angry", "thick": true, "mouth": "frown"}
+	"lachu": {"shirt": Color("f4f1e8"), "stripe": Color("c0392b"), "vest": Color("1d3557"), "hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.18, "build": "round", "prop": "oar", "brows": "angry", "thick": true, "mouth": "frown"}
 }
 var names = {"sair1": "sair", "sair2": "sair", "sair3": "sair"}
 var house_centers = [Vector3(-9,0,12), Vector3(10,0,7), Vector3(-11,0,1), Vector3(12,0,-4)]
@@ -288,7 +288,7 @@ var regions = [
 	["hill", "sang: the west hill", Vector2(-60, -38), 16.0, Vector3(-57, 0, -35)],
 	["spring", "The hot spring", Vector2(-44, -21), 7.5, Vector3(-40, 0, -16)],
 	["circle", "The stone circle", Vector2(32, -42), 9.0, Vector3(37, 0, -39)],
-	["healer", "Vira's garden", Vector2(51, -4), 9.0, Vector3(48, 0, -8)],
+	["healer", "Jeli's garden", Vector2(51, -4), 9.0, Vector3(48, 0, -8)],
 	["orchard", "The orchard", Vector2(45, 22), 10.0, Vector3(46, 0, 14)],
 	["lagoon", "hai: the east lagoon", Vector2(69, 21), 11.0, Vector3(63, 0, 20)],
 	["lighthouse", "fardom: the lighthouse", Vector2(75, -7), 9.0, Vector3(70, 0, -7)],
@@ -1032,9 +1032,9 @@ func build_entities():
 		(kid["node"] as Node3D).scale = Vector3.ONE * 0.78
 		kid["ph"] = 1.55
 	entity("pomo","npc","Pomo",Vector3(-58.8,0,-36.4),Color("4f7ca8"))
-	entity("vira","npc","Vira",Vector3(51.6,0,-4.4),Color("5b8c5a"))
-	entity("ila","npc","Ila",Vector3(53.4,0,-1.8),Color("a78bda"))
-	entity("yalo","npc","Yalo",Vector3(73.4,0,-5.0),Color("3f5f8a"))
+	entity("jeli","npc","Jeli",Vector3(51.6,0,-4.4),Color("5b8c5a"))
+	entity("sije","npc","Sije",Vector3(53.4,0,-1.8),Color("a78bda"))
+	entity("asya","npc","Asya",Vector3(73.4,0,-5.0),Color("3f5f8a"))
 	entity("desh","npc","Desh",Vector3(67.0,0,20.6),Color("e9c46a"))
 	entity("sair3","npc","sair",Vector3(64.2,0,15.2),Color("c0392b"))
 	# ---- second expansion: things ----
@@ -1079,7 +1079,7 @@ func build_entities():
 	# ---- third expansion ----
 	entity("oku","npc","Oku",Vector3(-59.6,0,35.8),Color("6b4f36"))
 	entity("gav","npc","Gav",Vector3(5.4,0,34.4),Color("2a6f97"))
-	var tm = entity("tamu","npc","Tamu",Vector3(-2.4,0,41.0),Color("c0392b"))
+	var tm = entity("lachu","npc","Lachu",Vector3(-2.4,0,41.0),Color("c0392b"))
 	(tm["node"] as Node3D).position.y = 0.11
 	tm["home"].y = 0.11
 	entity("ruins","object","dom",Vector3(-60.8,0,38.6),Color.WHITE,2.2,Vector2(1.4,1.8))
@@ -2546,21 +2546,21 @@ func lookout_quiz(i: int):
 func pain_puzzle():
 	var p = Data.PAIN
 	for w in ["tong", "dau", "ten", "mal"]: learn(w)
-	choice_puzzle("Where does it hurt?", p["gesture"] + "\n\nWhat is Ila telling Vira?", p["options"], p["correct"], func():
+	choice_puzzle("Where does it hurt?", p["gesture"] + "\n\nWhat is Sije telling Jeli?", p["options"], p["correct"], func():
 		if not solved.has("pain"): solved.append("pain")
 		save_game(),
-		p["why"], "Look at where Ila holds her hands: dau is head, ten is foot, mal is hand.", talk.bind("vira"),
-		func(): button("Continue", talk.bind("vira"), content))
+		p["why"], "Look at where Sije holds her hands: dau is head, ten is foot, mal is hand.", talk.bind("jeli"),
+		func(): button("Continue", talk.bind("jeli"), content))
 
 func light_puzzle():
 	learn("ling")
 	learn("-tir")
-	choice_puzzle("Light the lamp", "Yalo carries the torch up the stairs and calls down to you:\n\n“Fardom t-i-ling-tir-o!”\n\nWhat is Yalo asking you to do?",
+	choice_puzzle("Light the lamp", "Asya carries the torch up the stairs and calls down to you:\n\n“Fardom t-i-ling-tir-o!”\n\nWhat is Asya asking you to do?",
 		["Make the lighthouse bright!", "Make the lighthouse dark!", "Do not touch the lighthouse!"], 0, func():
 			consume(["torch"])
 			complete("lighthouse"),
 		"ling is bright and -tir means cause or make, so ling-tir means make bright. t-i- means you act on it, and -o makes it a command. You pull the lever and the lamp blazes.",
-		"Look for ling (bright) and the causative -tir, make.", talk.bind("yalo"))
+		"Look for ling (bright) and the causative -tir, make.", talk.bind("asya"))
 
 func desh_round(i: int, order: Array):
 	var cmd: Dictionary = order[i]
@@ -2634,10 +2634,10 @@ func add_topics(id: String):
 			topic("Ask about the hill", "hill_taller", id)
 			topic("Ask about the summit", "summit_highest", id)
 			topic("Ask about the night sky", "night_sky", id)
-		"vira": topic("Ask about the sleeping child", "child_sleeps", id)
-		"ila":
-			if completed.has("healer"): topic("Ask how Ila feels", "ila_happy", id)
-		"yalo":
+		"jeli": topic("Ask about the sleeping child", "child_sleeps", id)
+		"sije":
+			if completed.has("healer"): topic("Ask how Sije feels", "ila_happy", id)
+		"asya":
 			if completed.has("lighthouse"):
 				topic("Ask about the light", "lighthouse_bright", id)
 				topic("Ask about the night", "night_light", id)
@@ -2658,8 +2658,8 @@ func add_topics(id: String):
 		"gav":
 			topic("Ask Gav about his work", "gav_mail", id)
 			button("Ask about the lost chonies" + ("  [ok]" if completed.has("chonies") else ""), choni_hints, content)
-		"tamu":
-			topic("Ask Tamu about the boat", "tamu_ferry", id)
+		"lachu":
+			topic("Ask Lachu about the boat", "tamu_ferry", id)
 			topic("Ask about the small island", "islet_small", id)
 
 func topic(label: String, sid: String, npc: String):
@@ -2835,43 +2835,43 @@ func talk(id: String):
 			text_line("Pomo hands you the telescope. “Bei, nam, dong, sai,” Pomo says, pointing north, south, east and west in turn.")
 			if completed.has("lookout"): text_line("“Ho!” You already know your directions.")
 			button("Repeat the questions" if completed.has("lookout") else "Answer Pomo's questions", lookout_quiz.bind(0), content)
-		"vira":
+		"jeli":
 			learn("yok")
-			clear_panel("Vira the healer")
+			clear_panel("Jeli the healer")
 			if completed.has("healer"):
-				text_line("Vira is grinding herbs. Ila is up and about. “Ila i-seng-da.”")
+				text_line("Jeli is grinding herbs. Sije is up and about. “Sije i-seng-da.”")
 			elif not solved.has("pain"):
-				text_line("Vira kneels beside Ila, who looks miserable. Vira asks Ila where it hurts, then turns to you.")
-				button("Listen to Ila", pain_puzzle, content)
+				text_line("Jeli kneels beside Sije, who looks miserable. Jeli asks Sije where it hurts, then turns to you.")
+				button("Listen to Sije", pain_puzzle, content)
 			else:
 				learn("cha")
 				learn("e")
-				text_line("Vira mimes crushing leaves into a steaming cup.\n\n“Yok e cha t-na-ven-o-ye.”")
+				text_line("Jeli mimes crushing leaves into a steaming cup.\n\n“Yok e cha t-na-ven-o-ye.”")
 				button("Offer yok and cha", func():
 					if has_items(["herb", "tea"]):
 						consume(["herb", "tea"])
 						complete("healer")
 						learn("seng")
-						message("Ila feels better", "Vira brews the herb in the hot tea. Ila sips it, and slowly the frown fades. “Ila i-seng-da.” Ila is happy.")
+						message("Sije feels better", "Jeli brews the herb in the hot tea. Sije sips it, and slowly the frown fades. “Sije i-seng-da.” Sije is happy.")
 					else:
 						var miss: Array = []
 						if not inventory.has("herb"): miss.append("yok: a healing herb that grows on the west hill (it glows)")
 						if not inventory.has("tea"): miss.append("cha: Ketu at the market trades tea for three fish")
-						message("Vira repeats the request", "Still needed:\n" + "\n".join(miss)), content)
-		"ila":
-			clear_panel("Ila")
-			if completed.has("healer"): text_line("Ila stretches and smiles at you.")
-			else: text_line("Ila holds her head and groans quietly. Vira the healer is looking after her.")
-		"yalo":
+						message("Jeli repeats the request", "Still needed:\n" + "\n".join(miss)), content)
+		"sije":
+			clear_panel("Sije")
+			if completed.has("healer"): text_line("Sije stretches and smiles at you.")
+			else: text_line("Sije holds her head and groans quietly. Jeli the healer is looking after her.")
+		"asya":
 			for w in ["fardom", "far", "tar", "-ye"]: learn(w)
-			clear_panel("Yalo the lighthouse keeper")
+			clear_panel("Asya the lighthouse keeper")
 			if completed.has("lighthouse"):
-				text_line("The beam sweeps the water. Yalo grins and gives you a thumbs up.")
+				text_line("The beam sweeps the water. Asya grins and gives you a thumbs up.")
 			else:
-				text_line("Yalo points up at the lamp room. “Fardom i-dam-da. Far ma-i-esh-ki-da.” Then he looks at you hopefully:\n\n“Far t-na-tar-o-ye.”")
+				text_line("Asya points up at the lamp room. “Fardom i-dam-da. Far ma-i-esh-ki-da.” Then he looks at you hopefully:\n\n“Far t-na-tar-o-ye.”")
 				button("Offer far (fire)", func():
 					if inventory.has("torch"): light_puzzle()
-					else: message("Yalo shakes his head", "No far yet. Neri keeps a campfire at the northern cove; a torch there would do. It glows, so you can spot it."), content)
+					else: message("Asya shakes his head", "No far yet. Neri keeps a campfire at the northern cove; a torch there would do. It glows, so you can spot it."), content)
 		"oku":
 			clear_panel("Oku at the old ruins")
 			learn("shora")
@@ -2896,7 +2896,7 @@ func talk(id: String):
 					solved.append("mail_start")
 					for p in Data.PARCELS.keys(): inventory.append(p)
 					save_game()
-					message("Three parcels", "The labels say:\nKetu-ru\nYalo-ru\nOku-ru\n\nThe ending -ru means to. Find each person and choose Give a parcel. Ketu is at the market, Yalo at the lighthouse, Oku at the old ruins in the south-west."), content)
+					message("Three parcels", "The labels say:\nKetu-ru\nAsya-ru\nOku-ru\n\nThe ending -ru means to. Find each person and choose Give a parcel. Ketu is at the market, Asya at the lighthouse, Oku at the old ruins in the south-west."), content)
 			else:
 				var left: Array = []
 				for p in Data.PARCELS.keys():
@@ -2909,12 +2909,12 @@ func talk(id: String):
 					text_line("Gav beams. “K-ta-har-da!” He presses pan gin, five coins, into your hand.")
 				else:
 					text_line("Parcels still to deliver:\n" + "\n".join(left))
-		"tamu":
-			clear_panel("Tamu the boatman")
+		"lachu":
+			clear_panel("Lachu the boatman")
 			learn("sena")
-			text_line("Tamu leans on the oar and nods toward the sea. Far out, a small island with one tree.")
+			text_line("Lachu leans on the oar and nods toward the sea. Far out, a small island with one tree.")
 			if inventory.has("map") and not completed.has("treasure"):
-				text_line("Tamu glances at your old map and raises his eyebrows.")
+				text_line("Lachu glances at your old map and raises his eyebrows.")
 			button("Ask for a ride", ride_puzzle.bind(player.position.z < 60.0), content)
 		"desh":
 			for w in ["hai", "-o"]: learn(w)
@@ -3346,7 +3346,11 @@ func save_game():
 
 func load_game():
 	if not FileAccess.file_exists(SAVE): return
-	var data = JSON.parse_string(FileAccess.get_file_as_string(SAVE))
+	var raw = FileAccess.get_file_as_string(SAVE)
+	# villagers renamed in October 2026: carry old saves over to the new names
+	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"]]:
+		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
+	var data = JSON.parse_string(raw)
 	if not data is Dictionary: return
 	guesses = data.get("guesses",{})
 	inventory = data.get("inventory",[])
@@ -3682,7 +3686,7 @@ func ride_puzzle(to_islet: bool):
 	learn("-ru")
 	var place = "Sendor" if to_islet else "Teka"
 	var opts = [place + "-ru t-na-tar-o-ye.", place + "-ta t-na-tar-o-ye.", place + "-ma t-na-tar-o-ye."]
-	choice_puzzle("Tamu's boat", ("Tamu points out to sea, toward a small island with one tree.\n\nAsk Tamu to take you to Sendor." if to_islet else "Tamu waits by the boat, ready to row home.\n\nAsk Tamu to take you back to the village."), opts, 0, func(): master("q:ride"),
+	choice_puzzle("Lachu's boat", ("Lachu points out to sea, toward a small island with one tree.\n\nAsk Lachu to take you to Sendor." if to_islet else "Lachu waits by the boat, ready to row home.\n\nAsk Lachu to take you back to the village."), opts, 0, func(): master("q:ride"),
 		opts[0] + " means Please take me to " + ("Sendor." if to_islet else "the village.") + " The ending -ru means to; -ta would mean from and -ma in.",
 		"Which ending means to? -ru is to, -ta is from, -ma is in.", Callable(),
 		func(): button("Set off!", start_ride.bind(to_islet), content))
@@ -4143,16 +4147,16 @@ func greeting(id: String) -> String:
 		"rin": return "An ravar na-an-da."
 		"ola": return "Ti kelar ta-an-ha?"
 		"pomo": return "Bei, nam, dong, sai."
-		"vira": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Ila i-seng-da."
-		"ila": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
-		"yalo": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
+		"jeli": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Sije i-seng-da."
+		"sije": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
+		"asya": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
 		"desh": return "Aloha! Ta-sum-o!"
 		"sair1": return "Anke panak k-i-mai-fu."
 		"sair2": return "Cha i-ret."
 		"sair3": return "I-ser-ng."
 		"oku": return "Ki dom i-shora."
 		"gav": return "Kel-ir! Kel-ir!" if not completed.has("mail") else "K-ta-har-da!"
-		"tamu": return "Chau... Sendor-ru?"
+		"lachu": return "Chau... Sendor-ru?"
 	return ""
 
 func make_bubble(e: Dictionary):
@@ -5006,7 +5010,7 @@ func gossip_buttons(id: String):
 	for g in Data.GOSSIP:
 		if g["about"] == id and solved.has("gh:" + g["id"]):
 			button("Ask about what " + str(g["by"]).capitalize() + " said" + ("  [ok]" if solved.has("gc:" + g["id"]) else ""), gossip_reply.bind(g), content)
-	if gossip_count("gh:") >= 1 and not names.has(id) and id != "ila" and id != "rin":
+	if gossip_count("gh:") >= 1 and not names.has(id) and id != "sije" and id != "rin":
 		button("Tell some gossip", rumor_composer.bind(id), content)
 	if not rumors.is_empty():
 		button("What's the news?", news.bind(id), content)
@@ -5744,7 +5748,7 @@ func tease(id: String):
 			"sleepy": react(id, sv, se, "Choni...? zzz", "Chonies...? zzz", "sleepy", 0)
 			_: react(id, sv, se, "Shenani! Ha!", "Mischief! Ha!", "embarrassed", 0)
 		return
-	if id == "vira":
+	if id == "jeli":
 		react(id, sv, se, "Ho! Yok i-wai-da! Polu i-zen-da!", "Yes! The medicine is bad! Everyone knows!", "laugh", 1)
 		return
 	match pp["trait"]:
@@ -6746,8 +6750,8 @@ func do_prank(id: String, p: Dictionary):
 	if id == "gav" and p["id"] == "choni":
 		react(id, sv, se, "Anni choni?! Hama?! HAMA?! ...Hiri? Ha! Ha!", "(" + act + ") My chonies?! Where?! WHERE?! ...A prank? Ha ha!", "shocked", 1)
 		return
-	if id == "yalo" and p["id"] == "ghost":
-		react(id, sv, se, "AAAH! Poltergais! ...Ti?! Hiri?! Maki...", "(Yalo hides under his own coat.) AAAH! A poltergeist! ...You?! A prank?! No...", "faint", 0)
+	if id == "asya" and p["id"] == "ghost":
+		react(id, sv, se, "AAAH! Poltergais! ...Ti?! Hiri?! Maki...", "(Asya hides under his own coat.) AAAH! A poltergeist! ...You?! A prank?! No...", "faint", 0)
 		return
 	var r: Array = Data.PRANKED[tt]
 	react(id, sv + "  ...Hiri!", se + " ...Gotcha!", r[0], "(" + act + ") " + r[1], r[2], r[3])
@@ -7207,7 +7211,7 @@ func solve_how(s: Array):
 func solve_check(who: String, ev: String):
 	log_event("mystery_guess", {"who": who, "ending": ev}, who == "Par" and ev == "shi")
 	if who != "Par":
-		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Ena asked.", "Poltergais": "Ila says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
+		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Ena asked.", "Poltergais": "Sije says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
 		message("Hmm, not quite", why + " Look at your clues again: feathers, kraa, and someone who goes out at night.")
 		button("Try again", solve_mystery, content)
 		return
@@ -7578,7 +7582,7 @@ func where_menu(id: String):
 	add_portrait(id)
 	learn("hama")
 	text_line("Ask about a person or a place. The answer uses bei north, nam south, dong east, sai west.", 16)
-	for p in ["neri", "ketu", "suri", "pomo", "vira", "yalo", "desh", "oku", "gav", "tamu", "tor", "mira", "oren", "lira"]:
+	for p in ["neri", "ketu", "suri", "pomo", "jeli", "asya", "desh", "oku", "gav", "lachu", "tor", "mira", "oren", "lira"]:
 		if p != id: button(p.capitalize(), where_say.bind(id, p), content)
 	for w in Data.WHERE_PLACES.keys():
 		button(w + " (" + Data.WHERE_PLACES[w][0] + ")", where_say.bind(id, w), content)
