@@ -470,7 +470,7 @@ New word: tujuju (jabiru stork), from the South American name tuyuyu (origin unc
 |---|---|---|
 | Tujuju morama i-tari-nuk-im-da. | The stork is fishing in the river. | Composed on Kelar i-tari-nuk-ak-pa-da (section 23) with -im |
 | Sair-ir tujuju-ir-ni shanma dor-ma ri-tal-ak-pa-nu. | They say the people came to the land behind the storks. | Composed: -ni shanma as in Gin murak-ni shanma; ri-tal-ak-pa-nu as in the creation story |
-| Tujuju-ir hai-ta dor-ru ri-fei-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu. | The storks flew from the sea to the land, they say. The people went behind the storks. | Composed; new creation story chapter 5 (depth 30) |
+| Tujuju-ir hen-ta ri-tal-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu. | The storks came down from the sky, they say. The people went behind the storks. | Composed; new creation story chapter 5 (depth 30) |
 | Tujuju-ir dor-ma ri-esh-ur-nu. | They say storks live on the land. | Composed; a Var Tari line |
 
-Things to check: 42. -ta (from) and -ru (to) on the same verb (hai-ta dor-ru ri-fei-ak-pa-nu). 43. -ni shanma after a plural noun (tujuju-ir-ni). 44. Whether the island's name should be written Tujuju or with a Tujuju respelling, and whether a native island word (like sendor for the small island) should exist alongside it.
+Things to check: 42. hen-ta ri-tal-ak-pa-nu (arrived from the sky) uses tal for "came down"; there is no separate verb for descending. 43. -ni shanma after a plural noun (tujuju-ir-ni). 44. Whether the island's name should be written Tujuju or with a Tujuju respelling, and whether a native island word (like sendor for the small island) should exist alongside it.

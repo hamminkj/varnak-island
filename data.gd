@@ -1197,7 +1197,7 @@ const KIR_STORY = [
 	{"depth": 15.0, "v": "Var tari haima i-sul-pa-nu. Tari-ni dau-ma sao-ir ri-esh-pa-nu.", "en": "A great fish slept in the sea, they say. On the fish's head there were stars."},
 	{"depth": 21.0, "v": "Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu.", "en": "The fish jumped, they say. The stars went up into the sky."},
 	{"depth": 27.0, "v": "Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu.", "en": "The fish sang a song, they say. Out of the song, the land arrived."},
-	{"depth": 30.0, "pic": "stork", "v": "Tujuju-ir hai-ta dor-ru ri-fei-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu.", "en": "The storks flew from the sea to the land, they say. The people went behind the storks."},
+	{"depth": 30.0, "pic": "stork", "v": "Tujuju-ir hen-ta ri-tal-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu.", "en": "The storks came down from the sky, they say. The people went behind the storks."},
 	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
 	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
 	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
