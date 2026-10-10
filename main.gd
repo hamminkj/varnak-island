@@ -1529,6 +1529,91 @@ func button(text: String, callback: Callable, parent: Node) -> Button:
 	parent.add_child(b)
 	return b
 
+# ---- photos: a small camera button that captures only the scenery ----
+var photo_btn: Button
+var photo_busy: bool = false
+
+func build_photo_button():
+	photo_btn = Button.new()
+	photo_btn.flat = true
+	photo_btn.focus_mode = Control.FOCUS_NONE
+	photo_btn.tooltip_text = "Take a picture of the scenery"
+	photo_btn.custom_minimum_size = Vector2(40, 34)
+	photo_btn.size = Vector2(40, 34)
+	photo_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	photo_btn.offset_left = -54
+	photo_btn.offset_right = -14
+	photo_btn.offset_top = 172
+	photo_btn.offset_bottom = 206
+	photo_btn.modulate = Color(1, 1, 1, 0.55)
+	var ic = Control.new()
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ic.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ic.draw.connect(func():
+		var c = ic.size * 0.5
+		var ink = Color("fff6df")
+		var shade = Color(0.12, 0.1, 0.08, 0.55)
+		ic.draw_rect(Rect2(c + Vector2(-15, -9), Vector2(30, 20)), shade, true)
+		ic.draw_rect(Rect2(c + Vector2(-15, -9), Vector2(30, 20)), ink, false, 2.0)
+		ic.draw_rect(Rect2(c + Vector2(-6, -13), Vector2(12, 4)), ink, true)
+		ic.draw_arc(c + Vector2(0, 1), 6.0, 0.0, TAU, 18, ink, 2.0, true))
+	photo_btn.add_child(ic)
+	photo_btn.pressed.connect(take_photo)
+	ui.add_child(photo_btn)
+
+func take_photo():
+	if photo_busy: return
+	photo_busy = true
+	# hide every button, toolbar, label and marker, so only the scenery is in the picture
+	var hidden: Array = []
+	for n in find_children("*", "Label3D", true, false):
+		if n.has_meta("scenery"): continue
+		if (n as Node3D).visible:
+			(n as Node3D).visible = false
+			hidden.append(n)
+	for n in get_tree().get_nodes_in_group("hud3d"):
+		if n is Node3D and (n as Node3D).visible:
+			(n as Node3D).visible = false
+			hidden.append(n)
+	if marker and marker.visible:
+		marker.visible = false
+		hidden.append(marker)
+	ui.visible = false
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	var img: Image = get_viewport().get_texture().get_image()
+	ui.visible = true
+	for n in hidden:
+		if is_instance_valid(n): (n as Node3D).visible = true
+	if img == null or img.is_empty():
+		toast("Couldn't take a picture here")
+		photo_busy = false
+		return
+	play_sfx("page", -12.0, 1.6)
+	# a quick white flash, like a shutter
+	var flash = ColorRect.new()
+	flash.color = Color(1, 1, 1, 0.7)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ui.add_child(flash)
+	var tw = create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.35)
+	tw.tween_callback(flash.queue_free)
+	var stamp = Time.get_datetime_string_from_system().replace(":", "").replace("-", "").replace("T", "-")
+	var fname = "tujuju-" + stamp + ".png"
+	if OS.has_feature("web"):
+		JavaScriptBridge.download_buffer(img.save_png_to_buffer(), fname, "image/png")
+		toast("Picture saved to your downloads")
+	else:
+		DirAccess.make_dir_recursive_absolute("user://pictures")
+		img.save_png("user://pictures/" + fname)
+		toast("Picture saved: " + ProjectSettings.globalize_path("user://pictures/" + fname))
+	last_photo = img
+	log_event("photo", fname)
+	photo_busy = false
+
+var last_photo: Image
+
 func build_ui():
 	var layer = CanvasLayer.new()
 	add_child(layer)
@@ -1560,6 +1645,7 @@ func build_ui():
 	top_row = HBoxContainer.new()
 	top_row.position = Vector2(14,124)
 	ui.add_child(top_row)
+	build_photo_button()
 	top_row.add_theme_constant_override("separation", 6)
 	for tb in [["Notebook", show_notebook], ["Bag", show_inventory], ["Map", show_map], ["", show_more]]:
 		var b = button(tb[0], tb[1], top_row)

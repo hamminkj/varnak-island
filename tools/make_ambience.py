@@ -113,10 +113,10 @@ def forest():
         lambda: np.concatenate([bird_whistle(3900, 3900, 0.18), np.zeros(int(SR * 0.08)), bird_whistle(3300, 3200, 0.24)]),
         lambda: bird_trill(rng.uniform(4200, 5200), rng.integers(8, 16), rng.uniform(14, 22)),
         lambda: bird_warble(rng.uniform(2400, 3200), rng.uniform(0.5, 0.9)),
-        lambda: dove() * 1.6,
+        lambda: dove() * 0.4,
         lambda: np.concatenate([bird_whistle(f, f * 0.92, 0.09) for f in rng.uniform(2800, 3800, 5)]),
     ]
-    for sp, (rate, vol, dist) in zip(species, [(0.35, 0.5, 0.6), (0.25, 0.45, 0.9), (0.22, 0.35, 0.5), (0.2, 0.35, 1.2), (0.12, 0.45, 1.5), (0.18, 0.35, 0.8)]):
+    for sp, (rate, vol, dist) in zip(species, [(0.35, 0.5, 0.6), (0.25, 0.45, 0.9), (0.22, 0.35, 0.5), (0.2, 0.35, 1.2), (0.12, 0.45, 2.4), (0.18, 0.35, 0.8)]):
         pan = rng.uniform(-0.85, 0.85)
         at = rng.uniform(0, 3)
         while at < sec:

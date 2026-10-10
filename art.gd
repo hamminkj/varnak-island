@@ -942,6 +942,7 @@ static func signpost(parent: Node3D, pos: Vector3, text: String, face_yaw: float
 	fs = mini(fs, int(0.5 / (lines.size() * 1.15 * 0.006)))
 	for back in [false, true]:
 		var lb = Label3D.new()
+		lb.set_meta("scenery", true)
 		lb.text = text
 		lb.font_size = fs
 		lb.pixel_size = 0.006
@@ -973,6 +974,7 @@ void fragment() {
 # A soft column of light so loose items can be spotted from a distance.
 static func beacon(parent: Node3D) -> Node3D:
 	var b = Node3D.new()
+	b.add_to_group("hud3d")
 	parent.add_child(b)
 	var sh = Shader.new()
 	sh.code = BEAM_SHADER

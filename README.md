@@ -126,6 +126,9 @@ Three tujuju, jabiru storks with bare black heads, red collars and giant bills, 
 ## The Ayvu typewriter (kir-kor)
 Once Var Tari has taught you Ayvu, show Dofo the Ayvu chart and he builds you a kir-kor, a writing box (Bag or Notebook to use it). Its keys follow the writing itself: shape keys pick the consonant shape, the dot and bar keys add the inner marks, the round dial turns the mark for the vowel and points the way the mark will face (a right, e down, i left, o up), the u lever adds the line underneath (only with the dial at a), and the final key types a small raised consonant at the end of a syllable. Marks that don't fit a shape make the key jam, with the reason. There is no backspace, only correction tape. The sheet is saved, can be read aloud, and shows its reading underneath.
 
+## Pictures
+A small, faint camera button sits at the right edge under the top row. It takes a picture of the scenery only: buttons, toolbars, the quest box, the joystick, floating name labels and quest markers are hidden for that one frame (sign lettering stays). On the web the picture downloads as tujuju-<date>-<time>.png; elsewhere it is saved in the game's pictures folder.
+
 ## Look
 The art is nudged toward the painted backgrounds of Eyvind Earle: flat, banded light with no shine, a teal sky fading to pale yellow-green, cool blue-violet distance, cool shadows, richer blue-greens, and taller, slimmer stacked pines. His patterning and shaping: fine, broken parallel lines run up trunks, down pine tiers and over canopies (a shader that follows each shape and fades with distance), hills carry wavy contour striations, rocks are grained, broadleaf trees are tall upright ovals on long trunks, and clouds are long, flat-bottomed and stacked in tiers.
 
