@@ -477,8 +477,8 @@ func build_world():
 const SKY_TOP = Color("1f6a8c")
 const SKY_HZ = Color("e8e6b2")
 const SKY_LOW = Color("7d97ad")
-const FOG_DAY = Color("a7b6d3")
-const SHADE = Color("7d8fbd")
+const FOG_DAY = Color("9fa9d6")
+const SHADE = Color("7486c2")
 
 func build_environment():
 	var we = WorldEnvironment.new()
@@ -502,13 +502,13 @@ func build_environment():
 	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	env.tonemap_exposure = 0.82
 	env.adjustment_enabled = true
-	env.adjustment_saturation = 1.16
-	env.adjustment_contrast = 1.09
+	env.adjustment_saturation = 1.26
+	env.adjustment_contrast = 1.14
 	# distance turns into layers of cool blue-violet, like painted backdrops
 	env.fog_enabled = true
 	env.fog_light_color = FOG_DAY
-	env.fog_density = 0.0052
-	env.fog_sky_affect = 0.12
+	env.fog_density = 0.0078
+	env.fog_sky_affect = 0.1
 	we.environment = env
 	add_child(we)
 	sun = DirectionalLight3D.new()
@@ -628,28 +628,28 @@ func add_tree(p: Vector3, vary: RandomNumberGenerator, trunks: Array, trunk_colo
 	tree_pts.append(Vector2(p.x, p.z))
 	var s = vary.randf_range(0.85, 1.45)
 	var yaw = vary.randf() * TAU
-	var trunk_h = 2.0 * s
+	var trunk_h = 2.4 * s
 	tree_info.append([p, s])
 	trunks.append(Transform3D(Basis.from_scale(Vector3(s, trunk_h, s)), p + Vector3(0, trunk_h * 0.5, 0)))
 	trunk_colors.append(Color("6b4f36").lerp(Color("85623f"), vary.randf()))
 	if vary.randf() < 0.5:
 		# tall, slim, stacked: the stylized pines of a painted forest
 		for layer in range(3):
-			var r = (1.5 - layer * 0.38) * s
-			var h = 2.35 * s
-			var y = trunk_h * 0.75 + layer * 1.5 * s + h * 0.5
+			var r = (1.3 - layer * 0.33) * s
+			var h = 2.8 * s
+			var y = trunk_h * 0.8 + layer * 1.8 * s + h * 0.5
 			pines.append(Transform3D(Basis.from_scale(Vector3(r, h, r)).rotated(Vector3.UP, yaw), p + Vector3(0, y, 0)))
 			pine_colors.append(Color("164a40").lerp(Color("2f7a55"), vary.randf() * 0.8 + layer * 0.1))
 	else:
 		var base = Color("3c7f45").lerp(Color("8ab456"), vary.randf())
 		if vary.randf() < 0.08: base = Color("d98f3a")
 		# tall, upright canopies: ovals stacked on a long trunk
-		var cy = trunk_h + 1.1 * s
-		oaks.append(Transform3D(Basis.from_scale(Vector3(1.65 * s, 2.15 * s, 1.65 * s)), p + Vector3(0, cy, 0)))
+		var cy = trunk_h + 1.5 * s
+		oaks.append(Transform3D(Basis.from_scale(Vector3(1.5 * s, 2.7 * s, 1.5 * s)), p + Vector3(0, cy, 0)))
 		oak_colors.append(base)
-		oaks.append(Transform3D(Basis.from_scale(Vector3(1.05 * s, 1.5 * s, 1.05 * s)), p + Vector3(0.75 * s * cos(yaw), cy + 1.0 * s, 0.75 * s * sin(yaw))))
-		oak_colors.append(base.lightened(0.1))
-		oaks.append(Transform3D(Basis.from_scale(Vector3(0.95 * s, 1.35 * s, 0.95 * s)), p + Vector3(-0.7 * s * cos(yaw), cy + 0.4 * s, -0.7 * s * sin(yaw))))
+		oaks.append(Transform3D(Basis.from_scale(Vector3(0.95 * s, 1.85 * s, 0.95 * s)), p + Vector3(0.7 * s * cos(yaw), cy + 1.3 * s, 0.7 * s * sin(yaw))))
+		oak_colors.append(base.lightened(0.12))
+		oaks.append(Transform3D(Basis.from_scale(Vector3(0.85 * s, 1.6 * s, 0.85 * s)), p + Vector3(-0.65 * s * cos(yaw), cy + 0.5 * s, -0.65 * s * sin(yaw))))
 		oak_colors.append(base.darkened(0.08))
 
 func build_village():
@@ -1123,7 +1123,7 @@ func grass_ok(x: float, z: float) -> bool:
 
 func build_sky_life():
 	cloud_mat = StandardMaterial3D.new()
-	cloud_mat.albedo_color = Color(1, 1, 1, 0.93)
+	cloud_mat.albedo_color = Color(0.98, 0.95, 0.86, 0.95)
 	cloud_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	cloud_mat.disable_fog = true
 	cloud_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -1147,7 +1147,7 @@ func build_sky_life():
 			var sc = rc.randf_range(4.5, 8)
 			var tier = k % 3
 			m.position = Vector3(k * 4.0 - 8 + rc.randf_range(-1.5, 1.5), tier * 1.6, rc.randf_range(-2, 2))
-			m.scale = Vector3(sc * (2.4 - tier * 0.55), sc * 0.32, sc * 0.7)
+			m.scale = Vector3(sc * (3.2 - tier * 0.7), sc * 0.26, sc * 0.6)
 			m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			c.add_child(m)
 		clouds.append(c)
@@ -1472,19 +1472,31 @@ func update_marks():
 
 # ------------------------------------------------------------ ui
 
+# UI palette, taken from the chalkboard and the painted island: deep teal, ivory paper,
+# cream lettering, gold for Tujuju, terracotta for closing.
+const UI_BOARD = Color("1b3231")
+const UI_TEAL = Color("2c6a62")
+const UI_TEAL_HI = Color("38806f")
+const UI_TEAL_LO = Color("204f49")
+const UI_INK = Color("1f2b2a")
+const UI_PAPER = Color("f3eedc")
+const UI_CREAM = Color("f6efd9")
+const UI_GOLD = Color("d9a948")
+const UI_CORAL = Color("c0563c")
+
 func panel_style() -> StyleBoxFlat:
 	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color(0.98, 0.95, 0.86, 0.97)
-	sb.border_color = Color(0.55, 0.38, 0.2)
+	sb.bg_color = Color(UI_PAPER, 0.97)
+	sb.border_color = UI_TEAL_LO
 	sb.set_border_width_all(3)
-	sb.set_corner_radius_all(16)
+	sb.set_corner_radius_all(18)
 	sb.shadow_color = Color(0, 0, 0, 0.35)
 	sb.shadow_size = 10
 	return sb
 
 func chip_style(alpha: float = 0.62) -> StyleBoxFlat:
 	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color(0.07, 0.11, 0.14, alpha)
+	sb.bg_color = Color(UI_BOARD, minf(alpha + 0.12, 0.92))
 	sb.set_corner_radius_all(12)
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
@@ -1507,16 +1519,18 @@ func button_style(color: Color) -> StyleBoxFlat:
 func make_theme() -> Theme:
 	var theme = Theme.new()
 	theme.default_font_size = 18
-	theme.set_stylebox("normal", "Button", button_style(Color("e0b676")))
-	theme.set_stylebox("hover", "Button", button_style(Color("ebc78e")))
-	theme.set_stylebox("pressed", "Button", button_style(Color("c99a58")))
-	theme.set_stylebox("focus", "Button", button_style(Color("ebc78e")))
-	theme.set_stylebox("disabled", "Button", button_style(Color("c9bfae")))
-	theme.set_color("font_color", "Button", Color("2e1c0c"))
-	theme.set_color("font_hover_color", "Button", Color("2e1c0c"))
-	theme.set_color("font_pressed_color", "Button", Color("2e1c0c"))
-	theme.set_color("font_disabled_color", "Button", Color("7d735f"))
-	theme.set_color("font_color", "Label", Color("2e1c0c"))
+	theme.set_stylebox("normal", "Button", button_style(UI_TEAL))
+	theme.set_stylebox("hover", "Button", button_style(UI_TEAL_HI))
+	theme.set_stylebox("pressed", "Button", button_style(UI_TEAL_LO))
+	theme.set_stylebox("focus", "Button", button_style(UI_TEAL_HI))
+	theme.set_stylebox("disabled", "Button", button_style(Color("9db0aa")))
+	theme.set_color("font_color", "Button", UI_CREAM)
+	theme.set_color("font_hover_color", "Button", Color.WHITE)
+	theme.set_color("font_pressed_color", "Button", UI_GOLD.lightened(0.3))
+	theme.set_color("font_focus_color", "Button", UI_CREAM)
+	theme.set_color("font_hover_pressed_color", "Button", UI_GOLD.lightened(0.3))
+	theme.set_color("font_disabled_color", "Button", Color("e6e2d6"))
+	theme.set_color("font_color", "Label", UI_INK)
 	theme.set_stylebox("panel", "PanelContainer", panel_style())
 	return theme
 
@@ -1756,7 +1770,7 @@ func build_ui():
 	close_x.offset_bottom = 284
 	for st in ["normal", "hover", "pressed"]:
 		var xsb = StyleBoxFlat.new()
-		xsb.bg_color = Color("8a2f1f") if st != "pressed" else Color("5e1f15")
+		xsb.bg_color = UI_CORAL if st != "pressed" else UI_CORAL.darkened(0.3)
 		xsb.set_corner_radius_all(26)
 		xsb.set_border_width_all(2)
 		xsb.border_color = Color("f4e9d0")
@@ -1776,12 +1790,12 @@ func build_ui():
 	listen_button.offset_bottom = -96
 	listen_button.add_theme_font_size_override("font_size", 20)
 	var lsb = StyleBoxFlat.new()
-	lsb.bg_color = Color("7a1f3d")
+	lsb.bg_color = UI_GOLD
 	lsb.set_corner_radius_all(10)
 	lsb.set_border_width_all(2)
-	lsb.border_color = Color("e9c46a")
+	lsb.border_color = UI_CREAM
 	listen_button.add_theme_stylebox_override("normal", lsb)
-	listen_button.add_theme_color_override("font_color", Color.WHITE)
+	listen_button.add_theme_color_override("font_color", UI_INK)
 	listen_button.hide()
 	panel.visibility_changed.connect(func(): close_x.visible = panel.visible)
 	marker = MeshInstance3D.new()
@@ -1842,16 +1856,91 @@ func text_line(text: String, font_size: int = 20) -> Control:
 	return label
 
 func close_panel():
+	if title_overlay and is_instance_valid(title_overlay):
+		title_overlay.queue_free()
+		title_overlay = null
 	mg = {}
 	portrait_id = ""
 	talk_partner = ""
 	panel.hide()
 	lesson = ""
 
+# The start screen: the chalk Tujuju on its board, one button, a small credit, and a quiet
+# link to how to play. Everything else waits in the menus.
+var title_overlay: Control
+
 func show_intro():
-	clear_panel("Tujuju Island")
-	var by = text_line("by je hammink", 18)
-	by.add_theme_color_override("font_color", Color("6b4a2e"))
+	close_panel()
+	if title_overlay and is_instance_valid(title_overlay): title_overlay.queue_free()
+	title_overlay = Control.new()
+	title_overlay.name = "TitleScreen"
+	title_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	title_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	ui.add_child(title_overlay)
+	var bg = ColorRect.new()
+	bg.color = UI_BOARD
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	title_overlay.add_child(bg)
+	var art = TextureRect.new()
+	art.texture = load("res://art/title.png")
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.set_anchors_preset(Control.PRESET_FULL_RECT)
+	art.anchor_bottom = 0.74
+	art.offset_left = 24
+	art.offset_right = -24
+	art.offset_top = 40
+	title_overlay.add_child(art)
+	var col = VBoxContainer.new()
+	col.set_anchors_preset(Control.PRESET_FULL_RECT)
+	col.anchor_top = 0.76
+	col.offset_left = 70
+	col.offset_right = -70
+	col.offset_bottom = -30
+	col.alignment = BoxContainer.ALIGNMENT_BEGIN
+	col.add_theme_constant_override("separation", 14)
+	title_overlay.add_child(col)
+	var begin = Button.new()
+	begin.text = "Continue" if not discovered.is_empty() else "Begin"
+	begin.custom_minimum_size = Vector2(0, 58)
+	begin.add_theme_font_size_override("font_size", 24)
+	var bsb = button_style(UI_GOLD)
+	bsb.border_color = UI_CREAM
+	bsb.set_corner_radius_all(29)
+	for st in ["normal", "hover", "pressed", "focus"]: begin.add_theme_stylebox_override(st, bsb)
+	for fc in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]: begin.add_theme_color_override(fc, UI_INK)
+	begin.pressed.connect(func():
+		play_sfx("page", -10.0, 1.2)
+		dismiss_title()
+		if discovered.is_empty(): toast("Your friend Neri is somewhere on this island."))
+	col.add_child(begin)
+	var how = Button.new()
+	how.text = "How to play"
+	how.flat = true
+	how.add_theme_font_size_override("font_size", 16)
+	for fc in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]: how.add_theme_color_override(fc, Color(UI_CREAM, 0.75))
+	how.pressed.connect(func():
+		dismiss_title()
+		show_how_to_play())
+	col.add_child(how)
+	var by = Label.new()
+	by.text = "by je hammink"
+	by.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	by.add_theme_font_size_override("font_size", 14)
+	by.add_theme_color_override("font_color", Color(UI_CREAM, 0.5))
+	col.add_child(by)
+
+func dismiss_title():
+	if title_overlay == null or not is_instance_valid(title_overlay): return
+	var t = title_overlay
+	title_overlay = null
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tw = create_tween()
+	tw.tween_property(t, "modulate:a", 0.0, 0.45)
+	tw.tween_callback(t.queue_free)
+
+func show_how_to_play():
+	clear_panel("How to play")
 	text_line("Tujuju Island is a game about how languages work. Everyone here speaks Tujuju, an invented language, so you figure it out from gestures, objects and clues, then use it yourself. Along the way you notice patterns, guess meanings and build sentences, and the villagers are silly about all of it.")
 	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
@@ -3908,7 +3997,7 @@ func update_sky(delta: float):
 	env.fog_light_color = FOG_DAY.lerp(Color("e8b0a0"), warm * 0.5).lerp(Color("aab4bf"), rain_amt * 0.4).lerp(Color("1c2a44"), night)
 	stars_mat.albedo_color.a = clampf(night * 1.2 - 0.1, 0.0, 1.0) * (1.0 - rain_amt)
 	stars_node.position = player.position
-	cloud_mat.albedo_color = Color(1, 1, 1, 0.93).lerp(Color(0.62, 0.66, 0.72, 0.95), rain_amt).lerp(Color(0.2, 0.25, 0.38, 0.85), night)
+	cloud_mat.albedo_color = Color(0.98, 0.95, 0.86, 0.95).lerp(Color(0.62, 0.66, 0.72, 0.95), rain_amt).lerp(Color(0.2, 0.25, 0.38, 0.85), night)
 	moon.visible = night > 0.15
 	var w = time_phase(day_t)
 	if w != time_word:
@@ -8565,8 +8654,10 @@ func guess_panel(last: String = ""):
 		sb.set_corner_radius_all(8)
 		sb.set_border_width_all(3 if guess["mode"] == "guess" and not crossed else 1)
 		sb.border_color = Color("7a1f3d") if guess["mode"] == "guess" else col.darkened(0.3)
-		b.add_theme_stylebox_override("normal", sb)
+		for gst in ["normal", "hover", "pressed", "focus"]: b.add_theme_stylebox_override(gst, sb)
 		b.add_theme_color_override("font_color", Color("8a8070") if crossed else Color("2b1d14"))
+		b.add_theme_color_override("font_hover_color", Color("8a8070") if crossed else Color("2b1d14"))
+		b.add_theme_color_override("font_pressed_color", Color("8a8070") if crossed else Color("2b1d14"))
 		b.pressed.connect(guess_tap.bind(id))
 		grid.add_child(b)
 	if guess["mode"] == "guess":
@@ -9932,8 +10023,8 @@ func show_typewriter():
 			for st in K.glyph_strokes(shape, "a"):
 				var pts = PackedVector2Array()
 				for p in st: pts.append(o + (p as Vector2) * 14.0)
-				icon.draw_polyline(pts, Color("1d3557"), 2.0, true)
-			icon.draw_string(ThemeDB.fallback_font, Vector2(4, icon.size.y - 4), shape if shape != "" else "vowel", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("6b4a2e")))
+				icon.draw_polyline(pts, UI_CREAM, 2.0, true)
+			icon.draw_string(ThemeDB.fallback_font, Vector2(4, icon.size.y - 4), shape if shape != "" else "vowel", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, UI_GOLD.lightened(0.2)))
 		key.add_child(icon)
 		key.pressed.connect(func():
 			tw_shape = shape
@@ -10154,13 +10245,18 @@ func kir_picture(what: String) -> Array:
 				[Vector2(0.14, 0.17), Vector2(0.14, 0.45)], [Vector2(0.32, 0.13), Vector2(0.34, 0.45)],
 				[Vector2(-0.95, 0.5), Vector2(0.95, 0.5)]]
 		"stork":
-			return [[Vector2(-0.55, -0.05), Vector2(-0.15, -0.22), Vector2(0.22, -0.16), Vector2(0.34, 0.0), Vector2(0.1, 0.16), Vector2(-0.3, 0.13), Vector2(-0.55, -0.05)],
-				[Vector2(-0.55, -0.05), Vector2(-0.78, 0.04)],
-				[Vector2(0.28, -0.12), Vector2(0.38, -0.5), Vector2(0.44, -0.72)],
-				K.arc(Vector2(0.48, -0.8), 0.09, 0, 360, 10),
-				[Vector2(0.56, -0.8), Vector2(0.74, -0.64), Vector2(0.86, -0.46)],
-				[Vector2(-0.02, 0.15), Vector2(-0.02, 0.88)], [Vector2(0.12, 0.15), Vector2(0.16, 0.88)],
-				[Vector2(-0.95, 0.72), Vector2(-0.6, 0.66), Vector2(-0.25, 0.74), Vector2(0.1, 0.66), Vector2(0.45, 0.74), Vector2(0.95, 0.68)]]
+			# the chalk Tujuju: a dancing jabiru, wing raised, one foot lifted
+			return [[Vector2(0.330, -0.092), Vector2(0.330, -0.050), Vector2(0.314, -0.007), Vector2(0.281, 0.037), Vector2(0.233, 0.079), Vector2(0.172, 0.118), Vector2(0.100, 0.152), Vector2(0.021, 0.180), Vector2(-0.062, 0.200), Vector2(-0.145, 0.212), Vector2(-0.227, 0.216), Vector2(-0.302, 0.210), Vector2(-0.367, 0.195), Vector2(-0.421, 0.173), Vector2(-0.461, 0.143), Vector2(-0.485, 0.107), Vector2(-0.492, 0.067), Vector2(-0.482, 0.024), Vector2(-0.456, -0.020), Vector2(-0.413, -0.063), Vector2(-0.357, -0.103), Vector2(-0.290, -0.140), Vector2(-0.213, -0.170), Vector2(-0.132, -0.193), Vector2(-0.048, -0.209), Vector2(0.035, -0.215), Vector2(0.113, -0.213), Vector2(0.183, -0.202), Vector2(0.241, -0.183), Vector2(0.287, -0.155), Vector2(0.317, -0.122), Vector2(0.332, -0.084), Vector2(0.334, -0.042), Vector2(0.319, 0.002)],
+				[Vector2(-0.201, -0.174), Vector2(-0.277, -0.208), Vector2(-0.345, -0.246), Vector2(-0.405, -0.289), Vector2(-0.456, -0.336), Vector2(-0.500, -0.388), Vector2(-0.536, -0.444), Vector2(-0.563, -0.504), Vector2(-0.583, -0.569), Vector2(-0.594, -0.638), Vector2(-0.598, -0.712), Vector2(-0.593, -0.790), Vector2(-0.581, -0.873), Vector2(-0.560, -0.960), Vector2(-0.489, -0.907), Vector2(-0.422, -0.854), Vector2(-0.360, -0.800), Vector2(-0.302, -0.744), Vector2(-0.250, -0.689), Vector2(-0.202, -0.632), Vector2(-0.159, -0.575), Vector2(-0.120, -0.516), Vector2(-0.087, -0.457), Vector2(-0.058, -0.398), Vector2(-0.034, -0.337), Vector2(-0.014, -0.276), Vector2(0.001, -0.214)],
+				[Vector2(-0.500, 0.090), Vector2(-0.561, 0.098), Vector2(-0.625, 0.113), Vector2(-0.691, 0.133), Vector2(-0.760, 0.160)],
+				[Vector2(0.221, -0.191), Vector2(0.279, -0.252), Vector2(0.327, -0.317), Vector2(0.365, -0.385), Vector2(0.393, -0.456), Vector2(0.412, -0.531), Vector2(0.421, -0.609), Vector2(0.420, -0.690)],
+				[Vector2(0.550, -0.800), Vector2(0.540, -0.756), Vector2(0.511, -0.722), Vector2(0.471, -0.706), Vector2(0.428, -0.711), Vector2(0.393, -0.737), Vector2(0.373, -0.777), Vector2(0.373, -0.823), Vector2(0.393, -0.863), Vector2(0.428, -0.889), Vector2(0.471, -0.894), Vector2(0.511, -0.878), Vector2(0.540, -0.844), Vector2(0.550, -0.800)],
+				[Vector2(0.570, -0.860), Vector2(0.597, -0.792), Vector2(0.625, -0.724), Vector2(0.654, -0.658), Vector2(0.686, -0.592), Vector2(0.719, -0.527), Vector2(0.754, -0.463), Vector2(0.790, -0.400)],
+				[Vector2(0.500, -0.740), Vector2(0.530, -0.687), Vector2(0.564, -0.635), Vector2(0.602, -0.584), Vector2(0.644, -0.536), Vector2(0.689, -0.489), Vector2(0.738, -0.444), Vector2(0.790, -0.400)],
+				[Vector2(-0.020, 0.180), Vector2(-0.008, 0.285), Vector2(0.000, 0.390), Vector2(0.004, 0.493), Vector2(0.004, 0.596), Vector2(0.000, 0.698), Vector2(-0.008, 0.800), Vector2(-0.020, 0.900)],
+				[Vector2(0.140, 0.160), Vector2(0.184, 0.240), Vector2(0.236, 0.310), Vector2(0.297, 0.369), Vector2(0.365, 0.418), Vector2(0.442, 0.456), Vector2(0.527, 0.483), Vector2(0.620, 0.500)],
+				[Vector2(0.640, 0.420), Vector2(0.632, 0.473), Vector2(0.622, 0.527), Vector2(0.610, 0.580)],
+				[Vector2(-0.980, 0.899), Vector2(-0.849, 0.927), Vector2(-0.719, 0.957), Vector2(-0.588, 0.963), Vector2(-0.457, 0.940), Vector2(-0.327, 0.908), Vector2(-0.196, 0.895), Vector2(-0.065, 0.914), Vector2(0.065, 0.946), Vector2(0.196, 0.965), Vector2(0.327, 0.952), Vector2(0.457, 0.920), Vector2(0.588, 0.897), Vector2(0.719, 0.903), Vector2(0.849, 0.933), Vector2(0.980, 0.961)]]
 		"bird":
 			return [[Vector2(-0.9, -0.2), Vector2(-0.4, -0.45), Vector2(0.0, 0.0), Vector2(0.4, -0.45), Vector2(0.9, -0.2)], K.arc(Vector2(0.0, 0.15), 0.15, 0, 360, 8)]
 		"water":

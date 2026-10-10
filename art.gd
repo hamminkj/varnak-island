@@ -147,7 +147,7 @@ void fragment() {
 	grass = mix(grass, vec3(0.55, 0.58, 0.24), smoothstep(0.62, 0.9, vnoise(p * 0.7)) * 0.4);
 	grass = mix(grass, vec3(0.20, 0.36, 0.30), smoothstep(1.0, 6.0, wp.y) * 0.55);
 	// fine stipple, like a painted background
-	grass *= 0.95 + 0.07 * step(0.55, hash(floor(p * 9.0)));
+	grass *= 0.93 + 0.11 * step(0.55, hash(floor(p * 9.0)));
 	vec3 sand = mix(vec3(0.82, 0.72, 0.50), vec3(0.74, 0.63, 0.42), vnoise(p * 2.2));
 	float smask = smoothstep(0.25, 0.75, mask.r + (vnoise(p * 0.9) - 0.5) * 0.5);
 	vec3 col = mix(grass, sand, smask);
@@ -170,8 +170,8 @@ void fragment() {
 	float hfw = fwidth(hu);
 	float hd = min(fract(hu), 1.0 - fract(hu));
 	float hl = (1.0 - smoothstep(0.07, 0.07 + hfw * 1.5, hd)) * (1.0 - smoothstep(0.2, 0.5, hfw));
-	float hill = smoothstep(0.1, 0.35, slope) * (1.0 - path) * (1.0 - smask * 0.7);
-	col *= 1.0 - 0.28 * hl * hill;
+	float hill = smoothstep(0.06, 0.3, slope) * (1.0 - path) * (1.0 - smask * 0.7);
+	col *= 1.0 - 0.38 * hl * hill;
 	col += vec3(0.07, 0.07, 0.03) * (1.0 - smoothstep(0.07, 0.07 + hfw * 1.5, abs(hd - 0.5))) * hill * (1.0 - smoothstep(0.2, 0.5, hfw));
 	float wet = smoothstep(0.02, -0.25, wp.y);
 	col = mix(col, vec3(0.52, 0.47, 0.34) * (1.0 - smoothstep(-0.2, -2.0, wp.y) * 0.45), wet);
@@ -222,8 +222,8 @@ const PATTERN_SHADER = """
 shader_type spatial;
 render_mode diffuse_toon, specular_disabled;
 uniform float lines = 28.0;
-uniform float strength = 0.22;
-uniform float light = 0.10;
+uniform float strength = 0.34;
+uniform float light = 0.16;
 float h1(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
 void fragment() {
 	vec3 c = COLOR.rgb;
@@ -243,7 +243,7 @@ void fragment() {
 """
 static var _pattern_mats: Dictionary = {}
 
-static func pattern_material(lines: float, strength: float = 0.22) -> ShaderMaterial:
+static func pattern_material(lines: float, strength: float = 0.34) -> ShaderMaterial:
 	var key = str(lines) + "|" + str(strength)
 	if _pattern_mats.has(key): return _pattern_mats[key]
 	var sh = Shader.new()

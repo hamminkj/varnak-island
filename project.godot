@@ -3,6 +3,11 @@ config_version=5
 config/name="Tujuju Island"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
+config/icon="res://art/icon.png"
+boot_splash/bg_color=Color(0.10588, 0.19608, 0.19216, 1)
+boot_splash/image="res://art/title.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=true
 [display]
 window/size/viewport_width=480
 window/size/viewport_height=854
