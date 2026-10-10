@@ -489,3 +489,5 @@ New word: kapibara (capybara), respelled from Guarani capii-bara (the RAE's etym
 Things to check: 45. Names made only of vowels (Ai, Eo) are a game invention; Tujuju names otherwise start with a consonant or have consonants inside. 46. Kapibarake ti uses ti (2SG) unmarked as the object, following the ergative pattern.
 
 Things to check: 47. Ayvu (the writing, formerly kirmel) is borrowed from Guarani ayvu (language, speech). Its syllable-final y breaks the rule that only m, n, ng, l, r, s, k or t end a syllable, like the loans puts and kluts. In Ayvu itself it is written a + raised y, vu.
+
+Things to check: 48. ruma (woman, from the handoff document's example Rumake sanu tekama i-pal-pa-da) is the only gendered word in the game. Tujuju grammar has no gender, and the English glosses now use they for everyone. Should ruma stay as woman, or become a neutral word (for example, the same sentence with sair, person)?

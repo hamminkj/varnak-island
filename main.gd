@@ -164,7 +164,7 @@ var side_quests = [
 	["market","ketu","Ketu at the market (west) wants mur tari: three fish. Fish at the river, the dock or the lagoon."],
 	["school","suri","Answer Suri's four questions at the school, north of the market."],
 	["lookout","radi","Climb the west hill and answer Radi's direction questions."],
-	["healer","jeli","Help Jeli the healer, east of the village. Her patient needs yok and cha."],
+	["healer","jeli","Help Jeli the healer, east of the village. Jeli's patient needs yok and cha."],
 	["lighthouse","asya","The lighthouse is dark. Bring far (fire) from Neri's campfire to Asya."],
 	["lagoon","desh","Play Desh's drum game at the east lagoon."],
 	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
@@ -2916,7 +2916,7 @@ func pain_puzzle():
 	choice_puzzle("Where does it hurt?", p["gesture"] + "\n\nWhat is Sije telling Jeli?", p["options"], p["correct"], func():
 		if not solved.has("pain"): solved.append("pain")
 		save_game(),
-		p["why"], "Look at where Sije holds her hands: dau is head, ten is foot, mal is hand.", talk.bind("jeli"),
+		p["why"], "Look at where Sije holds their hands: dau is head, ten is foot, mal is hand.", talk.bind("jeli"),
 		func(): button("Continue", talk.bind("jeli"), content))
 
 func light_puzzle():
@@ -3025,7 +3025,7 @@ func add_topics(id: String):
 			button("Ask about the old stick" if not solved.has("wand") else "Use the word wand", oku_wand, content)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
 		"gav":
-			topic("Ask Gav about his work", "gav_mail", id)
+			topic("Ask Gav about their work", "gav_mail", id)
 			button("Ask about the lost chonies" + ("  [ok]" if completed.has("chonies") else ""), choni_hints, content)
 		"lachu":
 			topic("Ask Lachu about the boat", "tamu_ferry", id)
@@ -3182,7 +3182,7 @@ func talk(id: String):
 				text_line("Suri smiles. “Ho!” You know the question words now: hal who, han what, hama where, hamur how many.")
 				button("Repeat the lesson", school_quiz.bind(0), content)
 			else:
-				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. She waves you toward a bench.")
+				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. Suri waves you toward a bench.")
 				button("Start the lesson", school_quiz.bind(0), content)
 		"vivi", "oli":
 			if hiding.get(id, false):
@@ -3230,17 +3230,17 @@ func talk(id: String):
 		"sije":
 			clear_panel("Sije")
 			if completed.has("healer"): text_line("Sije stretches and smiles at you.")
-			else: text_line("Sije holds her head and groans quietly. Jeli the healer is looking after her.")
+			else: text_line("Sije holds their head and groans quietly. Jeli the healer is looking after them.")
 		"asya":
 			for w in ["fardom", "far", "tar", "-ye"]: learn(w)
 			clear_panel("Asya the lighthouse keeper")
 			if completed.has("lighthouse"):
 				text_line("The beam sweeps the water. Asya grins and gives you a thumbs up.")
 			else:
-				text_line("Asya points up at the lamp room. “Fardom i-dam-da. Far ma-i-esh-ki-da.” Then he looks at you hopefully:\n\n“Far t-na-tar-o-ye.”")
+				text_line("Asya points up at the lamp room. “Fardom i-dam-da. Far ma-i-esh-ki-da.” Then they look at you hopefully:\n\n“Far t-na-tar-o-ye.”")
 				button("Offer far (fire)", func():
 					if inventory.has("torch"): light_puzzle()
-					else: message("Asya shakes his head", "No far yet. Neri keeps a campfire at the northern cove; a torch there would do. It glows, so you can spot it."), content)
+					else: message("Asya shakes their head", "No far yet. Neri keeps a campfire at the northern cove; a torch there would do. It glows, so you can spot it."), content)
 		"oku":
 			clear_panel("Oku at the old ruins")
 			learn("shora")
@@ -3255,12 +3255,12 @@ func talk(id: String):
 			for w in ["kel", "-ru", "tar"]: learn(w)
 			var nlt = next_letter()
 			if nlt >= 0:
-				text_line("Gav waves an envelope. “Ti-ru pai! Hal-ta? Ma-na-zen-ki-da.” A letter for you! From whom? He doesn't know.", 17)
+				text_line("Gav waves an envelope. “Ti-ru pai! Hal-ta? Ma-na-zen-ki-da.” A letter for you! From whom? Gav doesn't know.", 17)
 				button("Read the mystery letter", letter_panel.bind(nlt), content)
 			if completed.has("mail"):
-				text_line("Gav tips his cap. “K-ta-har-da!” You were a great help.")
+				text_line("Gav tips their cap. “K-ta-har-da!” You were a great help.")
 			elif not solved.has("mail_start"):
-				text_line("Gav's satchel is overflowing. “Anke polu-ru kel-ir k-ri-tar-ur-da,” he sighs. He holds out three parcels, each with a label.")
+				text_line("Gav's satchel is overflowing. “Anke polu-ru kel-ir k-ri-tar-ur-da,” they sigh. They hold out three parcels, each with a label.")
 				button("Take the parcels", func():
 					solved.append("mail_start")
 					for p in Data.PARCELS.keys(): inventory.append(p)
@@ -3275,7 +3275,7 @@ func talk(id: String):
 					gin += 5
 					learn("gin")
 					learn("har")
-					text_line("Gav beams. “K-ta-har-da!” He presses pan gin, five coins, into your hand.")
+					text_line("Gav beams. “K-ta-har-da!” They press pan gin, five coins, into your hand.")
 				else:
 					text_line("Parcels still to deliver:\n" + "\n".join(left))
 		"lachu":
@@ -3283,7 +3283,7 @@ func talk(id: String):
 			learn("sena")
 			text_line("Lachu leans on the oar and nods toward the sea. Far out, a small island with one tree.")
 			if inventory.has("map") and not completed.has("treasure"):
-				text_line("Lachu glances at your old map and raises his eyebrows.")
+				text_line("Lachu glances at your old map and raises their eyebrows.")
 			button("Ask for a ride", ride_puzzle.bind(player.position.z < 60.0), content)
 		"desh":
 			for w in ["hai", "-o"]: learn(w)
@@ -3294,7 +3294,7 @@ func talk(id: String):
 				again.shuffle()
 				button("Play again", desh_round.bind(0, again), content)
 			else:
-				text_line("Desh bangs the drum. “Ta-nang-o! Ta-pav-o! Ta-sum-o!” He wants to play a game: he calls a command, and you do it.")
+				text_line("Desh bangs the drum. “Ta-nang-o! Ta-pav-o! Ta-sum-o!” Desh wants to play a game: Desh calls a command, and you do it.")
 				var order = Data.DESH.duplicate()
 				order.shuffle()
 				button("Play Desh's game", desh_round.bind(0, order), content)
@@ -6455,8 +6455,8 @@ func ext_items(w: String) -> Dictionary:
 			var f: Array = Data.EXT_VERBS_I[w]
 			forms = [["I will " + f[0], "na-" + w + "-fu", ["ta-" + w + "-fu", "na-" + w + "-pa"], "na- is I, -fu is the future."],
 				["Don't " + f[0] + "!", "ma-ta-" + w + "-o-ki!", ["ta-" + w + "-o!", "ma-ta-" + w + "-ki-o!"], "Don't: ma- in front, -o for the command, -ki after it."],
-				["They are " + f[2], "ri-" + w + "-im", ["i-" + w + "-im", "ri-" + w + "-pa"], "ri- is they, -im is in progress."],
-				["She " + f[1] + " (I saw it)", "i-" + w + "-pa-da", ["i-" + w + "-pa-nu", "na-" + w + "-pa-da"], "-pa is past, -da means I saw it."]]
+				["They (a group) are " + f[2], "ri-" + w + "-im", ["i-" + w + "-im", "ri-" + w + "-pa"], "ri- is they, -im is in progress."],
+				["They (one person) " + f[1] + " (I saw it)", "i-" + w + "-pa-da", ["i-" + w + "-pa-nu", "na-" + w + "-pa-da"], "-pa is past, -da means I saw it."]]
 			builds = [{"en": "Dofo " + f[1] + " at the market (people say).", "tiles": ["Dofo", "kurma", "i-" + w + "-pa-nu."], "decoys": ["Dofoke", "kurru", "i-" + w + "-pa-da."], "tip": "No -ke: this verb acts on nothing. People say is -nu."},
 				{"en": "The dog is " + f[2] + " in the sea.", "tiles": ["Gor", "haima", "i-" + w + "-im-da."], "decoys": ["Gorke", "haita"], "tip": "In the sea is hai-ma, and in progress is -im."}]
 		"vt":
@@ -6752,9 +6752,9 @@ func show_varnak():
 	var secs = [
 		["Sounds and spelling", "Five vowels (a e i o u), and the letter y sounds like the y in yes. Words end only in m, n, ng, l, r, s, k or t, so borrowed words get respelled: brouhaha becomes buruhaha.", []],
 		["Words are built from pieces", "Tujuju glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
-		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is he, she or it, ri- is they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
+		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is one person (they) or it, ri- is a group (they). Tujuju has no gender: everyone on Tujuju Island is a they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
 		["Time and aspect", "Endings after the verb show when and how: -pa past, -fu future, -im happening now, -ur usually, -ak finished.", ["“I-nang-pa.” walked.   “I-nang-fu.” will walk.   “I-nang-im.” is walking.   “I-nang-ur.” usually walks."]],
-		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Tujuju gossip.", ["“Dofo kurma i-tal-pa-da.” I saw Dofo arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
+		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Tujuju gossip.", ["“Dofo kurma i-tal-pa-da.” I saw Dofo arrive at the market.   “...i-tal-pa-shi.” Apparently Dofo arrived.   “...i-tal-pa-nu.” People say Dofo arrived."]],
 		["Who did what to whom", "Tujuju marks the doer of an action on another thing with -ke. This is called ergative marking. Someone who just goes, sleeps or is, takes no ending.", ["“Sanu i-lum-pa-da.” The child went.   “Mirake puka i-rav-pa-da.” Mira read the book."]],
 		["Case endings", "Short endings on nouns do the work of English words like to, in, from and with: -ni of, -ru to, -ma in or at, -ta from, -su together with, -li by means of.", ["“Tekama” in the village.   “Moraru” to the river.   “Tisu” with you."]],
 		["Many and ordinal", "-ir makes a plural. A number comes before its noun, and -ve makes ordinal numbers.", ["“Tari-ir” fish (many).   “Mur tari” three fish.   “Bar-ve hai-sao” the eighth sea star."]],
@@ -7068,7 +7068,7 @@ func choni_hints():
 	learn("-shi")
 	learn("-nu")
 	var n = chonies_found()
-	text_line("Gav sniffles. " + str(n) + " of " + str(Data.CHONI_HUNT.size()) + " found. His clues (how does Gav know each one?):", 16)
+	text_line("Gav sniffles. " + str(n) + " of " + str(Data.CHONI_HUNT.size()) + " found. Gav's clues (how does Gav know each one?):", 16)
 	var ens: Array = []
 	for c in Data.CHONI_HUNT:
 		if solved.has("ch:" + c[0]):
@@ -7126,7 +7126,7 @@ func do_prank(id: String, p: Dictionary):
 		react(id, sv, se, "Anni choni?! Hama?! HAMA?! ...Hiri? Ha! Ha!", "(" + act + ") My chonies?! Where?! WHERE?! ...A prank? Ha ha!", "shocked", 1)
 		return
 	if id == "asya" and p["id"] == "ghost":
-		react(id, sv, se, "AAAH! Poltergais! ...Ti?! Hiri?! Maki...", "(Asya hides under his own coat.) AAAH! A poltergeist! ...You?! A prank?! No...", "faint", 0)
+		react(id, sv, se, "AAAH! Poltergais! ...Ti?! Hiri?! Maki...", "(Asya hides under their own coat.) AAAH! A poltergeist! ...You?! A prank?! No...", "faint", 0)
 		return
 	var r: Array = Data.PRANKED[tt]
 	react(id, sv + "  ...Hiri!", se + " ...Gotcha!", r[0], "(" + act + ") " + r[1], r[2], r[3])
@@ -7586,7 +7586,7 @@ func solve_how(s: Array):
 func solve_check(who: String, ev: String):
 	log_event("mystery_guess", {"who": who, "ending": ev}, who == "Par" and ev == "shi")
 	if who != "Par":
-		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Vufi asked.", "Poltergais": "Sije says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
+		var why = {"Gav": "Gav only carries the letters. Gav was as puzzled as anyone when Vufi asked.", "Poltergais": "Sije says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
 		message("Hmm, not quite", why + " Look at your clues again: feathers, kraa, and someone who goes out at night.")
 		button("Try again", solve_mystery, content)
 		return
@@ -8304,7 +8304,7 @@ func wand_panel():
 			"verb": extra = Data.WAND_VERBS[cur][0]
 			"tense": extra = Data.WAND_TENSE[cur]
 			"ev": extra = Data.WAND_EV[cur]
-			"pre": extra = {"na": "I", "ta": "you", "i": "he, she, it", "ri": "they"}[cur]
+			"pre": extra = {"na": "I", "ta": "you", "i": "they (one), it", "ri": "they (a group)"}[cur]
 		button(r[0] + ":  " + label + "  (" + extra + ")", func():
 			var i = opts.find(wand[key])
 			wand[key] = opts[(i + 1) % opts.size()]
@@ -8335,7 +8335,7 @@ func wand_cast():
 	if not ok_grammar:
 		play_sfx("kabum", -2.0)
 		var who_en = Data.WAND_WHO[who][0]
-		text_line("The wand sputters and goes kabum! The person prefix does not match: " + who_en + " needs " + need + "-, not " + str(wand["pre"]) + "-. (na- I, ta- you, i- he or she, ri- they)", 17)
+		text_line("The wand sputters and goes kabum! The person prefix does not match: " + who_en + " needs " + need + "-, not " + str(wand["pre"]) + "-. (na- I, ta- you, i- one person or thing, ri- a group)", 17)
 		button("Fix it", wand_panel, content)
 		button("Return", close_panel, content)
 		return
@@ -9102,7 +9102,7 @@ func update_audio(delta: float):
 		amb_w = ambient_weights()
 	for n in amb_w.keys():
 		set_amb(n, float(amb_w[n]), delta)
-	# Desh plays louder when he is performing
+	# Desh plays louder when performing
 	if desh_music:
 		var perf = acts.has("desh") or (panel.visible and talk_partner == "desh")
 		desh_music.volume_db = lerpf(desh_music.volume_db, 2.0 if perf else -6.0, 0.5)
@@ -10577,7 +10577,7 @@ func suri_kirmel(step: int):
 				suri_kirmel.call_deferred(step + 1)
 			else:
 				play_sfx("wrong", -4.0)
-				fb.text = "Suri tilts her head. Look at the turn of each mark (the vowel) and its shape (the first sound)."
+				fb.text = "Suri tilts their head. Look at the turn of each mark (the vowel) and its shape (the first sound)."
 				fb.add_theme_color_override("font_color", Color("8a2f1f")))
 		content.add_child(b)
 	button("Back", talk.bind("suri"), content)
