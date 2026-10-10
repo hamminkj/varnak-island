@@ -22,7 +22,7 @@ Tujuju was called Varnak in the handoff document and in early builds of the game
 | Bei-ru. | To the north. | Composed | Allative -ru on bei, like the doc's bei-ru i-kel-esh-pa-da (section 27.2) |
 | Mora-ven. | As far as the river. | Composed | Terminative -ven on mora (moraven, section 19.3) |
 | Teka-ma. | In the village. | Composed | Locative -ma on teka (tekama, section 19.3) |
-| Torke gira i-varn-ak-pa-da. | Tor built the bridge (I witnessed it). | Composed | Ergative -ke, 3P-build-PFV-PST-DIR (sections 19.4, 21.1); varn from the verb list |
+| Dofoke gira i-varn-ak-pa-da. | Dofo built the bridge (I witnessed it). | Composed | Ergative -ke, 3P-build-PFV-PST-DIR (sections 19.4, 21.1); varn from the verb list |
 | Murak i-gao. | The tree is tall. | Composed | Stative gao with 3S prefix (section 24) |
 | Teka i-var. | The village is big. | Doc | Appears as an example sentence |
 | Wak korma i-esh-da. | Water is in the container. | Doc | Appears as an example sentence |
@@ -130,7 +130,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 
 ## Things to double-check
 
-1. Proper names with -ke (Mirake, Torke). I treated names like ordinary nouns.
+1. Proper names with -ke (Mirake, Dofoke). I treated names like ordinary nouns.
 2. sign_river uses Mora-ven (as far as the river). If you prefer a different board text, it is one line in data.gd.
 3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Jeli's sleeping child) and the notebook notes that it is also a name.
 4. mai-ai (sell) is listed as a verb in the vocabulary, but -ai is also the antipassive suffix. I treated mai-ai as an ordinary transitive root in Ketuke panak i-mai-ai-ur-da. If sell should be read as antipassive, the agent would not take -ke.
@@ -243,7 +243,7 @@ Decoy tiles at higher levels are made automatically by swapping endings (-ke add
 
 ## Fifth expansion: gossip, nonsense and rumors
 
-Gossip (all composed): Rofi mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Radi sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olike polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
+Gossip (all composed): Rofi mar-ru i-mel-ur-nu; Dofo girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Radi sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olike polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
 
 Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Sije i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
 
@@ -267,7 +267,7 @@ Things to check: 14. Exclamations like Ho!, Maki... MAKI!, Ha! Ha! and Hmph! are
 
 ## Seventh expansion: practice for new words, and poems
 
-Practice forms are generated from rules already listed above: X-ru, X-ma, X-ta, anni X, mur X, X-su; na-V-fu, ma-ta-V-o-ki, ri-V-im, i-V-pa-da; k-i-V-pa, t-i-V-o, t-na-V-pa; Dom ma-i-S-ki, S dom, Sena dom-ta i-u-S; N-ve and N tari. Practice sentences: X i-var; X tekama i-esh-da; Anke X k-i-pal-da; X t-na-ven-o-ye; Tor kurma i-V-pa-nu; Gor haima i-V-im-da; Mirake puka i-V-pa-da; Anni yamat i-S; Tari-ir ri-S.
+Practice forms are generated from rules already listed above: X-ru, X-ma, X-ta, anni X, mur X, X-su; na-V-fu, ma-ta-V-o-ki, ri-V-im, i-V-pa-da; k-i-V-pa, t-i-V-o, t-na-V-pa; Dom ma-i-S-ki, S dom, Sena dom-ta i-u-S; N-ve and N tari. Practice sentences: X i-var; X tekama i-esh-da; Anke X k-i-pal-da; X t-na-ven-o-ye; Dofo kurma i-V-pa-nu; Gor haima i-V-im-da; Mirake puka i-V-pa-da; Anni yamat i-S; Tari-ir ri-S.
 
 New compounds (composed): ning-guro (song-fruit: a berry) and sao-dau (star-head: a mushroom).
 
@@ -309,7 +309,7 @@ Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds
 | aloha | hello, goodbye | Hawaiian |
 | chau | bye | Italian ciao |
 
-Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Torke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Lachu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
+Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Desh's party); gossip Dofoke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Desh-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Desh) and Chau... (Lachu); bombom at Ketu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
 
 Things to check: 17. Whether loans keep ch (as in cha) or should become sh. 18. Stress and long vowels in loans are not marked.
 
@@ -364,7 +364,7 @@ Key sentences:
 - Ti choni-na ta-an-da! (You are a choni person!)
 - Choni-ir hen-ta ri-kar-im-da! (Chonies are coming from the sky!)
 
-New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Radi's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
+New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Radi's doppelganger (-shi), Dofo the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
 
 Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
 
@@ -413,14 +413,14 @@ Things to check: 30. -kan and -vai are new suffixes; their slot (right after the
 New words: gao-murak (the word wand: gao tell + murak wood), dau-yir (hat: head clothing, a calque), pal-sek (glasses: see-stones, a calque), barba (beard, borrowed from Spanish, Italian and Portuguese).
 
 Word wand (from Oku at the ruins): the player builds Who + Where + verb and it comes true. The endings decide what happens:
-- the person prefix must agree (Tor i-, Polu ri-, An na-), or the wand fizzles (kabum);
+- the person prefix must agree (Dofo i-, Polu ri-, An na-), or the wand fizzles (kabum);
 - -im now, -fu in a moment, -pa already happened (nothing changes);
 - -da it happens, -shi it half happens (at home, apparently), -nu it only becomes a rumor that people repeat;
 - ma- ... -ki: they go there and pointedly do not do it. Swimming anywhere but haima goes badly.
 Example: Polu kurma ri-kachaka-im-da. (Everyone is dancing at the market.) An fardom-ma na-pul-im-da. (I am jumping at the lighthouse: this moves the player.)
 
 Pass it on (reported speech): the source says what they saw with An and -da; a faithful relay names the source with -ke, drops the I-prefix and uses -nu.
-- Anke Tor-ni choni girama k-i-pal-pa-da! -> Lirake Tor-ni choni girama i-pal-pa-nu.
+- Anke Dofo-ni choni girama k-i-pal-pa-da! -> Lirake Dofo-ni choni girama i-pal-pa-nu.
 - Yeshma Oku sek-ir-su i-ning-pa-da! -> Yeshma Oku sek-ir-su i-ning-pa-nu.
 - Anke haima yue k-i-pal-pa-da! Yue i-sum-im-da! -> Deshke haima yue i-pal-pa-nu. Yue i-sum-im-nu.
 Wrong relays (keeping An, keeping -da, or a swapped noun) come back as a changed rumor.

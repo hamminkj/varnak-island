@@ -23,7 +23,7 @@ func run():
 	game.completed.clear()
 	game.discovered.clear()
 	game.inventory = ["own_bag"]
-	game.talk("ena")
+	game.talk("vufi")
 	press("Anni kel")
 	assert(game.completed.has("belongings"))
 	game.inventory.append_array(["water","fruit","container"])
@@ -36,15 +36,15 @@ func run():
 	press("Offer the forest bag")
 	assert(game.completed.has("bag"))
 	game.inventory.append_array(["wood","stone","rope"])
-	game.talk("tor")
+	game.talk("dofo")
 	press("Offer repair materials")
 	assert(game.completed.has("bridge"))
-	game.account("tor","italpada","Witnessed")
+	game.account("dofo","italpada","Witnessed")
 	game.talk("lira")
 	game.talk("rofi")
 	game.check_evidence("Lira: italpanu")
 	assert(not game.completed.has("evidence"))
-	game.check_evidence("Tor: italpada")
+	game.check_evidence("Dofo: italpada")
 	assert(game.completed.has("evidence"))
 	game.talk("neri")
 	assert(game.completed.has("cove"))
@@ -107,8 +107,8 @@ func run():
 	assert(game.fish_caught == 1)
 	game.where_puzzle("lira")
 	press(Data.WHERE["lira"]["options"][0])
-	game.where_puzzle("tor")
-	press(Data.WHERE["tor"]["options"][1])
+	game.where_puzzle("dofo")
+	press(Data.WHERE["dofo"]["options"][1])
 	game.neri_story()
 	press("Kelarke tari i-nuk-ak-pa-da.")
 	# ---- expansion: workshop and practice ----
@@ -217,7 +217,7 @@ func run():
 	game.identity_puzzle()
 	press("An kelar na-an-da.")
 	assert(game.mastered.has("q:oli"))
-	for id in ["ketu","suri","rin","oli","radi","jeli","sije","asya","desh","neri"]:
+	for id in ["ketu","suri","vivi","oli","radi","jeli","sije","asya","desh","neri"]:
 		game.talk(id)
 		assert(game.panel.visible)
 	for id in Data.COUNTS.keys():
@@ -230,7 +230,7 @@ func run():
 	var marks = {}
 	for e in game.entities:
 		if e.has("mark"): marks[e["id"]] = e["mark"].visible
-	assert(marks["ena"] and not marks["mira"] and marks["ketu"] and marks["desh"] and not marks["sair1"])
+	assert(marks["vufi"] and not marks["mira"] and marks["ketu"] and marks["desh"] and not marks["sair1"])
 	game.complete("market")
 	for e in game.entities:
 		if e["id"] == "ketu": assert(not e["mark"].visible)
@@ -242,7 +242,7 @@ func run():
 	game.player.rotation.y = 0.0
 	await physics_frame
 	await process_frame
-	for want in ["ena", "own_bag", "water"]:
+	for want in ["vufi", "own_bag", "water"]:
 		var ent = null
 		for e in game.entities:
 			if e["id"] == want: ent = e
@@ -390,10 +390,10 @@ func run():
 	# hide and seek
 	game.talk("oli")
 	press("Play hide and seek")
-	assert(game.hiding["rin"] and game.hiding["oli"])
-	game.talk("rin")
+	assert(game.hiding["vivi"] and game.hiding["oli"])
+	game.talk("vivi")
 	press("T-na-pal-da!")
-	assert(game.hiding["rin"])
+	assert(game.hiding["vivi"])
 	press("K-ta-pal-da!")
 	game.talk("oli")
 	press("K-ta-pal-da!")
@@ -492,7 +492,7 @@ func run():
 	for w in Data.TILES[Data.CHALLENGES["mira"]]["tiles"]: game.tile_tapped(tray_tile(w))
 	press("Check")
 	assert(game.mastered.has("c:mira") and game.gin == g0 + 1)
-	game.talk("tor")
+	game.talk("dofo")
 	press("Say it yourself")
 	game.diff_bias = 0
 	# memory, market rush, speed round
@@ -619,9 +619,9 @@ func run():
 		press(Data.SENTENCES[id]["en"])
 	assert(game.completed.has("strange"))
 	# rumors: English and Tujuju are built correctly
-	var rc = {"who": "Tor", "place": "haima", "adv": "hala", "verb": "sum", "tense": "past", "neg": false, "ev": "nu"}
-	assert(game.rumor_parts(rc)["v"] == "Tor haima hala i-sum-pa-nu.")
-	assert(game.rumor_en(rc) == "Tor swam in the sea fast (people say)")
+	var rc = {"who": "Dofo", "place": "haima", "adv": "hala", "verb": "sum", "tense": "past", "neg": false, "ev": "nu"}
+	assert(game.rumor_parts(rc)["v"] == "Dofo haima hala i-sum-pa-nu.")
+	assert(game.rumor_en(rc) == "Dofo swam in the sea fast (people say)")
 	rc = {"who": "An", "place": "", "adv": "", "verb": "ning", "tense": "usual", "neg": true, "ev": "da"}
 	assert(game.rumor_parts(rc)["v"] == "An ma-na-ning-ur-ki-da.")
 	assert(game.rumor_en(rc) == "I do not usually sing (I saw it!)")
@@ -634,8 +634,8 @@ func run():
 	press("Whisper it to Mira")
 	assert(game.rumors.size() == 1 and game.rumors[0]["v"] == "Asya murakma i-ning-ur-nu.")
 	assert(has_text("Then Mira laughs") or true)
-	game.rumor_composer("tor")
-	press("Whisper it to Tor")
+	game.rumor_composer("dofo")
+	press("Whisper it to Dofo")
 	assert(game.rumor_count == 2)
 	game.rumor_composer("desh")
 	press("Desh")
@@ -692,7 +692,7 @@ func run():
 		game.joke_menu(id)
 		game.do_joke(id, Data.JOKES[0])
 		game.feel(id)
-	assert(game.mastered.has("chat:mira:faint") and game.mastered.has("chat:tor:proud") and game.mastered.has("chat:lira:laugh"))
+	assert(game.mastered.has("chat:mira:faint") and game.mastered.has("chat:dofo:proud") and game.mastered.has("chat:lira:laugh"))
 	# gifts: likes, hates and neutral
 	game.fish_caught = 3
 	game.gin = 5
@@ -705,7 +705,7 @@ func run():
 	assert(int(game.friend["mira"]) == maxi(f1 - 1, 0) and not game.inventory.has("bread"))
 	game.give_gift("desh", "gin")
 	# secrets and the friends quest
-	for id in ["ena", "ketu", "desh", "neri", "gav"]: game.add_friend(id, 10)
+	for id in ["vufi", "ketu", "desh", "neri", "gav"]: game.add_friend(id, 10)
 	assert(game.completed.has("friends"))
 	game.chat_menu("ketu")
 	press("Ask about a secret")
@@ -761,11 +761,11 @@ func run():
 			assert(has_text("Correct!"), "build " + str(b["tiles"]))
 	game.discovered.erase("sena")
 	game.pending_ext.clear()
-	game.talk("ena")
+	game.talk("vufi")
 	press("Ask about the boat")
-	game.talk("ena")
+	game.talk("vufi")
 	assert(game.content.get_children().any(func(c): return c is PanelContainer and not c.is_queued_for_deletion() and find_button(c, "Use it in a new form") != null), "practice box after a new word")
-	game.ext_form("sena", game.talk.bind("ena"))
+	game.ext_form("sena", game.talk.bind("vufi"))
 	for f in game.ext_items("sena")["forms"]:
 		if find_button(game.content, f[1]) != null and has_text("You know sena"):
 			var prompt_ok = false
@@ -799,9 +799,9 @@ func run():
 	assert(game.berries == 0, "berries need time to regrow")
 	game.shrooms = 3
 	game.berries = 2
-	game.gift_menu("tor")
+	game.gift_menu("dofo")
 	press("ning-guro (song-berry)")
-	assert(game.poems.size() == 2 and game.poems[-1]["by"] == "tor")
+	assert(game.poems.size() == 2 and game.poems[-1]["by"] == "dofo")
 	game.villager_poem("lira", "sao-dau")
 	game.eat_poem("sao-dau")
 	game.eat_poem("sao-dau")
@@ -813,13 +813,13 @@ func run():
 		game.do_compliment(id, ["Ti ta-kawai-da!", "You are cute!", "cute"])
 		assert(game.panel.visible)
 	seed(3)
-	for k in range(12): game.tease("tor")
+	for k in range(12): game.tease("dofo")
 	for g in Data.GOSSIP:
 		if g["id"] in ["tor_choni", "oku_candy", "desh_party"]:
 			game.gossip_card(g, 0)
 			press(g["en"])
 	game.inventory.append("candy")
-	game.give_gift("rin", "bombom")
+	game.give_gift("vivi", "bombom")
 	assert(not game.inventory.has("candy"))
 	game.discovered.append("choni")
 	game.show_loans()
@@ -850,8 +850,8 @@ func run():
 	for w in ["var", "len", "kawai"]:
 		var fs: Array = game.ext_items(w)["forms"]
 		assert(fs.any(func(f): return f[1] == "Dom i-" + w + "-" + w + "."))
-	var rcd = {"who": "Tor", "place": "", "adv": "", "verb": "sum", "dbl": true, "tense": "past", "neg": false, "ev": "nu"}
-	assert(game.rumor_parts(rcd)["v"] == "Tor i-sum-sum-pa-nu.")
+	var rcd = {"who": "Dofo", "place": "", "adv": "", "verb": "sum", "dbl": true, "tense": "past", "neg": false, "ev": "nu"}
+	assert(game.rumor_parts(rcd)["v"] == "Dofo i-sum-sum-pa-nu.")
 	assert(game.rumor_en(rcd).contains("again and again"))
 	rcd["who"] = "Rofi"
 	game.rumor_react("rofi", rcd)
@@ -1102,7 +1102,7 @@ func run():
 	assert(game.mastered.has("kan:ning:desh") and game.survey_found("ning").has("desh") and has_any("Tarara"))
 	for v in Data.KAN.keys():
 		for who in Data.KAN[v][1]: game.can_answer(who, v)
-	game.can_answer("tor", "fei")
+	game.can_answer("dofo", "fei")
 	assert(game.completed.has("survey"))
 	game.show_survey()
 	assert(has_any("Desh"))
@@ -1111,7 +1111,7 @@ func run():
 	press("Ti han t-i-nuk-vai-ha?")
 	await process_frame
 	assert(game.mastered.has("want:ketu") and game.panel.visible)
-	for rep10 in range(10): game.want_answer(["rofi", "radi", "lira", "mira", "tor", "ena"][rep10 % 6])
+	for rep10 in range(10): game.want_answer(["rofi", "radi", "lira", "mira", "dofo", "vufi"][rep10 % 6])
 	# where is...?
 	game.where_say("desh", "fardom")
 	press("Fardom hama i-esh-ha?")
@@ -1177,24 +1177,24 @@ func run():
 	press("Try the wand")
 	assert(has_any("gao-murak"))
 	# wrong prefix fizzles
-	game.wand = {"who": "Tor", "where": "kurma", "pre": "ri", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+	game.wand = {"who": "Dofo", "where": "kurma", "pre": "ri", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
 	game.wand_cast()
 	assert(has_any("kabum") and game.wand_pending.is_empty())
 	# cycling a piece changes the sentence
 	game.wand_panel()
-	press("Who:  Tor  (Tor)")
-	assert(game.wand["who"] != "Tor")
-	# -im -da: Tor dances at the market right now
-	var tn = game.entity_by_id("tor")["node"]
-	var thome = game.entity_by_id("tor")["home"]
-	game.wand = {"who": "Tor", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+	press("Who:  Dofo  (Dofo)")
+	assert(game.wand["who"] != "Dofo")
+	# -im -da: Dofo dances at the market right now
+	var tn = game.entity_by_id("dofo")["node"]
+	var thome = game.entity_by_id("dofo")["home"]
+	game.wand = {"who": "Dofo", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
 	game.wand_cast()
-	assert(tn.position.distance_to(Data.WAND_PLACES["kurma"][1]) < 3.0 and game.acts.has("tor"), "teleported to the market " + str(tn.position) + str(game.acts.keys()) + str(game.wand_pending.size()))
-	assert(game.talk_partner == "tor")
+	assert(tn.position.distance_to(Data.WAND_PLACES["kurma"][1]) < 3.0 and game.acts.has("dofo"), "teleported to the market " + str(tn.position) + str(game.acts.keys()) + str(game.wand_pending.size()))
+	assert(game.talk_partner == "dofo")
 	for f in range(800):
 		game.clock += 0.05
 		game.update_acts(0.05)
-	assert(tn.position.distance_to(thome) < 0.1 and not game.acts.has("tor"), "Tor comes home")
+	assert(tn.position.distance_to(thome) < 0.1 and not game.acts.has("dofo"), "Dofo comes home")
 	# -fu waits, then happens
 	game.wand = {"who": "Mira", "where": "haima", "pre": "i", "neg": false, "verb": "sum", "tense": "fu", "ev": "da"}
 	game.wand_cast()
@@ -1276,10 +1276,10 @@ func run():
 		var secret = game.guess["secret"]
 		press(Data.GUESS_Q["hat"][0])
 		assert(has_any("Neri:"))
-		game.guess_tap("ena" if secret != "ena" else "mira")
+		game.guess_tap("vufi" if secret != "vufi" else "mira")
 		assert(game.guess["out"].size() == 1)
 		press("Make a guess")
-		var other = "tor" if secret != "tor" else "oku"
+		var other = "dofo" if secret != "dofo" else "oku"
 		game.guess_tap(other)
 		assert(game.guess["wrong"] == 1)
 		press("Make a guess")
@@ -1554,6 +1554,9 @@ func run():
 	assert(game.guardian_lines().has(Data.GUARDIAN_LINES.size() - 1))
 	game.close_panel()
 	print("PASS: storks (tujuju), the island's name and the stork carving")
+	var pc: Dictionary = game.plant_counts
+	assert(pc["ferns"] > 80 and pc["pads"] > 50 and pc["cattails"] > 50 and pc["vine_flowers"] > 100, "plants: " + str(pc))
+	print("PASS: passionflower vines, ferns, lotus and cattails")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

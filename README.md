@@ -51,18 +51,18 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 - Follow-up questions for every resident, a phrasebook of collected sentences, a word workshop for case endings, and practice quizzes.
 - Counting piles with the Tujuju number words one to ten, fishing with noun incorporation (with three fishing spots), signs that teach case endings.
 - Side-quest language: question words (Suri), compass directions with -ma (Radi), body words and pain (Jeli), causative -tir (Asya), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
-- A bridge that is visibly broken until Tor's repair, and a table that is laid after Mira's meal.
+- A bridge that is visibly broken until Dofo's repair, and a table that is laid after Mira's meal.
 - Notebook with editable meaning guesses, optional meaning reveals and mastery marks.
 - Inventory, island guide, automatic saving, manual restart confirmation.
 - Procedural 3D scenery: sky, sun with shadows, animated water, detailed houses, boat and bridge, trees, grass, flowers, butterflies, clouds, and characters with idle animation.
 - Wrong-answer feedback and shuffled answer choices.
 
 ## Quest walkthrough
-1. Pick up the brown bag beside Ena. Tell Ena Anni kel.
+1. Pick up the brown bag beside Vufi. Tell Vufi Anni kel.
 2. Collect wak, guro and kor beside the main path between harbor and village. Offer them to Mira.
 3. Collect the blue kel west of the forest path. Offer it to Sanu.
-4. Collect murak, sek and lin beside the path toward the river. Offer them to Tor.
-5. Ask Tor about Neri. Talk to Lira in the village and Rofi north of the crossing. Compare accounts. Tor's italpada is witnessed; Rofi's italpashi is inferred; Lira's italpanu is reported.
+4. Collect murak, sek and lin beside the path toward the river. Offer them to Dofo.
+5. Ask Dofo about Neri. Talk to Lira in the village and Rofi north of the crossing. Compare accounts. Dofo's italpada is witnessed; Rofi's italpashi is inferred; Lira's italpanu is reported.
 6. Continue north to Neri at the cove.
 Exploration is open. Finding Neri early acknowledges the discovery while leaving the clue objective available.
 
@@ -75,7 +75,7 @@ Side quests, in any order:
 - Lagoon (Desh, east lagoon): follow four drum-game commands.
 - Riddles (Oku, old ruins): five riddles about the sun, moon, stars, fish and trees. The reward is a whispered secret.
 - Mail (Gav, harbor): deliver parcels labeled Ketu-ru, Asya-ru and Oku-ru, then return to Gav for five coins.
-- Hide and seek (Oli, school): find Rin and Oli and shout K-ta-pal-da! (I see you!).
+- Hide and seek (Oli, school): find Vivi and Oli and shout K-ta-pal-da! (I see you!).
 - Sea stars: find eight hai-sao on the beaches; each one names its ordinal (yanve, velve, murve...).
 - Dog: sell fish to Ketu or earn coins, buy panak, and share it with the village dog.
 - Secret: behind the waterfall is a hidden room with an old map. Ask Lachu for a ride to Sendor (Sendor-ru t-na-tar-o-ye) and dig where the map says: murak-ni shanma, behind the tree.
@@ -123,11 +123,14 @@ Glowing carved stones line the cenote: a picture stone near the surface (fish, s
 ## The storks (tujuju)
 Three tujuju, jabiru storks with bare black heads, red collars and giant bills, wade in the shallows at the river mouth (east, just north of the falls). They feed with their heads down and lift off in slow, broad flaps if you walk close, circle the river and glide back; walk up by tapping one and it stays put. Tapping one teaches tujuju and a sentence card (Tujuju morama i-tari-nuk-im-da). Once you know the word, Oku tells why the island has its name (Sair-ir tujuju-ir-ni shanma dor-ma ri-tal-ak-pa-nu: they say the people came to the land behind the storks), a new carving in the cenote (chapter 5, with a stork drawn beside the marks) tells the same story, and Var Tari has heard of them. The name: tuyuyu is used in South America for the jabiru and the wood stork; the RAE gives its origin as uncertain, perhaps Guarani.
 
+## Plants
+Passionflower vines wind up some tree trunks and along the field and paddock fences, with white and purple flowers. Ferns grow in the forest shade, around the cenote and by the falls. Lotus pads and pink lotus flowers float in the river-mouth marsh where the storks wade and along the slow edges of the river, and cattails stand in clumps on the banks and around the marsh. They are scenery for now and use their own random seed, so nothing else on the island moved.
+
 ## Learning data
 The game keeps a local learning log (user://varnak_log.json, in the browser's storage on the web): sessions, words found, items mastered, every answer and built sentence with what the player chose and the target, quests, errands, overheard conversations, letters and mystery guesses. More > My learning and data export (also Notebook > My learning) shows a summary, accuracy by activity and words in missed questions, and exports everything as JSON (summary, words, phrases, events) or CSV (one row per event). Nothing is sent anywhere. Reset progress keeps the log and records a reset event. The save and log files keep their original names (varnak_island.json, varnak_log.json) so progress from before the rename carries over.
 
 ## Current limits
-This is a playable blockout, with simple models and short encounters. It does not yet include recorded Tujuju speech, animated gestures, a broad dialogue generator, advanced sentence building, or a simulated ecology. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Tor repairs it. Click-to-walk heads straight for its target and stops with a hint if something is in the way. Deep water cannot be entered; the river is crossed by the bridge, the stepping stones or the log bridge.
+This is a playable blockout, with simple models and short encounters. It does not yet include recorded Tujuju speech, animated gestures, a broad dialogue generator, advanced sentence building, or a simulated ecology. Gestures are described in text. The crossing remains traversable throughout, although its planks are visibly broken until Dofo repairs it. Click-to-walk heads straight for its target and stops with a hint if something is in the way. Deep water cannot be entered; the river is crossed by the bridge, the stepping stones or the log bridge.
 
 ## Verification
 Imported and launched headlessly with Godot 4.5.1. The included smoke_test.gd walks off the ferry onto Sendor with real physics, checks the practice forms and sentences for every word class, generates hundreds of poems, and checks every chat action for every personality, gifts, moods, secrets, the friends quest and that every emotion animation resets cleanly; the gossip evidentials and replies, the strange things, rumor Tujuju and English generation, rumor spreading, the parrot and the silly events; the drag-and-drop engine (placing, swapping and returning tiles, at every level), every sentence, gap, forge and match answer, the challenges, Memory, Market rush, Speed round and fishing; all eighteen quest completions, the folding quest box, the shop, parcels, hide and seek, the treasure dig, the ferry ride both ways, every Sentence builder and Verb builder answer, the day cycle, rain and the whale; earlier checks cover (with wrong answers first where it matters), the quest marks, click picking of a person and items, click-to-walk with real physics, that every person, item and object stands on land reachable from the harbor, map travel, incorrect/correct evidence answers, inventory consumption, save/load and UI panel generation. It also checks that every sentence card, door, counting pile, fishing step, workshop and practice screen works, that every Tujuju form used has a notebook gloss, and that every interactable can be used.

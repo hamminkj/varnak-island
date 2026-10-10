@@ -21,7 +21,7 @@ const DAY_LEN = 480.0
 const FERRY_HARBOR = Vector3(1.8, 0, 44.6)
 const FERRY_ISLET = Vector3(49.8, 0, 66.0)
 const STARS = [Vector3(-14, 0, -46), Vector3(-30, 0, -45), Vector3(66, 0, 31), Vector3(55, 0, 86), Vector3(-30, 0, 41), Vector3(30, 0, 40), Vector3(-134, 0, 6), Vector3(-71, 0, 47)]
-const HIDE_SPOTS = {"rin": Vector3(-50.5, 0, -13.4), "oli": Vector3(-42.4, 0, 19.9)}
+const HIDE_SPOTS = {"vivi": Vector3(-50.5, 0, -13.4), "oli": Vector3(-42.4, 0, 19.9)}
 const MAP_X0 = -143.0
 const MAP_X1 = 90.0
 const MAP_Z0 = -56.0
@@ -152,11 +152,11 @@ var words = {
 	"italpanu":"They reportedly arrived (i + tal + pa + nu)"
 }
 var quests = [
-	["belongings","Find your bag at the harbor. Talk to Ena."],
+	["belongings","Find your bag at the harbor. Talk to Vufi."],
 	["meal","Bring wak, guro and kor to Mira in the village."],
 	["bag","Find the forest bag and take it to Sanu."],
-	["bridge","Bring murak, sek and lin to Tor by the river."],
-	["evidence","Compare the accounts of Tor, Lira and Rofi."],
+	["bridge","Bring murak, sek and lin to Dofo by the river."],
+	["evidence","Compare the accounts of Dofo, Lira and Rofi."],
 	["cove","Visit the northern cove and talk to Neri."]
 ]
 # id, person, objective text
@@ -169,7 +169,7 @@ var side_quests = [
 	["lagoon","desh","Play Desh's drum game at the east lagoon."],
 	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
 	["mail","gav","Gav at the harbor needs parcels delivered. Read the labels!"],
-	["hide","oli","Rin and Oli at the school want to play hide and seek."],
+	["hide","oli","Vivi and Oli at the school want to play hide and seek."],
 	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
 	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
 	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
@@ -231,16 +231,16 @@ const PLANTS = [
 ]
 # skin, hair, hair style, accent
 var looks = {
-	"ena": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
+	"vufi": [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")],
 	"mira": [Color("c68e66"), Color("3b2418"), 2, Color("f2e6c8")],
 	"sanu": [Color("e3b98f"), Color("7a4a22"), 3, Color("5b8c5a")],
-	"tor": [Color("a87650"), Color("1d1d1d"), 4, Color("c9a46d")],
+	"dofo": [Color("a87650"), Color("1d1d1d"), 4, Color("c9a46d")],
 	"lira": [Color("f0c9a0"), Color("b5651d"), 1, Color("e76f51")],
 	"rofi": [Color("8d5a3b"), Color("4a4a4a"), 0, Color("a8dadc")],
 	"neri": [Color("d9a679"), Color("2e2a5a"), 2, Color("f4a261")],
 	"ketu": [Color("b07a52"), Color("2b1d14"), 3, Color("e9c46a")],
 	"suri": [Color("e8bf98"), Color("1d1d1d"), 1, Color("f2e6c8")],
-	"rin": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
+	"vivi": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
 	"oli": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
 	"radi": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
 	"jeli": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
@@ -256,16 +256,16 @@ var looks = {
 }
 # Extra features so every villager has their own silhouette.
 var person_ex = {
-	"ena": {"shirt": Color("f4f1e8"), "stripe": Color("1d3557"), "hat": "cap", "hat_color": Color("1d3557"), "pants": Color("2b3a55"), "style": 9, "prop": "clipboard", "freckles": true, "brows": "raised", "mouth": "smile"},
+	"vufi": {"shirt": Color("f4f1e8"), "stripe": Color("1d3557"), "hat": "cap", "hat_color": Color("1d3557"), "pants": Color("2b3a55"), "style": 9, "prop": "clipboard", "freckles": true, "brows": "raised", "mouth": "smile"},
 	"mira": {"shirt": Color("bb714b"), "apron": Color("f4f1e8"), "hat": "toque", "build": "round", "w": 1.15, "h": 0.95, "prop": "ladle", "brows": "raised", "mouth": "o", "earrings": true},
 	"sanu": {"shirt": Color("8ecae6"), "stripe": Color("f4f1e8"), "pants": Color("8ecae6"), "hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.8, "cheeks": true, "prop": "pillow", "eye_kind": "sleepy"},
-	"tor": {"shirt": Color("c0392b"), "overalls": Color("4a5d78"), "pants": Color("4a5d78"), "w": 1.25, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("e9c46a"), "prop": "hammer", "brows": "flat", "thick": true, "mouth": "grin"},
+	"dofo": {"shirt": Color("c0392b"), "overalls": Color("4a5d78"), "pants": Color("4a5d78"), "w": 1.25, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("e9c46a"), "prop": "hammer", "brows": "flat", "thick": true, "mouth": "grin"},
 	"lira": {"shirt": Color("9678a5"), "dress": Color("7d5a94"), "face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a"), "prop": "cup", "brows": "raised", "mouth": "grin"},
 	"rofi": {"shirt": Color("7e9975"), "vest": Color("6d4a33"), "mustache": Color("4a4a4a"), "hat": "cowboy", "hat_color": Color("8c5a3c"), "w": 0.95, "h": 1.1, "prop": "carrot", "brows": "angry", "thick": true, "mouth": "frown"},
 	"neri": {"shirt": Color("bd795f"), "backpack": Color("c0392b"), "scarf": Color("f4a261"), "prop": "map", "mouth": "smile", "brows": "flat"},
 	"ketu": {"shirt": Color("e76f51"), "build": "round", "w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14"), "prop": "fish", "mouth": "grin", "brows": "raised"},
 	"suri": {"shirt": Color("2a9d8f"), "dress": Color("21867a"), "h": 1.14, "w": 0.9, "face": "glasses", "earrings": true, "prop": "book", "brows": "raised", "mouth": "line"},
-	"rin": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
+	"vivi": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
 	"oli": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
 	"radi": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
 	"jeli": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
@@ -462,6 +462,7 @@ func build_world():
 	T.extra_lobe = false
 	build_forest()
 	build_scatter()
+	build_plants()
 	T.extra_lobe = true
 	build_cenote()
 	build_sky_life()
@@ -608,12 +609,14 @@ func near_entity(x: float, z: float, d: float) -> bool:
 	return false
 
 var tree_pts: Array = []
+var tree_info: Array = []   # [base position, trunk scale] for vines
 
 func add_tree(p: Vector3, vary: RandomNumberGenerator, trunks: Array, trunk_colors: Array, pines: Array, pine_colors: Array, oaks: Array, oak_colors: Array):
 	tree_pts.append(Vector2(p.x, p.z))
 	var s = vary.randf_range(0.85, 1.45)
 	var yaw = vary.randf() * TAU
 	var trunk_h = 2.0 * s
+	tree_info.append([p, s])
 	trunks.append(Transform3D(Basis.from_scale(Vector3(s, trunk_h, s)), p + Vector3(0, trunk_h * 0.5, 0)))
 	trunk_colors.append(Color("6b4f36").lerp(Color("85623f"), vary.randf()))
 	if vary.randf() < 0.5:
@@ -912,6 +915,180 @@ func build_scatter():
 	Art.scatter(self, Art.sphere_mesh(1.0, 8), rocks, rock_colors)
 	Art.scatter(self, Art.cyl_mesh(0.03, 1.0, 4), reeds, reed_colors, false)
 
+# ---- passionflower vines, ferns, lotus and cattails ----
+# Their own random stream, so the rest of the island stays exactly where it was.
+func build_plants():
+	var rs = RandomNumberGenerator.new()
+	rs.seed = 40426
+	var leaf: Array = []
+	var leaf_c: Array = []
+	var disc: Array = []
+	var disc_c: Array = []
+	var dots: Array = []
+	var dots_c: Array = []
+	var stem: Array = []
+	var stem_c: Array = []
+	var head: Array = []
+	var head_c: Array = []
+	# cattails: clumps along the river banks and around the river-mouth marsh
+	var spots: Array = []
+	for k in range(26):
+		var x = rs.randf_range(-36.0, 74.0)
+		if absf(x) < 4.0 or absf(x + 30.0) < 3.0 or absf(x - 52.0) < 3.5: continue
+		var side = -1.0 if k % 2 == 0 else 1.0
+		spots.append(Vector2(x, T.river_z(x) + side * rs.randf_range(2.4, 3.0)))
+	for k in range(14):
+		var a = rs.randf() * TAU
+		spots.append(Vector2(84.0, -31.5) + Vector2(cos(a) * rs.randf_range(4.5, 8.0), sin(a) * rs.randf_range(3.0, 5.0)))
+	for c in spots:
+		if T.coast(c.x, c.y) < 3.0 and c.x < 70.0: continue
+		for n in range(rs.randi_range(5, 11)):
+			var x = c.x + rs.randf_range(-0.7, 0.7)
+			var z = c.y + rs.randf_range(-0.7, 0.7)
+			var y = T.height(x, z)
+			if y < -0.7 or y > 0.35 or near_path(x, z, 1.0) or is_blocked(x, z, 0.2): continue
+			var h = rs.randf_range(1.1, 1.8)
+			var lean = Basis.from_euler(Vector3(rs.randf_range(-0.1, 0.1), 0, rs.randf_range(-0.1, 0.1)))
+			stem.append(Transform3D((lean * Basis.from_scale(Vector3(1, h, 1))), Vector3(x, y + h * 0.5 - 0.05, z)))
+			stem_c.append(Color("5e8a3a").lerp(Color("8aa64a"), rs.randf()))
+			if rs.randf() < 0.75:
+				head.append(Transform3D((lean * Basis.from_scale(Vector3(0.045, 0.16, 0.045))), Vector3(x, y - 0.05, z) + lean * Vector3(0, h * 0.78, 0)))
+				head_c.append(Color("6b4226").lerp(Color("8a5a32"), rs.randf()))
+			for b in range(2):
+				var bh = h * rs.randf_range(0.7, 1.05)
+				var bb = Basis.from_euler(Vector3(rs.randf_range(-0.3, 0.3), rs.randf() * TAU, rs.randf_range(-0.3, 0.3)))
+				leaf.append(Transform3D((bb * Basis.from_scale(Vector3(0.035, bh * 0.5, 0.01))), Vector3(x, y + bh * 0.5 - 0.05, z)))
+				leaf_c.append(Color("4f7f34").lerp(Color("97ad55"), rs.randf()))
+	# lotus: pads and flowers on the still water of the marsh and the slow river edges
+	var lot: Array = []
+	for k in range(70):
+		var a = rs.randf() * TAU
+		lot.append(Vector2(85.0, -32.5) + Vector2(cos(a) * rs.randf_range(0.0, 6.5), sin(a) * rs.randf_range(0.0, 2.6)))
+	for k in range(40):
+		var x = rs.randf_range(10.0, 48.0)
+		lot.append(Vector2(x, T.river_z(x) + (1.0 if k % 2 == 0 else -1.0) * rs.randf_range(1.6, 2.3)))
+	var pads: Array = []
+	var pad_c: Array = []
+	for c in lot:
+		var y = T.height(c.x, c.y)
+		if y > -0.3 or absf(c.x) < 3.0 or absf(c.x - 52.0) < 3.0: continue
+		var r = rs.randf_range(0.28, 0.55)
+		pads.append(Transform3D(Basis.from_scale(Vector3(r, 0.02, r)).rotated(Vector3.UP, rs.randf() * TAU), Vector3(c.x, 0.07, c.y)))
+		pad_c.append(Color("3f7f3a").lerp(Color("7fae4a"), rs.randf()))
+		if rs.randf() < 0.35:
+			var fh = rs.randf_range(0.0, 0.45)
+			var fp = Vector3(c.x + rs.randf_range(-0.15, 0.15), 0.1 + fh, c.y + rs.randf_range(-0.15, 0.15))
+			if fh > 0.08:
+				stem.append(Transform3D(Basis.from_scale(Vector3(0.6, fh, 0.6)), fp - Vector3(0, fh * 0.5, 0)))
+				stem_c.append(Color("6e9a46"))
+			var pink = Color("f2a6c4").lerp(Color("fbe3ec"), rs.randf() * 0.6)
+			for pt in range(7):
+				var pa = pt * TAU / 7.0 + rs.randf() * 0.3
+				var pb = Basis.from_euler(Vector3(0.75, pa, 0))
+				dots.append(Transform3D((pb * Basis.from_scale(Vector3(0.05, 0.11, 0.025))), fp + Vector3(sin(pa) * 0.07, 0.07, cos(pa) * 0.07)))
+				dots_c.append(pink)
+			dots.append(Transform3D(Basis.from_scale(Vector3(0.035, 0.03, 0.035)), fp + Vector3(0, 0.07, 0)))
+			dots_c.append(Color("e9c84a"))
+	# ferns: in the forest shade, around the cenote and near the falls
+	var fern_spots: Array = []
+	for t in tree_pts:
+		if rs.randf() < 0.55:
+			var a = rs.randf() * TAU
+			fern_spots.append((t as Vector2) + Vector2(cos(a), sin(a)) * rs.randf_range(1.0, 2.6))
+	for k in range(60):
+		var a = rs.randf() * TAU
+		fern_spots.append(T.CENOTE + Vector2(cos(a), sin(a)) * rs.randf_range(T.CENOTE_R + 1.0, 12.0))
+	for k in range(24):
+		var a = rs.randf() * TAU
+		fern_spots.append(T.FALLS_POOL + Vector2(cos(a), sin(a)) * rs.randf_range(3.2, 7.0))
+	var ferns = 0
+	for c in fern_spots:
+		if in_house(c.x, c.y) or near_path(c.x, c.y, 1.0) or is_blocked(c.x, c.y, 0.3): continue
+		var y = T.height(c.x, c.y)
+		if y < -0.05 or T.coast(c.x, c.y) < 4.0: continue
+		if Vector2(c.x, c.y).distance_to(T.CENOTE) < T.CENOTE_R + 0.6: continue
+		var sz = rs.randf_range(0.55, 1.05)
+		var nf = rs.randi_range(6, 9)
+		var yaw0 = rs.randf() * TAU
+		var g = Color("2f6e34").lerp(Color("5e9d42"), rs.randf())
+		for f in range(nf):
+			var fa = yaw0 + f * TAU / nf + rs.randf_range(-0.2, 0.2)
+			var tilt = rs.randf_range(0.75, 1.15)
+			var fb = Basis(Vector3.UP, fa) * Basis(Vector3.RIGHT, tilt)
+			var length = sz * rs.randf_range(0.8, 1.1)
+			leaf.append(Transform3D((fb * Basis.from_scale(Vector3(0.11 * sz, length * 0.5, 0.015))), Vector3(c.x, y, c.y) + fb * Vector3(0, length * 0.5, 0)))
+			leaf_c.append(g.lerp(Color("7fb45a"), rs.randf() * 0.3))
+		ferns += 1
+		fern_pts.append(Vector3(c.x, y, c.y))
+	# passionflower vines: winding up some trunks, with purple and white flowers
+	for ti in tree_info:
+		if rs.randf() > 0.16: continue
+		var p: Vector3 = ti[0]
+		var sc: float = ti[1]
+		if near_path(p.x, p.z, 2.0): continue
+		vine_trees.append(p)
+		var rad = 0.28 * sc + 0.03
+		var top = 2.0 * sc * rs.randf_range(0.75, 0.95)
+		var a0 = rs.randf() * TAU
+		var n = int(top / 0.075)
+		for k in range(n):
+			var u = float(k) / n
+			var a = a0 + u * TAU * 2.2
+			var pos = p + Vector3(cos(a) * rad, 0.1 + u * top, sin(a) * rad)
+			var lb = Basis(Vector3.UP, -a + PI * 0.5) * Basis(Vector3.RIGHT, rs.randf_range(-0.5, 0.5))
+			leaf.append(Transform3D((lb * Basis.from_scale(Vector3(0.11, 0.095, 0.012))), pos))
+			leaf_c.append(Color("3e7a32").lerp(Color("6aa444"), rs.randf()))
+			if k % 3 == 1 and rs.randf() < 0.8:
+				var out = Vector3(cos(a), 0, sin(a))
+				var fpos = pos + out * 0.05
+				var fb = Basis.looking_at(out, Vector3.UP) * Basis(Vector3.RIGHT, PI * 0.5)
+				disc.append(Transform3D((fb * Basis.from_scale(Vector3(0.13, 0.01, 0.13))), fpos))
+				disc_c.append(Color("f4f0fa").lerp(Color("c9b6ea"), rs.randf()))
+				disc.append(Transform3D((fb * Basis.from_scale(Vector3(0.085, 0.012, 0.085))), fpos + out * 0.012))
+				disc_c.append(Color("6a3d9a").lerp(Color("8f5cc2"), rs.randf()))
+				dots.append(Transform3D(Basis.from_scale(Vector3(0.025, 0.025, 0.025)), fpos + out * 0.03))
+				dots_c.append(Color("d8e27a"))
+	# and along some of the field and paddock fences
+	for seg in [[Vector3(17, 0, -0.8), Vector3(29, 0, -0.8)], [Vector3(29, 0, 12), Vector3(29, 0, 22)], [Vector3(17, 0, 22), Vector3(29, 0, 22)], [Vector3(17, 0, 10), Vector3(23, 0, 10)]]:
+		var a: Vector3 = seg[0]
+		var b: Vector3 = seg[1]
+		var dir = (b - a).normalized()
+		var side = Vector3(dir.z, 0, -dir.x)
+		var t0 = rs.randf_range(0.0, 2.0)
+		var t1 = (b - a).length() - rs.randf_range(0.0, 2.0)
+		var t = t0
+		var k = 0
+		while t < t1:
+			var sd = 1.0 if k % 2 == 0 else -1.0
+			var hang = absf(sin(t * 1.7)) * 0.45 if k % 3 == 0 else 0.0
+			var pos = a + dir * t + Vector3(0, gy(a.x + dir.x * t, a.z + dir.z * t) + 0.84 + sin(t * 2.3) * 0.06 - hang, 0) + side * 0.05 * sd
+			var lb = Basis.looking_at(side * sd, Vector3.UP) * Basis(Vector3.FORWARD, rs.randf_range(-0.6, 0.6))
+			leaf.append(Transform3D((lb * Basis.from_scale(Vector3(0.11, 0.095, 0.012))), pos))
+			leaf_c.append(Color("3e7a32").lerp(Color("6aa444"), rs.randf()))
+			if k % 4 == 2 and rs.randf() < 0.8:
+				var out = side * sd
+				var fpos = pos + out * 0.05
+				var fb = Basis.looking_at(out, Vector3.UP) * Basis(Vector3.RIGHT, PI * 0.5)
+				disc.append(Transform3D((fb * Basis.from_scale(Vector3(0.13, 0.01, 0.13))), fpos))
+				disc_c.append(Color("f4f0fa").lerp(Color("c9b6ea"), rs.randf()))
+				disc.append(Transform3D((fb * Basis.from_scale(Vector3(0.085, 0.012, 0.085))), fpos + out * 0.012))
+				disc_c.append(Color("6a3d9a").lerp(Color("8f5cc2"), rs.randf()))
+				dots.append(Transform3D(Basis.from_scale(Vector3(0.025, 0.025, 0.025)), fpos + out * 0.03))
+				dots_c.append(Color("d8e27a"))
+			t += 0.09
+			k += 1
+	Art.scatter(self, Art.sphere_mesh(1.0, 6), leaf, leaf_c, false)
+	Art.scatter(self, Art.cyl_mesh(1.0, 1.0, 10), disc, disc_c, false)
+	Art.scatter(self, Art.cyl_mesh(1.0, 1.0, 9), pads, pad_c, false)
+	Art.scatter(self, Art.sphere_mesh(1.0, 6), dots, dots_c, false)
+	Art.scatter(self, Art.cyl_mesh(0.022, 1.0, 4), stem, stem_c, false)
+	Art.scatter(self, Art.sphere_mesh(1.0, 8), head, head_c, false)
+	plant_counts = {"ferns": ferns, "pads": pads.size(), "cattails": head.size(), "vine_flowers": disc.size() / 2}
+
+var plant_counts: Dictionary = {}
+var vine_trees: Array = []
+var fern_pts: Array = []
+
 func in_house(x: float, z: float) -> bool:
 	for c in house_centers:
 		if abs(x - c.x) < 4.0 and abs(z - c.z) < 4.0: return true
@@ -984,10 +1161,10 @@ func build_sky_life():
 		gulls.append({"node": g, "l": wl, "r": wr, "p": i * 2.1, "rad": 18 + (i % 3) * 5, "h": 15 + (i % 3) * 3, "c": flocks[i]})
 
 func build_entities():
-	entity("ena","npc","Ena",Vector3(-2,0,32),Color("426c9c"))
+	entity("vufi","npc","Vufi",Vector3(-2,0,32),Color("426c9c"))
 	entity("mira","npc","Mira",Vector3(-4,0,11),Color("bb714b"))
 	entity("sanu","npc","Sanu",Vector3(4,0,-8),Color("d5b54c"))
-	entity("tor","npc","Tor",Vector3(-3,0,-19),Color("637ba3"))
+	entity("dofo","npc","Dofo",Vector3(-3,0,-19),Color("637ba3"))
 	entity("lira","npc","Lira",Vector3(7,0,3),Color("9678a5"))
 	entity("rofi","npc","Rofi",Vector3(6,0,-29),Color("7e9975"))
 	entity("neri","npc","Neri",Vector3(0,0,-40),Color("bd795f"))
@@ -1026,9 +1203,9 @@ func build_entities():
 	entity("sair1","npc","sair",Vector3(-53.5,0,15.0),Color("6b7f9c"))
 	entity("sair2","npc","sair",Vector3(-46.5,0,15.6),Color("8f5a48"))
 	entity("suri","npc","Suri",Vector3(-45.0,0,-3.4),Color("2a9d8f"))
-	var rin = entity("rin","npc","Rin",Vector3(-47.4,0,-2.4),Color("f4a261"))
+	var vivi = entity("vivi","npc","Vivi",Vector3(-47.4,0,-2.4),Color("f4a261"))
 	var oli = entity("oli","npc","Oli",Vector3(-49.6,0,-3.2),Color("e9c46a"))
-	for kid in [rin, oli]:
+	for kid in [vivi, oli]:
 		(kid["node"] as Node3D).scale = Vector3.ONE * 0.78
 		kid["ph"] = 1.55
 	entity("radi","npc","Radi",Vector3(-58.8,0,-36.4),Color("4f7ca8"))
@@ -1243,14 +1420,14 @@ func update_marks():
 			break
 	var main_people: Array = []
 	match main:
-		"belongings": main_people = ["ena"]
+		"belongings": main_people = ["vufi"]
 		"meal": main_people = ["mira"]
 		"bag": main_people = ["sanu"]
-		"bridge": main_people = ["tor"]
+		"bridge": main_people = ["dofo"]
 		"evidence":
-			for p in ["tor", "lira", "rofi"]:
+			for p in ["dofo", "lira", "rofi"]:
 				if not completed.has("heard_" + p): main_people.append(p)
-			if main_people.is_empty(): main_people = ["tor"]
+			if main_people.is_empty(): main_people = ["dofo"]
 		"cove": main_people = ["neri"]
 	for e in entities:
 		if not e.has("mark"): continue
@@ -1578,7 +1755,7 @@ func complete(id: String):
 		completed.append(id)
 		log_event("quest", id)
 		play_sfx("fanfare", -4.0)
-		var giver = {"belongings": "ena", "meal": "mira", "bag": "sanu", "bridge": "tor", "evidence": "tor", "cove": "neri"}.get(id, "")
+		var giver = {"belongings": "vufi", "meal": "mira", "bag": "sanu", "bridge": "dofo", "evidence": "dofo", "cove": "neri"}.get(id, "")
 		for s in side_quests:
 			if s[0] == id: giver = s[1]
 		if giver != "" and Data.PEOPLE.has(giver):
@@ -2589,7 +2766,7 @@ func identity_puzzle():
 
 func add_topics(id: String):
 	match id:
-		"ena": topic("Ask about the boat", "boat_small", id)
+		"vufi": topic("Ask about the boat", "boat_small", id)
 		"mira":
 			topic("Ask about the village", "village_big", id)
 			topic("Ask about the food", "food_warm", id)
@@ -2597,9 +2774,9 @@ func add_topics(id: String):
 			topic("Ask about that noise", "mira_sizzle", id)
 			if completed.has("meal"): topic("Ask about the water", "water_container", id)
 		"sanu": topic("Ask about the path", "path_safe", id)
-		"tor":
+		"dofo":
 			topic("Ask about the river", "river_small", id)
-			button("Answer: where are you?", where_puzzle.bind("tor"), content)
+			button("Answer: where are you?", where_puzzle.bind("dofo"), content)
 			if completed.has("bridge"):
 				topic("Ask about the bridge", "gira_safe", id)
 				topic("Ask who built it", "tor_built", id)
@@ -2624,10 +2801,10 @@ func add_topics(id: String):
 		"suri":
 			topic("Ask who Suri is", "suri_teacher", id)
 			topic("Ask about the students", "students_read", id)
-			topic("Ask why Rin and Oli are giggling", "suri_kinder", id)
+			topic("Ask why Vivi and Oli are giggling", "suri_kinder", id)
 			if mastered.has("kir:taught") and not completed.has("kirmel"): button("Show Suri the old writing", suri_kirmel.bind(0), content)
-		"rin":
-			topic("Ask who Rin is", "rin_student", id)
+		"vivi":
+			topic("Ask who Vivi is", "rin_student", id)
 			topic("Ask what they are doing", "students_read", id)
 		"oli": button("Answer Oli's question", identity_puzzle, content)
 		"radi":
@@ -2670,18 +2847,18 @@ func talk(id: String):
 	if talk_partner != id: log_event("talk", id)
 	talk_partner = id
 	match id:
-		"ena":
+		"vufi":
 			learn("kel")
 			learn("anni")
 			learn("tekaru")
-			clear_panel("Ena")
-			text_line("Ena points to your bag, then gestures toward you.\n\n“Kel.”\n\nTry telling Ena: \"My bag.\"")
+			clear_panel("Vufi")
+			text_line("Vufi points to your bag, then gestures toward you.\n\n“Kel.”\n\nTry telling Vufi: \"My bag.\"")
 			button("Anni kel",func():
 				if inventory.has("own_bag"):
 					complete("belongings")
-					message("Ena nods", "“Tekaru.” Ena points along the path toward the village. Mira is preparing a meal there.")
-				else: message("Ena points again", "Pick up the brown bag beside Ena (it glows), then try again."),content)
-			button("Kel anni",func(): message("Ena demonstrates","Ena places a hand on their own bag: “Anni kel.” The possessor comes before the object."),content)
+					message("Vufi nods", "“Tekaru.” Vufi points along the path toward the village. Mira is preparing a meal there.")
+				else: message("Vufi points again", "Pick up the brown bag beside Vufi (it glows), then try again."),content)
+			button("Kel anni",func(): message("Vufi demonstrates","Vufi places a hand on their own bag: “Anni kel.” The possessor comes before the object."),content)
 		"mira":
 			learn("tnaveno")
 			for word in ["wak","guro","kor"]: learn(word)
@@ -2703,21 +2880,21 @@ func talk(id: String):
 				if inventory.has("forest_bag"):
 					consume(["forest_bag"])
 					complete("bag")
-					message("Sanu recognizes the bag","Sanu thanks you and points north to Tor at the river crossing.")
-				elif completed.has("bag"): message("Sanu waves", "Sanu has the bag back. Tor is north at the river crossing.")
+					message("Sanu recognizes the bag","Sanu thanks you and points north to Dofo at the river crossing.")
+				elif completed.has("bag"): message("Sanu waves", "Sanu has the bag back. Dofo is north at the river crossing.")
 				else: offer_help(["forest_bag"]),content)
-		"tor":
+		"dofo":
 			for word in ["murak","sek","lin","tnaveno"]: learn(word)
-			clear_panel("Tor")
-			text_line("Tor examines the crossing and points to three materials.\n\n“Murak. Sek. Lin. Tnaveno.”")
+			clear_panel("Dofo")
+			text_line("Dofo examines the crossing and points to three materials.\n\n“Murak. Sek. Lin. Tnaveno.”")
 			button("Offer repair materials",func():
 				if has_items(["wood","stone","rope"]):
 					consume(["wood","stone","rope"])
 					complete("bridge")
-					message("The crossing is repaired","Tor secures the planks. Ask Tor about Neri, and compare the accounts of Lira and Rofi.")
-				elif completed.has("bridge"): message("Tor nods","The crossing is secure. You can ask about Neri.")
+					message("The crossing is repaired","Dofo secures the planks. Ask Dofo about Neri, and compare the accounts of Lira and Rofi.")
+				elif completed.has("bridge"): message("Dofo nods","The crossing is secure. You can ask about Neri.")
 				else: offer_help(["wood","stone","rope"]),content)
-			button("Ask about Neri",func(): account("tor","italpada","Tor points to their eyes, then the river crossing. Tor personally saw Neri arrive."),content)
+			button("Ask about Neri",func(): account("dofo","italpada","Dofo points to their eyes, then the river crossing. Dofo personally saw Neri arrive."),content)
 		"lira":
 			account("lira","italpanu","Lira gestures to someone in the distance. Another resident told Lira about Neri's arrival.")
 			gossip_buttons(id)
@@ -2740,7 +2917,7 @@ func talk(id: String):
 				button("Tell Neri about your adventure", tile_puzzle.bind(-1, talk.bind("neri")), content)
 				button("Practice evidence again",show_evidence,content)
 			else:
-				text_line("You found Neri by exploring. To understand the journey, compare Tor's, Lira's and Rofi's accounts, then return.")
+				text_line("You found Neri by exploring. To understand the journey, compare Dofo's, Lira's and Rofi's accounts, then return.")
 			if not completed.has("lighthouse"):
 				learn("far")
 				text_line("A torch leans against a stone by the campfire. Neri points at it: “Far.”")
@@ -2815,14 +2992,14 @@ func talk(id: String):
 			else:
 				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. She waves you toward a bench.")
 				button("Start the lesson", school_quiz.bind(0), content)
-		"rin", "oli":
+		"vivi", "oli":
 			if hiding.get(id, false):
 				found_puzzle(id)
 				return
 	match id:
-		"rin":
-			clear_panel("Rin")
-			text_line("Rin looks up from a book and waves. “Puka!” Rin says, holding it up.")
+		"vivi":
+			clear_panel("Vivi")
+			text_line("Vivi looks up from a book and waves. “Puka!” Vivi says, holding it up.")
 			learn("puka")
 		"oli":
 			clear_panel("Oli")
@@ -2948,26 +3125,26 @@ func account(id: String, phrase: String, gesture: String):
 	complete("heard_"+id)
 	clear_panel(id.capitalize())
 	text_line("“Neri " + phrase + ".”\n\n" + gesture)
-	if completed.has("heard_tor") and completed.has("heard_lira") and completed.has("heard_rofi"):
+	if completed.has("heard_dofo") and completed.has("heard_lira") and completed.has("heard_rofi"):
 		button("Compare the evidence",show_evidence,content)
 	button("Return",close_panel,content)
 
 func show_evidence():
 	clear_panel("Which account was witnessed?")
 	text_line("Three speakers used the same arrival root but different endings. Who saw Neri arrive?")
-	var options = ["Lira: italpanu", "Tor: italpada", "Rofi: italpashi"]
+	var options = ["Lira: italpanu", "Dofo: italpada", "Rofi: italpashi"]
 	options.shuffle()
 	for option in options:
 		button(option,check_evidence.bind(option),content)
 	button("Return",close_panel,content)
 
 func check_evidence(option: String):
-	if option.begins_with("Tor"):
+	if option.begins_with("Dofo"):
 		complete("evidence")
 		learn("bei")
 		message("You understood the source","The ending da marks direct knowledge. Follow the main path bei, north, past the crossing to the cove.")
 	else:
-		message("Compare the gestures","Lira heard a report. Rofi found footprints. Tor pointed to their eyes. Revisit the notebook or compare again.")
+		message("Compare the gestures","Lira heard a report. Rofi found footprints. Dofo pointed to their eyes. Revisit the notebook or compare again.")
 		button("Try again",show_evidence,content)
 
 func has_items(items: Array) -> bool:
@@ -3348,7 +3525,7 @@ func load_game():
 	if not FileAccess.file_exists(SAVE): return
 	var raw = FileAccess.get_file_as_string(SAVE)
 	# villagers renamed in October 2026: carry old saves over to the new names
-	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"]]:
+	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"], ["tor", "dofo"], ["rin", "vivi"], ["ena", "vufi"]]:
 		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
 		raw = raw.replace("\"heard_" + pair[0] + "\"", "\"heard_" + pair[1] + "\"").replace("\"mail_" + pair[0] + "\"", "\"mail_" + pair[1] + "\"")
 	var data = JSON.parse_string(raw)
@@ -3823,13 +4000,13 @@ func entity_by_id(id: String) -> Dictionary:
 
 func start_hide():
 	learn("pal")
-	for kid in ["rin", "oli"]:
+	for kid in ["vivi", "oli"]:
 		var e = entity_by_id(kid)
 		var spot: Vector3 = HIDE_SPOTS[kid]
 		(e["node"] as Node3D).position = Vector3(spot.x, gy(spot.x, spot.z), spot.z)
 		if e.has("emote"): e.erase("emote")
 		hiding[kid] = true
-	message("Ma-ta-pal-o-ki!", "Oli covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Rin and Oli are gone. One hid near the school, one near the market. Find them!")
+	message("Ma-ta-pal-o-ki!", "Oli covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Vivi and Oli are gone. One hid near the school, one near the market. Find them!")
 
 func found_puzzle(id: String):
 	choice_puzzle("Found you!", id.capitalize() + " is crouching out of sight, giggling. What do you shout?",
@@ -3838,7 +4015,7 @@ func found_puzzle(id: String):
 			var e = entity_by_id(id)
 			if e.has("emote"): e.erase("emote")
 			(e["node"] as Node3D).position = e["home"]
-			if not hiding.get("rin", false) and not hiding.get("oli", false):
+			if not hiding.get("vivi", false) and not hiding.get("oli", false):
 				complete("hide"),
 		"K-ta-pal-da: I see you! k- is I acting and ta- is you being seen. T-na-pal-da would mean you see me, and ma- ... -ki says not.",
 		"Who sees whom? k- is I as the one acting, ta- is you receiving. ma- ... -ki means not.")
@@ -4136,16 +4313,16 @@ func greeting(id: String) -> String:
 	if Data.PEOPLE.has(id) and int(friend.get(id, 0)) >= 8 and (day_count + id.length()) % 2 == 0:
 		return Data.ENDEAR[Data.PEOPLE[id]["trait"]]
 	match id:
-		"ena": return "Anni kel."
+		"vufi": return "Anni kel."
 		"mira": return "Yamat i-nav."
 		"sanu": return "Sava ruk."
-		"tor": return "Gira i-sava-da." if completed.has("bridge") else "Gira ma-i-sava-ki-da."
+		"dofo": return "Gira i-sava-da." if completed.has("bridge") else "Gira ma-i-sava-ki-da."
 		"lira": return "Teka i-var."
 		"rofi": return "Mar hala i-pav."
 		"neri": return "Teka i-var!"
 		"ketu": return "Mur tari t-na-ven-o-ye." if not completed.has("market") else "Tari i-ho!"
 		"suri": return "Ravarir ri-puka-rav-im-da."
-		"rin": return "An ravar na-an-da."
+		"vivi": return "An ravar na-an-da."
 		"oli": return "Ti kelar ta-an-ha?"
 		"radi": return "Bei, nam, dong, sai."
 		"jeli": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Sije i-seng-da."
@@ -5011,7 +5188,7 @@ func gossip_buttons(id: String):
 	for g in Data.GOSSIP:
 		if g["about"] == id and solved.has("gh:" + g["id"]):
 			button("Ask about what " + str(g["by"]).capitalize() + " said" + ("  [ok]" if solved.has("gc:" + g["id"]) else ""), gossip_reply.bind(g), content)
-	if gossip_count("gh:") >= 1 and not names.has(id) and id != "sije" and id != "rin":
+	if gossip_count("gh:") >= 1 and not names.has(id) and id != "sije" and id != "vivi":
 		button("Tell some gossip", rumor_composer.bind(id), content)
 	if not rumors.is_empty():
 		button("What's the news?", news.bind(id), content)
@@ -5106,7 +5283,7 @@ func rumor_en(rc: Dictionary) -> String:
 	return s
 
 func rumor_composer(listener: String):
-	var rc = {"who": "Tor", "place": "haima", "adv": "", "verb": "ning", "dbl": false, "tense": "usual", "neg": false, "ev": "nu"}
+	var rc = {"who": "Dofo", "place": "haima", "adv": "", "verb": "ning", "dbl": false, "tense": "usual", "neg": false, "ev": "nu"}
 	for w in ["mel", "sela", "hala", "-nu", "-shi", "-da"]: learn(w)
 	clear_panel("Tell " + listener.capitalize() + " some gossip")
 	text_line("Make up any rumor you like. Choose the pieces; the Tujuju and its meaning update as you go.", 17)
@@ -6083,7 +6260,7 @@ func ext_items(w: String) -> Dictionary:
 				["Don't " + f[0] + "!", "ma-ta-" + w + "-o-ki!", ["ta-" + w + "-o!", "ma-ta-" + w + "-ki-o!"], "Don't: ma- in front, -o for the command, -ki after it."],
 				["They are " + f[2], "ri-" + w + "-im", ["i-" + w + "-im", "ri-" + w + "-pa"], "ri- is they, -im is in progress."],
 				["She " + f[1] + " (I saw it)", "i-" + w + "-pa-da", ["i-" + w + "-pa-nu", "na-" + w + "-pa-da"], "-pa is past, -da means I saw it."]]
-			builds = [{"en": "Tor " + f[1] + " at the market (people say).", "tiles": ["Tor", "kurma", "i-" + w + "-pa-nu."], "decoys": ["Torke", "kurru", "i-" + w + "-pa-da."], "tip": "No -ke: this verb acts on nothing. People say is -nu."},
+			builds = [{"en": "Dofo " + f[1] + " at the market (people say).", "tiles": ["Dofo", "kurma", "i-" + w + "-pa-nu."], "decoys": ["Dofoke", "kurru", "i-" + w + "-pa-da."], "tip": "No -ke: this verb acts on nothing. People say is -nu."},
 				{"en": "The dog is " + f[2] + " in the sea.", "tiles": ["Gor", "haima", "i-" + w + "-im-da."], "decoys": ["Gorke", "haita"], "tip": "In the sea is hai-ma, and in progress is -im."}]
 		"vt":
 			var f: Array = Data.EXT_VERBS_T[w]
@@ -6380,7 +6557,7 @@ func show_varnak():
 		["Words are built from pieces", "Tujuju glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
 		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is he, she or it, ri- is they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
 		["Time and aspect", "Endings after the verb show when and how: -pa past, -fu future, -im happening now, -ur usually, -ak finished.", ["“I-nang-pa.” walked.   “I-nang-fu.” will walk.   “I-nang-im.” is walking.   “I-nang-ur.” usually walks."]],
-		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Tujuju gossip.", ["“Tor kurma i-tal-pa-da.” I saw Tor arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
+		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Tujuju gossip.", ["“Dofo kurma i-tal-pa-da.” I saw Dofo arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
 		["Who did what to whom", "Tujuju marks the doer of an action on another thing with -ke. This is called ergative marking. Someone who just goes, sleeps or is, takes no ending.", ["“Sanu i-lum-pa-da.” The child went.   “Mirake puka i-rav-pa-da.” Mira read the book."]],
 		["Case endings", "Short endings on nouns do the work of English words like to, in, from and with: -ni of, -ru to, -ma in or at, -ta from, -su together with, -li by means of.", ["“Tekama” in the village.   “Moraru” to the river.   “Tisu” with you."]],
 		["Many and ordinal", "-ir makes a plural. A number comes before its noun, and -ve makes ordinal numbers.", ["“Tari-ir” fish (many).   “Mur tari” three fish.   “Bar-ve hai-sao” the eighth sea star."]],
@@ -7212,7 +7389,7 @@ func solve_how(s: Array):
 func solve_check(who: String, ev: String):
 	log_event("mystery_guess", {"who": who, "ending": ev}, who == "Par" and ev == "shi")
 	if who != "Par":
-		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Ena asked.", "Poltergais": "Sije says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
+		var why = {"Gav": "Gav only carries the letters. He was as puzzled as anyone when Vufi asked.", "Poltergais": "Sije says the poltergeist never says “kraa.”", "Oku": "Oku talks to stones and trinkets, not paper. And nobody has seen a feather at the ruins."}.get(who, "")
 		message("Hmm, not quite", why + " Look at your clues again: feathers, kraa, and someone who goes out at night.")
 		button("Try again", solve_mystery, content)
 		return
@@ -7583,7 +7760,7 @@ func where_menu(id: String):
 	add_portrait(id)
 	learn("hama")
 	text_line("Ask about a person or a place. The answer uses bei north, nam south, dong east, sai west.", 16)
-	for p in ["neri", "ketu", "suri", "radi", "jeli", "asya", "desh", "oku", "gav", "lachu", "tor", "mira", "rofi", "lira"]:
+	for p in ["neri", "ketu", "suri", "radi", "jeli", "asya", "desh", "oku", "gav", "lachu", "dofo", "mira", "rofi", "lira"]:
 		if p != id: button(p.capitalize(), where_say.bind(id, p), content)
 	for w in Data.WHERE_PLACES.keys():
 		button(w + " (" + Data.WHERE_PLACES[w][0] + ")", where_say.bind(id, w), content)
@@ -7871,7 +8048,7 @@ func buttons_to_end(labels: Array):
 
 # ---- the word wand: sentences come true ----
 
-var wand: Dictionary = {"who": "Tor", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
+var wand: Dictionary = {"who": "Dofo", "where": "kurma", "pre": "i", "neg": false, "verb": "kachaka", "tense": "im", "ev": "da"}
 var wand_pending: Array = []
 var sea_spot: Vector3 = Vector3.INF
 
@@ -7970,7 +8147,7 @@ func wand_cast():
 	var pos = wand_place_pos(wand["where"])
 	var watcher = ""
 	if wand["tense"] == "pa":
-		var p = who.to_lower() if who != "An" and who != "Polu" else "tor"
+		var p = who.to_lower() if who != "An" and who != "Polu" else "dofo"
 		text_line("Past tense: it already happened, so nothing changes now.", 17)
 		if who == "An": text_line("You suddenly remember " + Data.WAND_VERBS[vb][2] + " " + Data.WAND_PLACES[wand["where"]][0] + " last week. Did you? The wand says so.", 17)
 		else:
@@ -9077,8 +9254,8 @@ func build_cenote():
 	add_child(stone)
 	Art.cyl(stone, Vector3(0, 0.3, 0), 0.9, 1.0, 0.6, Color("6f8f88"), Vector3.ZERO, 14)
 	for k in range(3):
-		var tor = Art.torus(stone, Vector3(0, 0.61, 0), 0.3 + k * 0.2, 0.35 + k * 0.2, Color("7dffe0"), Vector3.ZERO)
-		tor.material_override = gmat
+		var dofo = Art.torus(stone, Vector3(0, 0.61, 0), 0.3 + k * 0.2, 0.35 + k * 0.2, Color("7dffe0"), Vector3.ZERO)
+		dofo.material_override = gmat
 	# floating motes in the water
 	var motes = CPUParticles3D.new()
 	motes.amount = 160
