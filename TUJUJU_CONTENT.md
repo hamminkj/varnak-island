@@ -134,7 +134,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 2. sign_river uses Mora-ven (as far as the river). If you prefer a different board text, it is one line in data.gd.
 3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Jeli's sleeping child) and the notebook notes that it is also a name.
 4. mai-ai (sell) is listed as a verb in the vocabulary, but -ai is also the antipassive suffix. I treated mai-ai as an ordinary transitive root in Ketuke panak i-mai-ai-ur-da. If sell should be read as antipassive, the agent would not take -ke.
-5. Ho! (Good!) is used on its own as an exclamation by Suri, Pomo and Desh, and Tari i-ho (The fish are good) by Ketu. The document only lists ho as a stative root.
+5. Ho! (Good!) is used on its own as an exclamation by Suri, Radi and Desh, and Tari i-ho (The fish are good) by Ketu. The document only lists ho as a stative root.
 6. Compounds I made with the modifier-first rule: fardom (fire-house, lighthouse) and murak-gira (log bridge). Both are new words, not in the document.
 7. dar is both ten and cook, and mar is both horse and full, in the document. The game uses both senses and the notebook gloss mentions the second meaning.
 
@@ -243,7 +243,7 @@ Decoy tiles at higher levels are made automatically by swapping endings (-ke add
 
 ## Fifth expansion: gossip, nonsense and rumors
 
-Gossip (all composed): Oren mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Pomo sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olake polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
+Gossip (all composed): Rofi mar-ru i-mel-ur-nu; Tor girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ketu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Desh haima i-ning-ur-da; Radi sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olike polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
 
 Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Sije i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
 
@@ -258,7 +258,7 @@ Things to check: 12. par as fear and yam as eat are homonyms in the document (bi
 
 Chat phrases (composed): Ti-ni X i-ho! (Your X is good!) / Ti ta-ho-da! (You are good!, a stative with the 2S prefix ta-) / Ti-ni dau i-var! (Your head is big!) / Ti-ni X i-wai! (Your X is bad!) / Ki X ti-ru! (This X, for you!) / Ti ta-seng-ha? (Are you happy?) / Na-seng-da (I am happy), Ma-na-seng-ki-da (I am not happy), Na-lei-da (I am tired) / Anni palar ta-an-da (You are my friend, copula with ta-) / Ti ta-mel-pa-da (you already said it: you spoke; intransitive mel with ta-).
 
-Secrets (composed): An haima ma-na-sum-ur-ki-da; An yamat ma-na-dar-ur-ki-da. Ketuke i-dar-ur-da; An rukma na-sul-ur-da; Gira i-sava... shi; Anni tovu-ir ri-fau-da; An mar-ru na-ning-ur-da; An tari-ta na-par-ur-da; Tari-ir anni palar-ir ri-an-da; Anke puka ma-k-i-rav-pa-ki-da; Anke Ola-ni guro k-i-nuk-pa-da; An sao-ir-ru na-mel-ur-da; An sang-ma na-sul-ur-da; Yok i-wai-da. Polu i-zen-da; Anni dauma tong ma-i-esh-pa-ki-da; An yesh-ta na-par-ur-da. I-zen-da; Tari-ir ma-ri-seng-ur-ki-da; Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da; Kel-ir-ma yamat i-ho-da; An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.
+Secrets (composed): An haima ma-na-sum-ur-ki-da; An yamat ma-na-dar-ur-ki-da. Ketuke i-dar-ur-da; An rukma na-sul-ur-da; Gira i-sava... shi; Anni tovu-ir ri-fau-da; An mar-ru na-ning-ur-da; An tari-ta na-par-ur-da; Tari-ir anni palar-ir ri-an-da; Anke puka ma-k-i-rav-pa-ki-da; Anke Oli-ni guro k-i-nuk-pa-da; An sao-ir-ru na-mel-ur-da; An sang-ma na-sul-ur-da; Yok i-wai-da. Polu i-zen-da; Anni dauma tong ma-i-esh-pa-ki-da; An yesh-ta na-par-ur-da. I-zen-da; Tari-ir ma-ri-seng-ur-ki-da; Sek-ir ma-ri-mel-ur-ki-da. An na-mel-ur-da; Kel-ir-ma yamat i-ho-da; An sena-li ma-na-kel-ur-ki-da. Na-sum-ur-da.
 
 Jokes (composed): Mar wak-korma i-esh-da; Yue guro i-an-shi; Gor ket-ma i-sul-im-da; Par sena-li i-kel-ur-da; Sek-ir ri-ning-ur-nu; Tari-ir dom-ma ri-sul-ur-da; Gira i-pav-im-da.
 
@@ -359,12 +359,12 @@ Key sentences:
 - Ti-ni X hama i-esh-ha? ...Anke k-i-dop-pa-da! (Where is your X? ...I hid it!)
 - Ma-ta-hiri-o-ki! (Don't prank me!)
 - Uuuu... Anke Gav-ni choni k-i-nuk-pa-da! (Woooo... I took Gav's choni!), answered with T-na-ven-o-ye! (Please give it to me!)
-- An dopelgenger na-an-da! Pomo i-sul-im-da. An ma-na-sul-ur-ki-da! (I am the doppelganger! Pomo is sleeping. I never sleep!)
+- An dopelgenger na-an-da! Radi i-sul-im-da. An ma-na-sul-ur-ki-da! (I am the doppelganger! Radi is sleeping. I never sleep!)
 - Choni sang-ni tarma i-esh-shi. Choni Sendor-ma i-esh-nu. Poltergaiske choni i-nuk-pa-nu. (Gav's clues use -shi and -nu.)
 - Ti choni-na ta-an-da! (You are a choni person!)
 - Choni-ir hen-ta ri-kar-im-da! (Chonies are coming from the sky!)
 
-New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Pomo's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
+New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Desh at karaoke (-da), Suri's selfies (-shi), Ketu's fish pizza (-nu), Radi's doppelganger (-shi), Tor the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
 
 Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
 

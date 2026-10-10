@@ -193,10 +193,10 @@ const SENTENCES = {
 		"gesture": "Lira wiggles two fingers like running legs and laughs.",
 		"words": ["gor", "pav", "-im"], "wrong": ["The dog is sleeping.", "The dog is big."]},
 	"horse_fast": {"v": "Mar hala i-pav.", "parts": "mar  hala  i-pav\nhorse  fast  3S-run", "en": "The horse runs fast.",
-		"gesture": "Oren flicks his fingers quickly across his palm.",
+		"gesture": "Rofi flicks his fingers quickly across his palm.",
 		"words": ["mar", "hala", "pav"], "wrong": ["The horse is tired.", "The horse ran away."]},
 	"tree_tall": {"v": "Murak i-gao.", "parts": "murak  i-gao\ntree  3S-be.tall", "en": "The tree is tall.",
-		"gesture": "Oren raises one hand high above his head.",
+		"gesture": "Rofi raises one hand high above his head.",
 		"words": ["murak", "gao"], "wrong": ["The tree is old.", "The tree is dark."]},
 	"fish_river": {"v": "Tari morama i-esh-da.", "parts": "tari  mora-ma  i-esh-da\nfish  river-LOC  3S-be.located-DIR", "en": "A fish is in the river.",
 		"gesture": "A silver flash in the water; you see it yourself.",
@@ -248,7 +248,7 @@ const SENTENCES = {
 		"gesture": "Rin holds up a book and grins.",
 		"words": ["an", "ravar"], "wrong": ["I am a traveler.", "She is a student."]},
 	"hill_taller": {"v": "Sang murak-ta i-u-gao.", "parts": "sang  murak-ta  i-u-gao\nhill  tree-ABL  3S-COMP-tall", "en": "The hill is taller than the tree.",
-		"gesture": "Pomo holds one hand at tree height, then lifts the other far above it.",
+		"gesture": "Radi holds one hand at tree height, then lifts the other far above it.",
 		"words": ["sang", "murak", "-ta", "u-", "gao"], "wrong": ["The tree is taller than the hill.", "The hill is as tall as the tree."]},
 	"summit_highest": {"v": "Ki sang polu-ta i-u-gao.", "parts": "ki  sang  polu-ta  i-u-gao\nthis  hill  all-ABL  3S-COMP-tall", "en": "This hill is the highest of all.",
 		"gesture": "A cairn marks the top. From here every roof on the island is below you.",
@@ -345,7 +345,7 @@ const SENTENCES = {
 		"gesture": "Gav shrugs a bulging satchel and waves at the whole island.",
 		"words": ["polu", "-ru", "kel", "-ir", "tar", "-ur"], "wrong": ["Everyone brings bags to me.", "I lost a bag yesterday."]},
 	"night_sky": {"v": "Yeshma sao-ir ri-ling-da.", "parts": "yesh-ma  sao-ir  ri-ling-da\nnight-LOC  star-PL  3PL.S-be.bright-DIR", "en": "At night the stars shine.",
-		"gesture": "Pomo points up at the sky full of stars.",
+		"gesture": "Radi points up at the sky full of stars.",
 		"words": ["yesh", "sao", "-ir", "ling"], "wrong": ["In the day the sun shines.", "The stars are falling."]},
 	# ---- fifth expansion: strange things and silly events ----
 	"odd_fish": {"v": "Tari wak-korma i-esh-da!", "parts": "tari  wak-kor-ma  i-esh-da\nfish  well-LOC  3S-be.located-DIR", "en": "A fish is in the well!",
@@ -379,7 +379,7 @@ const SENTENCES = {
 		"gesture": "A pair of spotted chonies flaps from the very top of the lighthouse like a flag. Choni is a word Tujuju borrowed.",
 		"words": ["choni", "-ni", "fardom", "tar", "-ma"], "wrong": ["Gav is on top of the lighthouse.", "The lighthouse is wearing a hat."]},
 	"suri_kinder": {"v": "Ki senak sanu-mara ma-i-an-ki-da!", "parts": "ki  senak  sanu-mara  ma-i-an-ki-da\nthis  school  child-field  NEG-3S-be-NEG-DIR", "en": "This school is NOT a kindergarten!",
-		"gesture": "Suri says it to Rin and Ola, who are giggling under a bench. Sanu-mara is a calque of German Kindergarten: child-field.",
+		"gesture": "Suri says it to Rin and Oli, who are giggling under a bench. Sanu-mara is a calque of German Kindergarten: child-field.",
 		"words": ["senak", "sanu-mara", "ma- -ki"], "wrong": ["This school is a kindergarten!", "The children are in the field."]},
 	"oku_brainstorm": {"v": "Anni dauma dau-fong i-esh-im-da!", "parts": "anni  dau-ma  dau-fong  i-esh-im-da\nmy  head-LOC  head-wind  3S-exist-IPFV-DIR", "en": "There is a brainstorm in my head!",
 		"gesture": "Oku clutches their head as their hair blows about. Dau-fong, head-wind, is a calque of brainstorm.",
@@ -419,9 +419,9 @@ const SENTENCES = {
 # Village gossip. by: who tells it, about: who it is about, ev: how the teller knows.
 # reply: what the person it is about says when you ask them.
 const GOSSIP = [
-	{"id": "oren_horse", "by": "lira", "about": "oren", "ev": "nu", "v": "Oren mar-ru i-mel-ur-nu.", "en": "People say Oren usually talks to his horse.",
+	{"id": "oren_horse", "by": "lira", "about": "rofi", "ev": "nu", "v": "Rofi mar-ru i-mel-ur-nu.", "en": "People say Rofi usually talks to his horse.",
 		"gesture": "Lira leans close and whispers behind her hand.",
-		"reply": {"v": "Maki! Mar anru i-mel-ur-da.", "en": "No! The horse usually talks to ME.", "gesture": "Oren folds his arms, offended on the horse's behalf."}},
+		"reply": {"v": "Maki! Mar anru i-mel-ur-da.", "en": "No! The horse usually talks to ME.", "gesture": "Rofi folds his arms, offended on the horse's behalf."}},
 	{"id": "tor_bridge", "by": "mira", "about": "tor", "ev": "shi", "v": "Tor girama i-sul-ur-shi.", "en": "Apparently Tor usually sleeps on the bridge.",
 		"gesture": "Mira points to a pillow and a blanket left on the bridge planks.",
 		"reply": {"v": "Gira i-sava-da! An girama na-sul-ur-da.", "en": "The bridge is safe! Yes, I sleep on the bridge.", "gesture": "Tor pats the planks proudly."}},
@@ -431,15 +431,15 @@ const GOSSIP = [
 	{"id": "ketu_fish", "by": "tor", "about": "ketu", "ev": "nu", "v": "Ketu tari-ir-su i-mel-ur-nu.", "en": "They say Ketu talks with the fish.",
 		"gesture": "Tor glances toward the market and taps his ear.",
 		"reply": {"v": "Tari-ir i-ho! Ri-dap-ur-da.", "en": "The fish are good! They answer.", "gesture": "Ketu holds up a fish to his ear and nods seriously."}},
-	{"id": "yalo_night", "by": "oren", "about": "asya", "ev": "nu", "v": "Asya yesh-ta i-par-ur-nu.", "en": "People say Asya is afraid of the night.",
-		"gesture": "Oren grins. A lighthouse keeper afraid of the dark!",
+	{"id": "yalo_night", "by": "rofi", "about": "asya", "ev": "nu", "v": "Asya yesh-ta i-par-ur-nu.", "en": "People say Asya is afraid of the night.",
+		"gesture": "Rofi grins. A lighthouse keeper afraid of the dark!",
 		"reply": {"v": "Maki! Fardom i-ling-da!", "en": "No! The lighthouse is bright!", "gesture": "Asya glances nervously at the sunset and turns the lamp up a little more."}},
 	{"id": "desh_sea", "by": "suri", "about": "desh", "ev": "da", "v": "Desh haima i-ning-ur-da.", "en": "Desh usually sings in the sea. I have seen it.",
 		"gesture": "Suri covers her ears and laughs.",
 		"reply": {"v": "Tari-ir ri-seng-ur-da!", "en": "The fish are happy when I do!", "gesture": "Desh plays a triumphant drum roll."}},
-	{"id": "pomo_sleep", "by": "desh", "about": "pomo", "ev": "shi", "v": "Pomo sang-ma i-sul-ur-shi.", "en": "Apparently Pomo usually sleeps on the hill.",
+	{"id": "pomo_sleep", "by": "desh", "about": "radi", "ev": "shi", "v": "Radi sang-ma i-sul-ur-shi.", "en": "Apparently Radi usually sleeps on the hill.",
 		"gesture": "Desh imitates loud snoring drifting down from the lookout.",
-		"reply": {"v": "Maki! An na-pal-ai-ur-da!", "en": "No! I look around all the time!", "gesture": "Pomo yawns enormously in the middle of saying it."}},
+		"reply": {"v": "Maki! An na-pal-ai-ur-da!", "en": "No! I look around all the time!", "gesture": "Radi yawns enormously in the middle of saying it."}},
 	{"id": "oku_stones", "by": "gav", "about": "oku", "ev": "nu", "v": "Oku sek-ir-su i-mel-ur-nu.", "en": "They say Oku talks with the stones.",
 		"gesture": "Gav makes a spooky face and wiggles his fingers.",
 		"reply": {"v": "Sek-ir ri-zen-da.", "en": "The stones know.", "gesture": "Oku smiles mysteriously. Somewhere, a stone seems to nod."}},
@@ -449,9 +449,9 @@ const GOSSIP = [
 	{"id": "sanu_bag", "by": "ena", "about": "sanu", "ev": "da", "v": "Sanuke kel i-mong-ur-da.", "en": "Sanu always forgets the bag. I know it.",
 		"gesture": "Ena rolls her eyes toward the forest path.",
 		"reply": {"v": "Han kel?", "en": "What bag?", "gesture": "Sanu looks around, genuinely puzzled."}},
-	{"id": "ola_fruit", "by": "rin", "about": "ola", "ev": "shi", "v": "Olake polu-ni guro i-nuk-ur-shi.", "en": "Apparently Ola takes everyone's fruit.",
-		"gesture": "Rin points at Ola's very sticky fingers.",
-		"reply": {"v": "Maki! ...Guro i-ho.", "en": "No! ...Fruit is good.", "gesture": "Ola hides something round behind her back."}},
+	{"id": "ola_fruit", "by": "rin", "about": "oli", "ev": "shi", "v": "Olike polu-ni guro i-nuk-ur-shi.", "en": "Apparently Oli takes everyone's fruit.",
+		"gesture": "Rin points at Oli's very sticky fingers.",
+		"reply": {"v": "Maki! ...Guro i-ho.", "en": "No! ...Fruit is good.", "gesture": "Oli hides something round behind her back."}},
 	{"id": "vira_medicine", "by": "sije", "about": "jeli", "ev": "da", "v": "Jeli-ni yok i-wai-da.", "en": "Jeli's medicine tastes bad. I know firsthand.",
 		"gesture": "Sije sticks out her tongue and shudders.",
 		"reply": {"v": "Yok i-wai, dan Sije i-seng-da!", "en": "The medicine is bad, but Sije is happy!", "gesture": "Jeli shrugs, completely unbothered."}},
@@ -464,8 +464,8 @@ const GOSSIP = [
 	{"id": "desh_party", "by": "lira", "about": "desh", "ev": "nu", "v": "Desh-ni fiyesta-ma halabalu i-esh-pa-nu.", "en": "They say there was a hullabaloo at Desh's party.",
 		"gesture": "Lira covers her ears, then dances a little.",
 		"reply": {"v": "Ho! Fiyesta i-ho-pa-da! Wala!", "en": "Yes! The party was great! Ta-da!", "gesture": "Desh plays a drum roll and throws imaginary confetti."}},
-	{"id": "tor_habibi", "by": "oren", "about": "tor", "ev": "nu", "v": "Tor mar-ru habibi i-mel-ur-nu.", "en": "They say Tor calls the horse habibi (darling).",
-		"gesture": "Oren glares toward the bridge and pats his horse protectively.",
+	{"id": "tor_habibi", "by": "rofi", "about": "tor", "ev": "nu", "v": "Tor mar-ru habibi i-mel-ur-nu.", "en": "They say Tor calls the horse habibi (darling).",
+		"gesture": "Rofi glares toward the bridge and pats his horse protectively.",
 		"reply": {"v": "Ho! Mar i-kawai-kawai-da!", "en": "Yes! The horse is so, so cute!", "gesture": "Tor clasps his hands and swoons a little."}},
 	{"id": "gav_choni_sea", "by": "mira", "about": "gav", "ev": "shi", "emote": "proud", "v": "Gav-ni choni-ir haima ri-sum-im-shi.", "en": "Apparently Gav's chonies are swimming in the sea.",
 		"gesture": "Mira shades her eyes and points dramatically at something spotted, floating far out.",
@@ -473,8 +473,8 @@ const GOSSIP = [
 	{"id": "yalo_ghost", "by": "sanu", "about": "asya", "ev": "nu", "emote": "shocked", "v": "Asya poltergais-ta i-par-ur-nu.", "en": "They say Asya is afraid of a poltergeist.",
 		"gesture": "Sanu yawns, then whispers and wiggles spooky fingers.",
 		"reply": {"v": "Ho! Poltergais Hirimara-ma i-esh-da! I-zen-da!", "en": "Yes! The poltergeist is in Hirimara, the prank field! It's true!", "gesture": "Asya hides behind his own hands and peeks out."}},
-	{"id": "desh_karaoke", "by": "oren", "about": "desh", "ev": "da", "emote": "laugh", "v": "Desh karaoke-ma i-ning-pa-da.", "en": "I saw Desh sing at karaoke.",
-		"gesture": "Oren covers his ears and scowls. Then he mimes every fish in the sea swimming away.",
+	{"id": "desh_karaoke", "by": "rofi", "about": "desh", "ev": "da", "emote": "laugh", "v": "Desh karaoke-ma i-ning-pa-da.", "en": "I saw Desh sing at karaoke.",
+		"gesture": "Rofi covers his ears and scowls. Then he mimes every fish in the sea swimming away.",
 		"reply": {"v": "Bravo! Bravo! An na-ning-fu!", "en": "Bravo! Bravo! I will sing again!", "gesture": "Desh bows deeply to an invisible crowd."}},
 	{"id": "suri_selfi", "by": "rin", "about": "suri", "ev": "shi", "emote": "embarrassed", "v": "Suri-ni puka-ma selfi-ir ri-esh-shi.", "en": "Apparently there are selfies inside Suri's book.",
 		"gesture": "Rin giggles and makes a duck face.",
@@ -482,9 +482,9 @@ const GOSSIP = [
 	{"id": "ketu_pitsa", "by": "gav", "about": "ketu", "ev": "nu", "emote": "proud", "v": "Ketuke tari-pitsa i-dar-ur-nu.", "en": "They say Ketu makes fish pizza.",
 		"gesture": "Gav licks his lips, then looks unsure.",
 		"reply": {"v": "Ho! Tari-pitsa i-ho-ho-da! Bravo!", "en": "Yes! Fish pizza is super good! Bravo!", "gesture": "Ketu kisses his fingertips."}},
-	{"id": "pomo_dopel", "by": "ola", "about": "pomo", "ev": "shi", "emote": "confused", "v": "Pomo-ni dopelgenger Hirimara-ma i-esh-shi.", "en": "Apparently Pomo's double is in Hirimara, the prank field.",
-		"gesture": "Ola points at Pomo, then far to the west, then back at Pomo.",
-		"reply": {"v": "Han?! An yan na-an-da! ...zzz", "en": "What?! There is only one of me! ...zzz", "gesture": "Pomo counts himself on his fingers and falls asleep halfway."}},
+	{"id": "pomo_dopel", "by": "oli", "about": "radi", "ev": "shi", "emote": "confused", "v": "Radi-ni dopelgenger Hirimara-ma i-esh-shi.", "en": "Apparently Radi's double is in Hirimara, the prank field.",
+		"gesture": "Oli points at Radi, then far to the west, then back at Radi.",
+		"reply": {"v": "Han?! An yan na-an-da! ...zzz", "en": "What?! There is only one of me! ...zzz", "gesture": "Radi counts himself on his fingers and falls asleep halfway."}},
 	{"id": "tor_kluts", "by": "lira", "about": "tor", "ev": "da", "emote": "embarrassed", "v": "Kluts! Tor gira-ta mora-ru i-lum-pa-da.", "en": "Klutz! I saw Tor go from the bridge into the river.",
 		"gesture": "Lira mimes a wobble, a slip and a big splash.",
 		"reply": {"v": "Ups. ...An na-sum-pa-da. I-zen-da.", "en": "Oops. ...I went swimming. It's true.", "gesture": "Tor wrings out his shirt with great dignity."}},
@@ -500,8 +500,8 @@ const GOSSIP = [
 	{"id": "sanu_choni", "by": "jeli", "about": "sanu", "ev": "da", "emote": "sleepy", "v": "Sanu choni-ir-ma i-sul-pa-da.", "en": "I saw Sanu sleeping in a pile of chonies!",
 		"gesture": "Jeli shakes with silent laughter.",
 		"reply": {"v": "Choni-ir ri-nav-da... zzz", "en": "The chonies are warm... zzz", "gesture": "Sanu curls up as if the pile were still there."}},
-	{"id": "lira_story", "by": "pomo", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
-		"gesture": "Pomo points down the hill at the village and mimes a chattering mouth.",
+	{"id": "lira_story", "by": "radi", "about": "lira", "ev": "da", "v": "Lirake polu-ni tovu i-gao-ur-da.", "en": "Lira tells everyone's stories. I have heard her.",
+		"gesture": "Radi points down the hill at the village and mimes a chattering mouth.",
 		"reply": {"v": "Ho! Ki tovu i-ho!", "en": "Ha! This story is good!", "gesture": "Lira is already telling someone else."}}
 ]
 
@@ -514,7 +514,7 @@ const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["s
 	"pav": ["run", "running", "ran", "runs"], "nang": ["walk", "walking", "walked", "walks"], "mel": ["talk", "talking", "talked", "talks"],
 	"tal": ["arrive", "arriving", "arrived", "arrives"], "sir": ["search", "searching", "searched", "searches"],
 	"kororo": ["snore", "snoring", "snored", "snores"], "tarara": ["toot like a trumpet", "tooting like a trumpet", "tooted like a trumpet", "toots like a trumpet"], "vava": ["wobble", "wobbling", "wobbled", "wobbles"]}
-const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Jeli", "Asya", "Desh", "Oku", "Gav", "Lachu", "Neri", "Gor", "Mar", "Par", "Poltergais", "Robot"]
+const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Rofi", "Sanu", "Ena", "Suri", "Radi", "Jeli", "Asya", "Desh", "Oku", "Gav", "Lachu", "Neri", "Gor", "Mar", "Par", "Poltergais", "Robot"]
 const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird", "Poltergais": "The poltergeist", "Robot": "The robot"}
 
 # Door puzzles, one per house. situation is a gesture; options are Tujuju commands.
@@ -561,13 +561,13 @@ const COUNTS = {
 	"garden": {"noun": "fal", "n": 10, "numword": "dar", "en": "flowers", "wrongs": ["gov", "luk"]}
 }
 
-# Pomo's direction questions from the hilltop. Answers use the locative -ma on a direction word.
+# Radi's direction questions from the hilltop. Answers use the locative -ma on a direction word.
 const LOOKOUT = [
-	{"q": "Fardom hama i-esh-ha?", "en": "Where is the lighthouse?", "gesture": "Pomo points across the whole island toward the striped tower where the sun rises.",
+	{"q": "Fardom hama i-esh-ha?", "en": "Where is the lighthouse?", "gesture": "Radi points across the whole island toward the striped tower where the sun rises.",
 		"options": ["Dongma i-esh-da.", "Saima i-esh-da.", "Namma i-esh-da."], "correct": 0, "why": "dong is east, and dong-ma means in the east."},
-	{"q": "Kur hama i-esh-ha?", "en": "Where is the market?", "gesture": "Pomo points down the hill toward the stalls, away from the north.",
+	{"q": "Kur hama i-esh-ha?", "en": "Where is the market?", "gesture": "Radi points down the hill toward the stalls, away from the north.",
 		"options": ["Beima i-esh-da.", "Namma i-esh-da.", "Dongma i-esh-da."], "correct": 1, "why": "nam is south, the opposite of bei (north)."},
-	{"q": "Hai hama i-esh-ha?", "en": "Where is the sea?", "gesture": "Pomo turns you around to face the nearest water, where the sun sets.",
+	{"q": "Hai hama i-esh-ha?", "en": "Where is the sea?", "gesture": "Radi turns you around to face the nearest water, where the sun sets.",
 		"options": ["Saima i-esh-da.", "Dongma i-esh-da.", "Beima i-esh-da."], "correct": 0, "why": "sai is west, where the sun sets."}
 ]
 
@@ -584,7 +584,7 @@ const SCHOOL = [
 		"why": "han means what. Tike is you acting on something, and t-i- means you act on it."},
 	{"q": "Hamur ravar i-esh-ha?", "gesture": "Suri sweeps a hand toward her students and waits for you to count them.",
 		"options": ["Vel ravar i-esh-da.", "Mur ravar i-esh-da.", "Yan ravar i-esh-da."], "correct": 0,
-		"why": "hamur means how many. There are two students, Rin and Ola, so vel."}
+		"why": "hamur means how many. There are two students, Rin and Oli, so vel."}
 ]
 
 # Desh's lagoon game: follow the command. Each entry: command, gloss, the matching action, decoys.
@@ -678,7 +678,7 @@ const GOODS = {"guro": "fruit", "panak": "bread", "tari": "fish", "cha": "tea", 
 const NUMBERS = ["nul", "yan", "vel", "mur", "kes", "pan", "luk", "set", "bar", "gov", "dar"]
 
 # "Say it yourself" challenges: residents ask you to build a sentence (index into TILES). Unlock at level 2.
-const CHALLENGES = {"mira": 15, "tor": 2, "ketu": 8, "jeli": 20, "desh": 17, "lira": 14, "oren": 6, "lachu": 18, "oku": 19, "neri": 1, "suri": 12, "pomo": 21, "sanu": 16, "ena": 9, "asya": 11, "gav": 13}
+const CHALLENGES = {"mira": 15, "tor": 2, "ketu": 8, "jeli": 20, "desh": 17, "lira": 14, "rofi": 6, "lachu": 18, "oku": 19, "neri": 1, "suri": 12, "radi": 21, "sanu": 16, "ena": 9, "asya": 11, "gav": 13}
 
 const LEVEL_NAMES = ["", "Explorer", "Speaker", "Storyteller", "Elder"]
 
@@ -698,7 +698,7 @@ const PEOPLE = {
 		"secret": {"v": "Gira i-sava... shi.", "en": "The bridge is safe... apparently. (-shi: Tor is only guessing!)"}},
 	"lira": {"trait": "giggly", "thing": ["tovu", "story"], "likes": ["gin"], "hates": ["tari"],
 		"secret": {"v": "Anni tovu-ir ri-fau-da.", "en": "My stories are false."}},
-	"oren": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha", "bombom", "ret-gor"],
+	"rofi": {"trait": "grumpy", "thing": ["mar", "horse"], "likes": ["panak"], "hates": ["cha", "bombom", "ret-gor"],
 		"secret": {"v": "An mar-ru na-ning-ur-da.", "en": "I sing to the horse."}},
 	"neri": {"trait": "cheerful", "thing": ["puka", "notebook"], "likes": ["tari", "panak", "cha", "gin"], "hates": [],
 		"secret": {"v": "An tari-ta na-par-ur-da.", "en": "I am afraid of fish."}},
@@ -707,10 +707,10 @@ const PEOPLE = {
 	"suri": {"trait": "proud", "thing": ["senak", "school"], "likes": ["cha"], "hates": [],
 		"secret": {"v": "Anke puka ma-k-i-rav-pa-ki-da.", "en": "I did not read the book."}},
 	"rin": {"trait": "giggly", "thing": ["puka", "book"], "likes": ["panak", "bombom"], "hates": ["cha"],
-		"secret": {"v": "Anke Ola-ni guro k-i-nuk-pa-da.", "en": "I took Ola's fruit. (Ola was framed!)"}},
-	"ola": {"trait": "giggly", "thing": ["guro", "fruit"], "likes": ["panak", "bombom"], "hates": ["cha"],
+		"secret": {"v": "Anke Oli-ni guro k-i-nuk-pa-da.", "en": "I took Oli's fruit. (Oli was framed!)"}},
+	"oli": {"trait": "giggly", "thing": ["guro", "fruit"], "likes": ["panak", "bombom"], "hates": ["cha"],
 		"secret": {"v": "An sao-ir-ru na-mel-ur-da.", "en": "I talk to the stars."}},
-	"pomo": {"trait": "sleepy", "thing": ["sang", "hill"], "likes": ["cha"], "hates": ["tari"],
+	"radi": {"trait": "sleepy", "thing": ["sang", "hill"], "likes": ["cha"], "hates": ["tari"],
 		"secret": {"v": "An sang-ma na-sul-ur-da.", "en": "I do sleep on the hill."}},
 	"jeli": {"trait": "cheerful", "thing": ["yok", "medicine"], "likes": ["cha"], "hates": [],
 		"secret": {"v": "Yok i-wai-da. Polu i-zen-da.", "en": "The medicine is bad. Everyone knows."}},
@@ -768,7 +768,7 @@ const FALSE_FRIENDS = [
 # Sound words from Guarani: [word, scene, decoys]. Used by the "What's that sound?" game.
 const SOUND_SCENES = [
 	["pororo", "Corn kernels burst in a hot pot.", ["kororo", "siri"]], ["chiriri", "Fish fry in a pan of hot oil.", ["tarara", "vava"]],
-	["kororo", "Pomo is asleep under a tree, mouth wide open.", ["piriri", "pururu"]], ["tarara", "Desh blows into a big shell like a trumpet.", ["siri", "chiriri"]],
+	["kororo", "Radi is asleep under a tree, mouth wide open.", ["piriri", "pururu"]], ["tarara", "Desh blows into a big shell like a trumpet.", ["siri", "chiriri"]],
 	["pururu", "You bite into a very crispy panak.", ["guarara", "vava"]], ["siri", "Water trickles down a rock into the pond.", ["sununu", "pororo"]],
 	["vava", "A palm tree sways in the wind.", ["pururu", "tarara"]], ["piriri", "Sparks fizz and twinkle above the campfire.", ["kororo", "sununu"]],
 	["guarara", "The waterfall roars and crashes.", ["piriri", "chiriri"]], ["sununu", "The whole village shouts and stomps about a missing hot dog.", ["siri", "vava"]]
@@ -884,27 +884,27 @@ const OVERHEAR = [
 	{"id": "ov_boat", "a": "lachu", "b": "ena", "words": ["sena", "kaput", "haku", "par"],
 		"lines": [["lachu", "Sena i-kaput-da.", "The boat is broken."], ["ena", "Haku?", "Why?"], ["lachu", "Desh senama i-ning-pa-da. Sena i-par-pa-shi.", "Desh sang in the boat. Apparently the boat got scared."]],
 		"q": "Why is the boat broken, according to Lachu?", "opts": ["Desh sang in it", "A whale bumped it", "Tor built it"]},
-	{"id": "ov_habibi", "a": "oren", "b": "tor", "words": ["gira", "har", "habibi", "ups"],
-		"lines": [["oren", "Ti-ni gira i-ho-da.", "Your bridge is good."], ["tor", "K-ta-har-da! ...Ti ta-seng-ha?", "Thank you! ...Are you happy?"], ["oren", "Maki. Ti anni mar-ru “habibi” ta-mel-ur-nu!", "No. People say you call my horse “habibi”!"], ["tor", "...Ups.", "...Oops."]],
-		"q": "Why is Oren upset with Tor?", "opts": ["Tor calls Oren's horse “habibi”", "The bridge is broken", "Tor ate Oren's bread"]},
+	{"id": "ov_habibi", "a": "rofi", "b": "tor", "words": ["gira", "har", "habibi", "ups"],
+		"lines": [["rofi", "Ti-ni gira i-ho-da.", "Your bridge is good."], ["tor", "K-ta-har-da! ...Ti ta-seng-ha?", "Thank you! ...Are you happy?"], ["rofi", "Maki. Ti anni mar-ru “habibi” ta-mel-ur-nu!", "No. People say you call my horse “habibi”!"], ["tor", "...Ups.", "...Oops."]],
+		"q": "Why is Rofi upset with Tor?", "opts": ["Tor calls Rofi's horse “habibi”", "The bridge is broken", "Tor ate Rofi's bread"]},
 	{"id": "ov_sleep", "a": "lira", "b": "sanu", "words": ["sul", "zen", "kororo"],
 		"lines": [["lira", "Sanu, ti ta-sul-im-ha?", "Sanu, are you sleeping?"], ["sanu", "Ma-na-sul-im-ki-da... kororo... kororo...", "I'm not sleeping... snore... snore..."], ["lira", "Sanu i-sul-im-da. I-zen-da.", "Sanu is sleeping. I can see it. It's true."]],
 		"q": "Is Sanu asleep?", "opts": ["Yes, even though Sanu says no", "No, Sanu is reading", "No, Sanu is swimming"]},
 	{"id": "ov_feather", "a": "rin", "b": "suri", "clue": "feather", "words": ["par-yir", "senak", "var-var"],
 		"lines": [["rin", "Senakma par-yir i-esh-da! I-var-var!", "There's a feather in the school! It's huge!"], ["suri", "Par-yir i-var-var? Par i-var-shi.", "A huge feather? Then apparently the bird is big."], ["rin", "Ki par-yir Suri-ni pai-ni dalma i-esh-pa-da.", "This feather was next to Suri's paper."]],
 		"q": "What did Rin find at the school?", "opts": ["A huge feather", "A huge fish", "Suri's selfies"]},
-	{"id": "ov_fruit", "a": "ketu", "b": "ola", "words": ["mal", "guro-guro", "han"],
-		"lines": [["ketu", "Ola! Ti-ni malma han i-esh-ha?", "Ola! What's in your hand?"], ["ola", "Han? Maki... guro ma-i-esh-ki-da.", "What? No... there's no fruit."], ["ketu", "Ti-ni malma guro-guro i-esh-da!", "There are all kinds of fruit in your hand!"]],
-		"q": "What is Ola hiding?", "opts": ["Fruit", "A fish", "A book"]},
+	{"id": "ov_fruit", "a": "ketu", "b": "oli", "words": ["mal", "guro-guro", "han"],
+		"lines": [["ketu", "Oli! Ti-ni malma han i-esh-ha?", "Oli! What's in your hand?"], ["oli", "Han? Maki... guro ma-i-esh-ki-da.", "What? No... there's no fruit."], ["ketu", "Ti-ni malma guro-guro i-esh-da!", "There are all kinds of fruit in your hand!"]],
+		"q": "What is Oli hiding?", "opts": ["Fruit", "A fish", "A book"]},
 	{"id": "ov_concert", "a": "desh", "b": "asya", "words": ["yeshma", "fardom", "ning", "-fu"],
 		"lines": [["desh", "Asya! Yeshma fardom-ma na-ning-fu-da!", "Asya! Tonight I will sing at the lighthouse!"], ["asya", "Maki! Tari-ir ri-par-fu! Sena-ir ri-par-fu!", "No! The fish will get scared! The boats will get scared!"], ["desh", "Tarara! Tarara!", "Toot! Toot!"]],
 		"q": "What does Desh want to do?", "opts": ["Sing at the lighthouse tonight", "Swim in the sea", "Fix the boat"]},
-	{"id": "ov_night", "a": "ola", "b": "rin", "clue": "night", "words": ["yeshma", "lum", "hama", "zen"],
-		"lines": [["rin", "Ketu-ni par yeshma hama i-esh-ha?", "Where is Ketu's parrot at night?"], ["ola", "Yeshma par kurma ma-i-esh-ki-da. Par i-lum-ur-da.", "At night the parrot is not at the market. It usually goes away."], ["rin", "Hama-ru?", "To where?"], ["ola", "Ma-na-zen-ki-da!", "I don't know!"]],
+	{"id": "ov_night", "a": "oli", "b": "rin", "clue": "night", "words": ["yeshma", "lum", "hama", "zen"],
+		"lines": [["rin", "Ketu-ni par yeshma hama i-esh-ha?", "Where is Ketu's parrot at night?"], ["oli", "Yeshma par kurma ma-i-esh-ki-da. Par i-lum-ur-da.", "At night the parrot is not at the market. It usually goes away."], ["rin", "Hama-ru?", "To where?"], ["oli", "Ma-na-zen-ki-da!", "I don't know!"]],
 		"q": "Where is Ketu's parrot at night?", "opts": ["Gone from the market; nobody knows where", "Asleep at the market", "At the lighthouse with Asya"]},
-	{"id": "ov_horse", "a": "oren", "b": "neri", "words": ["mel", "dap", "dan"],
-		"lines": [["neri", "Oren, ti ti-ni mar-ru ta-mel-ur-ha?", "Oren, do you talk to your horse?"], ["oren", "Ho. Dan mar ma-i-dap-ur-ki-da.", "Yes. But the horse doesn't usually answer."], ["neri", "Tari-ir ri-dap-ur-nu.", "People say fish answer."], ["oren", "...Ketu i-an-shi.", "...That must be Ketu talking."]],
-		"q": "What does Oren say about his horse?", "opts": ["It doesn't answer", "It sings", "It's afraid of the night"]}
+	{"id": "ov_horse", "a": "rofi", "b": "neri", "words": ["mel", "dap", "dan"],
+		"lines": [["neri", "Rofi, ti ti-ni mar-ru ta-mel-ur-ha?", "Rofi, do you talk to your horse?"], ["rofi", "Ho. Dan mar ma-i-dap-ur-ki-da.", "Yes. But the horse doesn't usually answer."], ["neri", "Tari-ir ri-dap-ur-nu.", "People say fish answer."], ["rofi", "...Ketu i-an-shi.", "...That must be Ketu talking."]],
+		"q": "What does Rofi say about his horse?", "opts": ["It doesn't answer", "It sings", "It's afraid of the night"]}
 ]
 
 # Story clues about the mystery letter writer, shown in the Letters page.
@@ -982,12 +982,12 @@ const WORDS10 = {
 
 # Find someone who can... verb root -> [English, people who can]
 const KAN = {
-	"sum": ["swim", ["desh", "lachu", "ketu", "ola"]],
+	"sum": ["swim", ["desh", "lachu", "ketu", "oli"]],
 	"ning": ["sing", ["desh", "lira", "mira", "sije"]],
 	"dar": ["cook", ["mira", "ketu", "jeli"]],
 	"rav": ["read", ["suri", "rin", "oku", "neri", "ena", "asya"]],
-	"varn": ["build things", ["tor", "lachu", "oren"]],
-	"pav": ["run fast", ["ola", "rin", "gav", "neri"]],
+	"varn": ["build things", ["tor", "lachu", "rofi"]],
+	"pav": ["run fast", ["oli", "rin", "gav", "neri"]],
 	"fei": ["fly", []]
 }
 # Special answers: "id:root" -> [Tujuju, English, emote]
@@ -996,8 +996,8 @@ const KAN_LINES = {
 	"desh:ning": ["Ho! Na-ning-kan-da! Tarara! TARARA!", "Yes! I can sing! Toot! TOOT!", "laugh"],
 	"desh:sum": ["Ho! Haima na-ning-ka na-sum-ur-da!", "Yes! In the sea I sing and then I swim!", "proud"],
 	"asya:sum": ["Maki! Hai i-var-var! Tari-ir ri-var-var!", "No! The sea is huge! The fish are huge!", "shocked"],
-	"oren:ning": ["Maki. Mar i-ning-kan-da. An maki.", "No. The horse can sing. Not me.", "angry"],
-	"pomo:pav": ["Pav...? Ma-na-pav-kan-ki-da... zzz", "Run...? I can't run... zzz", "sleepy"],
+	"rofi:ning": ["Maki. Mar i-ning-kan-da. An maki.", "No. The horse can sing. Not me.", "angry"],
+	"radi:pav": ["Pav...? Ma-na-pav-kan-ki-da... zzz", "Run...? I can't run... zzz", "sleepy"],
 	"gav:pav": ["Ho! Polu-ru na-pav-ur-da!", "Yes! I run to everyone, every day!", "proud"],
 	"mira:dar": ["HO! Na-dar-kan-da! Yamat i-ho-ho!", "YES! I can cook! The food is super good!", "proud"],
 	"oku:rav": ["Ho. Anke sek-ir-ni tovu k-i-rav-kan-da.", "Yes. I can read the stones' stories.", "proud"],
@@ -1024,8 +1024,8 @@ const WORDS11 = {
 }
 
 # Word wand pieces. Who: [English, correct prefix]
-const WAND_WHO = {"An": ["I", "na"], "Tor": ["Tor", "i"], "Mira": ["Mira", "i"], "Ketu": ["Ketu", "i"], "Desh": ["Desh", "i"], "Pomo": ["Pomo", "i"],
-	"Oren": ["Oren", "i"], "Lira": ["Lira", "i"], "Gav": ["Gav", "i"], "Asya": ["Asya", "i"], "Polu": ["everyone", "ri"]}
+const WAND_WHO = {"An": ["I", "na"], "Tor": ["Tor", "i"], "Mira": ["Mira", "i"], "Ketu": ["Ketu", "i"], "Desh": ["Desh", "i"], "Radi": ["Radi", "i"],
+	"Rofi": ["Rofi", "i"], "Lira": ["Lira", "i"], "Gav": ["Gav", "i"], "Asya": ["Asya", "i"], "Polu": ["everyone", "ri"]}
 # Where: [English, position]. haima is found at run time (the nearest sea).
 const WAND_PLACES = {"tekama": ["in the village", Vector3(0, 0, 14)], "kurma": ["at the market", Vector3(-48, 0, 15)], "haima": ["in the sea", Vector3.ZERO],
 	"fardom-ma": ["at the lighthouse", Vector3(70, 0, -6)], "sang-ma": ["on the hill", Vector3(-58, 0, -35)], "senak-ma": ["at the school", Vector3(-45, 0, 1)],
@@ -1070,7 +1070,7 @@ const GUESS_Q = {
 	"sleepy": ["Sa i-sul-ur-ha?", "Do they sleep a lot?"],
 	"happy": ["Sa i-seng-ur-ha?", "Are they usually happy?"]
 }
-const GUESS_PEOPLE = ["ena", "mira", "sanu", "tor", "lira", "oren", "ketu", "suri", "rin", "ola", "pomo", "jeli", "sije", "asya", "desh", "oku", "gav", "lachu"]
+const GUESS_PEOPLE = ["ena", "mira", "sanu", "tor", "lira", "rofi", "ketu", "suri", "rin", "oli", "radi", "jeli", "sije", "asya", "desh", "oku", "gav", "lachu"]
 
 # ---------------------------------------------------------------- twelfth expansion: yesen (improv scenes)
 const WORDS12 = {
@@ -1102,12 +1102,12 @@ const YESEN = [
 		["Ning sena-ru i-lum-im-da!", "The song is going to the boat!", [["Lachu is sleeping in the boat!", ["Lachu", "sena-ma", "i-sul-im-da."]], ["the boat is singing!", ["Sena", "i-ning-im-da."]]]],
 		["Ti ta-ning-o-ye! Tarara!", "Please sing! Toot!", [["I sing with you!", ["An", "ti-su", "na-ning-im-da."]], ["I sing to the moon!", ["An", "yue-ru", "na-ning-im-da."]]]]],
 		"end": ["Wala! Hai i-seng-da! Bravo!", "Ta-da! The sea is happy! Bravo!"]},
-	{"id": "notsleeping", "sug": ["kororo", "snore"], "who": "pomo", "title": "Pomo is NOT sleeping", "rounds": [
+	{"id": "notsleeping", "sug": ["kororo", "snore"], "who": "radi", "title": "Radi is NOT sleeping", "rounds": [
 		["Ma-na-sul-im-ki-da... kororo...", "I'm not sleeping... snore...", [["you are sleeping on the hill.", ["Ti", "sang-ma", "ta-sul-im-da."]], ["the stars are sleeping too.", ["Sao-ir", "ri-sul-im-da."]]]],
 		["Sang-ma par i-esh-da... par i-fei-kan-da...", "There's a bird on the hill... the bird can fly...", [["I can fly too!", ["An", "na-fei-kan-da."]], ["the bird is sleeping!", ["Par", "i-sul-im-da."]]]],
 		["Han? Ti hal ta-an-ha?", "What? Who are you?", [["I am your friend!", ["An", "ti-ni palar", "na-an-da."]], ["I am a bird!", ["An", "par", "na-an-da."]]]]],
 		"end": ["Ho... palar... par... zzz", "Yes... friend... bird... zzz"]},
-	{"id": "horsehead", "sug": ["dau-yir", "hat"], "who": "oren", "title": "The horse on my head", "rounds": [
+	{"id": "horsehead", "sug": ["dau-yir", "hat"], "who": "rofi", "title": "The horse on my head", "rounds": [
 		["Mar anni dau-ma i-esh-da!", "The horse is on my head!", [["the horse is singing!", ["Mar", "i-ning-im-da."]], ["the horse has a hat!", ["Mar-su", "dau-yir", "i-esh-da."]]]],
 		["Mar ti-ru “puts” i-mel-pa-da!", "The horse called you a putz!", [["I am a putz!", ["An", "puts", "na-an-da."]], ["the horse is a putz!", ["Mar", "puts", "i-an-da."]]]],
 		["Mar sela i-an-vai-da.", "The horse wants to be alone.", [["I will go home.", ["An", "dom-ru", "na-lum-fu-da."]], ["the horse is going to Hirimara.", ["Mar", "Hirimara-ru", "i-lum-im-da."]]]]],
@@ -1147,7 +1147,7 @@ const YESEN = [
 		["Hen-ma sena-ir ri-esh-da!", "There are boats in the sky!", [["the birds are swimming!", ["Par-ir", "ri-sum-im-da."]], ["Gav brings the letters by boat.", ["Gavke", "pai-ir", "sena-li", "i-tar-im-da."]]]],
 		["Ti sena-ma ta-kar-o-ye!", "Please come into the boat!", [["I will bring bread!", ["Anke", "panak", "k-i-tar-fu-da."]], ["I am sitting in the boat!", ["An", "sena-ma", "na-tum-im-da."]]]]],
 		"end": ["Hmph... Ha! Sena i-ho-da!", "Hmph... Ha! The boat is good!"]},
-	{"id": "fruitchoni", "sug": ["shenani", "mischief"], "who": "ola", "title": "A choni in the fruit", "rounds": [
+	{"id": "fruitchoni", "sug": ["shenani", "mischief"], "who": "oli", "title": "A choni in the fruit", "rounds": [
 		["Guro-ma choni i-esh-da!", "There's a choni in the fruit!", [["the choni is tiny!", ["Choni", "i-sen-sen-da."]], ["Gav is happy!", ["Gav", "i-seng-da."]]]],
 		["Choni guro-ta i-pav-pa-da!", "The choni ran out of the fruit!", [["the choni is running to the market!", ["Choni", "kur-ru", "i-pav-im-da."]], ["I caught the choni!", ["Anke", "choni", "k-i-nuk-pa-da."]]]],
 		["Ti choni-na ta-an-da!", "You are a choni person!", [["I am happy!", ["An", "na-seng-da."]], ["you are a choni person!", ["Ti", "choni-na", "ta-an-da."]]]]],

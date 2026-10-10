@@ -31,7 +31,7 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 - Borrowed words: Tujuju has picked up words from other languages, respelled with Tujuju sounds (choni, buruhaha, kafufel, halabalu, shenani, gesunhait, hutspa, kawai, kaput, fiyesta, bombom, wala, pajama, aloha, chau). They turn up in gossip, jokes, compliments and teases, greetings, sneezes, events, a new strange thing, Ketu's stall, poems and practice, with a Borrowed words page in the notebook.
 - About Tujuju: a page in the menu (the three-line button) summarizing the language's features (sounds, verb prefixes, tense and aspect, evidentials, ergative marking, cases, negation, questions, noun incorporation, compounds, doubling), each with examples.
 - Word play: borrowed endearments (habibi, shatsi, monshu, bubala) and playful insults (puts, baka, shlemil) that each personality uses in its own way; close friends greet you with them. Calques built piece by piece (far-par firefly, ret-gor hot dog, sao-tari starfish, hai-mar seahorse, sanu-mara kindergarten, dau-fong brainstorm). False friends that look like English (hen sky, ten foot, gin money, far fire...) with a False friends game. Doubling (var-var huge, pav-pav run around and around, guro-guro all kinds of fruit) in practice, poems, the rumor composer and Desh's commands.
-- Hirimara, the prank field: a new peninsula far to the west of the market, with a hedge maze (lavir) hiding a chest, a karaoke stage that turns a generated poem into your song, a poltergeist's bungalow with floating furniture (ask it nicely, T-na-ven-o-ye!, to get a choni back), Pomo's doppelganger, and a scarecrow wearing chonies. Finding all five secrets is a side quest.
+- Hirimara, the prank field: a new peninsula far to the west of the market, with a hedge maze (lavir) hiding a chest, a karaoke stage that turns a generated poem into your song, a poltergeist's bungalow with floating furniture (ask it nicely, T-na-ven-o-ye!, to get a choni back), Radi's doppelganger, and a scarecrow wearing chonies. Finding all five secrets is a side quest.
 - The great choni hunt: Gav has lost six chonies. He gives clues in Tujuju with evidentials (Choni sang-ni tarma i-esh-shi), and finding all six makes you a choni-na (choni person) and fills his clothesline. It sometimes rains chonies.
 - Pranks: a Play a prank menu (fake spider, hide their thing, Look! Chonies!, be a poltergeist, be a robot); each personality reacts differently, and pranking twice in one day earns Ma-ta-hiri-o-ki! (Don't prank me!). Villagers prank you back. New teases (Ti kluts ta-an-da!, Ti wai-dau ta-an-da!), 11 new pieces of gossip, 11 new jokes, four new poem patterns (doubling, why-questions, Bravo!, and chonies), villagers who recite poems on their own, and a deja vu stone in the stone circle that replays your last message.
 - About 30 new words, most of them borrowed: karaoke, bravo, ups, pitsa, selfi, robot, safari, tabu, kudos, chochke, kluts, poltergais, dopelgenger, deshavu, gobeldigok, ninkompup, karinyo, shampu, yureka, bungalo, kabum, plus native hiri (prank), sipu (spider), dop (hide), lavir (maze) and the person ending -na.
@@ -50,7 +50,7 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 - Four house doors, each a small puzzle in commands: open, please open, do not open, close.
 - Follow-up questions for every resident, a phrasebook of collected sentences, a word workshop for case endings, and practice quizzes.
 - Counting piles with the Tujuju number words one to ten, fishing with noun incorporation (with three fishing spots), signs that teach case endings.
-- Side-quest language: question words (Suri), compass directions with -ma (Pomo), body words and pain (Jeli), causative -tir (Asya), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
+- Side-quest language: question words (Suri), compass directions with -ma (Radi), body words and pain (Jeli), causative -tir (Asya), commands and prohibitions in a drum game (Desh), comparatives and superlatives, habitual -ur, future -fu and inceptive -ng.
 - A bridge that is visibly broken until Tor's repair, and a table that is laid after Mira's meal.
 - Notebook with editable meaning guesses, optional meaning reveals and mastery marks.
 - Inventory, island guide, automatic saving, manual restart confirmation.
@@ -62,20 +62,20 @@ The island is designed for portrait orientation, with a 480 x 854 reference layo
 2. Collect wak, guro and kor beside the main path between harbor and village. Offer them to Mira.
 3. Collect the blue kel west of the forest path. Offer it to Sanu.
 4. Collect murak, sek and lin beside the path toward the river. Offer them to Tor.
-5. Ask Tor about Neri. Talk to Lira in the village and Oren north of the crossing. Compare accounts. Tor's italpada is witnessed; Oren's italpashi is inferred; Lira's italpanu is reported.
+5. Ask Tor about Neri. Talk to Lira in the village and Rofi north of the crossing. Compare accounts. Tor's italpada is witnessed; Rofi's italpashi is inferred; Lira's italpanu is reported.
 6. Continue north to Neri at the cove.
 Exploration is open. Finding Neri early acknowledges the discovery while leaving the clue objective available.
 
 Side quests, in any order:
 - Market (Ketu, west): catch three fish (river by the bridge, end of the dock, or the lagoon) and give them to Ketu. Ketu gives you cha (tea).
 - School (Suri, north of the market): answer four questions built on hal, hama, han and hamur.
-- Lookout (Pomo, top of the west hill): answer three direction questions (dongma, namma, saima). The yok herb grows on the hill path.
+- Lookout (Radi, top of the west hill): answer three direction questions (dongma, namma, saima). The yok herb grows on the hill path.
 - Healer (Jeli, east of the village): say where Sije hurts, then bring yok and cha.
 - Lighthouse (Asya, east coast): bring the far (torch) from Neri's campfire, then understand Fardom t-i-ling-tir-o!
 - Lagoon (Desh, east lagoon): follow four drum-game commands.
 - Riddles (Oku, old ruins): five riddles about the sun, moon, stars, fish and trees. The reward is a whispered secret.
 - Mail (Gav, harbor): deliver parcels labeled Ketu-ru, Asya-ru and Oku-ru, then return to Gav for five coins.
-- Hide and seek (Ola, school): find Rin and Ola and shout K-ta-pal-da! (I see you!).
+- Hide and seek (Oli, school): find Rin and Oli and shout K-ta-pal-da! (I see you!).
 - Sea stars: find eight hai-sao on the beaches; each one names its ordinal (yanve, velve, murve...).
 - Dog: sell fish to Ketu or earn coins, buy panak, and share it with the village dog.
 - Secret: behind the waterfall is a hidden room with an old map. Ask Lachu for a ride to Sendor (Sendor-ru t-na-tar-o-ye) and dig where the map says: murak-ni shanma, behind the tree.

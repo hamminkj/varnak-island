@@ -21,7 +21,7 @@ const DAY_LEN = 480.0
 const FERRY_HARBOR = Vector3(1.8, 0, 44.6)
 const FERRY_ISLET = Vector3(49.8, 0, 66.0)
 const STARS = [Vector3(-14, 0, -46), Vector3(-30, 0, -45), Vector3(66, 0, 31), Vector3(55, 0, 86), Vector3(-30, 0, 41), Vector3(30, 0, 40), Vector3(-134, 0, 6), Vector3(-71, 0, 47)]
-const HIDE_SPOTS = {"rin": Vector3(-50.5, 0, -13.4), "ola": Vector3(-42.4, 0, 19.9)}
+const HIDE_SPOTS = {"rin": Vector3(-50.5, 0, -13.4), "oli": Vector3(-42.4, 0, 19.9)}
 const MAP_X0 = -143.0
 const MAP_X1 = 90.0
 const MAP_Z0 = -56.0
@@ -156,20 +156,20 @@ var quests = [
 	["meal","Bring wak, guro and kor to Mira in the village."],
 	["bag","Find the forest bag and take it to Sanu."],
 	["bridge","Bring murak, sek and lin to Tor by the river."],
-	["evidence","Compare the accounts of Tor, Lira and Oren."],
+	["evidence","Compare the accounts of Tor, Lira and Rofi."],
 	["cove","Visit the northern cove and talk to Neri."]
 ]
 # id, person, objective text
 var side_quests = [
 	["market","ketu","Ketu at the market (west) wants mur tari: three fish. Fish at the river, the dock or the lagoon."],
 	["school","suri","Answer Suri's four questions at the school, north of the market."],
-	["lookout","pomo","Climb the west hill and answer Pomo's direction questions."],
+	["lookout","radi","Climb the west hill and answer Radi's direction questions."],
 	["healer","jeli","Help Jeli the healer, east of the village. Her patient needs yok and cha."],
 	["lighthouse","asya","The lighthouse is dark. Bring far (fire) from Neri's campfire to Asya."],
 	["lagoon","desh","Play Desh's drum game at the east lagoon."],
 	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
 	["mail","gav","Gav at the harbor needs parcels delivered. Read the labels!"],
-	["hide","ola","Rin and Ola at the school want to play hide and seek."],
+	["hide","oli","Rin and Oli at the school want to play hide and seek."],
 	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
 	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
 	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
@@ -236,13 +236,13 @@ var looks = {
 	"sanu": [Color("e3b98f"), Color("7a4a22"), 3, Color("5b8c5a")],
 	"tor": [Color("a87650"), Color("1d1d1d"), 4, Color("c9a46d")],
 	"lira": [Color("f0c9a0"), Color("b5651d"), 1, Color("e76f51")],
-	"oren": [Color("8d5a3b"), Color("4a4a4a"), 0, Color("a8dadc")],
+	"rofi": [Color("8d5a3b"), Color("4a4a4a"), 0, Color("a8dadc")],
 	"neri": [Color("d9a679"), Color("2e2a5a"), 2, Color("f4a261")],
 	"ketu": [Color("b07a52"), Color("2b1d14"), 3, Color("e9c46a")],
 	"suri": [Color("e8bf98"), Color("1d1d1d"), 1, Color("f2e6c8")],
 	"rin": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
-	"ola": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
-	"pomo": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
+	"oli": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
+	"radi": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
 	"jeli": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
 	"sije": [Color("f0c9a0"), Color("7a4a22"), 2, Color("f4a261")],
 	"asya": [Color("c68e66"), Color("2e2a5a"), 4, Color("f4f1e8")],
@@ -261,13 +261,13 @@ var person_ex = {
 	"sanu": {"shirt": Color("8ecae6"), "stripe": Color("f4f1e8"), "pants": Color("8ecae6"), "hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.8, "cheeks": true, "prop": "pillow", "eye_kind": "sleepy"},
 	"tor": {"shirt": Color("c0392b"), "overalls": Color("4a5d78"), "pants": Color("4a5d78"), "w": 1.25, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("e9c46a"), "prop": "hammer", "brows": "flat", "thick": true, "mouth": "grin"},
 	"lira": {"shirt": Color("9678a5"), "dress": Color("7d5a94"), "face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a"), "prop": "cup", "brows": "raised", "mouth": "grin"},
-	"oren": {"shirt": Color("7e9975"), "vest": Color("6d4a33"), "mustache": Color("4a4a4a"), "hat": "cowboy", "hat_color": Color("8c5a3c"), "w": 0.95, "h": 1.1, "prop": "carrot", "brows": "angry", "thick": true, "mouth": "frown"},
+	"rofi": {"shirt": Color("7e9975"), "vest": Color("6d4a33"), "mustache": Color("4a4a4a"), "hat": "cowboy", "hat_color": Color("8c5a3c"), "w": 0.95, "h": 1.1, "prop": "carrot", "brows": "angry", "thick": true, "mouth": "frown"},
 	"neri": {"shirt": Color("bd795f"), "backpack": Color("c0392b"), "scarf": Color("f4a261"), "prop": "map", "mouth": "smile", "brows": "flat"},
 	"ketu": {"shirt": Color("e76f51"), "build": "round", "w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14"), "prop": "fish", "mouth": "grin", "brows": "raised"},
 	"suri": {"shirt": Color("2a9d8f"), "dress": Color("21867a"), "h": 1.14, "w": 0.9, "face": "glasses", "earrings": true, "prop": "book", "brows": "raised", "mouth": "line"},
 	"rin": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
-	"ola": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
-	"pomo": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
+	"oli": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
+	"radi": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
 	"jeli": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
 	"sije": {"shirt": Color("a78bda"), "scarf": Color("f4f1e8"), "hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true, "prop": "mug", "brows": "worried", "mouth": "o"},
 	"asya": {"shirt": Color("f2c14e"), "robe": Color("e0ac2a"), "h": 1.18, "w": 0.85, "hat": "captain", "mustache": Color("2e2a5a"), "prop": "lantern", "brows": "worried", "mouth": "o"},
@@ -989,7 +989,7 @@ func build_entities():
 	entity("sanu","npc","Sanu",Vector3(4,0,-8),Color("d5b54c"))
 	entity("tor","npc","Tor",Vector3(-3,0,-19),Color("637ba3"))
 	entity("lira","npc","Lira",Vector3(7,0,3),Color("9678a5"))
-	entity("oren","npc","Oren",Vector3(6,0,-29),Color("7e9975"))
+	entity("rofi","npc","Rofi",Vector3(6,0,-29),Color("7e9975"))
 	entity("neri","npc","Neri",Vector3(0,0,-40),Color("bd795f"))
 	entity("own_bag","item","kel",Vector3(2,0,32),Color("c58b55"))
 	entity("water","item","wak",Vector3(4,0,20),Color("52bddd"))
@@ -1027,11 +1027,11 @@ func build_entities():
 	entity("sair2","npc","sair",Vector3(-46.5,0,15.6),Color("8f5a48"))
 	entity("suri","npc","Suri",Vector3(-45.0,0,-3.4),Color("2a9d8f"))
 	var rin = entity("rin","npc","Rin",Vector3(-47.4,0,-2.4),Color("f4a261"))
-	var ola = entity("ola","npc","Ola",Vector3(-49.6,0,-3.2),Color("e9c46a"))
-	for kid in [rin, ola]:
+	var oli = entity("oli","npc","Oli",Vector3(-49.6,0,-3.2),Color("e9c46a"))
+	for kid in [rin, oli]:
 		(kid["node"] as Node3D).scale = Vector3.ONE * 0.78
 		kid["ph"] = 1.55
-	entity("pomo","npc","Pomo",Vector3(-58.8,0,-36.4),Color("4f7ca8"))
+	entity("radi","npc","Radi",Vector3(-58.8,0,-36.4),Color("4f7ca8"))
 	entity("jeli","npc","Jeli",Vector3(51.6,0,-4.4),Color("5b8c5a"))
 	entity("sije","npc","Sije",Vector3(53.4,0,-1.8),Color("a78bda"))
 	entity("asya","npc","Asya",Vector3(73.4,0,-5.0),Color("3f5f8a"))
@@ -1248,7 +1248,7 @@ func update_marks():
 		"bag": main_people = ["sanu"]
 		"bridge": main_people = ["tor"]
 		"evidence":
-			for p in ["tor", "lira", "oren"]:
+			for p in ["tor", "lira", "rofi"]:
 				if not completed.has("heard_" + p): main_people.append(p)
 			if main_people.is_empty(): main_people = ["tor"]
 		"cove": main_people = ["neri"]
@@ -2535,13 +2535,13 @@ func lookout_quiz(i: int):
 	var q: Dictionary = Data.LOOKOUT[i]
 	learn("hama")
 	for w in ["bei", "nam", "dong", "sai"]: learn(w)
-	choice_puzzle("Pomo's question: " + str(i + 1) + " of 3", q["gesture"] + "\n\n“" + q["q"] + "”  (" + q["en"] + ")\n\nHow do you answer?", q["options"], q["correct"], func():
+	choice_puzzle("Radi's question: " + str(i + 1) + " of 3", q["gesture"] + "\n\n“" + q["q"] + "”  (" + q["en"] + ")\n\nHow do you answer?", q["options"], q["correct"], func():
 		master("q:lookout" + str(i))
 		if i == 2: complete("lookout"),
-		q["why"], "bei is north, nam south, dong east and sai west. Follow Pomo's pointing hand.", talk.bind("pomo"),
+		q["why"], "bei is north, nam south, dong east and sai west. Follow Radi's pointing hand.", talk.bind("radi"),
 		func():
 			if i < 2: button("Next question", lookout_quiz.bind(i + 1), content)
-			else: text_line("Pomo grins and hands you the telescope. You can see the whole island from here."))
+			else: text_line("Radi grins and hands you the telescope. You can see the whole island from here."))
 
 func pain_puzzle():
 	var p = Data.PAIN
@@ -2582,10 +2582,10 @@ func desh_round(i: int, order: Array):
 func identity_puzzle():
 	learn("-ha")
 	learn("kelar")
-	choice_puzzle("Ti kelar ta-an-ha?", "Ola looks at your bag and dusty boots, then asks:\n\n“Ti kelar ta-an-ha?”\n\nHow do you answer?",
-		["An kelar na-an-da.", "An senar na-an-da.", "An ravar na-an-da."], 0, func(): master("q:ola"),
-		"An kelar na-an-da: I am a traveler. Ola's question used ta- (you) and -ha (a yes or no question); your answer uses na- (I) and -da.",
-		"You are not a teacher (senar) or a student (ravar). You are traveling.", talk.bind("ola"))
+	choice_puzzle("Ti kelar ta-an-ha?", "Oli looks at your bag and dusty boots, then asks:\n\n“Ti kelar ta-an-ha?”\n\nHow do you answer?",
+		["An kelar na-an-da.", "An senar na-an-da.", "An ravar na-an-da."], 0, func(): master("q:oli"),
+		"An kelar na-an-da: I am a traveler. Oli's question used ta- (you) and -ha (a yes or no question); your answer uses na- (I) and -da.",
+		"You are not a teacher (senar) or a student (ravar). You are traveling.", talk.bind("oli"))
 
 func add_topics(id: String):
 	match id:
@@ -2606,7 +2606,7 @@ func add_topics(id: String):
 		"lira":
 			button("Answer: where are you?", where_puzzle.bind("lira"), content)
 			topic("Ask about the dog", "dog_runs", id)
-		"oren":
+		"rofi":
 			topic("Ask about the horse", "horse_fast", id)
 			topic("Ask about the tree", "tree_tall", id)
 		"neri":
@@ -2624,13 +2624,13 @@ func add_topics(id: String):
 		"suri":
 			topic("Ask who Suri is", "suri_teacher", id)
 			topic("Ask about the students", "students_read", id)
-			topic("Ask why Rin and Ola are giggling", "suri_kinder", id)
+			topic("Ask why Rin and Oli are giggling", "suri_kinder", id)
 			if mastered.has("kir:taught") and not completed.has("kirmel"): button("Show Suri the old writing", suri_kirmel.bind(0), content)
 		"rin":
 			topic("Ask who Rin is", "rin_student", id)
 			topic("Ask what they are doing", "students_read", id)
-		"ola": button("Answer Ola's question", identity_puzzle, content)
-		"pomo":
+		"oli": button("Answer Oli's question", identity_puzzle, content)
+		"radi":
 			topic("Ask about the hill", "hill_taller", id)
 			topic("Ask about the summit", "summit_highest", id)
 			topic("Ask about the night sky", "night_sky", id)
@@ -2714,7 +2714,7 @@ func talk(id: String):
 				if has_items(["wood","stone","rope"]):
 					consume(["wood","stone","rope"])
 					complete("bridge")
-					message("The crossing is repaired","Tor secures the planks. Ask Tor about Neri, and compare the accounts of Lira and Oren.")
+					message("The crossing is repaired","Tor secures the planks. Ask Tor about Neri, and compare the accounts of Lira and Rofi.")
 				elif completed.has("bridge"): message("Tor nods","The crossing is secure. You can ask about Neri.")
 				else: offer_help(["wood","stone","rope"]),content)
 			button("Ask about Neri",func(): account("tor","italpada","Tor points to their eyes, then the river crossing. Tor personally saw Neri arrive."),content)
@@ -2723,8 +2723,8 @@ func talk(id: String):
 			gossip_buttons(id)
 			add_topics(id)
 			return
-		"oren":
-			account("oren","italpashi","Oren points to fresh footprints in the sand. Oren inferred that Neri arrived.")
+		"rofi":
+			account("rofi","italpashi","Rofi points to fresh footprints in the sand. Rofi inferred that Neri arrived.")
 			gossip_buttons(id)
 			add_topics(id)
 			return
@@ -2740,7 +2740,7 @@ func talk(id: String):
 				button("Tell Neri about your adventure", tile_puzzle.bind(-1, talk.bind("neri")), content)
 				button("Practice evidence again",show_evidence,content)
 			else:
-				text_line("You found Neri by exploring. To understand the journey, compare Tor's, Lira's and Oren's accounts, then return.")
+				text_line("You found Neri by exploring. To understand the journey, compare Tor's, Lira's and Rofi's accounts, then return.")
 			if not completed.has("lighthouse"):
 				learn("far")
 				text_line("A torch leans against a stone by the campfire. Neri points at it: “Far.”")
@@ -2815,7 +2815,7 @@ func talk(id: String):
 			else:
 				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. She waves you toward a bench.")
 				button("Start the lesson", school_quiz.bind(0), content)
-		"rin", "ola":
+		"rin", "oli":
 			if hiding.get(id, false):
 				found_puzzle(id)
 				return
@@ -2824,17 +2824,17 @@ func talk(id: String):
 			clear_panel("Rin")
 			text_line("Rin looks up from a book and waves. “Puka!” Rin says, holding it up.")
 			learn("puka")
-		"ola":
-			clear_panel("Ola")
-			text_line("Ola studies you with great curiosity.")
+		"oli":
+			clear_panel("Oli")
+			text_line("Oli studies you with great curiosity.")
 			if not completed.has("hide"):
 				button("Play hide and seek", start_hide, content)
-		"pomo":
+		"radi":
 			for w in ["sang", "bei", "nam", "dong", "sai"]: learn(w)
-			clear_panel("Pomo at the lookout")
-			text_line("Pomo hands you the telescope. “Bei, nam, dong, sai,” Pomo says, pointing north, south, east and west in turn.")
+			clear_panel("Radi at the lookout")
+			text_line("Radi hands you the telescope. “Bei, nam, dong, sai,” Radi says, pointing north, south, east and west in turn.")
 			if completed.has("lookout"): text_line("“Ho!” You already know your directions.")
-			button("Repeat the questions" if completed.has("lookout") else "Answer Pomo's questions", lookout_quiz.bind(0), content)
+			button("Repeat the questions" if completed.has("lookout") else "Answer Radi's questions", lookout_quiz.bind(0), content)
 		"jeli":
 			learn("yok")
 			clear_panel("Jeli the healer")
@@ -2948,14 +2948,14 @@ func account(id: String, phrase: String, gesture: String):
 	complete("heard_"+id)
 	clear_panel(id.capitalize())
 	text_line("“Neri " + phrase + ".”\n\n" + gesture)
-	if completed.has("heard_tor") and completed.has("heard_lira") and completed.has("heard_oren"):
+	if completed.has("heard_tor") and completed.has("heard_lira") and completed.has("heard_rofi"):
 		button("Compare the evidence",show_evidence,content)
 	button("Return",close_panel,content)
 
 func show_evidence():
 	clear_panel("Which account was witnessed?")
 	text_line("Three speakers used the same arrival root but different endings. Who saw Neri arrive?")
-	var options = ["Lira: italpanu", "Tor: italpada", "Oren: italpashi"]
+	var options = ["Lira: italpanu", "Tor: italpada", "Rofi: italpashi"]
 	options.shuffle()
 	for option in options:
 		button(option,check_evidence.bind(option),content)
@@ -2967,7 +2967,7 @@ func check_evidence(option: String):
 		learn("bei")
 		message("You understood the source","The ending da marks direct knowledge. Follow the main path bei, north, past the crossing to the cove.")
 	else:
-		message("Compare the gestures","Lira heard a report. Oren found footprints. Tor pointed to their eyes. Revisit the notebook or compare again.")
+		message("Compare the gestures","Lira heard a report. Rofi found footprints. Tor pointed to their eyes. Revisit the notebook or compare again.")
 		button("Try again",show_evidence,content)
 
 func has_items(items: Array) -> bool:
@@ -3348,8 +3348,9 @@ func load_game():
 	if not FileAccess.file_exists(SAVE): return
 	var raw = FileAccess.get_file_as_string(SAVE)
 	# villagers renamed in October 2026: carry old saves over to the new names
-	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"]]:
+	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"]]:
 		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
+		raw = raw.replace("\"heard_" + pair[0] + "\"", "\"heard_" + pair[1] + "\"").replace("\"mail_" + pair[0] + "\"", "\"mail_" + pair[1] + "\"")
 	var data = JSON.parse_string(raw)
 	if not data is Dictionary: return
 	guesses = data.get("guesses",{})
@@ -3822,13 +3823,13 @@ func entity_by_id(id: String) -> Dictionary:
 
 func start_hide():
 	learn("pal")
-	for kid in ["rin", "ola"]:
+	for kid in ["rin", "oli"]:
 		var e = entity_by_id(kid)
 		var spot: Vector3 = HIDE_SPOTS[kid]
 		(e["node"] as Node3D).position = Vector3(spot.x, gy(spot.x, spot.z), spot.z)
 		if e.has("emote"): e.erase("emote")
 		hiding[kid] = true
-	message("Ma-ta-pal-o-ki!", "Ola covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Rin and Ola are gone. One hid near the school, one near the market. Find them!")
+	message("Ma-ta-pal-o-ki!", "Oli covers your eyes and shouts “Ma-ta-pal-o-ki!” Don't look! When you turn around, Rin and Oli are gone. One hid near the school, one near the market. Find them!")
 
 func found_puzzle(id: String):
 	choice_puzzle("Found you!", id.capitalize() + " is crouching out of sight, giggling. What do you shout?",
@@ -3837,7 +3838,7 @@ func found_puzzle(id: String):
 			var e = entity_by_id(id)
 			if e.has("emote"): e.erase("emote")
 			(e["node"] as Node3D).position = e["home"]
-			if not hiding.get("rin", false) and not hiding.get("ola", false):
+			if not hiding.get("rin", false) and not hiding.get("oli", false):
 				complete("hide"),
 		"K-ta-pal-da: I see you! k- is I acting and ta- is you being seen. T-na-pal-da would mean you see me, and ma- ... -ki says not.",
 		"Who sees whom? k- is I as the one acting, ta- is you receiving. ma- ... -ki means not.")
@@ -4140,13 +4141,13 @@ func greeting(id: String) -> String:
 		"sanu": return "Sava ruk."
 		"tor": return "Gira i-sava-da." if completed.has("bridge") else "Gira ma-i-sava-ki-da."
 		"lira": return "Teka i-var."
-		"oren": return "Mar hala i-pav."
+		"rofi": return "Mar hala i-pav."
 		"neri": return "Teka i-var!"
 		"ketu": return "Mur tari t-na-ven-o-ye." if not completed.has("market") else "Tari i-ho!"
 		"suri": return "Ravarir ri-puka-rav-im-da."
 		"rin": return "An ravar na-an-da."
-		"ola": return "Ti kelar ta-an-ha?"
-		"pomo": return "Bei, nam, dong, sai."
+		"oli": return "Ti kelar ta-an-ha?"
+		"radi": return "Bei, nam, dong, sai."
 		"jeli": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Sije i-seng-da."
 		"sije": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
 		"asya": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
@@ -6564,14 +6565,14 @@ func build_hirimara():
 	for d in range(4): Art.sph(sc, Vector3(-0.18 + d * 0.12, 2.24, 0.205), 0.04, Color("e76f51"), Vector3(1, 1, 0.3), 5)
 	solid(sc.position + Vector3(0, 1.0, 0), Vector3(0.4, 2.0, 0.4))
 	entity("scarecrow", "object", "choni", Vector3(-92.0, 0, -5.8), Color.WHITE, 2.7, Vector2(1.0, 2.4))
-	# ---- Pomo's doppelganger, standing very still on a rock ----
+	# ---- Radi's doppelganger, standing very still on a rock ----
 	var dp = Vector3(-127.0, gy(-127.0, 14.0), 14.0)
 	Art.sph(self, dp + Vector3(0, 0.2, 0), 1.0, Color("8d9394"), Vector3(1.3, 0.5, 1.1), 9)
-	var dopel = Art.person(Color("4f7ca8"), Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b"), person_ex["pomo"])
+	var dopel = Art.person(Color("4f7ca8"), Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b"), person_ex["radi"])
 	dopel.position = dp + Vector3(0, 0.45, 0)
 	dopel.rotation_degrees.y = 90
 	add_child(dopel)
-	entity("dopel", "object", "Pomo?", Vector3(-126.0, 0, 14.0), Color.WHITE, 2.7, Vector2(1.0, 2.6))
+	entity("dopel", "object", "Radi?", Vector3(-126.0, 0, 14.0), Color.WHITE, 2.7, Vector2(1.0, 2.6))
 	# ---- the deja vu stone in the stone circle ----
 	var dv = Vector3(34.6, 0, -44.2)
 	Art.sph(self, Vector3(dv.x, gy(dv.x, dv.z) + 0.45, dv.z), 0.55, Color("8f5fd0"), Vector3(0.8, 1.3, 0.8), 10, 0.6)
@@ -6797,16 +6798,16 @@ func ghost_panel():
 func dopel_panel():
 	for w in ["dopelgenger", "hal", "an", "-ha"]: learn(w)
 	hiri_secret("dopel")
-	clear_panel("Pomo...?")
-	text_line("It looks exactly like Pomo. It is wide awake, and it has not blinked once. It says Pomo's directions backwards:", 17)
+	clear_panel("Radi...?")
+	text_line("It looks exactly like Radi. It is wide awake, and it has not blinked once. It says Radi's directions backwards:", 17)
 	varnak_banner("Sai, dong, nam, bei.", 28)
 	button("Ask: Ti hal ta-an-ha? (Who are you?)", func():
 		clear_panel("The doppelganger")
-		varnak_banner("An dopelgenger na-an-da! Pomo i-sul-im-da. An ma-na-sul-ur-ki-da!", 24)
+		varnak_banner("An dopelgenger na-an-da! Radi i-sul-im-da. An ma-na-sul-ur-ki-da!", 24)
 		var en = text_line("(Tap Show meaning if you need it.)", 16)
-		button("Show meaning", func(): en.text = "I am the doppelganger! Pomo is sleeping. I never sleep! (dopelgenger is borrowed from German Doppelganger, double-goer)", content)
-		button("Say: Ti Pomo ma-ta-an-ki-da! (You are not Pomo!)", func():
-			message("Hiri!", "The doppelganger grins: “Hiri!” (Gotcha!) Then it stands perfectly still again, pretending to be a statue. Somewhere on the west hill, the real Pomo snores."), content)
+		button("Show meaning", func(): en.text = "I am the doppelganger! Radi is sleeping. I never sleep! (dopelgenger is borrowed from German Doppelganger, double-goer)", content)
+		button("Say: Ti Radi ma-ta-an-ki-da! (You are not Radi!)", func():
+			message("Hiri!", "The doppelganger grins: “Hiri!” (Gotcha!) Then it stands perfectly still again, pretending to be a statue. Somewhere on the west hill, the real Radi snores."), content)
 		button("Return", close_panel, content), content)
 	button("Return", close_panel, content)
 
@@ -7582,7 +7583,7 @@ func where_menu(id: String):
 	add_portrait(id)
 	learn("hama")
 	text_line("Ask about a person or a place. The answer uses bei north, nam south, dong east, sai west.", 16)
-	for p in ["neri", "ketu", "suri", "pomo", "jeli", "asya", "desh", "oku", "gav", "lachu", "tor", "mira", "oren", "lira"]:
+	for p in ["neri", "ketu", "suri", "radi", "jeli", "asya", "desh", "oku", "gav", "lachu", "tor", "mira", "rofi", "lira"]:
 		if p != id: button(p.capitalize(), where_say.bind(id, p), content)
 	for w in Data.WHERE_PLACES.keys():
 		button(w + " (" + Data.WHERE_PLACES[w][0] + ")", where_say.bind(id, w), content)

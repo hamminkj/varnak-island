@@ -41,7 +41,7 @@ func run():
 	assert(game.completed.has("bridge"))
 	game.account("tor","italpada","Witnessed")
 	game.talk("lira")
-	game.talk("oren")
+	game.talk("rofi")
 	game.check_evidence("Lira: italpanu")
 	assert(not game.completed.has("evidence"))
 	game.check_evidence("Tor: italpada")
@@ -216,8 +216,8 @@ func run():
 	assert(game.completed.has("lagoon"))
 	game.identity_puzzle()
 	press("An kelar na-an-da.")
-	assert(game.mastered.has("q:ola"))
-	for id in ["ketu","suri","rin","ola","pomo","jeli","sije","asya","desh","neri"]:
+	assert(game.mastered.has("q:oli"))
+	for id in ["ketu","suri","rin","oli","radi","jeli","sije","asya","desh","neri"]:
 		game.talk(id)
 		assert(game.panel.visible)
 	for id in Data.COUNTS.keys():
@@ -388,14 +388,14 @@ func run():
 	game.talk("gav")
 	assert(game.completed.has("mail") and game.gin == 5)
 	# hide and seek
-	game.talk("ola")
+	game.talk("oli")
 	press("Play hide and seek")
-	assert(game.hiding["rin"] and game.hiding["ola"])
+	assert(game.hiding["rin"] and game.hiding["oli"])
 	game.talk("rin")
 	press("T-na-pal-da!")
 	assert(game.hiding["rin"])
 	press("K-ta-pal-da!")
-	game.talk("ola")
+	game.talk("oli")
 	press("K-ta-pal-da!")
 	assert(game.completed.has("hide"))
 	# riddles
@@ -710,9 +710,9 @@ func run():
 	game.chat_menu("ketu")
 	press("Ask about a secret")
 	assert(game.mastered.has("sec:ketu"))
-	game.mood["oren"] = -2
-	assert(game.greeting("oren") == "Hmph!")
-	game.feel("oren")
+	game.mood["rofi"] = -2
+	assert(game.greeting("rofi") == "Hmph!")
+	game.feel("rofi")
 	# every reaction animates and resets cleanly
 	for k in ["happy", "love", "angry", "shocked", "sad", "embarrassed", "laugh", "faint", "dizzy", "confused", "sleepy", "proud", "disgust", "sneeze"]:
 		var e = game.entity_by_id("lira")
@@ -853,8 +853,8 @@ func run():
 	var rcd = {"who": "Tor", "place": "", "adv": "", "verb": "sum", "dbl": true, "tense": "past", "neg": false, "ev": "nu"}
 	assert(game.rumor_parts(rcd)["v"] == "Tor i-sum-sum-pa-nu.")
 	assert(game.rumor_en(rcd).contains("again and again"))
-	rcd["who"] = "Oren"
-	game.rumor_react("oren", rcd)
+	rcd["who"] = "Rofi"
+	game.rumor_react("rofi", rcd)
 	assert(has_any("Puts!"))
 	game.false_friends(true)
 	for k in range(8):
@@ -896,7 +896,7 @@ func run():
 	game.examine(game.entity_by_id("scarecrow"))
 	game.examine(game.entity_by_id("dopel"))
 	press("Ask: Ti hal ta-an-ha? (Who are you?)")
-	press("Say: Ti Pomo ma-ta-an-ki-da! (You are not Pomo!)")
+	press("Say: Ti Radi ma-ta-an-ki-da! (You are not Radi!)")
 	game.examine(game.entity_by_id("ghost_hut"))
 	press("Ta-sul-o-ye!")
 	assert(not game.solved.has("ch:choni_ghost"))
@@ -919,7 +919,7 @@ func run():
 			assert(game.panel.visible)
 			game.prank_menu(id)
 	seed(11)
-	for k in range(20): game.tease("oren")
+	for k in range(20): game.tease("rofi")
 	for g in Data.GOSSIP:
 		game.gossip_card(g, 0)
 		press(g["en"])
@@ -1111,7 +1111,7 @@ func run():
 	press("Ti han t-i-nuk-vai-ha?")
 	await process_frame
 	assert(game.mastered.has("want:ketu") and game.panel.visible)
-	for rep10 in range(10): game.want_answer(["oren", "pomo", "lira", "mira", "tor", "ena"][rep10 % 6])
+	for rep10 in range(10): game.want_answer(["rofi", "radi", "lira", "mira", "tor", "ena"][rep10 % 6])
 	# where is...?
 	game.where_say("desh", "fardom")
 	press("Fardom hama i-esh-ha?")
@@ -1123,12 +1123,12 @@ func run():
 	for p in ["neri", "asya", "suri"]: game.where_answer("ketu", p)
 	assert(has_any("Suri anni dalma i-esh-da!"))
 	# commands: villagers react to what you actually say
-	game.friend["oren"] = 2
-	game.mood["oren"] = 0
-	game.command_do("oren", "pul", "plain")
+	game.friend["rofi"] = 2
+	game.mood["rofi"] = 0
+	game.command_do("rofi", "pul", "plain")
 	assert(has_any("Maki!") and not game.mastered.has("cmd:pul"))
-	game.command_do("oren", "pul", "polite")
-	assert(game.mastered.has("cmd:pul") and game.acts.has("oren"))
+	game.command_do("rofi", "pul", "polite")
+	assert(game.mastered.has("cmd:pul") and game.acts.has("rofi"))
 	for f in range(240):
 		game.clock += 0.016
 		game.update_acts(0.016)
