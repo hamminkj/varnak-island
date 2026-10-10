@@ -584,6 +584,42 @@ static func animal(kind: String) -> Node3D:
 			body.add_child(wr)
 			box(wr, Vector3(0.15, 0, 0), Vector3(0.3, 0.03, 0.2), Color("2a9d8f"))
 			n.set_meta("wings", [wl, wr])
+		"tujuju":
+			# jabiru stork (tujuju): all-white body and wings, bare black head and swollen
+			# neck with a red collar at the base, huge black bill tilted slightly up, black legs
+			var white = Color("f4f2ec")
+			var black = Color("17171a")
+			var legs = Node3D.new()
+			legs.position = Vector3(0, 0.8, 0)
+			n.add_child(legs)
+			for lx in [-0.08, 0.08]:
+				box(legs, Vector3(lx, -0.4, 0), Vector3(0.05, 0.8, 0.05), black)
+				box(legs, Vector3(lx, -0.79, 0.06), Vector3(0.08, 0.02, 0.15), black)
+			sph(n, Vector3(0, 1.0, -0.03), 0.25, white, Vector3(1.0, 0.95, 1.7), 10)
+			box(n, Vector3(0, 0.98, -0.42), Vector3(0.22, 0.07, 0.18), white, Vector3(-12, 0, 0))
+			for side in [-1.0, 1.0]:
+				sph(n, Vector3(0.13 * side, 1.03, -0.1), 0.2, Color("e9e5da"), Vector3(0.45, 0.6, 1.75), 8)
+			var neck = Node3D.new()
+			neck.position = Vector3(0, 1.1, 0.3)
+			n.add_child(neck)
+			sph(neck, Vector3(0, 0.04, 0.0), 0.12, Color("c8282c"), Vector3(1.05, 0.55, 1.05), 10)
+			sph(neck, Vector3(0, 0.22, 0.01), 0.11, black, Vector3(0.95, 1.9, 1.0), 10)
+			sph(neck, Vector3(0, 0.47, 0.03), 0.085, black, Vector3(1, 1, 1.15), 8)
+			box(neck, Vector3(0, 0.44, 0.2), Vector3(0.075, 0.085, 0.24), black, Vector3(6, 0, 0))
+			box(neck, Vector3(0, 0.455, 0.39), Vector3(0.045, 0.05, 0.2), Color("25252a"), Vector3(-4, 0, 0))
+			sph(neck, Vector3(-0.07, 0.5, 0.08), 0.014, Color("cfc9b8"), Vector3.ONE, 4)
+			sph(neck, Vector3(0.07, 0.5, 0.08), 0.014, Color("cfc9b8"), Vector3.ONE, 4)
+			var ws: Array = []
+			for side in [-1.0, 1.0]:
+				var w = Node3D.new()
+				w.position = Vector3(0.21 * side, 1.06, 0.02)
+				n.add_child(w)
+				box(w, Vector3(0.5 * side, 0, 0.0), Vector3(1.0, 0.035, 0.46), white)
+				box(w, Vector3(0.96 * side, 0, -0.02), Vector3(0.12, 0.03, 0.4), Color("e6e2d8"))
+				ws.append(w)
+			n.set_meta("wings", ws)
+			n.set_meta("neck", neck)
+			n.set_meta("legs", legs)
 		"tari":
 			var body = Node3D.new()
 			n.add_child(body)

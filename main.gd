@@ -311,6 +311,7 @@ func _ready():
 	words.merge(Data.WORDS12)
 	words.merge(Data.WORDS13)
 	words.merge(Data.WORDS14)
+	words.merge(Data.WORDS15)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -407,6 +408,7 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 			node = Art.animal(word)
 			label_y = 0.85 if word != "mar" else 2.5
 			if word == "tari": label_y = 0.7
+			if word == "tujuju": label_y = 2.05
 			pr = 0.8 if word != "mar" else 1.3
 			ph = 1.0 if word != "mar" else 2.2
 			if word == "tari":
@@ -427,7 +429,8 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 	if pick != Vector2.ZERO:
 		pr = pick.x
 		ph = pick.y
-	if kind != "observe" or word != "tari": pos.y = gy(pos.x, pos.z)
+	if kind == "observe" and word == "tujuju": pos.y = T.height(pos.x, pos.z)
+	elif kind != "observe" or word != "tari": pos.y = gy(pos.x, pos.z)
 	node.position = pos
 	add_child(node)
 	var label_text = id.capitalize() if kind == "npc" else word
@@ -1041,6 +1044,9 @@ func build_entities():
 	add_animal(entity("bird2","observe","par",Vector3(-55,0,-43),Color("ead8a4")), "bird", 2.2, 1.0)
 	add_animal(entity("bird3","observe","par",Vector3(63.5,0,28.5),Color("ead8a4")), "bird", 2.0, 1.0)
 	add_animal(entity("fish2","observe","tari",Vector3(-3.4,0,43.8),Color("7bb9c7")), "fish", 0.0, 0.0)
+	# storks (tujuju) wading in the shallows at the river mouth
+	for k in range(STORKS.size()):
+		add_animal(entity("stork" + str(k), "observe", "tujuju", STORKS[k], Color.WHITE, 1.0, Vector2(3.2, 1.6)), "stork", 2.6, 0.35)
 	add_animal(entity("fish3","observe","tari",Vector3(71.0,0,18.0),Color("7bb9c7")), "fish", 0.0, 0.0)
 	entity("well","object","wak-kor",Vector3(-50,0,12),Color.WHITE,2.8,Vector2(1.3,2.4))
 	entity("stall","object","kur",Vector3(-45.5,0,6.0),Color.WHITE,3.1,Vector2(1.6,2.8))
@@ -1769,6 +1775,8 @@ func animate_animals(delta: float):
 				else:
 					a["wait"] = randf_range(2.5, 5.5)
 					node.position.y = -0.45
+			"stork":
+				update_stork(a, e, node, home, delta)
 			_:
 				if a.get("follow", false):
 					follow_player(a, delta)
@@ -1807,6 +1815,88 @@ func animate_animals(delta: float):
 						var tail = node.get_meta("tail") as Node3D
 						tail.rotation.z = sin(clock * 3.0) * 0.15
 						node.position.y = ground + (absf(sin(clock * 5.0)) * 0.04 if moving else 0.0)
+
+const STORKS = [Vector3(76.5, 0, -28.4), Vector3(79.2, 0, -28.6), Vector3(81.6, 0, -29.3)]
+
+# Storks wade, feed with their heads down, and lift off in slow broad flaps when you
+# come close (unless you are walking up to look at one). They circle and glide back.
+func update_stork(a: Dictionary, e: Dictionary, node: Node3D, home: Vector3, delta: float):
+	var wings: Array = node.get_meta("wings")
+	var neck = node.get_meta("neck") as Node3D
+	var legs = node.get_meta("legs") as Node3D
+	var ph = float(a.get("ph", 0.0))
+	if not a.has("ph"):
+		ph = randf() * 10.0
+		a["ph"] = ph
+	var ft = float(a.get("ft", -1.0))
+	var pd = Vector2(player.position.x - node.position.x, player.position.z - node.position.z).length()
+	var mine = (not target.is_empty() and target.get("id", "") == e["id"]) or (not walk_to.is_empty() and walk_to.get("id", "") == e["id"])
+	if ft < 0.0 and pd < 2.6 and not mine and not panel.visible:
+		ft = 0.0
+		a["p0"] = node.position
+		a["fa"] = atan2(node.position.z - player.position.z, node.position.x - player.position.x)
+		play_sfx("whoosh", -16.0, 0.6)
+	if ft >= 0.0:
+		ft += delta
+		var dur = 12.0
+		var u = clampf(ft / dur, 0.0, 1.0)
+		var lift = sin(u * PI)
+		var ang = float(a["fa"]) + ft * 0.5
+		var p0: Vector3 = a["p0"]
+		var c = home + (p0 - home) * (1.0 - u)
+		var np = Vector3(c.x + cos(ang) * 11.0 * lift, 0.0, c.z + sin(ang) * 11.0 * lift)
+		np.y = lerpf(p0.y, home.y, u) + lift * 9.0
+		var dir = np - node.position
+		dir.y = 0.0
+		node.position = np
+		if dir.length() > 0.0005: node.rotation.y = lerp_angle(node.rotation.y, atan2(dir.x, dir.z), minf(delta * 4.0, 1.0))
+		var flapping = u < 0.22 or u > 0.88
+		var flap = sin(clock * (5.5 if flapping else 1.0) + ph) * (0.75 if flapping else 0.06)
+		(wings[0] as Node3D).scale.x = lerpf((wings[0] as Node3D).scale.x, 1.0, minf(delta * 5.0, 1.0))
+		(wings[1] as Node3D).scale.x = (wings[0] as Node3D).scale.x
+		(wings[0] as Node3D).visible = true
+		(wings[1] as Node3D).visible = true
+		(wings[0] as Node3D).rotation.z = flap
+		(wings[1] as Node3D).rotation.z = -flap
+		neck.rotation.x = lerpf(neck.rotation.x, 1.35, minf(delta * 3.0, 1.0))
+		legs.rotation.x = lerpf(legs.rotation.x, 1.3 * minf(lift * 3.0, 1.0), minf(delta * 4.0, 1.0))
+		a["ft"] = ft
+		if u >= 1.0:
+			a["ft"] = -1.0
+			a["tp"] = node.position
+			a["wait"] = 2.0
+		e["gy"] = node.position.y
+		return
+	a["wait"] = float(a["wait"]) - delta
+	var to: Vector3 = a["tp"] - node.position
+	to.y = 0.0
+	var moving = false
+	if a["wait"] <= 0.0:
+		if to.length() > 0.12:
+			moving = true
+			node.position += to.normalized() * float(a["speed"]) * delta
+			node.rotation.y = lerp_angle(node.rotation.y, atan2(to.x, to.z), minf(delta * 2.0, 1.0))
+		else:
+			a["wait"] = randf_range(2.5, 7.0)
+			for tries in range(6):
+				var ang = randf() * TAU
+				var r = randf() * float(a["radius"])
+				var tp = home + Vector3(cos(ang) * r, 0, sin(ang) * r)
+				var h = T.height(tp.x, tp.z)
+				if h > -0.5 and h < 0.12:
+					a["tp"] = tp
+					break
+	var ground = T.height(node.position.x, node.position.z)
+	node.position.y = ground + (absf(sin(clock * 2.4 + ph)) * 0.02 if moving else 0.0)
+	e["gy"] = ground
+	for k in range(2):
+		var w = wings[k] as Node3D
+		w.scale.x = lerpf(w.scale.x, 0.05, minf(delta * 4.0, 1.0))
+		w.rotation.z = lerpf(w.rotation.z, 0.5 if k == 0 else -0.5, minf(delta * 4.0, 1.0))
+		w.visible = w.scale.x > 0.3
+	legs.rotation.x = lerpf(legs.rotation.x, 0.0, minf(delta * 5.0, 1.0))
+	var feeding = not moving and fmod(clock + ph, 6.0) < 1.4
+	neck.rotation.x = lerpf(neck.rotation.x, 1.95 if feeding else 0.12, minf(delta * 3.0, 1.0))
 
 func update_marker():
 	var shown = target
@@ -2245,6 +2335,10 @@ func observe(e: Dictionary):
 		return
 	match e["word"]:
 		"par": sentence_card("bird_sky")
+		"tujuju":
+			sentence_card("stork_fish", close_panel)
+			var tip = text_line("This is a tujuju, a jabiru stork. The island and its language are named after it. Oku, who knows the old stories, can tell you why.", 16)
+			content.move_child(tip, 2)
 		"gor": sentence_card("dog_runs")
 		"mar": sentence_card("horse_fast")
 		"tari":
@@ -2557,6 +2651,7 @@ func add_topics(id: String):
 			topic("Ask about the sea", "sea_cold", id)
 		"oku":
 			topic("Ask about the ruins", "ruins_old", id)
+			if discovered.has("tujuju"): topic("Ask why the island is called Tujuju", "tujuju_name", id)
 			topic("Ask why Oku's hair is a mess", "oku_brainstorm", id)
 			button("Ask about the old stick" if not solved.has("wand") else "Use the word wand", oku_wand, content)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
@@ -9399,6 +9494,15 @@ func carving_texture(i: int) -> ImageTexture:
 				paint_poly(img, pts, ink, 4)
 			var sub = K.image(pics[k][0], 128, 120, 34.0, ink, Color(0, 0, 0, 0), 4)
 			img.blend_rect(sub, Rect2i(0, 0, 128, 120), Vector2i(int(cx0) - 64, 160))
+	elif Data.KIR_STORY[i].has("pic"):
+		img = Image.create(640, 340, false, Image.FORMAT_RGBA8)
+		img.fill(Color(0, 0, 0, 0))
+		for st in kir_picture(str(Data.KIR_STORY[i]["pic"])):
+			var pts: Array = []
+			for p in st: pts.append(Vector2(88.0, 170.0) + (p as Vector2) * 74.0)
+			paint_poly(img, pts, ink, 5)
+		var sub = K.image(Data.KIR_STORY[i]["v"], 470, 340, 30.0, ink, Color(0, 0, 0, 0), 4)
+		img.blend_rect(sub, Rect2i(0, 0, 470, 340), Vector2i(170, 0))
 	else:
 		img = K.image(Data.KIR_STORY[i]["v"], 640, 340, 34.0, ink, Color(0, 0, 0, 0), 4)
 	return ImageTexture.create_from_image(img)
@@ -9428,6 +9532,14 @@ func kir_picture(what: String) -> Array:
 				var a = -PI * 0.5 + k * PI / 5.0
 				pts.append(Vector2(cos(a), sin(a)) * (0.85 if k % 2 == 0 else 0.35))
 			return [pts]
+		"stork":
+			return [[Vector2(-0.55, -0.05), Vector2(-0.15, -0.22), Vector2(0.22, -0.16), Vector2(0.34, 0.0), Vector2(0.1, 0.16), Vector2(-0.3, 0.13), Vector2(-0.55, -0.05)],
+				[Vector2(-0.55, -0.05), Vector2(-0.78, 0.04)],
+				[Vector2(0.28, -0.12), Vector2(0.38, -0.5), Vector2(0.44, -0.72)],
+				K.arc(Vector2(0.48, -0.8), 0.09, 0, 360, 10),
+				[Vector2(0.56, -0.8), Vector2(0.74, -0.64), Vector2(0.86, -0.46)],
+				[Vector2(-0.02, 0.15), Vector2(-0.02, 0.88)], [Vector2(0.12, 0.15), Vector2(0.16, 0.88)],
+				[Vector2(-0.95, 0.72), Vector2(-0.6, 0.66), Vector2(-0.25, 0.74), Vector2(0.1, 0.66), Vector2(0.45, 0.74), Vector2(0.95, 0.68)]]
 		"bird":
 			return [[Vector2(-0.9, -0.2), Vector2(-0.4, -0.45), Vector2(0.0, 0.0), Vector2(0.4, -0.45), Vector2(0.9, -0.2)], K.arc(Vector2(0.0, 0.15), 0.15, 0, 360, 8)]
 		"water":
@@ -9631,7 +9743,7 @@ func show_kir_chart():
 		l.text = v
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		grid.add_child(l)
-	for c in ["", "p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
+	for c in ["", "p", "b", "t", "d", "ch", "j", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
 		var rl = Label.new()
 		rl.text = c if c != "" else "(vowel)"
 		rl.add_theme_font_size_override("font_size", 14)
@@ -9648,7 +9760,7 @@ func show_kir_chart():
 
 func kir_all_keys() -> Array:
 	var out: Array = []
-	for c in ["", "p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
+	for c in ["", "p", "b", "t", "d", "ch", "j", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]:
 		for v in K.VOWELS: out.append(c + "|" + v)
 	return out
 
@@ -9734,6 +9846,7 @@ func guardian_lines() -> Array:
 			"night": ok = night > 0.5
 			"fish": ok = fish_caught > 0 or completed.has("market")
 			"yesen": ok = count_mastered("yesen:") > 0
+			"stork": ok = discovered.has("tujuju")
 			_: ok = completed.has(str(l[3]))
 		if ok: out.append(i)
 	return out
@@ -9774,7 +9887,7 @@ func guardian_listen():
 func guardian_teach():
 	for k in kir_all_keys():
 		master("ky:" + str(k))
-	for c in ["p", "b", "t", "d", "ch", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]: master("kf:" + c)
+	for c in ["p", "b", "t", "d", "ch", "j", "k", "g", "m", "n", "ng", "l", "r", "s", "z", "sh", "y", "w", "h", "f", "v"]: master("kf:" + c)
 	master("kir:taught")
 	log_event("kirmel", "taught by Var Tari")
 	play_sfx("hum", 0.0)

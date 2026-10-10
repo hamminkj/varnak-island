@@ -174,6 +174,14 @@ const SENTENCES = {
 	"gira_safe": {"v": "Gira i-sava-da.", "parts": "gira  i-sava-da\nbridge  3S-be.safe-DIR", "en": "The bridge is safe (I know it directly).",
 		"gesture": "Tor stamps on the planks and spreads both hands.",
 		"words": ["gira", "sava", "-da"], "wrong": ["The bridge is broken.", "The bridge is safe (I heard)."]},
+	"stork_fish": {"v": "Tujuju morama i-tari-nuk-im-da.", "parts": "tujuju  mora-ma  i-tari-nuk-im-da\nstork  river-LOC  3S-fish-take-IPFV-DIR",
+		"en": "The stork is fishing in the river.",
+		"gesture": "The huge white bird with the black head wades slowly, stirs the mud with one foot, and snaps its giant bill shut on something silver.",
+		"words": ["tujuju", "mora", "-ma", "tari", "nuk", "-im"], "wrong": ["The stork is sleeping in the river.", "The fish is catching the stork."]},
+	"tujuju_name": {"v": "Sair-ir tujuju-ir-ni shanma dor-ma ri-tal-ak-pa-nu.", "parts": "sair-ir  tujuju-ir-ni  shan-ma  dor-ma  ri-tal-ak-pa-nu\nperson-PL  stork-PL-GEN  rear-LOC  land-LOC  3PL.S-arrive-PFV-PST-REP",
+		"en": "They say the people came to the land behind the storks.",
+		"gesture": "Oku flaps both arms slowly like great white wings, shuffles along behind the invisible birds, then stamps on the ground: here. \"Tujuju!\" Oku says, and sweeps a hand over the whole island.",
+		"words": ["sair", "-ir", "tujuju", "-ni", "shan", "dor", "tal", "-ak", "-nu"], "wrong": ["They say the storks came to the land behind the people.", "I saw the people chase the storks off the land."]},
 	"tor_built": {"v": "Torke gira i-varn-ak-pa-da.", "parts": "Tor-ke  gira  i-varn-ak-pa-da\nTor-ERG  bridge.ABS  3P-build-PFV-PST-DIR",
 		"en": "Tor built the bridge (I witnessed it).",
 		"gesture": "Tor mimes hammering, then points at you and at the planks.",
@@ -1173,6 +1181,14 @@ const WORDS14 = {
 	"kirmel": "the old Tujuju writing, a syllabary (kir carve + mel speak: carved speech)",
 	"var tari": "Var Tari, the great fish who sleeps in the cenote (var big + tari fish)"
 }
+
+# ---------------------------------------------------------------- the stork
+# Tujuju: tuyuyu is a South American name for the jabiru (Jabiru mycteria) and the wood stork
+# (Mycteria americana); the RAE gives its origin as uncertain, perhaps Guarani. The model is a
+# jabiru. The island and the language are named after it.
+const WORDS15 = {
+	"tujuju": "jabiru stork, a huge white wading bird with a bare black head and neck, a red collar and a giant bill (from tuyuyu, a South American name for big storks, perhaps from Guarani). The island and its language are named after it."
+}
 # The picture stone near the surface: a word under each picture.
 const KIR_PICTURES = [["tari", "fish"], ["riya", "sun"], ["sao", "star"], ["par", "bird"], ["wak", "water"]]
 # The creation story, carved deeper and deeper. It is told with -nu: this is what people say.
@@ -1181,6 +1197,7 @@ const KIR_STORY = [
 	{"depth": 15.0, "v": "Var tari haima i-sul-pa-nu. Tari-ni dau-ma sao-ir ri-esh-pa-nu.", "en": "A great fish slept in the sea, they say. On the fish's head there were stars."},
 	{"depth": 21.0, "v": "Tari i-pul-ak-pa-nu. Sao-ir hen-ru ri-lum-ak-pa-nu.", "en": "The fish jumped, they say. The stars went up into the sky."},
 	{"depth": 27.0, "v": "Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu.", "en": "The fish sang a song, they say. Out of the song, the land arrived."},
+	{"depth": 30.0, "pic": "stork", "v": "Tujuju-ir hai-ta dor-ru ri-fei-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu.", "en": "The storks flew from the sea to the land, they say. The people went behind the storks."},
 	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
 	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
 	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
@@ -1201,5 +1218,6 @@ const GUARDIAN_LINES = [
 	["Par ti-ni palar i-an-nu.", "They say a bird is your friend.", "nu", "letters"],
 	["Fardom yeshma i-ling-ur-nu.", "They say the lighthouse is bright at night.", "nu", "lighthouse"],
 	["Ti-su palar-ir ri-esh-nu.", "They say you have many friends.", "nu", "friends"],
-	["Ti-su gao-murak i-esh-nu.", "They say you have the telling stick.", "nu", "wand"]
+	["Ti-su gao-murak i-esh-nu.", "They say you have the telling stick.", "nu", "wand"],
+	["Tujuju-ir dor-ma ri-esh-ur-nu.", "They say storks live on the land.", "nu", "stork"]
 ]

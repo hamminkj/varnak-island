@@ -461,3 +461,16 @@ The creation story, carved deeper and deeper in the cenote, is told with hearsay
 Var Tari speaks only with evidentials: -da for what it saw (you diving, you reading the stones, the tiny fish beside it), -nu for what it heard from the island above (your yesen, Gav's chonies, the parrot, the lighthouse), and -shi for what it works out (it is night, you came from land, you have been fishing). It has never seen the sky: Anke hen ma-k-i-pal-pa-ki-da.
 
 Things to check: 38. Plural agents with a singular object take ri- (Sair-irke kirmel ri-kir-pa-nu); the handoff document shows ri- for plural subjects, and this extends it to plural agents. 39. hai e yesh sela ri-esh-pa-nu uses sela (alone) for "only". 40. Tarike ning i-ning-pa-nu uses ning as both noun and verb (sing a song). 41. The script itself (shapes, turning for vowels, finals) is a game invention.
+
+## The storks (tujuju)
+
+New word: tujuju (jabiru stork), from the South American name tuyuyu (origin uncertain per the RAE, perhaps Guarani). The island and the language are named after it.
+
+| Form | Meaning | Source |
+|---|---|---|
+| Tujuju morama i-tari-nuk-im-da. | The stork is fishing in the river. | Composed on Kelar i-tari-nuk-ak-pa-da (section 23) with -im |
+| Sair-ir tujuju-ir-ni shanma dor-ma ri-tal-ak-pa-nu. | They say the people came to the land behind the storks. | Composed: -ni shanma as in Gin murak-ni shanma; ri-tal-ak-pa-nu as in the creation story |
+| Tujuju-ir hai-ta dor-ru ri-fei-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu. | The storks flew from the sea to the land, they say. The people went behind the storks. | Composed; new creation story chapter 5 (depth 30) |
+| Tujuju-ir dor-ma ri-esh-ur-nu. | They say storks live on the land. | Composed; a Var Tari line |
+
+Things to check: 42. -ta (from) and -ru (to) on the same verb (hai-ta dor-ru ri-fei-ak-pa-nu). 43. -ni shanma after a plural noun (tujuju-ir-ni). 44. Whether the island's name should be written Tujuju or with a Tujuju respelling, and whether a native island word (like sendor for the small island) should exist alongside it.

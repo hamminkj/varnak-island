@@ -1522,6 +1522,38 @@ func run():
 	assert(marked >= 8, "village signs show kirmel")
 	game.sentence_card("village_big")
 	print("PASS: kirmel, the carvings, Var Tari and bringing the writing home")
+	# wood storks: they wade, fly off when you come close, and give the island its name
+	game.close_panel()
+	var storks: Array = []
+	for an in game.animals:
+		if an["kind"] == "stork": storks.append(an)
+	assert(storks.size() == 3)
+	var sk: Dictionary = storks[0]
+	var sn = sk["e"]["node"] as Node3D
+	assert(Data.KIR_STORY.any(func(c): return c.has("pic")) and game.carving_texture(4) != null)
+	game.target = {}
+	game.walk_to = {}
+	game.player.position = sn.position + Vector3(1.2, 0.3, 0)
+	for f in range(20):
+		game.animate_animals(0.1)
+	assert(float(sk.get("ft", -1.0)) >= 0.0, "stork takes off")
+	for f in range(40):
+		game.animate_animals(0.1)
+	assert(sn.position.y > sk["e"]["home"].y + 2.0, "stork is flying")
+	game.player.position = Vector3(70, 0.3, -20)
+	for f in range(120):
+		game.animate_animals(0.1)
+	assert(float(sk.get("ft", -1.0)) < 0.0, "stork lands again")
+	game.player.position = Vector3(70, 0.3, -20)
+	game.discovered.erase("tujuju")
+	game.observe(sk["e"])
+	assert(game.discovered.has("tujuju") and has_any("named after it"))
+	game.talk("oku")
+	press("Ask why the island is called Tujuju")
+	assert(has_any("Tujuju!"))
+	assert(game.guardian_lines().has(Data.GUARDIAN_LINES.size() - 1))
+	game.close_panel()
+	print("PASS: storks (tujuju), the island's name and the stork carving")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")
