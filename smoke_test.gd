@@ -1557,6 +1557,36 @@ func run():
 	var pc: Dictionary = game.plant_counts
 	assert(pc["ferns"] > 80 and pc["pads"] > 50 and pc["cattails"] > 50 and pc["vine_flowers"] > 100, "plants: " + str(pc))
 	print("PASS: passionflower vines, ferns, lotus and cattails")
+	# capybaras: two-vowel names, different browns, lead along the trail toward the cenote
+	var capys: Array = game.animals.filter(func(an): return an["kind"] == "capy")
+	assert(capys.size() == Data.CAPYBARAS.size())
+	var cols: Array = []
+	var vre = RegEx.create_from_string("^[aeiou]{2}$")
+	for cb in Data.CAPYBARAS:
+		assert(vre.search(str(cb[0]).to_lower()) != null, "capybara name is two vowels: " + str(cb[0]))
+		assert(not cols.has(cb[1]))
+		cols.append(cb[1])
+	var c0: Dictionary = capys[0]
+	var c0n = c0["e"]["node"] as Node3D
+	var d_before = Vector2(c0n.position.x, c0n.position.z).distance_to(T.CENOTE)
+	game.close_panel()
+	for leg in range(8):
+		game.player.position = c0n.position + Vector3(-2.0, 0.3, 0.5)
+		for f in range(60):
+			game.animate_animals(0.1)
+	assert(int(c0["wp"]) > 2, "capybara moved along the trail")
+	assert(Vector2(c0n.position.x, c0n.position.z).distance_to(T.CENOTE) < d_before - 20.0, "capybara leads toward the cenote")
+	game.player.position = Vector3(70, 0.3, -20)
+	game.discovered.erase("kapibara")
+	game.observe(c0["e"])
+	assert(game.discovered.has("kapibara") and has_any("two vowel sounds"))
+	game.close_panel()
+	game.talk("oku")
+	press("Ask about the capybaras")
+	assert(has_any("capybara"))
+	game.close_panel()
+	assert(Data.KIR_STORY.any(func(c): return c.get("pic", "") == "capybara"))
+	print("PASS: capybaras, their names, the trail to the cenote and the myth")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

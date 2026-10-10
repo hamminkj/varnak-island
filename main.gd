@@ -312,6 +312,7 @@ func _ready():
 	words.merge(Data.WORDS13)
 	words.merge(Data.WORDS14)
 	words.merge(Data.WORDS15)
+	words.merge(Data.WORDS16)
 	words["kachaka"] = str(words.get("kachaka", "")) + "; as a verb root, dance (ta-kachaka-o!, dance!)"
 	for k in Data.GLOSS_UPDATES.keys(): words[k] = Data.GLOSS_UPDATES[k]
 	build_world()
@@ -405,10 +406,11 @@ func entity(id: String, kind: String, word: String, pos: Vector3, color: Color, 
 			pr = 0.75
 			ph = 1.2
 		"observe":
-			node = Art.animal(word)
+			node = Art.animal(word, color) if word == "kapibara" else Art.animal(word)
 			label_y = 0.85 if word != "mar" else 2.5
 			if word == "tari": label_y = 0.7
 			if word == "tujuju": label_y = 2.05
+			if word == "kapibara": label_y = 1.15
 			pr = 0.8 if word != "mar" else 1.3
 			ph = 1.0 if word != "mar" else 2.2
 			if word == "tari":
@@ -1224,6 +1226,19 @@ func build_entities():
 	# storks (tujuju) wading in the shallows at the river mouth
 	for k in range(STORKS.size()):
 		add_animal(entity("stork" + str(k), "observe", "tujuju", STORKS[k], Color.WHITE, 1.0, Vector2(3.2, 1.6)), "stork", 2.6, 0.35)
+	# capybaras resting along the way to the cenote; the last one swims in it
+	for k in range(Data.CAPYBARAS.size()):
+		var cb: Array = Data.CAPYBARAS[k]
+		var cid = "capy" + str(k)
+		names[cid] = cb[0]
+		var start: Vector2 = CAPY_TRAIL[mini(k * 2, CAPY_TRAIL.size() - 1)] if k < Data.CAPYBARAS.size() - 1 else T.CENOTE
+		var ce = entity(cid, "observe", "kapibara", Vector3(start.x, 0, start.y), Color(cb[1]), 1.0, Vector2(1.6, 1.0))
+		add_animal(ce, "capy", 0.0, 1.0)
+		var ca: Dictionary = animals[animals.size() - 1]
+		ca["wp"] = mini(k * 2, CAPY_TRAIL.size() - 1)
+		ca["goal"] = ca["wp"]
+		ca["k"] = k
+		ca["swim"] = k == Data.CAPYBARAS.size() - 1
 	add_animal(entity("fish3","observe","tari",Vector3(71.0,0,18.0),Color("7bb9c7")), "fish", 0.0, 0.0)
 	entity("well","object","wak-kor",Vector3(-50,0,12),Color.WHITE,2.8,Vector2(1.3,2.4))
 	entity("stall","object","kur",Vector3(-45.5,0,6.0),Color.WHITE,3.1,Vector2(1.6,2.8))
@@ -1954,6 +1969,8 @@ func animate_animals(delta: float):
 					node.position.y = -0.45
 			"stork":
 				update_stork(a, e, node, home, delta)
+			"capy":
+				update_capy(a, e, node, delta)
 			_:
 				if a.get("follow", false):
 					follow_player(a, delta)
@@ -1992,6 +2009,65 @@ func animate_animals(delta: float):
 						var tail = node.get_meta("tail") as Node3D
 						tail.rotation.z = sin(clock * 3.0) * 0.15
 						node.position.y = ground + (absf(sin(clock * 5.0)) * 0.04 if moving else 0.0)
+
+# The capybaras' trail: from the main path east of the village, over the river and the ridge,
+# to the rim of the cenote.
+const CAPY_TRAIL = [Vector2(24, -9.5), Vector2(36, -9.5), Vector2(48, -9.5), Vector2(53, -15), Vector2(53, -21),
+	Vector2(53, -28), Vector2(55, -34), Vector2(60, -39), Vector2(65, -45), Vector2(70, -52), Vector2(75, -57),
+	Vector2(78.5, -61), Vector2(80.2, -63.6)]
+
+# A capybara rests until you come close, then ambles a little farther along the trail, stops,
+# and looks back at you. At the end of the trail they gather on the rim of the cenote.
+func update_capy(a: Dictionary, e: Dictionary, node: Node3D, delta: float):
+	var head = node.get_meta("head") as Node3D
+	var k: int = a["k"]
+	if a.get("swim", false):
+		var t = clock * 0.18 + k
+		var np = Vector3(T.CENOTE.x + cos(t) * 1.5, cen_y_w - 0.36, T.CENOTE.y + sin(t) * 1.5)
+		var d = np - node.position
+		node.position = np
+		if d.length() > 0.0001: node.rotation.y = atan2(d.x, d.z)
+		head.rotation.x = -0.15 + sin(clock * 0.9 + k) * 0.05
+		e["gy"] = np.y
+		return
+	var last = CAPY_TRAIL.size() - 1
+	var pd = Vector2(player.position.x - node.position.x, player.position.z - node.position.z).length()
+	if a["goal"] == a["wp"] and a["wp"] < last and pd < 6.5 and not panel.visible:
+		a["goal"] = mini(int(a["wp"]) + 2, last)
+	var side = Vector2(-0.9 + 0.45 * (k % 5), 0.0)
+	var tgt2: Vector2 = CAPY_TRAIL[a["goal"]]
+	if a["goal"] == last:
+		var ang = -2.4 + k * 0.5
+		tgt2 = T.CENOTE + Vector2(cos(ang), sin(ang)) * (T.CENOTE_R + 1.6)
+	else:
+		tgt2 += side
+	var to = Vector3(tgt2.x - node.position.x, 0, tgt2.y - node.position.z)
+	var moving = false
+	if a["goal"] != a["wp"]:
+		if to.length() > 0.12:
+			moving = true
+			var step = minf(1.15 * delta, to.length())
+			node.position += to.normalized() * step
+			node.rotation.y = lerp_angle(node.rotation.y, atan2(to.x, to.z), minf(delta * 3.0, 1.0))
+		else:
+			a["wp"] = a["goal"]
+	var ground = gy(node.position.x, node.position.z)
+	node.position.y = ground + (absf(sin(clock * 7.0 + k)) * 0.035 if moving else 0.0)
+	e["gy"] = ground
+	if moving:
+		head.rotation.y = lerpf(head.rotation.y, 0.0, minf(delta * 4.0, 1.0))
+		head.rotation.x = lerpf(head.rotation.x, 0.0, minf(delta * 4.0, 1.0))
+	elif pd < 14.0:
+		# look back at the player: turn the head, and slowly the body
+		var look = atan2(player.position.x - node.position.x, player.position.z - node.position.z)
+		var rel = wrapf(look - node.rotation.y, -PI, PI)
+		head.rotation.y = lerpf(head.rotation.y, clampf(rel, -1.1, 1.1), minf(delta * 2.5, 1.0))
+		if absf(rel) > 1.1: node.rotation.y = lerp_angle(node.rotation.y, look, minf(delta * 0.6, 1.0))
+		head.rotation.x = lerpf(head.rotation.x, 0.0, minf(delta * 3.0, 1.0))
+	else:
+		var graze = fmod(clock * 0.5 + k * 1.7, 4.0) < 1.6
+		head.rotation.x = lerpf(head.rotation.x, 0.45 if graze else 0.0, minf(delta * 2.0, 1.0))
+		head.rotation.y = lerpf(head.rotation.y, 0.0, minf(delta * 2.0, 1.0))
 
 const STORKS = [Vector3(76.5, 0, -28.4), Vector3(79.2, 0, -28.6), Vector3(81.6, 0, -29.3)]
 
@@ -2512,6 +2588,18 @@ func observe(e: Dictionary):
 		return
 	match e["word"]:
 		"par": sentence_card("bird_sky")
+		"kapibara":
+			var cname: String = names.get(e["id"], "")
+			if not mastered.has("s:capy_looks"):
+				sentence_card("capy_looks", close_panel)
+				var ct = text_line("This capybara's name is " + cname + ". A capybara's name is always exactly two vowel sounds.", 16)
+				content.move_child(ct, 2)
+			else:
+				clear_panel(cname)
+				varnak_banner("Kapibara " + cname + ".")
+				text_line(cname + " is a capybara. A capybara's name is always exactly two vowel sounds.", 17)
+				text_line(["It chews, blinks at you, and looks down the trail.", "It flicks one tiny ear and waits for you.", "It sighs a big contented sigh.", "It gazes somewhere past the trees.", "It pays no attention to you at all, which is how capybaras are friendly."][randi() % 5], 17)
+				button("Return", close_panel, content)
 		"tujuju":
 			sentence_card("stork_fish", close_panel)
 			var tip = text_line("This is a tujuju, a jabiru stork. The island and its language are named after it. Oku, who knows the old stories, can tell you why.", 16)
@@ -2829,6 +2917,7 @@ func add_topics(id: String):
 		"oku":
 			topic("Ask about the ruins", "ruins_old", id)
 			if discovered.has("tujuju"): topic("Ask why the island is called Tujuju", "tujuju_name", id)
+			if discovered.has("kapibara"): topic("Ask about the capybaras", "capy_myth", id)
 			topic("Ask why Oku's hair is a mess", "oku_brainstorm", id)
 			button("Ask about the old stick" if not solved.has("wand") else "Use the word wand", oku_wand, content)
 			if completed.has("riddles"): topic("Ask about the secret", "room_behind", id)
@@ -9714,6 +9803,14 @@ func kir_picture(what: String) -> Array:
 				var a = -PI * 0.5 + k * PI / 5.0
 				pts.append(Vector2(cos(a), sin(a)) * (0.85 if k % 2 == 0 else 0.35))
 			return [pts]
+		"capybara":
+			return [[Vector2(-0.6, 0.0), Vector2(-0.52, -0.28), Vector2(-0.12, -0.38), Vector2(0.3, -0.3), Vector2(0.42, -0.12), Vector2(0.38, 0.14), Vector2(-0.5, 0.18), Vector2(-0.6, 0.0)],
+				[Vector2(0.34, -0.28), Vector2(0.55, -0.42), Vector2(0.82, -0.33), Vector2(0.86, -0.12), Vector2(0.56, -0.05), Vector2(0.42, -0.1)],
+				[Vector2(0.52, -0.42), Vector2(0.5, -0.52), Vector2(0.6, -0.46)],
+				K.arc(Vector2(0.66, -0.3), 0.03, 0, 360, 6),
+				[Vector2(-0.4, 0.17), Vector2(-0.4, 0.45)], [Vector2(-0.15, 0.18), Vector2(-0.15, 0.45)],
+				[Vector2(0.14, 0.17), Vector2(0.14, 0.45)], [Vector2(0.32, 0.13), Vector2(0.34, 0.45)],
+				[Vector2(-0.95, 0.5), Vector2(0.95, 0.5)]]
 		"stork":
 			return [[Vector2(-0.55, -0.05), Vector2(-0.15, -0.22), Vector2(0.22, -0.16), Vector2(0.34, 0.0), Vector2(0.1, 0.16), Vector2(-0.3, 0.13), Vector2(-0.55, -0.05)],
 				[Vector2(-0.55, -0.05), Vector2(-0.78, 0.04)],

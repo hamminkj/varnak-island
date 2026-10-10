@@ -474,3 +474,16 @@ New word: tujuju (jabiru stork), from the South American name tuyuyu (origin unc
 | Tujuju-ir dor-ma ri-esh-ur-nu. | They say storks live on the land. | Composed; a Var Tari line |
 
 Things to check: 42. hen-ta ri-tal-ak-pa-nu (arrived from the sky) uses tal for "came down"; there is no separate verb for descending. 43. -ni shanma after a plural noun (tujuju-ir-ni). 44. Whether the island's name should be written Tujuju or with a Tujuju respelling, and whether a native island word (like sendor for the small island) should exist alongside it.
+
+## The capybaras (kapibara)
+
+New word: kapibara (capybara), respelled from Guarani capii-bara (the RAE's etymology for Spanish capibara). Capybara names are exactly two vowel sounds: Ai, Eo, Ua, Io, Ou, Ea.
+
+| Form | Meaning | Source |
+|---|---|---|
+| Kapibarake ti i-pal-im-da. | The capybara is looking at you. | Composed: ergative -ke, pal (see), -im |
+| Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu. | They say the capybaras brought the people to the cenote. | Composed; tar (bring) as in Ti kirmel tekaru ta-tar-fu-ha? |
+| Kapibara-ir ri-tal-ak-pa-nu. Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu. | The capybaras came, they say. The capybaras brought the people to the cenote. | Composed; creation story chapter 7 (depth 36.5) |
+| Kapibara-ir sonot-ma ri-sum-ur-da. | Capybaras swim in the cenote. I see it. | Composed; a Var Tari line |
+
+Things to check: 45. Names made only of vowels (Ai, Eo) are a game invention; Tujuju names otherwise start with a consonant or have consonants inside. 46. Kapibarake ti uses ti (2SG) unmarked as the object, following the ergative pattern.

@@ -178,6 +178,14 @@ const SENTENCES = {
 		"en": "The stork is fishing in the river.",
 		"gesture": "The huge white bird with the black head wades slowly, stirs the mud with one foot, and snaps its giant bill shut on something silver.",
 		"words": ["tujuju", "mora", "-ma", "tari", "nuk", "-im"], "wrong": ["The stork is sleeping in the river.", "The fish is catching the stork."]},
+	"capy_looks": {"v": "Kapibarake ti i-pal-im-da.", "parts": "kapibara-ke  ti  i-pal-im-da\ncapybara-ERG  2SG  3P-see-IPFV-DIR",
+		"en": "The capybara is looking at you.",
+		"gesture": "The capybara chews slowly, turns its big square head toward you, and blinks. Then it looks down the trail.",
+		"words": ["kapibara", "-ke", "ti", "pal", "-im"], "wrong": ["You are looking at the capybara.", "The capybara is sleeping in the water."]},
+	"capy_myth": {"v": "Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu.", "parts": "kapibara-ir-ke  sair-ir  sonot-ru  ri-tar-ak-pa-nu\ncapybara-PL-ERG  person-PL  cenote-ALL  3PL-bring-PFV-PST-REP",
+		"en": "They say the capybaras brought the people to the cenote.",
+		"gesture": "Oku gets down on hands and knees, waddles a few steps like a capybara, looks back over one shoulder, and beckons you to follow.",
+		"words": ["kapibara", "-ir", "-ke", "sair", "sonot", "-ru", "tar", "-ak", "-nu"], "wrong": ["They say the people brought the capybaras to the cenote.", "I saw the capybaras swim in the sea."]},
 	"tujuju_name": {"v": "Sair-ir tujuju-ir-ni shanma dor-ma ri-tal-ak-pa-nu.", "parts": "sair-ir  tujuju-ir-ni  shan-ma  dor-ma  ri-tal-ak-pa-nu\nperson-PL  stork-PL-GEN  rear-LOC  land-LOC  3PL.S-arrive-PFV-PST-REP",
 		"en": "They say the people came to the land behind the storks.",
 		"gesture": "Oku flaps both arms slowly like great white wings, shuffles along behind the invisible birds, then stamps on the ground: here. \"Tujuju!\" Oku says, and sweeps a hand over the whole island.",
@@ -1182,6 +1190,15 @@ const WORDS14 = {
 	"var tari": "Var Tari, the great fish who sleeps in the cenote (var big + tari fish)"
 }
 
+# ---------------------------------------------------------------- the capybaras
+# kapibara: from Guarani capii-bara (the RAE's etymology for capibara). A capybara's name is
+# always exactly two vowel sounds and nothing else, so in kirmel it is two lone-vowel marks.
+const WORDS16 = {
+	"kapibara": "capybara, the biggest rodent, a gentle grass-eater that loves water (from Guarani capii-bara). A capybara's name is always exactly two vowel sounds."
+}
+# [name, fur color]. The first five rest along the way to the cenote; the last swims in it.
+const CAPYBARAS = [["Ai", "8b5a2b"], ["Eo", "a8794a"], ["Ua", "6a4226"], ["Io", "b8915f"], ["Ou", "7a5638"], ["Ea", "966238"]]
+
 # ---------------------------------------------------------------- the stork
 # Tujuju: tuyuyu is a South American name for the jabiru (Jabiru mycteria) and the wood stork
 # (Mycteria americana); the RAE gives its origin as uncertain, perhaps Guarani. The model is a
@@ -1199,6 +1216,7 @@ const KIR_STORY = [
 	{"depth": 27.0, "v": "Tarike ning i-ning-pa-nu. Ning-ta dor i-tal-ak-pa-nu.", "en": "The fish sang a song, they say. Out of the song, the land arrived."},
 	{"depth": 30.0, "pic": "stork", "v": "Tujuju-ir hen-ta ri-tal-ak-pa-nu. Sair-ir tujuju-ir-ni shanma ri-lum-pa-nu.", "en": "The storks came down from the sky, they say. The people went behind the storks."},
 	{"depth": 33.0, "v": "Sair-ir dor-ma ri-tal-ak-pa-nu. Sair-irke kirmel sek-ir-ma ri-kir-pa-nu.", "en": "People came to the land, they say. The people carved the writing into the stones."},
+	{"depth": 36.5, "pic": "capybara", "v": "Kapibara-ir ri-tal-ak-pa-nu. Kapibara-irke sair-ir sonot-ru ri-tar-ak-pa-nu.", "en": "The capybaras came, they say. The capybaras brought the people to the cenote."},
 	{"depth": 40.0, "v": "Dan yar-ir ri-lum-pa-nu. Sair-irke kirmel ri-mong-ak-pa-nu.", "en": "But the days went by, they say. The people forgot the writing."},
 	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
 ]
@@ -1219,5 +1237,6 @@ const GUARDIAN_LINES = [
 	["Fardom yeshma i-ling-ur-nu.", "They say the lighthouse is bright at night.", "nu", "lighthouse"],
 	["Ti-su palar-ir ri-esh-nu.", "They say you have many friends.", "nu", "friends"],
 	["Ti-su gao-murak i-esh-nu.", "They say you have the telling stick.", "nu", "wand"],
-	["Tujuju-ir dor-ma ri-esh-ur-nu.", "They say storks live on the land.", "nu", "stork"]
+	["Tujuju-ir dor-ma ri-esh-ur-nu.", "They say storks live on the land.", "nu", "stork"],
+	["Kapibara-ir sonot-ma ri-sum-ur-da.", "Capybaras swim in the cenote. I see it.", "da", "always"]
 ]

@@ -563,9 +563,28 @@ static func item_model(id: String, color: Color) -> Node3D:
 
 # ---------- animals ----------
 
-static func animal(kind: String) -> Node3D:
+static func animal(kind: String, coat_c: Color = Color("8b5a2b")) -> Node3D:
 	var n = Node3D.new()
 	match kind:
+		"kapibara":
+			# capybara: barrel body, big square head with a blunt snout, tiny ears, short legs
+			var dark = coat_c.darkened(0.22)
+			for lx in [-0.12, 0.12]:
+				for lz in [-0.25, 0.27]:
+					box(n, Vector3(lx, 0.09, lz), Vector3(0.11, 0.18, 0.12), dark)
+			sph(n, Vector3(0, 0.4, -0.03), 0.32, coat_c, Vector3(1.0, 0.88, 1.55), 10)
+			sph(n, Vector3(0, 0.55, -0.1), 0.22, coat_c.lightened(0.06), Vector3(1.0, 0.6, 1.4), 8)
+			var head = Node3D.new()
+			head.position = Vector3(0, 0.46, 0.42)
+			n.add_child(head)
+			box(head, Vector3(0, 0.05, 0.1), Vector3(0.3, 0.3, 0.34), coat_c.darkened(0.04))
+			box(head, Vector3(0, 0.0, 0.3), Vector3(0.27, 0.22, 0.12), coat_c.darkened(0.14))
+			box(head, Vector3(0, 0.04, 0.365), Vector3(0.15, 0.06, 0.02), Color("2a1d14"))
+			sph(head, Vector3(-0.15, 0.12, 0.17), 0.026, Color("140e0a"), Vector3.ONE, 5)
+			sph(head, Vector3(0.15, 0.12, 0.17), 0.026, Color("140e0a"), Vector3.ONE, 5)
+			sph(head, Vector3(-0.11, 0.22, 0.02), 0.045, dark, Vector3(1, 0.8, 0.6), 6)
+			sph(head, Vector3(0.11, 0.22, 0.02), 0.045, dark, Vector3(1, 0.8, 0.6), 6)
+			n.set_meta("head", head)
 		"par":
 			var body = Node3D.new()
 			n.add_child(body)
