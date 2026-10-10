@@ -618,7 +618,7 @@ func run():
 		game.interact()
 		press(Data.SENTENCES[id]["en"])
 	assert(game.completed.has("strange"))
-	# rumors: English and Varnak are built correctly
+	# rumors: English and Tujuju are built correctly
 	var rc = {"who": "Tor", "place": "haima", "adv": "hala", "verb": "sum", "tense": "past", "neg": false, "ev": "nu"}
 	assert(game.rumor_parts(rc)["v"] == "Tor haima hala i-sum-pa-nu.")
 	assert(game.rumor_en(rc) == "Tor swam in the sea fast (people say)")
@@ -1344,7 +1344,7 @@ func run():
 			if game.yesen_wrongs(t).is_empty(): continue
 			press(t)
 		press("Say it!")
-		assert(has_any("Perfect Varnak"))
+		assert(has_any("Perfect Tujuju"))
 		press("Next")
 	assert(has_any("standing ovation") and game.gin == 5 and game.mastered.has("yesen:soup"))
 	var aud = 0
@@ -1419,7 +1419,7 @@ func run():
 	assert(game.sound_on and not AudioServer.is_bus_mute(0))
 	game.sound_game(true)
 	assert(find_button(game.content, "Hear it again") != null)
-	print("PASS: sound effects, ambience, Desh's music and spoken Varnak")
+	print("PASS: sound effects, ambience, Desh's music and spoken Tujuju")
 	# ambient zones and the cenote
 	game.close_panel()
 	game.player.position = Vector3(0, 0.3, 40)
@@ -1459,7 +1459,7 @@ func run():
 	print("PASS: ambient zones, the cenote, swimming and diving")
 	# kirmel: the lost writing, the carvings and Var Tari
 	var Kir = preload("res://kirmel.gd")
-	assert(Kir.syllables("Varnak").map(func(x): return Kir.label(x)) == ["var", "nak"])
+	assert(Kir.syllables("Tujuju").map(func(x): return Kir.label(x)) == ["tu", "ju", "ju"])
 	assert(Kir.syllables("kachaka").map(func(x): return Kir.label(x)) == ["ka", "cha", "ka"])
 	var sigs = {}
 	for c in Kir.BASES + Kir.MARKS.keys():

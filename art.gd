@@ -1,5 +1,5 @@
 extends RefCounted
-# Procedural art for Varnak Island. Everything is built from primitives, so no asset files are needed.
+# Procedural art for Tujuju Island. Everything is built from primitives, so no asset files are needed.
 
 static var _mats: Dictionary = {}
 

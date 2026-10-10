@@ -1,4 +1,4 @@
-"""Lush stereo ambient loops for Varnak Island, generated from code (no recordings).
+"""Lush stereo ambient loops for Tujuju Island, generated from code (no recordings).
 Run: python3 tools/make_ambience.py   (needs numpy, scipy and ffmpeg). Writes sfx/amb_*.ogg.
 Every loop is seamless: the tail is folded back onto the start."""
 import os, subprocess, tempfile, wave

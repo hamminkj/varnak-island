@@ -1,5 +1,5 @@
 extends RefCounted
-# Kirmel, the lost Varnak syllabary (kir carve + mel speak).
+# Kirmel, the lost Tujuju syllabary (kir carve + mel speak).
 # One glyph per syllable. The shape is the consonant; the way it is turned is the vowel:
 # a points right, e is turned a quarter (down), i is turned around (left), o three quarters (up),
 # and u points right with a short line under it. A dot inside means a voiced sound (b d g z v j),

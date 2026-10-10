@@ -1549,15 +1549,15 @@ func close_panel():
 	lesson = ""
 
 func show_intro():
-	clear_panel("Varnak Island")
+	clear_panel("Tujuju Island")
 	var by = text_line("by je hammink", 18)
 	by.add_theme_color_override("font_color", Color("6b4a2e"))
-	text_line("Varnak Island is a game about how languages work. Everyone here speaks Varnak, an invented language, so you figure it out from gestures, objects and clues, then use it yourself. Along the way you notice patterns, guess meanings and build sentences, and the villagers are silly about all of it.")
+	text_line("Tujuju Island is a game about how languages work. Everyone here speaks Tujuju, an invented language, so you figure it out from gestures, objects and clues, then use it yourself. Along the way you notice patterns, guess meanings and build sentences, and the villagers are silly about all of it.")
 	text_line("Your friend Neri is somewhere on this island. Find them.")
 	button("Explore",close_panel,content)
 	text_line("Tap a person, animal or object to walk to it. Phone: drag the joystick (lower left) to walk, swipe the right side to look. Desktop: W A S D to move, drag to look, E to interact. When something is in reach, its name shows in the lower right: tap it to use it.")
-	text_line("Tap the speaker button, or any dark red Varnak words, to hear them read aloud by your device's voice.", 16)
-	text_line("Tap the quest box to fold it. The menu button (three lines, top row) has games, difficulty, About Varnak and Reset progress.")
+	text_line("Tap the speaker button, or any dark red Tujuju words, to hear them read aloud by your device's voice.", 16)
+	text_line("Tap the quest box to fold it. The menu button (three lines, top row) has games, difficulty, About Tujuju and Reset progress.")
 
 func learn(word: String):
 	if words.has(word) and not discovered.has(word):
@@ -1587,7 +1587,7 @@ func objective() -> String:
 		if not completed.has(q[0]): return q[1]
 	for s in side_quests:
 		if not completed.has(s[0]) and quest_open(s[0]): return quest_text(s)
-	return "Every quest is done. Keep exploring and practicing Varnak."
+	return "Every quest is done. Keep exploring and practicing Tujuju."
 
 func quest_open(id: String) -> bool:
 	if id == "treasure": return inventory.has("map")
@@ -2426,7 +2426,7 @@ func school_quiz(i: int):
 	var q: Dictionary = Data.SCHOOL[i]
 	for w in ["hal", "hama", "han", "hamur", "rav", "-ha"]:
 		if q["q"].to_lower().contains(w.trim_prefix("-")): learn(w)
-	choice_puzzle("Suri's lesson: " + str(i + 1) + " of 4", q["gesture"] + "\n\n“" + q["q"] + "”" + ("\n\nAnswer Suri in Varnak." if i == 3 else "\n\nWhat is Suri asking?"), q["options"], q["correct"], func():
+	choice_puzzle("Suri's lesson: " + str(i + 1) + " of 4", q["gesture"] + "\n\n“" + q["q"] + "”" + ("\n\nAnswer Suri in Tujuju." if i == 3 else "\n\nWhat is Suri asking?"), q["options"], q["correct"], func():
 		master("q:school" + str(i))
 		if i == 3:
 			learn("vel")
@@ -2520,7 +2520,7 @@ func add_topics(id: String):
 				button("Ask Neri for a story", neri_story, content)
 				button("Practice with Neri", show_practice, content)
 			topic("Ask about the campfire", "fire_pops", id)
-			button("Teach Neri some Varnak", teach_neri.bind(talk.bind("neri")), content)
+			button("Teach Neri some Tujuju", teach_neri.bind(talk.bind("neri")), content)
 			button("Play Guess who: Hal i-an-ha?", guess_start, content)
 		"ketu":
 			topic("Ask what Ketu sells", "ketu_sells", id)
@@ -2637,7 +2637,7 @@ func talk(id: String):
 			clear_panel("Neri at the northern cove")
 			if completed.has("evidence"):
 				complete("cove")
-				text_line("You found your friend and understood the clues. Neri shows you a notebook of island stories. Your Varnak adventure has begun.")
+				text_line("You found your friend and understood the clues. Neri shows you a notebook of island stories. Your Tujuju adventure has begun.")
 				if quests_done() < quests.size() + side_quests.size():
 					text_line("“Teka i-var,” Neri says, sweeping an arm across the island. There are more people to meet: open the Map to see who still needs help.")
 				else:
@@ -2989,7 +2989,7 @@ func practice_word(pool: Array):
 		sh.shuffle()
 		for o in sh:
 			if o != w and short_gloss(o) != short_gloss(w) and opts.size() < (3 if lv < 3 else 4): opts.append(o)
-		choice_puzzle("Practice", "Which Varnak form means \"" + short_gloss(w) + "\"?", opts, 0, func(): master("w:" + w), "“" + w + "” means " + str(words[w]) + ".", "Check the notebook for a hint, then try the next one.", show_notebook, func(): button("Next question", show_practice, content))
+		choice_puzzle("Practice", "Which Tujuju form means \"" + short_gloss(w) + "\"?", opts, 0, func(): master("w:" + w), "“" + w + "” means " + str(words[w]) + ".", "Check the notebook for a hint, then try the next one.", show_notebook, func(): button("Next question", show_practice, content))
 		return
 	var good = short_gloss(w)
 	var options: Array = [good]
@@ -3835,7 +3835,7 @@ func show_verb_builder(i: int = -1):
 	var ch: Array = Data.VERBS[i]
 	for w in ["na-", "ta-", "i-", "ri-", "lum", "pav", "sul", "sum", "tal", "nang"]: learn(w)
 	clear_panel("Verb builder")
-	text_line("Build one Varnak verb that means:\n\"" + ch[0] + "\"")
+	text_line("Build one Tujuju verb that means:\n\"" + ch[0] + "\"")
 	text_line("lum go · pav run · sul sleep · sum swim · tal arrive · nang walk\n-im in progress · -ak completed · -ur usually · -pa past · -fu future · -da seen · -shi apparently · -nu reportedly · ma- ... -ki not", 15)
 	var choice: Dictionary = {}
 	var preview = text_line("", 28)
@@ -3901,9 +3901,9 @@ func near_dock(p: Vector3) -> bool:
 	if absf(p.x - 48.0) < 1.5 and p.z > 65.8 and p.z < 74.2: return true
 	return false
 
-# ------------------------------------------------------------ fourth expansion: salient Varnak, levels, options
+# ------------------------------------------------------------ fourth expansion: salient Tujuju, levels, options
 
-# Varnak inside curly quotes is drawn larger, bold and highlighted so it stands out from English.
+# Tujuju inside curly quotes is drawn larger, bold and highlighted so it stands out from English.
 func rich_line(text: String, font_size: int = 20) -> RichTextLabel:
 	if quote_re == null: quote_re = RegEx.create_from_string("“([^”]*)”")
 	var r = RichTextLabel.new()
@@ -4008,7 +4008,7 @@ func show_more():
 	button("Games and activities", show_games, content)
 	button("My learning and data export", show_progress, content)
 	button("How to play", show_intro, content)
-	button("About the Varnak language", show_varnak, content)
+	button("About the Tujuju language", show_varnak, content)
 	button("Credits", show_credits, content)
 	if completed.has("kirmel"):
 		button("Kirmel writing: on" if kir_show else "Kirmel writing: off", func():
@@ -4363,7 +4363,7 @@ func challenge(id: String):
 	var i: int = Data.CHALLENGES[id]
 	var tp: Dictionary = Data.TILES[i]
 	var who = names.get(id, id.capitalize())
-	dnd({"title": "Say it yourself", "prompt": who + " wants to hear you say it in Varnak:\n\"" + tp["en"] + "\"", "answers": tp["tiles"], "pool": tile_pool(tp),
+	dnd({"title": "Say it yourself", "prompt": who + " wants to hear you say it in Tujuju:\n\"" + tp["en"] + "\"", "answers": tp["tiles"], "pool": tile_pool(tp),
 		"tip": tp["tip"], "key": "t:" + str(i), "back": talk.bind(id),
 		"on_right": func():
 			if not mastered.has("c:" + id):
@@ -4448,7 +4448,7 @@ func word_match(back: Callable = Callable()):
 	var hints: Array = []
 	for w in use: hints.append(short_gloss(w))
 	var extra: Array = ws.slice(use.size()) if lv >= 2 else []
-	dnd({"title": "Word match", "prompt": "Drag each Varnak word next to its meaning.", "answers": use, "hints": hints, "pool": extra,
+	dnd({"title": "Word match", "prompt": "Drag each Tujuju word next to its meaning.", "answers": use, "hints": hints, "pool": extra,
 		"tip": "Check the notebook for any word you are unsure of.", "key": "g:match", "again": word_match.bind(back), "again_label": "New words", "back": back})
 
 # ------------------------------------------------------------ mini-games with timers and cards
@@ -4528,7 +4528,7 @@ func memory_game(back: Callable = Callable()):
 		message("Memory cards", "Collect a few more words first: talk to people and examine things.")
 		return
 	clear_panel("Memory cards", true)
-	text_line("Turn over two cards at a time. Match each Varnak word with its meaning.")
+	text_line("Turn over two cards at a time. Match each Tujuju word with its meaning.")
 	var info = text_line("Moves: 0", 17)
 	var grid = GridContainer.new()
 	grid.columns = 4
@@ -4711,17 +4711,17 @@ func show_games():
 		["Sentence builder (drag and drop)", tile_puzzle.bind(-1, show_games), true, "Put words in order."],
 		["Fill the gap (drag and drop)", gap_fill.bind(show_games), true, "Drag the missing word into the sentence."],
 		["Word forge (drag and drop)", word_forge.bind(show_games), true, "Build words from roots and endings."],
-		["Word match (drag and drop)", word_match.bind(show_games), n >= 4, "Match Varnak words with meanings."],
+		["Word match (drag and drop)", word_match.bind(show_games), n >= 4, "Match Tujuju words with meanings."],
 		["Memory cards", memory_game.bind(show_games), n >= 4, "Find the pairs. Earn gin."],
 		["Speed round", speed_round, glossed_pool(6).size() >= 6, "60 seconds. How many can you get?"],
 		["Market rush", market_rush, completed.has("market"), "Serve Ketu's customers. Unlocks after Ketu's quest."],
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
-		["False friends", false_friends.bind(true), true, "Varnak words that look like English. Don't be fooled!"],
+		["False friends", false_friends.bind(true), true, "Tujuju words that look like English. Don't be fooled!"],
 		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
-		["Yesen! (improv)", show_yesen_list, level() >= YESEN_LEVEL, "Short, silly improv scenes. Say yes, and... in Varnak and win over a crowd. Level 2 and up."],
+		["Yesen! (improv)", show_yesen_list, level() >= YESEN_LEVEL, "Short, silly improv scenes. Say yes, and... in Tujuju and win over a crowd. Level 2 and up."],
 		["Word wand", wand_panel, solved.has("wand"), "Say a sentence and it comes true. Get the wand from Oku at the old ruins."],
 		["Guess who", guess_start, true, "Ask Neri yes or no questions and work out who they are thinking of."],
-		["Teach Neri", teach_neri.bind(show_games), true, "Neri makes a mistake in Varnak. Find it and fix it."],
+		["Teach Neri", teach_neri.bind(show_games), true, "Neri makes a mistake in Tujuju. Find it and fix it."],
 		["Review rusty words", review_rusty, discovered.size() >= 3, "Words you have found but not yet mastered."]
 	]
 	for g in games:
@@ -5009,7 +5009,7 @@ func rumor_composer(listener: String):
 	var rc = {"who": "Tor", "place": "haima", "adv": "", "verb": "ning", "dbl": false, "tense": "usual", "neg": false, "ev": "nu"}
 	for w in ["mel", "sela", "hala", "-nu", "-shi", "-da"]: learn(w)
 	clear_panel("Tell " + listener.capitalize() + " some gossip")
-	text_line("Make up any rumor you like. Choose the pieces; the Varnak and its meaning update as you go.", 17)
+	text_line("Make up any rumor you like. Choose the pieces; the Tujuju and its meaning update as you go.", 17)
 	var banner = varnak_banner("", 26)
 	var en_l = text_line("", 18)
 	en_l.add_theme_color_override("font_color", Color("6b4a2e"))
@@ -5163,8 +5163,8 @@ func text_field(placeholder: String, initial: String = "") -> LineEdit:
 
 func parrot_panel():
 	clear_panel("par: a parrot")
-	text_line("A big red parrot on a crate tilts its head at you. Type something in Varnak and it will say it back.")
-	var input = text_field("Type Varnak here")
+	text_line("A big red parrot on a crate tilts its head at you. Type something in Tujuju and it will say it back.")
+	var input = text_field("Type Tujuju here")
 	var out = text_line("", 20)
 	if mastered.has("lt:solved") and not completed.has("letters"):
 		button("Show the parrot one of its letters", parrot_reveal, content)
@@ -6214,7 +6214,7 @@ func false_friends(start: bool = true):
 		ff_i = 0
 	if ff_i >= ff_order.size():
 		clear_panel("False friends: done!")
-		text_line("You weren't fooled! False friends are words that look like words you know but mean something else. In Varnak, gin is money, hen is the sky, and ten is a foot.", 18)
+		text_line("You weren't fooled! False friends are words that look like words you know but mean something else. In Tujuju, gin is money, hen is the sky, and ten is a foot.", 18)
 		gin += 2
 		toast("+2 gin")
 		save_game()
@@ -6225,7 +6225,7 @@ func false_friends(start: bool = true):
 	learn(f[0])
 	var opts: Array = [f[2]]
 	opts.append_array(f[3])
-	choice_puzzle("False friend " + str(ff_i + 1) + " of " + str(ff_order.size()), "This Varnak word looks like " + f[1] + ":\n\n" + f[0] + "\n\nWhat does it really mean in Varnak?", opts, 0, func():
+	choice_puzzle("False friend " + str(ff_i + 1) + " of " + str(ff_order.size()), "This Tujuju word looks like " + f[1] + ":\n\n" + f[0] + "\n\nWhat does it really mean in Tujuju?", opts, 0, func():
 		master("ff:" + f[0])
 		ff_i += 1, f[0] + " means " + f[2] + ", not " + f[1] + "!", "Careful: it only looks like " + f[1] + ". Check the notebook.", show_games,
 		func(): button("Next false friend", false_friends.bind(false), content))
@@ -6260,8 +6260,8 @@ func sound_game(start: bool = true):
 
 func show_sounds():
 	clear_panel("Sound words")
-	text_line("Varnak borrowed a family of sound words from Guarani, a language spoken by millions of people in Paraguay. Many repeat their last syllable, the way the sound itself repeats.", 17)
-	var h = text_line("How they work in Varnak:\n- the sound itself: pororo! (pop!)\n- as a verb: Far i-pororo-im-da. (The fire is popping.)\n- doubled, again and again: i-pororo-pororo-im-da (popping and popping)\n- in the past, people say: i-pororo-pa-nu (it popped, they say)", 17)
+	text_line("Tujuju borrowed a family of sound words from Guarani, a language spoken by millions of people in Paraguay. Many repeat their last syllable, the way the sound itself repeats.", 17)
+	var h = text_line("How they work in Tujuju:\n- the sound itself: pororo! (pop!)\n- as a verb: Far i-pororo-im-da. (The fire is popping.)\n- doubled, again and again: i-pororo-pororo-im-da (popping and popping)\n- in the past, people say: i-pororo-pa-nu (it popped, they say)", 17)
 	h.add_theme_color_override("font_color", Color("2f5a2f"))
 	for w in ["pororo", "piriri", "chiriri", "guarara", "kororo", "tarara", "pururu", "siri", "vava", "sununu"]:
 		var known = discovered.has(w)
@@ -6273,15 +6273,15 @@ func show_sounds():
 	button("Notebook", show_notebook, content)
 
 func show_varnak():
-	clear_panel("About Varnak")
-	text_line("Varnak is an invented language built to work the way many real languages do. This page lists its main features. The game uses a simplified version, and the doubling and sound words were added for the game.", 17)
+	clear_panel("About Tujuju")
+	text_line("Tujuju is an invented language built to work the way many real languages do. This page lists its main features. The game uses a simplified version, and the doubling and sound words were added for the game.", 17)
 	var secs = [
 		["Sounds and spelling", "Five vowels (a e i o u), and the letter y sounds like the y in yes. Words end only in m, n, ng, l, r, s, k or t, so borrowed words get respelled: brouhaha becomes buruhaha.", []],
-		["Words are built from pieces", "Varnak glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
+		["Words are built from pieces", "Tujuju glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
 		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is he, she or it, ri- is they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
 		["Time and aspect", "Endings after the verb show when and how: -pa past, -fu future, -im happening now, -ur usually, -ak finished.", ["“I-nang-pa.” walked.   “I-nang-fu.” will walk.   “I-nang-im.” is walking.   “I-nang-ur.” usually walks."]],
-		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Varnak gossip.", ["“Tor kurma i-tal-pa-da.” I saw Tor arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
-		["Who did what to whom", "Varnak marks the doer of an action on another thing with -ke. This is called ergative marking. Someone who just goes, sleeps or is, takes no ending.", ["“Sanu i-lum-pa-da.” The child went.   “Mirake puka i-rav-pa-da.” Mira read the book."]],
+		["How do you know?", "Evidentials are endings that say how you know something: -da I saw it myself, -shi I infer it from evidence, -nu people say. They are the heart of Tujuju gossip.", ["“Tor kurma i-tal-pa-da.” I saw Tor arrive at the market.   “...i-tal-pa-shi.” Apparently he arrived.   “...i-tal-pa-nu.” They say he arrived."]],
+		["Who did what to whom", "Tujuju marks the doer of an action on another thing with -ke. This is called ergative marking. Someone who just goes, sleeps or is, takes no ending.", ["“Sanu i-lum-pa-da.” The child went.   “Mirake puka i-rav-pa-da.” Mira read the book."]],
 		["Case endings", "Short endings on nouns do the work of English words like to, in, from and with: -ni of, -ru to, -ma in or at, -ta from, -su together with, -li by means of.", ["“Tekama” in the village.   “Moraru” to the river.   “Tisu” with you."]],
 		["Many and ordinal", "-ir makes a plural. A number comes before its noun, and -ve makes ordinal numbers.", ["“Tari-ir” fish (many).   “Mur tari” three fish.   “Bar-ve hai-sao” the eighth sea star."]],
 		["No and please", "Not is wrapped around the verb: ma- before it and -ki after it. A command ends in -o, and -ye makes it polite.", ["“Ma-na-lum-ki-da.” I am not going.   “Ta-lum-o-ye.” Please go.   “Ma-ta-pav-o-ki!” Do not run!"]],
@@ -6293,7 +6293,7 @@ func show_varnak():
 		["Can and want (new)", "Two endings added for the game go right after the verb root: -kan means can, and -vai means want to. They work with every other ending.", ["“Na-sum-kan-da.” I can swim.   “Ti ta-ning-kan-ha?” Can you sing?   “Anke cha k-i-nuk-vai-da.” I want tea."]],
 		["Telling people what to do", "A command takes -o. Adding -ye makes it polite, and grumpy or proud people may ignore you without it. -ka means and then, for a second action by the same person.", ["“Ta-pul-o!” Jump!   “Ta-pul-o-ye!” Please jump!   “Ta-pul-o-ka ta-ning-o-ye!” Please jump and then sing!   “Ansu ta-kar-o-ye!” Please come with me!"]],
 		["Directions", "Bei north, nam south, dong east and sai west take -ma for in: bei-ma, in the north. To ask where, use hama with -ha.", ["“Kur hama i-esh-ha?” Where is the market?   “Kur sai-ma i-esh-da.” The market is in the west."]],
-		["Borrowed words and sound words", "Varnak borrows from other languages (choni, kawai, habibi, puts, pororo from Guarani) and respells them with its own sounds.", []]
+		["Borrowed words and sound words", "Tujuju borrows from other languages (choni, kawai, habibi, puts, pororo from Guarani) and respells them with its own sounds.", []]
 	]
 	for sec in secs:
 		var h = text_line(sec[0], 21)
@@ -6309,9 +6309,9 @@ func show_varnak():
 
 func show_credits():
 	clear_panel("Credits")
-	text_line("Varnak Island", 24)
+	text_line("Tujuju Island", 24)
 	text_line("A game by je hammink.")
-	text_line("Created and directed by je hammink: concept, Varnak language design, learning design and playtesting.")
+	text_line("Created and directed by je hammink: concept, Tujuju language design, learning design and playtesting.")
 	text_line("Built in Godot 4 with Claude, an AI model by Anthropic, as a coding assistant.", 17)
 	text_line("Every model, effect and piece of island nonsense is built from simple shapes in code. No outside assets are used.", 16)
 	button("Back", show_more, content)
@@ -6319,7 +6319,7 @@ func show_credits():
 
 func show_loans():
 	clear_panel("Word play")
-	text_line("Borrowed words. Varnak borrows words from other languages and respells them with Varnak sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
+	text_line("Borrowed words. Tujuju borrows words from other languages and respells them with Tujuju sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
 	var any = false
 	for w in words.keys():
 		if str(words[w]).contains("borrow"):
@@ -6864,14 +6864,14 @@ func export_payload(fmt: String) -> String:
 	for w in discovered: wl.append({"word": w, "meaning": short_gloss(w), "mastered": mastered.has("w:" + w)})
 	var pl: Array = []
 	for p in phrases: pl.append({"phrase": Data.SENTENCES[p]["v"], "meaning": Data.SENTENCES[p]["en"], "mastered": mastered.has("s:" + p)})
-	return JSON.stringify({"game": "Varnak Island", "exported_utc": iso(int(Time.get_unix_time_from_system())), "summary": learning_summary(),
+	return JSON.stringify({"game": "Tujuju Island", "exported_utc": iso(int(Time.get_unix_time_from_system())), "summary": learning_summary(),
 		"accuracy_by_activity": accuracy_by_activity(), "words": wl, "phrases": pl, "quests_done": completed, "mastered_keys": mastered, "events": events}, "  ")
 
 func export_data(fmt: String):
 	log_event("export", fmt)
 	var text = export_payload(fmt)
 	var stamp = Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var fname = "varnak-learning-" + stamp + "." + fmt
+	var fname = "tujuju-learning-" + stamp + "." + fmt
 	if OS.has_feature("web"):
 		JavaScriptBridge.download_buffer(text.to_utf8_buffer(), fname, "text/csv" if fmt == "csv" else "application/json")
 		toast("Downloading " + fname)
@@ -7042,7 +7042,7 @@ func reply_menu(k: int):
 	compact_buttons.call_deferred()
 	var lt: Dictionary = Data.LETTERS[k]
 	clear_panel("Write back")
-	text_line("What do you want to say? Then build it in Varnak.", 17)
+	text_line("What do you want to say? Then build it in Tujuju.", 17)
 	for i in range(lt["replies"].size()):
 		var r: Dictionary = lt["replies"][i]
 		button(r["en"], reply_build.bind(k, i), content)
@@ -7050,7 +7050,7 @@ func reply_menu(k: int):
 
 func reply_build(k: int, i: int):
 	var r: Dictionary = Data.LETTERS[k]["replies"][i]
-	dnd({"title": "Write back", "prompt": "Write in Varnak:\n\"" + r["en"] + "\"", "answers": r["tiles"], "pool": r["decoys"], "tip": r["tip"], "key": "lt:b:" + str(k) + ":" + str(i),
+	dnd({"title": "Write back", "prompt": "Write in Tujuju:\n\"" + r["en"] + "\"", "answers": r["tiles"], "pool": r["decoys"], "tip": r["tip"], "key": "lt:b:" + str(k) + ":" + str(i),
 		"back": show_letters, "on_right": func():
 			if not mastered.has("lt:reply:" + str(k)):
 				master("lt:said:" + str(k) + ":" + " ".join(r["tiles"]))
@@ -7103,7 +7103,7 @@ func solve_mystery():
 func solve_how(s: Array):
 	compact_buttons.call_deferred()
 	clear_panel("How do you know?")
-	text_line("Say it in Varnak. Which ending fits how you know?", 17)
+	text_line("Say it in Tujuju. Which ending fits how you know?", 17)
 	var base = s[0] + " ti-ni palar i-an-"
 	for ev in [["da", "I saw it with my own eyes"], ["shi", "The clues show it"], ["nu", "Somebody told me"]]:
 		button(base + ev[0] + ".  (" + ev[1] + ")", solve_check.bind(s[0], ev[0]), content)
@@ -7190,7 +7190,7 @@ func teach_neri(back: Callable = Callable()):
 	clear_panel("Teach Neri")
 	talk_partner = "neri"
 	learn("senar")
-	text_line("Neri is practicing Varnak and wants to say:\n\"" + tp["en"] + "\"", 18)
+	text_line("Neri is practicing Tujuju and wants to say:\n\"" + tp["en"] + "\"", 18)
 	text_line("Neri says:", 17)
 	varnak_banner(" ".join(said), 24)
 	var fb = text_line("Tap the word Neri got wrong.", 17)
@@ -7232,7 +7232,7 @@ func teach_fix(i: int, said: Array, m: Dictionary, back: Callable):
 		var f = alt.pop_front()
 		alt.append(f)
 		if not opts.has(" ".join(alt)): opts.append(" ".join(alt))
-		ask("Which order is right?", opts, 0, done, "In Varnak the verb comes last.", "Think about where the verb goes.", back, func():
+		ask("Which order is right?", opts, 0, done, "In Tujuju the verb comes last.", "Think about where the verb goes.", back, func():
 			button("Another one", teach_neri.bind(back), content))
 		return
 	var wrong: String = m["wrong"]
@@ -7568,7 +7568,7 @@ func command_menu(id: String):
 	button("Back", ask_menu.bind(id), content)
 
 func command_forms(v: String) -> Dictionary:
-	# meaning key -> Varnak. The player picks one; the villager reacts to what was actually said.
+	# meaning key -> Tujuju. The player picks one; the villager reacts to what was actually said.
 	if v == "kar":
 		return {"plain": "Ansu ta-kar-o!", "polite": "Ansu ta-kar-o-ye!", "statement": "Ansu ta-kar-da.", "me": "Ansu na-kar-o!", "dont": "Ansu ma-ta-kar-o-ki!"}
 	if v == "pul+ning":
@@ -8285,7 +8285,7 @@ func yesen_start(i: int, partner: String = ""):
 	var sg: Array = sc["sug"]
 	text_line("Suggestion: “" + str(sg[0]).capitalize() + "!” (" + str(sg[1]) + ")", 18)
 	text_line(partner.capitalize() + " takes the suggestion and starts a yesen, an improv scene. Yesen is borrowed from English \"yes, and\": always accept what your partner says, then add something.", 16)
-	text_line("Answer each line with Ho, e... (yes, and...) and build your sentence. The better your Varnak, the bigger the crowd.", 16)
+	text_line("Answer each line with Ho, e... (yes, and...) and build your sentence. The better your Tujuju, the bigger the crowd.", 16)
 	button("Start the scene", yesen_round, content)
 	button("Not now", close_panel, content)
 
@@ -8327,7 +8327,7 @@ func yesen_build(k: int):
 	var tiles: Array = idea[1]
 	var nw = 1 if level() < 3 else 2
 	compact_buttons.call_deferred()
-	clear_panel("Say it in Varnak")
+	clear_panel("Say it in Tujuju")
 	add_portrait(ys["who"])
 	text_line("You want to say: \"Yes, and... " + str(idea[0]) + "\" Choose one piece from each row.", 16)
 	var chosen: Array = []
@@ -8393,7 +8393,7 @@ func yesen_said(tiles: Array, chosen: Array):
 	varnak_banner(said, 20)
 	if frac >= 0.999:
 		emote(who, "laugh", 3.0)
-		text_line("Perfect Varnak! " + who.capitalize() + " cracks up and keeps going.", 17)
+		text_line("Perfect Tujuju! " + who.capitalize() + " cracks up and keeps going.", 17)
 	elif frac >= 0.5:
 		emote(who, "happy", 3.0)
 		text_line("Almost! " + who.capitalize() + " understands and keeps going. The right way: " + target, 17)
@@ -8495,7 +8495,7 @@ func yesen_end():
 		level_text = "Silence. Somewhere, a cricket goes chiriri. Then one person claps, very slowly."
 		reward = 0
 		kind = "confused"
-	text_line(level_text + " (" + str(n) + " watching. Varnak accuracy: " + str(int(round(frac * 100.0))) + "%.)", 17)
+	text_line(level_text + " (" + str(n) + " watching. Tujuju accuracy: " + str(int(round(frac * 100.0))) + "%.)", 17)
 	emote(who, kind, 4.0)
 	for a in ys["audience"]:
 		emote(a, kind, 4.0)
@@ -8526,14 +8526,14 @@ func show_yesen_list():
 		text_line("Yesen unlock at level 2 (Speaker). Keep playing, or choose Harder in the menu.", 17)
 		button("Back", show_games, content)
 		return
-	text_line("Any villager will do a yesen with you (Chat, then Yesen). Or pick a suggestion here and play it with its usual partner. A crowd gathers if your Varnak is good.", 16)
+	text_line("Any villager will do a yesen with you (Chat, then Yesen). Or pick a suggestion here and play it with its usual partner. A crowd gathers if your Tujuju is good.", 16)
 	button("Get three suggestions", yesen_suggest.bind(""), content)
 	for i in range(Data.YESEN.size()):
 		var sc: Dictionary = Data.YESEN[i]
 		button("“" + str(sc["sug"][0]).capitalize() + "”: " + str(sc["title"]) + " (" + str(sc["who"]).capitalize() + ")" + ("  [ok]" if mastered.has("yesen:" + str(sc["id"])) else ""), yesen_start.bind(i, str(sc["who"])), content)
 	button("Back", show_games, content)
 
-# ------------------------------------------------------------ sound: effects, ambience, Desh's music, spoken Varnak
+# ------------------------------------------------------------ sound: effects, ambience, Desh's music, spoken Tujuju
 
 const AMB_NAMES = ["ocean", "forest", "rain", "stream", "falls", "night", "wind", "cave", "underwater"]
 var amb_w: Dictionary = {}
@@ -8674,7 +8674,7 @@ func ambient_weights() -> Dictionary:
 		for k in ["ocean", "forest", "night", "rain", "wind", "stream", "falls"]: w[k] = float(w[k]) * (0.15 if under else 0.4)
 	return w
 
-# ---- the phone's voice reads Varnak aloud ----
+# ---- the phone's voice reads Tujuju aloud ----
 
 func speak(text: String):
 	var t = text.replace("“", "").replace("”", "").replace("\"", "").replace("-", "").replace("\n", " ")
@@ -9521,7 +9521,7 @@ func picture_stone(step: int):
 		if q[0] != p[0] and opts.size() < 3: opts.append(q[0])
 	ask("What do the marks say?", opts, 0, func():
 		for syl in K.syllables(p[0]): kir_learn_syl(syl)
-		picture_stone.call_deferred(step + 1), "", "Think of the Varnak word for " + str(p[1]) + ".", close_panel)
+		picture_stone.call_deferred(step + 1), "", "Think of the Tujuju word for " + str(p[1]) + ".", close_panel)
 
 func kir_first_unknown(sylls: Array) -> int:
 	for i in range(sylls.size()):
@@ -9591,7 +9591,7 @@ func decipher(idx: int):
 	ask("Which syllable is it?", opts, 0, func():
 		if deducible: master("kd:" + c + "|" + v)
 		kir_learn_syl(target_syl)
-		decipher.call_deferred(idx), "", "Read the words around it. Which Varnak word would fit?", close_panel)
+		decipher.call_deferred(idx), "", "Read the words around it. Which Tujuju word would fit?", close_panel)
 
 func kir_chapters_read() -> int:
 	var n = 0
@@ -9804,7 +9804,7 @@ func kir_options(name_text: String) -> Array:
 	return [sylls, wrong1, wrong2]
 
 func suri_kirmel(step: int):
-	var names = ["Suri", "Ketu", "Varnak"]
+	var names = ["Suri", "Ketu", "Tujuju"]
 	talk_partner = "suri"
 	if step >= names.size():
 		complete("kirmel")
@@ -9815,7 +9815,7 @@ func suri_kirmel(step: int):
 		emote("suri", "love", 4.0)
 		varnak_banner("Kirmel i-ho-ho! Senakma polu kirmel ri-rav-fu-da!", 20)
 		text_line("(The writing is wonderful! At the school, everyone will read the writing!)", 15)
-		text_line("Suri copies your chart onto the big board. By evening the village signs have kirmel on them, and the old writing shows above Varnak sentences everywhere.", 17)
+		text_line("Suri copies your chart onto the big board. By evening the village signs have kirmel on them, and the old writing shows above Tujuju sentences everywhere.", 17)
 		button("Return", close_panel, content)
 		return
 	clear_panel("Teach Suri kirmel (" + str(step + 1) + " of " + str(names.size()) + ")")

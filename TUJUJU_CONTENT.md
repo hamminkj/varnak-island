@@ -1,6 +1,6 @@
-# Varnak content in the game: review list
+# Tujuju content in the game: review list
 
-Every Varnak form added in the expansion, with where it comes from in the Constructed-Language Handoff Document. **Doc** means the form appears in the document as written. **Composed** means I built it from the document's rules; please check these first, since they are the only places I made grammar decisions.
+Tujuju was called Varnak in the handoff document and in early builds of the game. Every Tujuju form added in the expansion, with where it comes from in the Constructed-Language Handoff Document. **Doc** means the form appears in the document as written. **Composed** means I built it from the document's rules; please check these first, since they are the only places I made grammar decisions.
 
 ## Sentence cards
 
@@ -289,9 +289,9 @@ Things to check: 15. The poems combine nouns freely, so some lines are deliberat
 
 ## Borrowed words
 
-Varnak already borrows cha (tea) and kaf (coffee) in the document. The game adds more loanwords, respelled with Varnak sounds: five vowels, y for /j/, word-final consonants limited to m, n, ng, l, r, s, k, t, and a vowel added to break up hard clusters. ch is kept in loans, as in cha.
+Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds more loanwords, respelled with Tujuju sounds: five vowels, y for /j/, word-final consonants limited to m, n, ng, l, r, s, k, t, and a vowel added to break up hard clusters. ch is kept in loans, as in cha.
 
-| Varnak | Meaning | Source |
+| Tujuju | Meaning | Source |
 |---|---|---|
 | choni | underwear | Mexican Spanish chones, chonies |
 | buruhaha | uproar | French brouhaha |
@@ -328,9 +328,9 @@ Doubling (reduplication): a doubled describing root is stronger (var-var huge, s
 
 ## Sound words from Guarani
 
-Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeating the last syllable as the sound repeats. Varnak borrows a family of them, respelled (Guarani y becomes i, mb becomes b, nasal vowels are not marked):
+Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeating the last syllable as the sound repeats. Tujuju borrows a family of them, respelled (Guarani y becomes i, mb becomes b, nasal vowels are not marked):
 
-| Varnak | Meaning | Guarani source |
+| Tujuju | Meaning | Guarani source |
 |---|---|---|
 | pororo | pop, crackle | pororó, the sound of something bursting (also popcorn) |
 | piriri | sparkle, fizz | piriri, to sparkle or crackle |
@@ -343,7 +343,7 @@ Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeat
 | vava | sway | vava, to sway |
 | sununu | rumbling uproar | sununu, uprising or revolt |
 
-The paradigm in Varnak: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Desh i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
+The paradigm in Tujuju: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Desh i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
 
 Things to check: 19. Doubling is a game addition, not in the handoff document. 20. Whether sound words should be their own word class or ordinary verb roots (the game treats them as intransitive roots). 21. Whether the hyphen in doubled forms (var-var) is the right spelling.
 
@@ -352,7 +352,7 @@ Things to check: 19. Doubling is a game addition, not in the handoff document. 2
 
 New native words: hiri (prank; Hiri! = Gotcha!), hiri-hiri (prank after prank), sipu (spider), dop (hide, transitive), lavir (maze), Hirimara (hiri + mara, the prank field), deshavu-sek (the deja vu stone). The derivation ending -na (person who), from the handoff document's teka-na, is used for choni-na, a choni person.
 
-New borrowings, respelled with Varnak sounds: karaoke (Japanese), bravo (Italian), ups (English oops), pitsa (Italian pizza), selfi (English), robot (Czech), safari (Swahili), tabu (Tongan tapu, through English; a describing root), kudos (Greek), chochke (Yiddish tchotchke), kluts (Yiddish klutz), poltergais (German Poltergeist), dopelgenger (German Doppelganger), deshavu (French deja vu), gobeldigok (English gobbledygook), ninkompup (English nincompoop), karinyo (Spanish carino), shampu (Hindi champo), yureka (Greek eureka), bungalo (Hindi bangla), kabum (English kaboom). New calque: wai-dau (bad-head, from German Dummkopf), with the modifier first as in Varnak compounds.
+New borrowings, respelled with Tujuju sounds: karaoke (Japanese), bravo (Italian), ups (English oops), pitsa (Italian pizza), selfi (English), robot (Czech), safari (Swahili), tabu (Tongan tapu, through English; a describing root), kudos (Greek), chochke (Yiddish tchotchke), kluts (Yiddish klutz), poltergais (German Poltergeist), dopelgenger (German Doppelganger), deshavu (French deja vu), gobeldigok (English gobbledygook), ninkompup (English nincompoop), karinyo (Spanish carino), shampu (Hindi champo), yureka (Greek eureka), bungalo (Hindi bangla), kabum (English kaboom). New calque: wai-dau (bad-head, from German Dummkopf), with the modifier first as in Tujuju compounds.
 
 Key sentences:
 - Ti-ni dau-ma sipu i-esh-da! (There's a spider on your head!)
@@ -372,7 +372,7 @@ Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 
 
 Errands use the attested request pattern from Ketu's quest: number + noun + t-na-ven-o-ye (Vel panak t-na-ven-o-ye, please give me two bread).
 
-New words: par-yir (feather, a calque: bird + clothing, a bird's clothes), kraa (a parrot squawk, not really Varnak). monarma and yeshma are noun + -ma.
+New words: par-yir (feather, a calque: bird + clothing, a bird's clothes), kraa (a parrot squawk, not really Tujuju). monarma and yeshma are noun + -ma.
 
 Overheard conversations (data.gd OVERHEAR) are all composed. Examples:
 - Anni pai hama i-esh-ha? Ma-k-i-pal-ak-pa-ki-da. Halke pai i-nuk-pa-ha? (Where is my paper? I didn't see it. Who took the paper?)
@@ -441,7 +441,7 @@ Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-s
 
 ## The cenote
 
-New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Varnak sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
+New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Tujuju sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
 
 ## Kirmel: the lost writing
 

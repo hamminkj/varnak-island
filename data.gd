@@ -1,6 +1,6 @@
 extends RefCounted
-# Language data for Varnak Island. Every form here comes from the Varnak section of the
-# Constructed-Language Handoff Document (attested examples, marked "doc" in VARNAK_CONTENT.md)
+# Language data for Tujuju Island. Every form here comes from the Varnak section (the language's original name) of the
+# Constructed-Language Handoff Document (attested examples, marked "doc" in TUJUJU_CONTENT.md)
 # or is composed strictly by that document's rules (marked "composed").
 
 # Notebook glosses for words and morphemes added in this expansion.
@@ -64,7 +64,7 @@ const WORDS = {
 	"ti-ni": "your (ti + ni)", "ti-ru": "to you (ti + ru)",
 	"ning-guro": "song-berry (ning + guro): a glowing berry that makes you speak in poems",
 	"sao-dau": "star-head mushroom (sao + dau): a glowing mushroom that makes you speak in strange poems",
-	# borrowed words: respelled with Varnak sounds
+	# borrowed words: respelled with Tujuju sounds
 	"choni": "underwear (borrowed from Mexican Spanish chones, chonies)", "buruhaha": "an uproar, a commotion (borrowed from French brouhaha)",
 	"kafufel": "a fuss (borrowed from Scots kerfuffle)", "halabalu": "a noisy racket (borrowed from English hullabaloo)",
 	"shenani": "mischief, tricks (borrowed from English shenanigans)", "gesunhait": "bless you, said after a sneeze (borrowed from German Gesundheit)",
@@ -368,7 +368,7 @@ const SENTENCES = {
 		"gesture": "A giant fruit rolls down the main path. Everyone jumps out of the way.",
 		"words": ["var", "guro", "hala", "pav"], "wrong": ["A small fruit is sleeping.", "The fruit is not moving."]},
 	"odd_choni": {"v": "Gav-ni choni fardom-ni tarma i-esh-da!", "parts": "Gav-ni  choni  fardom-ni  tar-ma  i-esh-da\nGav-GEN  underwear  lighthouse-GEN  top-LOC  3S-be.located-DIR", "en": "Gav's underwear is on top of the lighthouse!",
-		"gesture": "A pair of spotted chonies flaps from the very top of the lighthouse like a flag. Choni is a word Varnak borrowed.",
+		"gesture": "A pair of spotted chonies flaps from the very top of the lighthouse like a flag. Choni is a word Tujuju borrowed.",
 		"words": ["choni", "-ni", "fardom", "tar", "-ma"], "wrong": ["Gav is on top of the lighthouse.", "The lighthouse is wearing a hat."]},
 	"suri_kinder": {"v": "Ki senak sanu-mara ma-i-an-ki-da!", "parts": "ki  senak  sanu-mara  ma-i-an-ki-da\nthis  school  child-field  NEG-3S-be-NEG-DIR", "en": "This school is NOT a kindergarten!",
 		"gesture": "Suri says it to Rin and Ola, who are giggling under a bench. Sanu-mara is a calque of German Kindergarten: child-field.",
@@ -509,7 +509,7 @@ const RUMOR_VERBS = {"sul": ["sleep", "sleeping", "slept", "sleeps"], "sum": ["s
 const RUMOR_WHO = ["An", "Tor", "Mira", "Ketu", "Lira", "Oren", "Sanu", "Ena", "Suri", "Pomo", "Vira", "Yalo", "Desh", "Oku", "Gav", "Tamu", "Neri", "Gor", "Mar", "Par", "Poltergais", "Robot"]
 const RUMOR_WHO_EN = {"An": "I", "Gor": "The dog", "Mar": "The horse", "Par": "The bird", "Poltergais": "The poltergeist", "Robot": "The robot"}
 
-# Door puzzles, one per house. situation is a gesture; options are Varnak commands.
+# Door puzzles, one per house. situation is a gesture; options are Tujuju commands.
 const DOORS = {
 	"house1": {"situation": "Warm light spills around the shut door. Someone inside waves, urging you to come in.",
 		"options": ["Mun t-i-por-o!", "Mun t-i-hep-o!", "Ma-t-i-por-o-ki!"], "correct": 0,
@@ -563,7 +563,7 @@ const LOOKOUT = [
 		"options": ["Saima i-esh-da.", "Dongma i-esh-da.", "Beima i-esh-da."], "correct": 0, "why": "sai is west, where the sun sets."}
 ]
 
-# Suri's lesson on question words. kind "meaning": pick the English meaning; "answer": answer in Varnak.
+# Suri's lesson on question words. kind "meaning": pick the English meaning; "answer": answer in Tujuju.
 const SCHOOL = [
 	{"q": "Halke puka i-rav-im-ha?", "gesture": "Suri points at Rin, who is reading, and raises her eyebrows.",
 		"options": ["Who is reading the book?", "Where is the book?", "How many books are there?"], "correct": 0,
@@ -598,7 +598,7 @@ const PAIN = {"gesture": "Ila presses both hands to her temples and winces.",
 const SUMMARY_NOTE = "Forms marked (doc) appear in the handoff document; others are composed from its rules."
 
 
-# Oku's riddles. Each clue is a short Varnak description; the answer is a noun.
+# Oku's riddles. Each clue is a short Tujuju description; the answer is a noun.
 const RIDDLES = [
 	{"q": "Yarma henma i-esh-da. I-ret.", "en": "In the day it is in the sky. It is hot.", "options": ["riya", "yue", "sao"], "correct": 0,
 		"why": "riya, the sun. yar-ma means in the day, hen-ma in the sky."},
@@ -677,7 +677,7 @@ const LEVEL_NAMES = ["", "Explorer", "Speaker", "Storyteller", "Elder"]
 # Times of day, announced as they change.
 const TIMES = {"salma": "dawn", "monar": "morning", "yar": "day", "wanar": "evening", "yesh": "night"}
 
-# Personalities. thing: what they are proud of (Varnak, English). trait decides how big their reactions are.
+# Personalities. thing: what they are proud of (Tujuju, English). trait decides how big their reactions are.
 # likes and hates are gifts: tari (fish), panak (bread), cha (tea), gin (a coin).
 const PEOPLE = {
 	"ena": {"trait": "cheerful", "thing": ["kel", "bag"], "likes": ["tari"], "hates": [],
@@ -749,7 +749,7 @@ const JOKES = [
 ]
 const GIFT_WORDS = {"tari": "fish", "panak": "bread", "cha": "tea", "gin": "a coin", "bombom": "candy", "ret-gor": "hot dog"}
 
-# False friends: Varnak words that look like English words.
+# False friends: Tujuju words that look like English words.
 const FALSE_FRIENDS = [
 	["hen", "a chicken", "sky", ["chicken", "egg"]], ["ten", "the number 10", "foot", ["ten", "hand"]], ["far", "far away", "fire", ["far away", "near"]],
 	["pal", "a friend", "see", ["friend", "talk"]], ["gin", "a drink", "money", ["a drink", "water"]], ["bar", "a bar", "eight", ["a bar", "a door"]],
@@ -823,7 +823,7 @@ const PRANKS = [
 	{"id": "robot", "label": "Be a robot", "v": "Bip. Bup. An robot na-an-da. Ti-ni bombom t-na-ven-o!", "en": "Beep. Boop. I am a robot. Give me your candy!", "words": ["robot", "bombom", "ven"],
 		"act": "{name} slowly starts to hand over an imaginary candy... then stops."}
 ]
-# How each personality reacts to being pranked: [Varnak, English, emote, friendship]
+# How each personality reacts to being pranked: [Tujuju, English, emote, friendship]
 const PRANKED = {
 	"dramatic": ["Aaah! AAAH!! ...Ho.", "Aaah! AAAH!! ...(faints, then gets up) Oh.", "faint", 0],
 	"giggly": ["Ha! Ha! Hiri! Ti ta-ho-da!", "Ha ha! A prank! You're good!", "laugh", 1],
@@ -832,7 +832,7 @@ const PRANKED = {
 	"sleepy": ["Han...? Hiri...? zzz", "What...? A prank...? zzz", "sleepy", 0],
 	"cheerful": ["Ha! Hiri! Kudos!", "Ha! A prank! Kudos to you!", "laugh", 1]
 }
-# Extra teases: [Varnak, English, new word]
+# Extra teases: [Tujuju, English, new word]
 const TEASES = [
 	["Ti kluts ta-an-da!", "You're a klutz! (kluts is borrowed from Yiddish klutz)", "kluts"],
 	["Ti-ni dau i-var-var!", "Your head is HUGE! (doubling makes var stronger)", "var-var"],
@@ -840,7 +840,7 @@ const TEASES = [
 	["Ti wai-dau ta-an-da!", "You're a dummy! (wai-dau, bad-head, is a calque of German Dummkopf)", "wai-dau"],
 	["Ti-ni mel gobeldigok i-an-da!", "Your talk is gibberish! (gobeldigok is borrowed from English gobbledygook)", "gobeldigok"]
 ]
-# Gav's six lost chonies: [id, position x, z, Varnak hint, English hint]
+# Gav's six lost chonies: [id, position x, z, Tujuju hint, English hint]
 const CHONI_HUNT = [
 	["choni_hill", -56.5, -38.6, "Choni sang-ni tarma i-esh-shi.", "Apparently a choni is on top of the hill."],
 	["choni_falls", 60.3, -35.6, "Choni wak hala i-lum-im-en mora-ni dalma i-esh-shi.", "Apparently a choni is beside the river where the water goes fast (near the waterfall)."],
@@ -853,12 +853,12 @@ const CHONI_HUNT = [
 # ---------------------------------------------------------------- ninth expansion: overheard talk, letters, Teach Neri
 const WORDS9 = {
 	"par-yir": "feather (calque: par bird + yir clothing, so a feather is a bird's clothes)",
-	"kraa": "kraa! (a parrot's squawk; not really a Varnak word, but somebody keeps writing it)",
+	"kraa": "kraa! (a parrot's squawk; not really a Tujuju word, but somebody keeps writing it)",
 	"monarma": "in the morning (monar morning + -ma)", "yeshma": "at night (yesh night + -ma)"
 }
 
 # Overheard conversations. a and b stand near each other; get close and listen in.
-# lines: [speaker, Varnak, English]. q: comprehension question, opts[0] is correct.
+# lines: [speaker, Tujuju, English]. q: comprehension question, opts[0] is correct.
 # clue: a story clue for the mystery letters (see LETTER_CLUES).
 const OVERHEAR = [
 	{"id": "ov_paper", "a": "suri", "b": "ketu", "clue": "paper", "words": ["pai", "hama", "hal", "nuk"],
@@ -982,7 +982,7 @@ const KAN = {
 	"pav": ["run fast", ["ola", "rin", "gav", "neri"]],
 	"fei": ["fly", []]
 }
-# Special answers: "id:root" -> [Varnak, English, emote]
+# Special answers: "id:root" -> [Tujuju, English, emote]
 const KAN_LINES = {
 	"tor:sum": ["Maki! ...Ups. Mora i-len-da.", "No! ...Oops. The river is cold.", "embarrassed"],
 	"desh:ning": ["Ho! Na-ning-kan-da! Tarara! TARARA!", "Yes! I can sing! Toot! TOOT!", "laugh"],
@@ -1047,7 +1047,7 @@ const RELAYS = [
 			"noun": ["Deshke haima yok i-pal-pa-nu. Yok i-sum-im-nu.", "yue turned into yok. Now the MEDICINE is swimming in the sea, and Vira is very upset."]}}
 ]
 
-# Guess who: yes/no questions. key -> [Varnak, English]
+# Guess who: yes/no questions. key -> [Tujuju, English]
 const GUESS_Q = {
 	"hat": ["Sa-su dau-yir i-esh-ha?", "Do they have a hat? (Is a hat with them?)"],
 	"glasses": ["Sa-su pal-sek i-esh-ha?", "Do they have glasses?"],
@@ -1072,7 +1072,7 @@ const WORDS12 = {
 }
 
 # Each scene: the villager starts, you answer with Ho, e... (yes, and...) plus a sentence you assemble.
-# rounds: [villager Varnak, English, ideas]; each idea: [English, tiles]. end: the villager's last line.
+# rounds: [villager Tujuju, English, ideas]; each idea: [English, tiles]. end: the villager's last line.
 const YESEN = [
 	{"id": "soup", "sug": ["chiriri", "sizzle"], "who": "mira", "title": "The runaway soup", "rounds": [
 		["Yamat i-pav-im-da!", "The food is running!", [["the food is swimming in the river!", ["Yamat", "morama", "i-sum-im-da."]], ["I can see the food!", ["Anke", "yamat", "k-i-pal-da."]]]],
@@ -1170,7 +1170,7 @@ const WORDS13 = {
 # ---------------------------------------------------------------- the lost writing (kirmel) and Var Tari
 const WORDS14 = {
 	"kir": "carve, write (root)",
-	"kirmel": "the old Varnak writing, a syllabary (kir carve + mel speak: carved speech)",
+	"kirmel": "the old Tujuju writing, a syllabary (kir carve + mel speak: carved speech)",
 	"var tari": "Var Tari, the great fish who sleeps in the cenote (var big + tari fish)"
 }
 # The picture stone near the surface: a word under each picture.
@@ -1186,7 +1186,7 @@ const KIR_STORY = [
 	{"depth": 52.0, "v": "Tari sonot-ma i-sul-im-nu. Tari kirmel i-zen-nu. Ti kirmel tekaru ta-tar-fu-ha?", "en": "The fish sleeps in the cenote, they say. The fish knows the writing. Will you bring the writing to the village?"}
 ]
 # Var Tari speaks only with evidentials: what it saw (-da), what it heard (-nu), what it works out (-shi).
-# [Varnak, English, ending, condition]
+# [Tujuju, English, ending, condition]
 const GUARDIAN_LINES = [
 	["Ti sonot-ma ta-lup-pa-da.", "You dived into the cenote. I saw it.", "da", "always"],
 	["Anke hen ma-k-i-pal-pa-ki-da.", "I have never seen the sky. (I know this myself.)", "da", "always"],

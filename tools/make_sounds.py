@@ -1,4 +1,4 @@
-"""Generate every sound in Varnak Island from code (no outside recordings).
+"""Generate every sound in Tujuju Island from code (no outside recordings).
 Run: python3 tools/make_sounds.py   (needs numpy and ffmpeg). Writes sfx/*.ogg."""
 import os, subprocess, tempfile, wave
 import numpy as np
