@@ -28,8 +28,55 @@ static func strokes(base: String) -> Array:
 		"y": return [[Vector2(-0.8, -0.7), Vector2(0.0, 0.0), Vector2(-0.8, 0.7)], [Vector2(0.0, 0.0), Vector2(0.9, 0.0)]]
 		"w": return [[Vector2(0.75, -0.85), Vector2(-0.6, 0.0), Vector2(0.75, 0.85)], [Vector2(0.75, -0.85), Vector2(0.75, -0.3)]]
 		"h": return [[Vector2(-0.7, -0.85), Vector2(-0.7, 0.85)], [Vector2(-0.7, 0.0), Vector2(0.7, 0.0), Vector2(0.7, 0.85)]]
-		"f": return [[Vector2(-0.8, 0.8), Vector2(0.75, -0.75)], [Vector2(0.75, -0.75), Vector2(0.0, -0.75)], [Vector2(0.75, -0.75), Vector2(0.75, 0.0)]]
+		"f": return [[Vector2(-0.8, 0.8), Vector2(0.4, -0.4)], arc(Vector2(0.58, -0.58), 0.26, 225.0, 585.0, 14)]
 	return [[Vector2(-0.5, -0.5), Vector2(0.5, 0.5)], [Vector2(-0.5, 0.5), Vector2(0.5, -0.5)]]
+
+# Soften a stroke so the marks look drawn by hand: every corner becomes a round curve and
+# every long straight stretch bends a little. Curves that are already smooth are left alone.
+static func soften(line: Array) -> Array:
+	if line.size() > 8: return line
+	var closed = line.size() > 3 and (line[0] as Vector2).distance_to(line[line.size() - 1]) < 0.001
+	var pts: Array = line.duplicate()
+	if closed: pts.pop_back()
+	var n = pts.size()
+	if n < 2: return line
+	var p_in: Array = []
+	var p_out: Array = []
+	for i in range(n):
+		var corner = closed or (i > 0 and i < n - 1)
+		if not corner:
+			p_in.append(pts[i])
+			p_out.append(pts[i])
+			continue
+		var a: Vector2 = pts[(i - 1 + n) % n]
+		var bb: Vector2 = pts[i]
+		var c: Vector2 = pts[(i + 1) % n]
+		var r = minf(0.62, minf(a.distance_to(bb), bb.distance_to(c)) * 0.48)
+		p_in.append(bb + (a - bb).normalized() * r)
+		p_out.append(bb + (c - bb).normalized() * r)
+	var out: Array = []
+	var last = n if closed else n - 1
+	for i in range(last):
+		var j = (i + 1) % n
+		if closed or i > 0:
+			for k in range(7):
+				var t = k / 6.0
+				var q0: Vector2 = (p_in[i] as Vector2).lerp(pts[i], t)
+				var q1: Vector2 = (pts[i] as Vector2).lerp(p_out[i], t)
+				out.append(q0.lerp(q1, t))
+		else:
+			out.append(pts[i])
+		var s0: Vector2 = p_out[i]
+		var s1: Vector2 = p_in[j]
+		var d = s1 - s0
+		if d.length() > 0.5:
+			var mid = (s0 + s1) * 0.5 + Vector2(-d.y, d.x).normalized() * d.length() * 0.08
+			for k in range(1, 6):
+				var t2 = k / 6.0
+				out.append(s0.lerp(mid, t2).lerp(mid.lerp(s1, t2), t2))
+	if closed: out.append(out[0])
+	else: out.append(pts[n - 1])
+	return out
 
 static func arc(c: Vector2, r: float, a0: float, a1: float, n: int) -> Array:
 	var out: Array = []
@@ -119,11 +166,13 @@ static func glyph_strokes(c: String, v: String) -> Array:
 	var raw: Array = strokes(base).duplicate(true)
 	if mark in ["dot", "dotbar"]:
 		var dp = {"p": Vector2(0.1, 0.15), "t": Vector2(0.0, 0.2), "k": Vector2(0.2, 0.0), "s": Vector2(-0.45, 0.45), "f": Vector2(0.3, 0.3)}.get(base, Vector2(0.3, 0.3))
+		if mark == "dotbar": dp += Vector2(0, -0.22)
 		raw.append(arc(dp, 0.16, 0.0, 360.0, 8))
 		raw.append(arc(dp, 0.07, 0.0, 360.0, 6))
 	if mark in ["bar", "dotbar"]: raw.append([Vector2(-0.35, 0.45), Vector2(0.35, 0.45)])
 	var ang = deg_to_rad(TURN.get(v, 0.0))
 	var out: Array = []
+	for k in range(raw.size()): raw[k] = soften(raw[k])
 	for line in raw:
 		var l2: Array = []
 		for p in line: l2.append((p as Vector2).rotated(ang))
@@ -202,7 +251,18 @@ static func image(text: String, w: int, h: int, cell: float, ink: Color, bg: Col
 			var a: Vector2 = pts[k] + off
 			var b: Vector2 = pts[k + 1] + off
 			var steps = int(maxf(a.distance_to(b), 1.0))
-			for s in range(steps + 1):
+			for s in range(0, steps + 1, maxi(1, thick / 3)):
 				var p = a.lerp(b, float(s) / steps)
-				img.fill_rect(Rect2i(int(p.x) - thick / 2, int(p.y) - thick / 2, thick, thick), ink)
+				dab(img, p, thick, ink)
 	return img
+
+# a round brush, so line ends and joins are soft
+static func dab(img: Image, p: Vector2, thick: int, ink: Color):
+	var r = thick * 0.5
+	var ri = int(ceil(r))
+	for dy in range(-ri, ri + 1):
+		for dx in range(-ri, ri + 1):
+			if dx * dx + dy * dy <= r * r + 0.25:
+				var x = int(p.x) + dx
+				var y = int(p.y) + dy
+				if x >= 0 and y >= 0 and x < img.get_width() and y < img.get_height(): img.set_pixel(x, y, ink)
