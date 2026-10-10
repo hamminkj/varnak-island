@@ -611,9 +611,9 @@ func build_forest():
 				var a = vary.randf() * TAU
 				Art.sph(self, p + Vector3(cos(a) * 1.05, 1.8 + vary.randf() * 0.6, sin(a) * 1.05), 0.12, Color("dc8060").lerp(Color("e9c46a"), vary.randf()), Vector3.ONE, 6)
 			solid(p + Vector3(0, 0.8, 0), Vector3(0.4, 1.6, 0.4))
-	Art.scatter(self, Art.cyl_mesh(0.28, 1.0, 7), trunks, trunk_colors)
-	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 8), pines, pine_colors)
-	Art.scatter(self, Art.sphere_mesh(1.0, 9), oaks, oak_colors)
+	Art.scatter(self, Art.cyl_mesh(0.28, 1.0, 7), trunks, trunk_colors, true, 14.0)
+	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 8), pines, pine_colors, true, 30.0)
+	Art.scatter(self, Art.sphere_mesh(1.0, 9), oaks, oak_colors, true, 36.0)
 
 func near_entity(x: float, z: float, d: float) -> bool:
 	for e in entities:
@@ -643,12 +643,13 @@ func add_tree(p: Vector3, vary: RandomNumberGenerator, trunks: Array, trunk_colo
 	else:
 		var base = Color("3c7f45").lerp(Color("8ab456"), vary.randf())
 		if vary.randf() < 0.08: base = Color("d98f3a")
-		var cy = trunk_h + 0.7 * s
-		oaks.append(Transform3D(Basis.from_scale(Vector3(2.0 * s, 1.55 * s, 2.0 * s)), p + Vector3(0, cy, 0)))
+		# tall, upright canopies: ovals stacked on a long trunk
+		var cy = trunk_h + 1.1 * s
+		oaks.append(Transform3D(Basis.from_scale(Vector3(1.65 * s, 2.15 * s, 1.65 * s)), p + Vector3(0, cy, 0)))
 		oak_colors.append(base)
-		oaks.append(Transform3D(Basis.from_scale(Vector3(1.3 * s, 1.1 * s, 1.3 * s)), p + Vector3(0.9 * s * cos(yaw), cy + 0.7 * s, 0.9 * s * sin(yaw))))
+		oaks.append(Transform3D(Basis.from_scale(Vector3(1.05 * s, 1.5 * s, 1.05 * s)), p + Vector3(0.75 * s * cos(yaw), cy + 1.0 * s, 0.75 * s * sin(yaw))))
 		oak_colors.append(base.lightened(0.1))
-		oaks.append(Transform3D(Basis.from_scale(Vector3(1.2 * s, 1.0 * s, 1.2 * s)), p + Vector3(-0.8 * s * cos(yaw), cy + 0.3 * s, -0.8 * s * sin(yaw))))
+		oaks.append(Transform3D(Basis.from_scale(Vector3(0.95 * s, 1.35 * s, 0.95 * s)), p + Vector3(-0.7 * s * cos(yaw), cy + 0.4 * s, -0.7 * s * sin(yaw))))
 		oak_colors.append(base.darkened(0.08))
 
 func build_village():
@@ -926,7 +927,7 @@ func build_scatter():
 	Art.scatter(self, Art.cone_mesh(0.045, 0.3, 4), tufts, tuft_colors, false)
 	Art.scatter(self, Art.cyl_mesh(0.015, 1.0, 4), stems, stem_colors, false)
 	Art.scatter(self, Art.sphere_mesh(0.085, 7), heads, head_colors, false)
-	Art.scatter(self, Art.sphere_mesh(1.0, 8), rocks, rock_colors)
+	Art.scatter(self, Art.sphere_mesh(1.0, 8), rocks, rock_colors, true, 18.0)
 	Art.scatter(self, Art.cyl_mesh(0.03, 1.0, 4), reeds, reed_colors, false)
 
 # ---- passionflower vines, ferns, lotus and cattails ----
@@ -1132,18 +1133,21 @@ func build_sky_life():
 		var c = Node3D.new()
 		c.position = Vector3(rc.randf_range(-160, 160), rc.randf_range(42, 66), rc.randf_range(-140, 80))
 		add_child(c)
+		# Earle's clouds: long, flat-bottomed, stacked in tiers
 		for k in range(rc.randi_range(3, 5)):
 			var m = MeshInstance3D.new()
 			var sm = SphereMesh.new()
 			sm.radius = 1.0
-			sm.height = 2.0
-			sm.radial_segments = 10
+			sm.height = 1.0
+			sm.is_hemisphere = true
+			sm.radial_segments = 14
 			sm.rings = 5
 			m.mesh = sm
 			m.material_override = cloud_mat
-			m.position = Vector3(k * 5.5 - 10, rc.randf_range(-1, 1.5), rc.randf_range(-3, 3))
 			var sc = rc.randf_range(4.5, 8)
-			m.scale = Vector3(sc, sc * 0.45, sc * 0.8)
+			var tier = k % 3
+			m.position = Vector3(k * 4.0 - 8 + rc.randf_range(-1.5, 1.5), tier * 1.6, rc.randf_range(-2, 2))
+			m.scale = Vector3(sc * (2.4 - tier * 0.55), sc * 0.32, sc * 0.7)
 			m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			c.add_child(m)
 		clouds.append(c)
@@ -9422,9 +9426,9 @@ func build_cenote_jungle():
 		solid(Vector3(x, y + 1.2, z), Vector3(0.5, 2.4, 0.5))
 		add_tree(Vector3(x, y, z), vary, trunks, trunk_colors, pines, pine_colors, oaks, oak_colors)
 		placed.append(Vector2(x, z))
-	Art.scatter(self, Art.cyl_mesh(0.28, 1.0, 7), trunks, trunk_colors)
-	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 8), pines, pine_colors)
-	Art.scatter(self, Art.sphere_mesh(1.0, 9), oaks, oak_colors)
+	Art.scatter(self, Art.cyl_mesh(0.28, 1.0, 7), trunks, trunk_colors, true, 14.0)
+	Art.scatter(self, Art.cone_mesh(1.0, 1.0, 8), pines, pine_colors, true, 30.0)
+	Art.scatter(self, Art.sphere_mesh(1.0, 9), oaks, oak_colors, true, 36.0)
 	# ferns and big leaves around the rim, and vines hanging into the opening
 	var leaf_t: Array = []
 	var leaf_c: Array = []

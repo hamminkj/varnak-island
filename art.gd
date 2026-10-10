@@ -121,6 +121,7 @@ uniform vec4 segs[24];
 uniform int seg_count = 0;
 varying vec3 wp;
 varying vec3 mask;
+varying vec3 wn;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p) {
 	vec2 i = floor(p);
@@ -136,6 +137,7 @@ float seg_d(vec2 p, vec4 s) {
 }
 void vertex() {
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	wn = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	mask = COLOR.rgb;
 }
 void fragment() {
@@ -162,6 +164,15 @@ void fragment() {
 	vec3 pathc = mix(vec3(0.72, 0.58, 0.36), vec3(0.62, 0.48, 0.30), vnoise(p * 3.5));
 	pathc = mix(pathc, vec3(0.50, 0.46, 0.40), step(0.965, hash(floor(p * 16.0))) * 0.55);
 	col = mix(col, pathc, path * 0.95 * (1.0 - smask * 0.6));
+	// Earle-style striations: fine lines that wrap around the hills like drawn contours
+	float slope = 1.0 - clamp(wn.y, 0.0, 1.0);
+	float hu = wp.y * 2.4 + vnoise(p * 0.18) * 2.2 + vnoise(p * 0.9) * 0.4;
+	float hfw = fwidth(hu);
+	float hd = min(fract(hu), 1.0 - fract(hu));
+	float hl = (1.0 - smoothstep(0.07, 0.07 + hfw * 1.5, hd)) * (1.0 - smoothstep(0.2, 0.5, hfw));
+	float hill = smoothstep(0.1, 0.35, slope) * (1.0 - path) * (1.0 - smask * 0.7);
+	col *= 1.0 - 0.28 * hl * hill;
+	col += vec3(0.07, 0.07, 0.03) * (1.0 - smoothstep(0.07, 0.07 + hfw * 1.5, abs(hd - 0.5))) * hill * (1.0 - smoothstep(0.2, 0.5, hfw));
 	float wet = smoothstep(0.02, -0.25, wp.y);
 	col = mix(col, vec3(0.52, 0.47, 0.34) * (1.0 - smoothstep(-0.2, -2.0, wp.y) * 0.45), wet);
 	ALBEDO = col;
@@ -204,7 +215,47 @@ static func plane(parent: Node3D, pos: Vector3, size: Vector2, material: Materia
 
 # ---------- multimesh scatter ----------
 
-static func scatter(parent: Node3D, mesh: Mesh, transforms: Array, colors: Array, shadows: bool = true) -> MultiMeshInstance3D:
+# Eyvind Earle patterning: fine, broken parallel lines running along a form (around the mesh's
+# UV, so up a trunk, down a cone, over a canopy), a few lighter strokes, banded light. The lines
+# fade out with distance so far trees read as flat shapes.
+const PATTERN_SHADER = """
+shader_type spatial;
+render_mode diffuse_toon, specular_disabled;
+uniform float lines = 28.0;
+uniform float strength = 0.22;
+uniform float light = 0.10;
+float h1(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
+void fragment() {
+	vec3 c = COLOR.rgb;
+	float u = UV.x * lines;
+	float cell = floor(u);
+	float j = h1(cell);
+	float d = min(fract(u), 1.0 - fract(u));
+	float fw = fwidth(u);
+	float fade = 1.0 - smoothstep(0.18, 0.45, fw);
+	float on = 1.0 - smoothstep(0.06, 0.06 + fw * 1.5, d);
+	float brk = step(0.28, fract(UV.y * (2.0 + j * 5.0) + j * 3.0));
+	float dark = on * brk * step(0.22, j);
+	float lite = on * brk * step(0.86, j);
+	ALBEDO = c * (1.0 - strength * dark * fade) + c * light * lite * fade;
+	ROUGHNESS = 1.0;
+}
+"""
+static var _pattern_mats: Dictionary = {}
+
+static func pattern_material(lines: float, strength: float = 0.22) -> ShaderMaterial:
+	var key = str(lines) + "|" + str(strength)
+	if _pattern_mats.has(key): return _pattern_mats[key]
+	var sh = Shader.new()
+	sh.code = PATTERN_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = sh
+	m.set_shader_parameter("lines", lines)
+	m.set_shader_parameter("strength", strength)
+	_pattern_mats[key] = m
+	return m
+
+static func scatter(parent: Node3D, mesh: Mesh, transforms: Array, colors: Array, shadows: bool = true, pattern: float = 0.0) -> MultiMeshInstance3D:
 	var mm = MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
@@ -215,6 +266,11 @@ static func scatter(parent: Node3D, mesh: Mesh, transforms: Array, colors: Array
 		mm.set_instance_color(i, colors[i])
 	var mmi = MultiMeshInstance3D.new()
 	mmi.multimesh = mm
+	if pattern > 0.0:
+		mmi.material_override = pattern_material(pattern)
+		if not shadows: mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		parent.add_child(mmi)
+		return mmi
 	var m = StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true
 	m.roughness = 0.95
