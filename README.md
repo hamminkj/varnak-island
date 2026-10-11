@@ -129,6 +129,9 @@ Once Var Tari has taught you Ayvu, show Dofo the Ayvu chart and Dofo builds you 
 ## No gender
 Tujuju has no grammatical gender (i- is one person or thing, ri- a group), so the English in the game never uses he or she: everyone on Tujuju Island is a they, and where a singular they could be confused with a group, glosses say they (one person) or they (a group), or repeat the name.
 
+## Villagers
+The villagers keep their puppet construction (separate head, arms and body that sway, wave and react), restyled to belong in the painted scenery: taller and slimmer, with longer tapered legs and an A-line torso; clothing in colors pulled toward the island palette (teal, ochre, rust, wine, plum, slate blue, olive, cream) with Earle-style fine vertical lines like fabric folds; and smaller, softer eyes. Skin tones, hair and faces keep their own colors.
+
 ## Start screen and UI
 The game opens on the chalk Tujuju (a dancing jabiru) with Tujuju written in Ayvu below it, one Begin (or Continue) button, a quiet How to play link and a small credit. The same drawing is the browser tab icon, the loading screen and the stork carving in the cenote. Menus use a palette taken from the chalkboard and the painted island: deep teal buttons with cream lettering, ivory panels with a teal border, gold for Tujuju sentences and the main button, and terracotta for closing.
 

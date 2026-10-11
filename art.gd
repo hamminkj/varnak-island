@@ -309,6 +309,57 @@ static func cyl_mesh(radius: float, height: float, seg: int = 7) -> CylinderMesh
 
 # ---------- people ----------
 
+# Clothing in the spirit of Eyvind Earle: flat color with fine vertical lines like fabric folds.
+const CLOTH_SHADER = """
+shader_type spatial;
+render_mode diffuse_toon, specular_disabled;
+uniform vec4 base : source_color = vec4(0.5, 0.5, 0.5, 1.0);
+uniform float lines = 22.0;
+uniform float strength = 0.24;
+float h1(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
+void fragment() {
+	vec3 c = base.rgb;
+	float u = UV.x * lines;
+	float j = h1(floor(u));
+	float d = min(fract(u), 1.0 - fract(u));
+	float fw = fwidth(u);
+	float fade = 1.0 - smoothstep(0.2, 0.5, fw);
+	float on = 1.0 - smoothstep(0.07, 0.07 + fw * 1.5, d);
+	float brk = step(0.22, fract(UV.y * (1.5 + j * 3.0) + j * 2.0));
+	ALBEDO = c * (1.0 - strength * on * brk * step(0.2, j) * fade) + c * 0.12 * on * brk * step(0.85, j) * fade;
+	ROUGHNESS = 1.0;
+}
+"""
+static var _cloth: Dictionary = {}
+static var _cloth_shader: Shader
+
+static func cloth_material(c: Color) -> ShaderMaterial:
+	var key = c.to_html()
+	if _cloth.has(key): return _cloth[key]
+	if _cloth_shader == null:
+		_cloth_shader = Shader.new()
+		_cloth_shader.code = CLOTH_SHADER
+	var m = ShaderMaterial.new()
+	m.shader = _cloth_shader
+	m.set_shader_parameter("base", c)
+	_cloth[key] = m
+	return m
+
+# Pull a clothing color toward the island's painted palette, keeping it recognizably itself.
+const EARLE_CLOTH = [Color("2c6a62"), Color("3f8a7a"), Color("d9a948"), Color("b5543a"), Color("7a2e3a"), Color("6e4a7e"), Color("3d5a8a"), Color("7a8a3a"), Color("e8dcc0"), Color("1f3a3a"), Color("c98a5a"), Color("2b2e4a")]
+
+static func harmonize(c: Color) -> Color:
+	var best: Color = EARLE_CLOTH[0]
+	var bd = 99.0
+	for p in EARLE_CLOTH:
+		var d = Vector3(c.r - p.r, c.g - p.g, c.b - p.b).length()
+		if d < bd:
+			bd = d
+			best = p
+	var out = c.lerp(best, 0.6)
+	out.s = out.s * 0.82
+	return out
+
 static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accent: Color = Color("f2e6c8"), ex: Dictionary = {}) -> Node3D:
 	shirt = ex.get("shirt", shirt)
 	style = ex.get("style", style)
@@ -321,12 +372,14 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	n.set_meta("h", h)
 	var pants: Color = ex.get("pants", shirt.darkened(0.45))
 	var shoes: Color = ex.get("shoes", Color("3b2d25"))
+	# longer, slimmer legs: Earle's figures are tall and elongated
 	for side in [-1.0, 1.0]:
-		box(rig, Vector3(side * 0.11 * w, 0.3, 0), Vector3(0.17 * w, 0.6, 0.2), pants)
-		box(rig, Vector3(side * 0.11 * w, 0.04, 0.05), Vector3(0.19 * w, 0.09, 0.32), shoes)
+		cyl(rig, Vector3(side * 0.095 * w, 0.37, 0), 0.08 * w, 0.06 * w, 0.72, pants, Vector3.ZERO, 10)
+		box(rig, Vector3(side * 0.095 * w, 0.035, 0.045), Vector3(0.13 * w, 0.07, 0.26), shoes)
 	var body = Node3D.new()
 	rig.add_child(body)
-	cyl(body, Vector3(0, 0.95, 0), 0.22, 0.28, 0.78, shirt, Vector3.ZERO, 14).scale = Vector3(w, 1, w)
+	# a tapered, A-line torso instead of a straight barrel
+	cyl(body, Vector3(0, 0.95, 0), 0.17, 0.275, 0.78, shirt, Vector3.ZERO, 16).scale = Vector3(w, 1, w)
 	cyl(body, Vector3(0, 0.62, 0), 0.285, 0.285, 0.07, accent.darkened(0.2), Vector3.ZERO, 14).scale = Vector3(w, 1, w)
 	torus(body, Vector3(0, 1.36, 0), 0.07, 0.18, accent, Vector3.ZERO)
 	if ex.get("build", "") == "round":
@@ -370,18 +423,18 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	body.add_child(head)
 	sph(head, Vector3.ZERO, 0.21, skin, Vector3(ex.get("head_w", 1.0), ex.get("head_h", 1.0), 1.0), 14)
 	sph(head, Vector3(0, -0.02, 0.2), ex.get("nose", 0.04), skin.darkened(0.08), Vector3.ONE, 6)
-	var eye: Color = ex.get("eyes", Color("1a120e"))
+	var eye: Color = ex.get("eyes", Color("1f2a2a"))
 	var eyes: String = ex.get("eye_kind", "")
 	for sd in [-1.0, 1.0]:
 		if eyes == "sleepy":
 			sph(head, Vector3(sd * 0.08, 0.02, 0.185), 0.04, eye, Vector3(1.1, 0.45, 0.7), 6)
 			box(head, Vector3(sd * 0.08, 0.045, 0.19), Vector3(0.1, 0.03, 0.03), skin.darkened(0.12))
 		elif eyes == "big":
-			sph(head, Vector3(sd * 0.085, 0.03, 0.18), 0.055, Color("fbf7ef"), Vector3(1, 1.2, 0.6), 8)
-			sph(head, Vector3(sd * 0.085, 0.025, 0.205), 0.035, eye, Vector3(1, 1.2, 0.6), 6)
+			sph(head, Vector3(sd * 0.085, 0.03, 0.18), 0.046, Color("f3eedc"), Vector3(1, 1.2, 0.6), 8)
+			sph(head, Vector3(sd * 0.085, 0.025, 0.205), 0.029, eye, Vector3(1, 1.2, 0.6), 6)
 			sph(head, Vector3(sd * 0.075, 0.045, 0.222), 0.011, Color.WHITE, Vector3.ONE, 4)
 		else:
-			sph(head, Vector3(sd * 0.08, 0.03, 0.185), 0.04, eye, Vector3(1, 1.25, 0.7), 6)
+			sph(head, Vector3(sd * 0.08, 0.03, 0.188), 0.03, eye, Vector3(1, 1.3, 0.7), 6)
 	var lip = skin.darkened(0.4)
 	match str(ex.get("mouth", "")):
 		"smile":
@@ -497,6 +550,21 @@ static func person(shirt: Color, skin: Color, hair: Color, style: int = 0, accen
 	if ex.get("earrings", false):
 		for side in [-1.0, 1.0]: sph(head, Vector3(side * 0.21, -0.08, 0.0), 0.03, Color("ffd34d"), Vector3.ONE, 6, 0.3)
 	if ex.has("prop"): add_prop(arms[1] if ex["prop"] != "cane" else arms[0], body, str(ex["prop"]), ex)
+	# raise everything above the legs, since the legs are longer now
+	for c in body.get_children(): (c as Node3D).position.y += 0.1
+	# fabric: harmonized colors with fine line patterning; faces and hair stay as they are
+	var stack: Array = [rig]
+	while not stack.is_empty():
+		var nd: Node = stack.pop_back()
+		if nd == head: continue
+		for ch in nd.get_children(): stack.append(ch)
+		if nd is MeshInstance3D:
+			var mi = nd as MeshInstance3D
+			var sm = mi.material_override as StandardMaterial3D
+			if sm == null or sm.emission_enabled: continue
+			var col = sm.albedo_color
+			if col.is_equal_approx(skin): continue
+			mi.material_override = cloth_material(harmonize(col))
 	var small: Array = [head]
 	small.append_array(arms)
 	for part in small:
