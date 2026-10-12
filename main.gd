@@ -656,9 +656,11 @@ func build_village():
 	var walls = [Color("e0c39a"), Color("ead2ac"), Color("d3b08a"), Color("dcc0a4")]
 	var roofs = [Color("b5654a"), Color("8f5a48"), Color("a8584a"), Color("6b7f9c")]
 	var trims = [Color("f4ead0"), Color("5c4b3e"), Color("f4ead0"), Color("f4ead0")]
+	var styles = [0, 1, 3, 2]   # cottage, loft house, stilt house, porch house
+	var yaws = [0.0, -6.0, 5.0, -3.0]
 	for i in range(4):
 		var c = house_centers[i]
-		var h = Art.house(self, c, walls[i], roofs[i], trims[i])
+		var h = Art.house(self, c, walls[i], roofs[i], trims[i], styles[i], yaws[i])
 		houses["house" + str(i + 1)] = h
 		solid(Vector3(c.x, 1.6, c.z), Vector3(5, 3.2, 5))
 		block(c.x, c.z, 4.0)
@@ -740,8 +742,8 @@ func build_places():
 		Art.stall(self, s[0], yaw, s[2], s[1])
 		solid(s[0] + Vector3(0, 0.55, 0), Vector3(2.7, 1.1, 1.1), yaw)
 		block(s[0].x, s[0].z, 2.0)
-	Art.house(self, Vector3(-63, 0, 4), Color("e6d2b0"), Color("a8584a"), Color("f4ead0"))
-	Art.house(self, Vector3(-62, 0, 21), Color("d9c4a2"), Color("6b7f9c"), Color("f4ead0"))
+	Art.house(self, Vector3(-63, 0, 4), Color("e6d2b0"), Color("a8584a"), Color("f4ead0"), 4, 6.0)
+	Art.house(self, Vector3(-62, 0, 21), Color("d9c4a2"), Color("6b7f9c"), Color("f4ead0"), 0, -5.0)
 	for c in [Vector2(-63, 4), Vector2(-62, 21)]:
 		solid(Vector3(c.x, 1.6, c.y), Vector3(5, 3.2, 5))
 		block(c.x, c.y, 4.0)

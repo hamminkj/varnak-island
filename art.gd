@@ -814,43 +814,148 @@ static func animal(kind: String, coat_c: Color = Color("8b5a2b")) -> Node3D:
 
 # ---------- buildings ----------
 
-static func house(parent: Node3D, pos: Vector3, wall: Color, roof: Color, trim: Color) -> Node3D:
+# Five kinds of building, so no two houses read as the same box:
+#   0 cottage      the old shape, side-on gable with a chimney
+#   1 loft house   narrow and tall, gable end to the street, loft window over the door
+#   2 porch house  wide and low, pyramid roof, deep porch on posts with a bench
+#   3 stilt house  raised on posts with steps and a drying rack, for the shore
+#   4 store        flat stepped roof, striped awning over a counter, signboard
+const HOUSE_STYLES = 5
+
+static func house(parent: Node3D, pos: Vector3, wall: Color, roof: Color, trim: Color, style: int = 0, yaw: float = 0.0) -> Node3D:
 	var h = Node3D.new()
 	h.position = Vector3(pos.x, 0, pos.z)
+	h.rotation_degrees.y = yaw
 	parent.add_child(h)
-	box(h, Vector3(0, 0.15, 0), Vector3(5.4, 0.3, 5.4), Color("9a9185"))
-	box(h, Vector3(0, 1.65, 0), Vector3(5.0, 3.0, 5.0), wall)
-	box(h, Vector3(2.52, 1.65, 0), Vector3(0.08, 3.0, 5.1), trim)
-	box(h, Vector3(-2.52, 1.65, 0), Vector3(0.08, 3.0, 5.1), trim)
-	prism(h, Vector3(0, 3.8, 0), Vector3(5.9, 1.9, 6.3), roof, Vector3(0, 90, 0))
-	prism(h, Vector3(0, 3.65, 0), Vector3(5.0, 1.65, 6.35), wall.lightened(0.05), Vector3(0, 90, 0))
-	box(h, Vector3(0, 2.72, 2.6), Vector3(5.5, 0.12, 0.3), trim)
-	box(h, Vector3(1.6, 4.5, -1.2), Vector3(0.7, 1.8, 0.7), Color("8a8279"))
-	box(h, Vector3(1.6, 5.45, -1.2), Vector3(0.85, 0.12, 0.85), Color("6f6860"))
-	box(h, Vector3(0, 1.35, 2.52), Vector3(1.6, 2.1, 0.08), trim.darkened(0.25))
-	box(h, Vector3(0, 0.12, 3.0), Vector3(1.9, 0.24, 1.0), Color("a89f93"))
-	var pivot = Node3D.new()
-	pivot.position = Vector3(-0.6, 0.3, 2.6)
-	h.add_child(pivot)
-	box(pivot, Vector3(0.6, 1.0, 0), Vector3(1.2, 2.0, 0.1), Color("6d4a33"))
+	var w := 5.0     # width across the front
+	var d := 5.0     # depth
+	var wh := 3.0    # wall height
+	var lift := 0.0  # floor height above the ground
+	match style:
+		1:
+			w = 4.4
+			d = 5.2
+			wh = 4.2
+		2:
+			w = 5.8
+			d = 4.6
+			wh = 2.6
+		3:
+			w = 4.8
+			d = 4.8
+			lift = 1.0
+		4:
+			w = 5.4
+			d = 4.8
+			wh = 3.2
+	# the body sits on the stilts, so everything in it is measured from its own floor
+	var b := Node3D.new()
+	b.position.y = lift
+	h.add_child(b)
+	var sx := w * 0.5          # side faces
+	var fz := d * 0.5          # front face
+	var eave := 0.15 + wh      # where the walls stop
+	var wood := Color("6d4a33")
+	var glass := Color("f6dc8c")
+	box(b, Vector3(0, 0.15, 0), Vector3(w + 0.4, 0.3, d + 0.4), Color("9a9185"))
+	box(b, Vector3(0, 0.15 + wh * 0.5, 0), Vector3(w, wh, d), wall)
+	for cx in [sx + 0.02, -sx - 0.02]:
+		box(b, Vector3(cx, 0.15 + wh * 0.5, 0), Vector3(0.08, wh, d + 0.1), trim)
+
+	# ---- roofs ----
+	if style == 2:
+		# a low pyramid: a four-sided cone, turned so its faces square up with the walls
+		box(b, Vector3(0, eave + 0.08, 0), Vector3(w + 1.4, 0.16, d + 1.4), roof.darkened(0.12))
+		cyl(b, Vector3(0, eave + 0.9, 0), 0.0, maxf(w, d) * 0.74, 1.6, roof, Vector3(0, 45, 0), 4)
+	elif style == 4:
+		box(b, Vector3(0, eave + 0.18, 0), Vector3(w + 0.7, 0.36, d + 0.7), roof)
+		box(b, Vector3(0, eave + 0.56, -0.2), Vector3(w * 0.74, 0.4, d * 0.74), roof.darkened(0.1))
+		box(b, Vector3(0, eave + 0.84, -0.2), Vector3(w * 0.52, 0.16, d * 0.52), roof.darkened(0.2))
+	elif style == 1:
+		# ridge front to back, so the street sees a tall gable end
+		# the eaves overhang the sides; the gable end stays shallow so the loft window shows
+		var rh1 := 2.6
+		var gz := d * 0.5 + 0.18
+		prism(b, Vector3(0, eave + rh1 * 0.34, 0), Vector3(w + 1.1, rh1, d + 0.3), roof)
+		prism(b, Vector3(0, eave + rh1 * 0.26, 0), Vector3(w, rh1 * 0.87, d + 0.36), wall.lightened(0.05))
+		box(b, Vector3(0, eave + 0.62, gz + 0.02), Vector3(0.96, 0.96, 0.05), trim.darkened(0.35), Vector3(0, 0, 45))
+		box(b, Vector3(0, eave + 0.62, gz + 0.06), Vector3(0.74, 0.74, 0.05), glass, Vector3(0, 0, 45), 0.4, 0.8)
+		box(b, Vector3(0, eave + 0.62, gz + 0.09), Vector3(0.05, 0.74, 0.04), trim.darkened(0.35), Vector3(0, 0, 45))
+		box(b, Vector3(0, eave + 0.62, gz + 0.09), Vector3(0.74, 0.05, 0.04), trim.darkened(0.35), Vector3(0, 0, 45))
+	else:
+		# ridge left to right: gable ends on the sides
+		var rh := 2.1 if style == 3 else 1.9
+		prism(b, Vector3(0, eave + rh * 0.34, 0), Vector3(d + 0.9, rh, w + 1.3), roof, Vector3(0, 90, 0))
+		prism(b, Vector3(0, eave + rh * 0.26, 0), Vector3(d, rh * 0.87, w + 1.35), wall.lightened(0.05), Vector3(0, 90, 0))
+	if style == 0 or style == 2:
+		box(b, Vector3(sx - 0.9, eave + 1.35, -1.2), Vector3(0.7, 1.8, 0.7), Color("8a8279"))
+		box(b, Vector3(sx - 0.9, eave + 2.3, -1.2), Vector3(0.85, 0.12, 0.85), Color("6f6860"))
+	if style != 2 and style != 4:
+		box(b, Vector3(0, eave - 0.43, fz + 0.1), Vector3(w + 0.5, 0.12, 0.3), trim)
+
+	# ---- door ----
+	box(b, Vector3(0, 1.35, fz + 0.02), Vector3(1.6, 2.1, 0.08), trim.darkened(0.25))
+	box(b, Vector3(0, 0.12, fz + 0.5), Vector3(1.9, 0.24, 1.0), Color("a89f93"))
+	var pivot := Node3D.new()
+	pivot.position = Vector3(-0.6, 0.3, fz + 0.1)
+	b.add_child(pivot)
+	box(pivot, Vector3(0.6, 1.0, 0), Vector3(1.2, 2.0, 0.1), wood)
 	sph(pivot, Vector3(1.0, 1.0, 0.08), 0.06, Color("e0c068"), Vector3.ONE, 6)
-	for wx in [-1.7, 1.7]:
-		box(h, Vector3(wx, 1.9, 2.52), Vector3(1.0, 1.0, 0.08), trim)
-		box(h, Vector3(wx, 1.9, 2.55), Vector3(0.8, 0.8, 0.06), Color("f6dc8c"), Vector3.ZERO, 0.4, 0.8)
-		box(h, Vector3(wx, 1.9, 2.58), Vector3(0.05, 0.8, 0.04), trim)
-		box(h, Vector3(wx, 1.9, 2.58), Vector3(0.8, 0.05, 0.04), trim)
-		box(h, Vector3(wx, 1.3, 2.7), Vector3(1.1, 0.22, 0.3), Color("6d4a33"))
-		sph(h, Vector3(wx - 0.3, 1.5, 2.7), 0.1, Color("e76f51"), Vector3.ONE, 6)
-		sph(h, Vector3(wx, 1.52, 2.7), 0.1, Color("f4a261"), Vector3.ONE, 6)
-		sph(h, Vector3(wx + 0.3, 1.5, 2.7), 0.1, Color("e9c46a"), Vector3.ONE, 6)
+
+	# ---- front windows ----
+	var win_x := [-sx + 0.8, sx - 0.8]
+	if style == 4: win_x = [-sx + 0.9]      # the other side of the front is the counter
+	for wx in win_x:
+		box(b, Vector3(wx, 1.9, fz + 0.02), Vector3(1.0, 1.0, 0.08), trim)
+		box(b, Vector3(wx, 1.9, fz + 0.05), Vector3(0.8, 0.8, 0.06), glass, Vector3.ZERO, 0.4, 0.8)
+		box(b, Vector3(wx, 1.9, fz + 0.08), Vector3(0.05, 0.8, 0.04), trim)
+		box(b, Vector3(wx, 1.9, fz + 0.08), Vector3(0.8, 0.05, 0.04), trim)
+		if style == 0 or style == 2:
+			box(b, Vector3(wx, 1.3, fz + 0.2), Vector3(1.1, 0.22, 0.3), wood)
+			sph(b, Vector3(wx - 0.3, 1.5, fz + 0.2), 0.1, Color("e76f51"), Vector3.ONE, 6)
+			sph(b, Vector3(wx, 1.52, fz + 0.2), 0.1, Color("f4a261"), Vector3.ONE, 6)
+			sph(b, Vector3(wx + 0.3, 1.5, fz + 0.2), 0.1, Color("e9c46a"), Vector3.ONE, 6)
+		if style == 1:                      # shutters instead of flower boxes
+			for s in [-0.72, 0.72]:
+				box(b, Vector3(wx + s, 1.9, fz + 0.06), Vector3(0.4, 1.1, 0.07), trim.darkened(0.3))
 	for sz in [-1.2, 1.2]:
-		box(h, Vector3(2.55, 1.9, sz), Vector3(0.06, 0.9, 0.8), Color("f6dc8c"), Vector3.ZERO, 0.4, 0.8)
-	cyl(h, Vector3(1.25, 2.3, 2.75), 0.03, 0.03, 0.4, Color("3b2d25"), Vector3.ZERO, 6)
-	sph(h, Vector3(1.25, 2.05, 2.75), 0.1, Color("ffd27a"), Vector3.ONE, 8, 1.6)
-	for c in h.get_children():
-		if c is MeshInstance3D:
-			var sz = (c as MeshInstance3D).mesh.get_aabb().size * (c as MeshInstance3D).scale
-			if sz.x * sz.y * sz.z < 1.6: (c as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		box(b, Vector3(sx + 0.05, 1.9, sz), Vector3(0.06, 0.9, 0.8), glass, Vector3.ZERO, 0.4, 0.8)
+
+	# ---- what each kind adds out front ----
+	if style == 2:
+		for px in [-sx + 0.5, sx - 0.5]:
+			cyl(b, Vector3(px, 1.35, fz + 1.5), 0.11, 0.13, 2.7, wood, Vector3.ZERO, 8)
+		box(b, Vector3(0, 2.78, fz + 0.9), Vector3(w + 0.6, 0.16, 2.1), roof.darkened(0.06), Vector3(7, 0, 0))
+		box(b, Vector3(-sx + 1.2, 0.72, fz + 1.1), Vector3(1.9, 0.14, 0.55), wood)
+		for px in [-sx + 0.55, -sx + 1.85]:
+			box(b, Vector3(px, 0.4, fz + 1.1), Vector3(0.14, 0.65, 0.5), wood.darkened(0.15))
+	elif style == 3:
+		for px in [-sx + 0.5, sx - 0.5]:
+			for pz in [-fz + 0.5, fz - 0.5]:
+				cyl(h, Vector3(px, lift * 0.5, pz), 0.17, 0.2, lift + 0.3, wood.darkened(0.1), Vector3.ZERO, 8)
+		for i in range(3):
+			box(h, Vector3(0, 0.18 + i * 0.3, fz + 1.5 - i * 0.42), Vector3(1.7, 0.16, 0.42), Color("a89f93"))
+		cyl(h, Vector3(-sx - 0.45, 1.3, -0.4), 0.07, 0.08, 2.6, wood, Vector3.ZERO, 7)
+		cyl(h, Vector3(-sx - 0.45, 1.3, 1.6), 0.07, 0.08, 2.6, wood, Vector3.ZERO, 7)
+		box(h, Vector3(-sx - 0.45, 2.3, 0.6), Vector3(0.07, 1.1, 1.9), Color("cdbfa2"), Vector3.ZERO, 1.0)
+	elif style == 4:
+		var counter_x := sx - 1.1
+		box(b, Vector3(counter_x, 1.75, fz + 0.02), Vector3(1.9, 1.5, 0.1), Color("2f2a24"))
+		box(b, Vector3(counter_x, 1.02, fz + 0.22), Vector3(2.2, 0.16, 0.6), wood.lightened(0.1))
+		for i in range(5):
+			var stripe: Color = trim if i % 2 == 0 else roof
+			box(b, Vector3(counter_x - 0.88 + i * 0.44, 2.72, fz + 0.75), Vector3(0.44, 0.1, 1.5), stripe, Vector3(14, 0, 0))
+		box(b, Vector3(0, eave + 1.25, fz - 0.1), Vector3(2.8, 0.9, 0.12), wood.darkened(0.1))
+		cyl(b, Vector3(0, eave + 0.55, fz - 0.1), 0.06, 0.06, 1.5, wood.darkened(0.2), Vector3.ZERO, 6)
+
+	if style != 3:
+		cyl(b, Vector3(1.25, 2.3, fz + 0.25), 0.03, 0.03, 0.4, Color("3b2d25"), Vector3.ZERO, 6)
+		sph(b, Vector3(1.25, 2.05, fz + 0.25), 0.1, Color("ffd27a"), Vector3.ONE, 8, 1.6)
+	for node in [h, b]:
+		for c in node.get_children():
+			if c is MeshInstance3D:
+				var sz = (c as MeshInstance3D).mesh.get_aabb().size * (c as MeshInstance3D).scale
+				if sz.x * sz.y * sz.z < 1.6: (c as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	h.set_meta("door", pivot)
 	return h
 
