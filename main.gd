@@ -156,23 +156,23 @@ var quests = [
 	["meal","Bring wak, guro and kor to Mira in the village."],
 	["bag","Find the forest bag and take it to Sanu."],
 	["bridge","Bring murak, sek and lin to Dofo by the river."],
-	["evidence","Compare the accounts of Dofo, Lira and Rofi."],
+	["evidence","Compare the accounts of Dofo, Sita and Rofi."],
 	["cove","Visit the northern cove and talk to Neri."]
 ]
 # id, person, objective text
 var side_quests = [
-	["market","ketu","Ketu at the market (west) wants mur tari: three fish. Fish at the river, the dock or the lagoon."],
-	["school","suri","Answer Suri's four questions at the school, north of the market."],
+	["market","arden","Arden at the market (west) wants mur tari: three fish. Fish at the river, the dock or the lagoon."],
+	["school","karen","Answer Karen's four questions at the school, north of the market."],
 	["lookout","radi","Climb the west hill and answer Radi's direction questions."],
 	["healer","jeli","Help Jeli the healer, east of the village. Jeli's patient needs yok and cha."],
 	["lighthouse","asya","The lighthouse is dark. Bring far (fire) from Neri's campfire to Asya."],
-	["lagoon","desh","Play Desh's drum game at the east lagoon."],
+	["lagoon","bete","Play Bete's drum game at the east lagoon."],
 	["riddles","oku","Oku at the old ruins (south-west) has five riddles."],
 	["mail","gav","Gav at the harbor needs parcels delivered. Read the labels!"],
 	["hide","oli","Vivi and Oli at the school want to play hide and seek."],
 	["seastars","","Find the eight hai-sao (sea stars) hidden on the beaches."],
-	["dog","","The village dog looks hungry. Buy panak (bread) from Ketu and share it."],
-	["gossip","lira","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
+	["dog","","The village dog looks hungry. Buy panak (bread) from Arden and share it."],
+	["gossip","sita","Village gossip! Hear six pieces of gossip (ask people: Any gossip?) and ask three people about what was said."],
 	["strange","","Something odd is going on. Find eight strange things around the island."],
 	["rumor","","Start three rumors of your own (Tell some gossip), then hear one come back from someone else (What's the news?)."],
 	["poems","","Find glowing ning-guro berries and sao-dau mushrooms. Eat them or give them to people, and collect five poems."],
@@ -182,10 +182,10 @@ var side_quests = [
 	["letters","gav","Mystery letters! Someone keeps writing to you. Gav at the harbor delivers them. Write back, listen in when villagers whisper, and work out who it is."],
 	["survey","","Find someone who can... Ask people Ti ta-___-kan-ha? (Can you ___?) until you find someone who can swim, sing, cook, read, build things and run fast. (Chat, then Ask or tell.)"],
 	["wand","oku","Oku at the old ruins has an old stick that makes sentences come true. Make five different sentences come true with it."],
-	["relay","","Pass it on! Lira, Gav and Desh have news. Pass each story to two people without changing it (you heard it, so: -nu)."],
+	["relay","","Pass it on! Sita, Gav and Bete have news. Pass each story to two people without changing it (you heard it, so: -nu)."],
 	["guesswho","neri","Play Guess who with Neri and win three times."],
 	["yesen","","Yesen! Do improv scenes with villagers (Chat, then Yesen) and get big applause in five of them. Level 2 and up."],
-	["kirmel","suri","The lost writing. Deep in the cenote in the far north-east there are carvings no one can read. Read them, find the one who remembers, and bring the writing back to the village."],
+	["kirmel","karen","The lost writing. Deep in the cenote in the far north-east there are carvings no one can read. Read them, find the one who remembers, and bring the writing back to the village."],
 	["treasure","lachu","Follow the old map: Gin murak-ni shanma i-esh-da. Lachu at the dock can take you to Sendor."]
 ]
 var secret_quests = ["treasure"]
@@ -235,18 +235,18 @@ var looks = {
 	"mira": [Color("c68e66"), Color("3b2418"), 2, Color("f2e6c8")],
 	"sanu": [Color("e3b98f"), Color("7a4a22"), 3, Color("5b8c5a")],
 	"dofo": [Color("a87650"), Color("1d1d1d"), 4, Color("c9a46d")],
-	"lira": [Color("f0c9a0"), Color("b5651d"), 1, Color("e76f51")],
+	"sita": [Color("f0c9a0"), Color("b5651d"), 1, Color("e76f51")],
 	"rofi": [Color("8d5a3b"), Color("4a4a4a"), 0, Color("a8dadc")],
 	"neri": [Color("d9a679"), Color("2e2a5a"), 2, Color("f4a261")],
-	"ketu": [Color("b07a52"), Color("2b1d14"), 3, Color("e9c46a")],
-	"suri": [Color("e8bf98"), Color("1d1d1d"), 1, Color("f2e6c8")],
+	"arden": [Color("b07a52"), Color("2b1d14"), 3, Color("e9c46a")],
+	"karen": [Color("e8bf98"), Color("1d1d1d"), 1, Color("f2e6c8")],
 	"vivi": [Color("c68e66"), Color("3b2418"), 5, Color("e76f51")],
 	"oli": [Color("9a6a48"), Color("1d1d1d"), 6, Color("a8dadc")],
 	"radi": [Color("d6ac83"), Color("6b6b6b"), 3, Color("c0392b")],
 	"jeli": [Color("8d5a3b"), Color("e6e1d6"), 1, Color("9bd06a")],
 	"sije": [Color("f0c9a0"), Color("7a4a22"), 2, Color("f4a261")],
 	"asya": [Color("c68e66"), Color("2e2a5a"), 4, Color("f4f1e8")],
-	"desh": [Color("7a4a32"), Color("1d1d1d"), 5, Color("2a9d8f")],
+	"bete": [Color("7a4a32"), Color("1d1d1d"), 5, Color("2a9d8f")],
 	"sair1": [Color("e3b98f"), Color("4a3020"), 1, Color("a78bda")],
 	"sair2": [Color("a87650"), Color("1d1d1d"), 0, Color("e9c46a")],
 	"sair3": [Color("d9a679"), Color("5a4030"), 3, Color("4f7ca8")],
@@ -260,18 +260,18 @@ var person_ex = {
 	"mira": {"shirt": Color("bb714b"), "apron": Color("f4f1e8"), "hat": "toque", "build": "round", "w": 1.15, "h": 0.95, "prop": "ladle", "brows": "raised", "mouth": "o", "earrings": true},
 	"sanu": {"shirt": Color("8ecae6"), "stripe": Color("f4f1e8"), "pants": Color("8ecae6"), "hat": "nightcap", "hat_color": Color("5b8c5a"), "h": 0.8, "cheeks": true, "prop": "pillow", "eye_kind": "sleepy"},
 	"dofo": {"shirt": Color("c0392b"), "overalls": Color("4a5d78"), "pants": Color("4a5d78"), "w": 1.25, "h": 1.08, "beard": Color("1d1d1d"), "hat": "band", "hat_color": Color("e9c46a"), "prop": "hammer", "brows": "flat", "thick": true, "mouth": "grin"},
-	"lira": {"shirt": Color("9678a5"), "dress": Color("7d5a94"), "face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a"), "prop": "cup", "brows": "raised", "mouth": "grin"},
+	"sita": {"shirt": Color("9678a5"), "dress": Color("7d5a94"), "face": "glasses", "frame": Color("b5651d"), "earrings": true, "h": 0.95, "scarf": Color("e9c46a"), "prop": "cup", "brows": "raised", "mouth": "grin"},
 	"rofi": {"shirt": Color("7e9975"), "vest": Color("6d4a33"), "mustache": Color("4a4a4a"), "hat": "cowboy", "hat_color": Color("8c5a3c"), "w": 0.95, "h": 1.1, "prop": "carrot", "brows": "angry", "thick": true, "mouth": "frown"},
 	"neri": {"shirt": Color("bd795f"), "backpack": Color("c0392b"), "scarf": Color("f4a261"), "prop": "map", "mouth": "smile", "brows": "flat"},
-	"ketu": {"shirt": Color("e76f51"), "build": "round", "w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14"), "prop": "fish", "mouth": "grin", "brows": "raised"},
-	"suri": {"shirt": Color("2a9d8f"), "dress": Color("21867a"), "h": 1.14, "w": 0.9, "face": "glasses", "earrings": true, "prop": "book", "brows": "raised", "mouth": "line"},
+	"arden": {"shirt": Color("e76f51"), "build": "round", "w": 1.3, "h": 0.97, "apron": Color("e9c46a"), "mustache": Color("2b1d14"), "prop": "fish", "mouth": "grin", "brows": "raised"},
+	"karen": {"shirt": Color("2a9d8f"), "dress": Color("21867a"), "h": 1.14, "w": 0.9, "face": "glasses", "earrings": true, "prop": "book", "brows": "raised", "mouth": "line"},
 	"vivi": {"shirt": Color("f4a261"), "h": 0.74, "freckles": true, "eye_kind": "big", "prop": "pencil", "mouth": "grin", "cheeks": true},
 	"oli": {"shirt": Color("e9c46a"), "dress": Color("e9c46a"), "h": 0.72, "eye_kind": "big", "cheeks": true, "prop": "fruit", "mouth": "grin"},
 	"radi": {"shirt": Color("4f7ca8"), "robe": Color("3d6590"), "beard": Color("d9d9d9"), "h": 0.98, "w": 1.12, "build": "round", "hat": "beanie", "hat_color": Color("c0392b"), "prop": "telescope", "eye_kind": "sleepy", "style": 0},
 	"jeli": {"shirt": Color("5b8c5a"), "robe": Color("4f7d4e"), "belt": Color("e9c46a"), "face": "glasses", "frame": Color("6b4f36"), "style": 9, "prop": "basket", "mouth": "smile", "brows": "flat"},
 	"sije": {"shirt": Color("a78bda"), "scarf": Color("f4f1e8"), "hat": "band", "hat_color": Color("f4f1e8"), "h": 0.92, "cheeks": true, "prop": "mug", "brows": "worried", "mouth": "o"},
 	"asya": {"shirt": Color("f2c14e"), "robe": Color("e0ac2a"), "h": 1.18, "w": 0.85, "hat": "captain", "mustache": Color("2e2a5a"), "prop": "lantern", "brows": "worried", "mouth": "o"},
-	"desh": {"shirt": Color("ff5d8f"), "stripe": Color("f4f1e8"), "face": "sunglasses", "style": 8, "prop": "drum", "mouth": "grin", "w": 1.05},
+	"bete": {"shirt": Color("ff5d8f"), "stripe": Color("f4f1e8"), "face": "sunglasses", "style": 8, "prop": "drum", "mouth": "grin", "w": 1.05},
 	"sair1": {"h": 0.93, "scarf": Color("a78bda")},
 	"sair2": {"w": 1.2, "hat": "beanie", "hat_color": Color("e9c46a")},
 	"sair3": {"h": 1.07, "face": "glasses"},
@@ -1185,7 +1185,7 @@ func build_entities():
 	entity("mira","npc","Mira",Vector3(-4,0,11),Color("bb714b"))
 	entity("sanu","npc","Sanu",Vector3(4,0,-8),Color("d5b54c"))
 	entity("dofo","npc","Dofo",Vector3(-3,0,-19),Color("637ba3"))
-	entity("lira","npc","Lira",Vector3(7,0,3),Color("9678a5"))
+	entity("sita","npc","Sita",Vector3(7,0,3),Color("9678a5"))
 	entity("rofi","npc","Rofi",Vector3(6,0,-29),Color("7e9975"))
 	entity("neri","npc","Neri",Vector3(0,0,-40),Color("bd795f"))
 	entity("own_bag","item","kel",Vector3(2,0,32),Color("c58b55"))
@@ -1219,10 +1219,10 @@ func build_entities():
 	build_count_prop(Vector3(3.6,0,24), "flower", 4)
 	build_count_prop(Vector3(-1.8,0,9.2), "fruit", 5)
 	# ---- second expansion: people ----
-	entity("ketu","npc","Ketu",Vector3(-46.8,0,8.0),Color("e76f51"))
+	entity("arden","npc","Arden",Vector3(-46.8,0,8.0),Color("e76f51"))
 	entity("sair1","npc","sair",Vector3(-53.5,0,15.0),Color("6b7f9c"))
 	entity("sair2","npc","sair",Vector3(-46.5,0,15.6),Color("8f5a48"))
-	entity("suri","npc","Suri",Vector3(-45.0,0,-3.4),Color("2a9d8f"))
+	entity("karen","npc","Karen",Vector3(-45.0,0,-3.4),Color("2a9d8f"))
 	var vivi = entity("vivi","npc","Vivi",Vector3(-47.4,0,-2.4),Color("f4a261"))
 	var oli = entity("oli","npc","Oli",Vector3(-49.6,0,-3.2),Color("e9c46a"))
 	for kid in [vivi, oli]:
@@ -1232,7 +1232,7 @@ func build_entities():
 	entity("jeli","npc","Jeli",Vector3(51.6,0,-4.4),Color("5b8c5a"))
 	entity("sije","npc","Sije",Vector3(53.4,0,-1.8),Color("a78bda"))
 	entity("asya","npc","Asya",Vector3(73.4,0,-5.0),Color("3f5f8a"))
-	entity("desh","npc","Desh",Vector3(67.0,0,20.6),Color("e9c46a"))
+	entity("bete","npc","Bete",Vector3(67.0,0,20.6),Color("e9c46a"))
 	entity("sair3","npc","sair",Vector3(64.2,0,15.2),Color("c0392b"))
 	# ---- second expansion: things ----
 	entity("herb","item","yok",Vector3(-54.5,0,-33.5),Color("5a9a3e"))
@@ -1458,7 +1458,7 @@ func update_marks():
 		"bag": main_people = ["sanu"]
 		"bridge": main_people = ["dofo"]
 		"evidence":
-			for p in ["dofo", "lira", "rofi"]:
+			for p in ["dofo", "sita", "rofi"]:
 				if not completed.has("heard_" + p): main_people.append(p)
 			if main_people.is_empty(): main_people = ["dofo"]
 		"cove": main_people = ["neri"]
@@ -2775,7 +2775,7 @@ func observe(e: Dictionary):
 					if a["e"]["id"] == "dog": a["follow"] = true
 				sentence_card("dog_with_me"), content)
 		else:
-			text_line("It looks hungry. Ketu at the market sells panak (bread).")
+			text_line("It looks hungry. Arden at the market sells panak (bread).")
 		button("Watch the dog", func(): sentence_card("dog_runs"), content)
 		button("Return", close_panel, content)
 		return
@@ -2948,7 +2948,7 @@ func fish_count_note():
 	var word = nums[fish_caught] if fish_caught < nums.size() else str(fish_caught)
 	var line = "Fish in your bag: " + str(fish_caught) + " (" + word + " tari)."
 	if not completed.has("market"):
-		if fish_caught >= 3: line += "\nThat is mur tari, three fish. Ketu at the market wants them."
+		if fish_caught >= 3: line += "\nThat is mur tari, three fish. Arden at the market wants them."
 		else: line += "\nKetu at the market wants three. Keep fishing."
 	text_line(line)
 
@@ -2978,16 +2978,16 @@ func school_quiz(i: int):
 	var q: Dictionary = Data.SCHOOL[i]
 	for w in ["hal", "hama", "han", "hamur", "rav", "-ha"]:
 		if q["q"].to_lower().contains(w.trim_prefix("-")): learn(w)
-	choice_puzzle("Suri's lesson: " + str(i + 1) + " of 4", q["gesture"] + "\n\n“" + q["q"] + "”" + ("\n\nAnswer Suri in Tujuju." if i == 3 else "\n\nWhat is Suri asking?"), q["options"], q["correct"], func():
+	choice_puzzle("Karen's lesson: " + str(i + 1) + " of 4", q["gesture"] + "\n\n“" + q["q"] + "”" + ("\n\nAnswer Karen in Tujuju." if i == 3 else "\n\nWhat is Karen asking?"), q["options"], q["correct"], func():
 		master("q:school" + str(i))
 		if i == 3:
 			learn("vel")
 			learn("ravar")
 			complete("school"),
-		q["why"], "Look at Suri's gesture and the question word: hal who, han what, hama where, hamur how many.", talk.bind("suri"),
+		q["why"], "Look at Karen's gesture and the question word: hal who, han what, hama where, hamur how many.", talk.bind("karen"),
 		func():
 			if i < 3: button("Next question", school_quiz.bind(i + 1), content)
-			else: text_line("Suri claps. “Ho!” (Good!) You finished the lesson."))
+			else: text_line("Karen claps. “Ho!” (Good!) You finished the lesson."))
 
 func lookout_quiz(i: int):
 	var q: Dictionary = Data.LOOKOUT[i]
@@ -3028,14 +3028,14 @@ func desh_round(i: int, order: Array):
 	for o in others:
 		if o["act"] != cmd["act"] and acts.size() < 3: acts.append(o["act"])
 	for w in cmd["words"]: learn(w)
-	choice_puzzle("Desh's game: " + str(i + 1) + " of 4", "Desh beats the drum and shouts:\n\n“" + cmd["v"] + "”\n\nWhat do you do?", acts, 0, func():
-		master("q:desh" + str(i))
+	choice_puzzle("Bete's game: " + str(i + 1) + " of 4", "Bete beats the drum and shouts:\n\n“" + cmd["v"] + "”\n\nWhat do you do?", acts, 0, func():
+		master("q:bete" + str(i))
 		if i == 3: complete("lagoon"),
 		cmd["v"] + " means " + cmd["en"] + " The prefix ta- is you, and -o makes a command.",
-		"Listen for the root: sum swim, pav run, ning sing, nang walk, sul sleep. ma- ... -ki means do not.", talk.bind("desh"),
+		"Listen for the root: sum swim, pav run, ning sing, nang walk, sul sleep. ma- ... -ki means do not.", talk.bind("bete"),
 		func():
 			if i < 3: button("Next command", desh_round.bind(i + 1, order), content)
-			else: text_line("Desh drums a long roll and laughs. You won the game!"))
+			else: text_line("Bete drums a long roll and laughs. You won the game!"))
 
 func identity_puzzle():
 	learn("-ha")
@@ -3062,8 +3062,8 @@ func add_topics(id: String):
 				topic("Ask about the bridge", "gira_safe", id)
 				topic("Ask who built it", "tor_built", id)
 			if mastered.has("kir:taught") and not inventory.has("typewriter"): button("Show Dofo the Ayvu chart", dofo_typewriter, content)
-		"lira":
-			button("Answer: where are you?", where_puzzle.bind("lira"), content)
+		"sita":
+			button("Answer: where are you?", where_puzzle.bind("sita"), content)
 			topic("Ask about the dog", "dog_runs", id)
 		"rofi":
 			topic("Ask about the horse", "horse_fast", id)
@@ -3075,16 +3075,16 @@ func add_topics(id: String):
 			topic("Ask about the campfire", "fire_pops", id)
 			button("Teach Neri some Tujuju", teach_neri.bind(talk.bind("neri")), content)
 			button("Play Guess who: Hal i-an-ha?", guess_start, content)
-		"ketu":
-			topic("Ask what Ketu sells", "ketu_sells", id)
+		"arden":
+			topic("Ask what Arden sells", "ketu_sells", id)
 			topic("Ask about the well", "well_full", id)
 			topic("Ask about the fruit", "fruit_variety", id)
 			if completed.has("market"): topic("Ask about the ret-gor", "hot_dog", id)
-		"suri":
-			topic("Ask who Suri is", "suri_teacher", id)
+		"karen":
+			topic("Ask who Karen is", "suri_teacher", id)
 			topic("Ask about the students", "students_read", id)
 			topic("Ask why Vivi and Oli are giggling", "suri_kinder", id)
-			if mastered.has("kir:taught") and not completed.has("kirmel"): button("Show Suri the old writing", suri_kirmel.bind(0), content)
+			if mastered.has("kir:taught") and not completed.has("kirmel"): button("Show Karen the old writing", suri_kirmel.bind(0), content)
 		"vivi":
 			topic("Ask who Vivi is", "rin_student", id)
 			topic("Ask what they are doing", "students_read", id)
@@ -3103,10 +3103,10 @@ func add_topics(id: String):
 			else:
 				topic("Ask about the lamp", "lighthouse_dark", id)
 				topic("Ask what is wrong", "no_fire", id)
-		"desh":
+		"bete":
 			topic("Ask about the party", "party_noise", id)
 			topic("Ask about the trumpet noise", "desh_toot", id)
-			topic("Ask Desh about swimming", "desh_swims", id)
+			topic("Ask Bete about swimming", "desh_swims", id)
 			topic("Ask about the sea", "sea_cold", id)
 		"oku":
 			topic("Ask about the ruins", "ruins_old", id)
@@ -3174,12 +3174,12 @@ func talk(id: String):
 				if has_items(["wood","stone","rope"]):
 					consume(["wood","stone","rope"])
 					complete("bridge")
-					message("The crossing is repaired","Dofo secures the planks. Ask Dofo about Neri, and compare the accounts of Lira and Rofi.")
+					message("The crossing is repaired","Dofo secures the planks. Ask Dofo about Neri, and compare the accounts of Sita and Rofi.")
 				elif completed.has("bridge"): message("Dofo nods","The crossing is secure. You can ask about Neri.")
 				else: offer_help(["wood","stone","rope"]),content)
 			button("Ask about Neri",func(): account("dofo","italpada","Dofo points to their eyes, then the river crossing. Dofo personally saw Neri arrive."),content)
-		"lira":
-			account("lira","italpanu","Lira gestures to someone in the distance. Another resident told Lira about Neri's arrival.")
+		"sita":
+			account("sita","italpanu","Sita gestures to someone in the distance. Another resident told Sita about Neri's arrival.")
 			gossip_buttons(id)
 			add_topics(id)
 			return
@@ -3200,23 +3200,23 @@ func talk(id: String):
 				button("Tell Neri about your adventure", tile_puzzle.bind(-1, talk.bind("neri")), content)
 				button("Practice evidence again",show_evidence,content)
 			else:
-				text_line("You found Neri by exploring. To understand the journey, compare Dofo's, Lira's and Rofi's accounts, then return.")
+				text_line("You found Neri by exploring. To understand the journey, compare Dofo's, Sita's and Rofi's accounts, then return.")
 			if not completed.has("lighthouse"):
 				learn("far")
 				text_line("A torch leans against a stone by the campfire. Neri points at it: “Far.”")
-		"ketu":
+		"arden":
 			for w in ["kur", "tari", "mur", "-ye", "tnaveno"]: learn(w)
-			clear_panel("Ketu at the market")
+			clear_panel("Arden at the market")
 			if completed.has("market"):
 				learn("gin")
-				text_line("Ketu waves you over. Your fish are drying on the rack: “Tari i-ho!” (The fish are good!)\n\nKetu buys fish (one gin each) and sells panak. You have " + str(gin) + " gin and " + str(fish_caught) + " fish.")
+				text_line("Arden waves you over. Your fish are drying on the rack: “Tari i-ho!” (The fish are good!)\n\nKetu buys fish (one gin each) and sells panak. You have " + str(gin) + " gin and " + str(fish_caught) + " fish.")
 				if fish_caught > 0:
 					button("Sell a fish: tari yan, gin yan", func():
 						fish_caught -= 1
 						gin += 1
 						toast("Tari yan, gin yan. (+1 gin)")
 						save_game()
-						talk("ketu"), content)
+						talk("arden"), content)
 				button("Buy panak (bread)", buy_bread, content)
 				button("Buy bombom (candy): gin yan", func():
 					if gin >= 1:
@@ -3225,8 +3225,8 @@ func talk(id: String):
 						learn("bombom")
 						toast("Bombom! (-1 gin)")
 						save_game()
-						talk("ketu")
-					else: message("Not enough gin", "Candy costs one coin. Sell a fish to Ketu first."), content)
+						talk("arden")
+					else: message("Not enough gin", "Candy costs one coin. Sell a fish to Arden first."), content)
 				button("Buy ret-gor (hot dog): gin yan", func():
 					if gin >= 1:
 						gin -= 1
@@ -3234,27 +3234,27 @@ func talk(id: String):
 						learn("ret-gor")
 						toast("Ret-gor! hot + dog. The village gor looks horrified. (-1 gin)")
 						save_game()
-						talk("ketu")
-					else: message("Not enough gin", "A hot dog costs one coin. Sell a fish to Ketu first."), content)
+						talk("arden")
+					else: message("Not enough gin", "A hot dog costs one coin. Sell a fish to Arden first."), content)
 				button("Buy cha (tea): gin yan", func():
 					if gin >= 1:
 						gin -= 1
 						inventory.append("tea")
 						toast("Cha! (-1 gin)")
 						save_game()
-						talk("ketu")
-					else: message("Not enough gin", "Tea costs one coin. Sell a fish to Ketu first."), content)
+						talk("arden")
+					else: message("Not enough gin", "Tea costs one coin. Sell a fish to Arden first."), content)
 			else:
-				text_line("Ketu holds up three fingers, then mimes a fish wriggling.\n\n“Mur tari t-na-ven-o-ye.”\n\nYou have " + str(fish_caught) + " fish.")
+				text_line("Arden holds up three fingers, then mimes a fish wriggling.\n\n“Mur tari t-na-ven-o-ye.”\n\nYou have " + str(fish_caught) + " fish.")
 				button("Give mur tari (3 fish)", func():
 					if fish_caught >= 3:
 						fish_caught -= 3
 						inventory.append("tea")
 						complete("market")
 						learn("cha")
-						message("Ketu is delighted", "Ketu counts the fish: “Yan, vel, mur!” Then Ketu hands you a cup of cha wrapped in cloth. “Cha i-ret.” Hot tea. Someone who is unwell might need it.")
+						message("Arden is delighted", "Arden counts the fish: “Yan, vel, mur!” Then Arden hands you a cup of cha wrapped in cloth. “Cha i-ret.” Hot tea. Someone who is unwell might need it.")
 					else:
-						message("Ketu counts your fish", "You have " + str(fish_caught) + ". Ketu needs mur: three. Watch for jumping fish at the river by the bridge, at the end of the harbor dock, or in the east lagoon, then tap one and try fishing."), content)
+						message("Arden counts your fish", "You have " + str(fish_caught) + ". Arden needs mur: three. Watch for jumping fish at the river by the bridge, at the end of the harbor dock, or in the east lagoon, then tap one and try fishing."), content)
 		"sair1":
 			sentence_card("buy_bread", close_panel)
 			return
@@ -3265,15 +3265,15 @@ func talk(id: String):
 			learn("ser")
 			sentence_card("rain_starts", close_panel)
 			return
-		"suri":
+		"karen":
 			learn("senak")
 			learn("senar")
-			clear_panel("Suri at the school")
+			clear_panel("Karen at the school")
 			if completed.has("school"):
-				text_line("Suri smiles. “Ho!” You know the question words now: hal who, han what, hama where, hamur how many.")
+				text_line("Karen smiles. “Ho!” You know the question words now: hal who, han what, hama where, hamur how many.")
 				button("Repeat the lesson", school_quiz.bind(0), content)
 			else:
-				text_line("Suri points to the chalkboard, then hands you a slate with four questions on it. Suri waves you toward a bench.")
+				text_line("Karen points to the chalkboard, then hands you a slate with four questions on it. Karen waves you toward a bench.")
 				button("Start the lesson", school_quiz.bind(0), content)
 		"vivi", "oli":
 			if hiding.get(id, false):
@@ -3316,7 +3316,7 @@ func talk(id: String):
 					else:
 						var miss: Array = []
 						if not inventory.has("herb"): miss.append("yok: a healing herb that grows on the west hill (it glows)")
-						if not inventory.has("tea"): miss.append("cha: Ketu at the market trades tea for three fish")
+						if not inventory.has("tea"): miss.append("cha: Arden at the market trades tea for three fish")
 						message("Jeli repeats the request", "Still needed:\n" + "\n".join(miss)), content)
 		"sije":
 			clear_panel("Sije")
@@ -3356,7 +3356,7 @@ func talk(id: String):
 					solved.append("mail_start")
 					for p in Data.PARCELS.keys(): inventory.append(p)
 					save_game()
-					message("Three parcels", "The labels say:\nKetu-ru\nAsya-ru\nOku-ru\n\nThe ending -ru means to. Find each person and choose Give a parcel. Ketu is at the market, Asya at the lighthouse, Oku at the old ruins in the south-west."), content)
+					message("Three parcels", "The labels say:\nKetu-ru\nAsya-ru\nOku-ru\n\nThe ending -ru means to. Find each person and choose Give a parcel. Arden is at the market, Asya at the lighthouse, Oku at the old ruins in the south-west."), content)
 			else:
 				var left: Array = []
 				for p in Data.PARCELS.keys():
@@ -3376,19 +3376,19 @@ func talk(id: String):
 			if inventory.has("map") and not completed.has("treasure"):
 				text_line("Lachu glances at your old map and raises their eyebrows.")
 			button("Ask for a ride", ride_puzzle.bind(player.position.z < 60.0), content)
-		"desh":
+		"bete":
 			for w in ["hai", "-o"]: learn(w)
-			clear_panel("Desh at the lagoon")
+			clear_panel("Bete at the lagoon")
 			if completed.has("lagoon"):
-				text_line("Desh drums a victory beat. “Ho!”")
+				text_line("Bete drums a victory beat. “Ho!”")
 				var again = Data.DESH.duplicate()
 				again.shuffle()
 				button("Play again", desh_round.bind(0, again), content)
 			else:
-				text_line("Desh bangs the drum. “Ta-nang-o! Ta-pav-o! Ta-sum-o!” Desh wants to play a game: Desh calls a command, and you do it.")
+				text_line("Bete bangs the drum. “Ta-nang-o! Ta-pav-o! Ta-sum-o!” Bete wants to play a game: Bete calls a command, and you do it.")
 				var order = Data.DESH.duplicate()
 				order.shuffle()
-				button("Play Desh's game", desh_round.bind(0, order), content)
+				button("Play Bete's game", desh_round.bind(0, order), content)
 	if Data.PEOPLE.has(id):
 		button("Chat with " + id.capitalize(), chat_menu.bind(id), content)
 		add_portrait(id)
@@ -3415,7 +3415,7 @@ func account(id: String, phrase: String, gesture: String):
 func show_evidence():
 	clear_panel("Which account was witnessed?")
 	text_line("Three speakers used the same arrival root but different endings. Who saw Neri arrive?")
-	var options = ["Lira: italpanu", "Dofo: italpada", "Rofi: italpashi"]
+	var options = ["Sita: italpanu", "Dofo: italpada", "Rofi: italpashi"]
 	options.shuffle()
 	for option in options:
 		button(option,check_evidence.bind(option),content)
@@ -3427,7 +3427,7 @@ func check_evidence(option: String):
 		learn("bei")
 		message("You understood the source","The ending da marks direct knowledge. Follow the main path bei, north, past the crossing to the cove.")
 	else:
-		message("Compare the gestures","Lira heard a report. Rofi found footprints. Dofo pointed to their eyes. Revisit the notebook or compare again.")
+		message("Compare the gestures","Sita heard a report. Rofi found footprints. Dofo pointed to their eyes. Revisit the notebook or compare again.")
 		button("Try again",show_evidence,content)
 
 func has_items(items: Array) -> bool:
@@ -3811,7 +3811,7 @@ func load_game():
 	if not FileAccess.file_exists(SAVE): return
 	var raw = FileAccess.get_file_as_string(SAVE)
 	# villagers renamed in October 2026: carry old saves over to the new names
-	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"], ["tor", "dofo"], ["rin", "vivi"], ["ena", "vufi"]]:
+	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"], ["tor", "dofo"], ["rin", "vivi"], ["ena", "vufi"], ["lira", "sita"], ["ketu", "arden"], ["suri", "karen"], ["desh", "bete"]]:
 		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
 		raw = raw.replace("\"heard_" + pair[0] + "\"", "\"heard_" + pair[1] + "\"").replace("\"mail_" + pair[0] + "\"", "\"mail_" + pair[1] + "\"")
 	var data = JSON.parse_string(raw)
@@ -4242,19 +4242,19 @@ func update_status():
 
 func buy_bread():
 	for w in ["yan", "panak", "gin", "vel"]: learn(w)
-	choice_puzzle("Buying bread", "Ketu waits for your request. How do you ask politely for one loaf?",
+	choice_puzzle("Buying bread", "Arden waits for your request. How do you ask politely for one loaf?",
 		["Yan panak t-na-ven-o-ye.", "Panak yan-ru t-na-ven-o-ye.", "Yan panak k-i-mai-pa-da."], 0, func(): master("q:buy"),
-		"Yan panak t-na-ven-o-ye: please give me one bread. Ketu answers: “Vel gin.” Two coins.",
-		"The number comes before the noun, and a polite request ends in -o-ye. k-i-mai-pa-da would mean I bought it.", talk.bind("ketu"),
+		"Yan panak t-na-ven-o-ye: please give me one bread. Arden answers: “Vel gin.” Two coins.",
+		"The number comes before the noun, and a polite request ends in -o-ye. k-i-mai-pa-da would mean I bought it.", talk.bind("arden"),
 		func():
 			button("Pay vel gin (2 coins)", func():
 				if gin >= 2:
 					gin -= 2
 					inventory.append("bread")
 					save_game()
-					message("Panak!", "Ketu wraps a warm loaf for you. You have " + str(gin) + " gin left. The village dog would love some.")
+					message("Panak!", "Arden wraps a warm loaf for you. You have " + str(gin) + " gin left. The village dog would love some.")
 				else:
-					message("Not enough gin", "You have " + str(gin) + " gin. Sell fish to Ketu (one gin each), or help Gav deliver parcels."), content))
+					message("Not enough gin", "You have " + str(gin) + " gin. Sell fish to Arden (one gin each), or help Gav deliver parcels."), content))
 
 func give_parcel(id: String):
 	learn("-ru")
@@ -4605,18 +4605,18 @@ func greeting(id: String) -> String:
 		"mira": return "Yamat i-nav."
 		"sanu": return "Sava ruk."
 		"dofo": return "Gira i-sava-da." if completed.has("bridge") else "Gira ma-i-sava-ki-da."
-		"lira": return "Teka i-var."
+		"sita": return "Teka i-var."
 		"rofi": return "Mar hala i-pav."
 		"neri": return "Teka i-var!"
-		"ketu": return "Mur tari t-na-ven-o-ye." if not completed.has("market") else "Tari i-ho!"
-		"suri": return "Ravarir ri-puka-rav-im-da."
+		"arden": return "Mur tari t-na-ven-o-ye." if not completed.has("market") else "Tari i-ho!"
+		"karen": return "Ravarir ri-puka-rav-im-da."
 		"vivi": return "An ravar na-an-da."
 		"oli": return "Ti kelar ta-an-ha?"
 		"radi": return "Bei, nam, dong, sai."
 		"jeli": return "Yok e cha t-na-ven-o-ye." if not completed.has("healer") else "Sije i-seng-da."
 		"sije": return "Anni dauma tong i-esh-da." if not completed.has("healer") else "An na-seng-da."
 		"asya": return "Far t-na-tar-o-ye." if not completed.has("lighthouse") else "Fardom i-ling-da."
-		"desh": return "Aloha! Ta-sum-o!"
+		"bete": return "Aloha! Ta-sum-o!"
 		"sair1": return "Anke panak k-i-mai-fu."
 		"sair2": return "Cha i-ret."
 		"sair3": return "I-ser-ng."
@@ -5158,7 +5158,7 @@ func market_next():
 		if s >= 3: master("g:market")
 		gin += s
 		save_game()
-		message("Ketu counts the takings", "You served " + str(s) + " of the customers correctly and earned " + str(s) + " gin. “Ho!” says Ketu.")
+		message("Arden counts the takings", "You served " + str(s) + " of the customers correctly and earned " + str(s) + " gin. “Ho!” says Arden.")
 		return
 	var lv = level()
 	var goods = Data.GOODS.keys()
@@ -5264,7 +5264,7 @@ func speed_end():
 	if s >= 15:
 		gin += 2
 	save_game()
-	message("Time!", "You scored " + str(s) + "." + (" A new best!" if best else " Best: " + str(best_speed) + ".") + (" Suri gives you vel gin for a great round." if s >= 15 else ""))
+	message("Time!", "You scored " + str(s) + "." + (" A new best!" if best else " Best: " + str(best_speed) + ".") + (" Karen gives you vel gin for a great round." if s >= 15 else ""))
 
 func show_games():
 	compact_buttons.call_deferred()
@@ -5279,7 +5279,7 @@ func show_games():
 		["Word match (drag and drop)", word_match.bind(show_games), n >= 4, "Match Tujuju words with meanings."],
 		["Memory cards", memory_game.bind(show_games), n >= 4, "Find the pairs. Earn gin."],
 		["Speed round", speed_round, glossed_pool(6).size() >= 6, "60 seconds. How many can you get?"],
-		["Market rush", market_rush, completed.has("market"), "Serve Ketu's customers. Unlocks after Ketu's quest."],
+		["Market rush", market_rush, completed.has("market"), "Serve Arden's customers. Unlocks after Arden's quest."],
 		["Verb builder", show_verb_builder.bind(-1), true, "Choose the pieces of a verb."],
 		["False friends", false_friends.bind(true), true, "Tujuju words that look like English. Don't be fooled!"],
 		["What's that sound?", sound_game.bind(true), true, "Match sound words borrowed from Guarani to what you hear."],
@@ -5317,7 +5317,7 @@ func build_places5():
 	for lx in [-0.23, 0.23]:
 		for lz in [-0.23, 0.23]:
 			Art.box(c, Vector3(lx, 0.22, lz), Vector3(0.06, 0.45, 0.06), Color("8a6a46"))
-	# Ketu's striped shirt up a tree
+	# Arden's striped shirt up a tree
 	var s = Node3D.new()
 	s.position = Vector3(40.9, 2.5, 27.9)
 	s.rotation_degrees = Vector3(0, 30, 12)
@@ -5327,7 +5327,7 @@ func build_places5():
 	Art.box(s, Vector3(-0.45, 0.32, 0), Vector3(0.3, 0.16, 0.08), Color("e76f51"))
 	Art.box(s, Vector3(0.45, 0.32, 0), Vector3(0.3, 0.16, 0.08), Color("e76f51"))
 	odd_nodes["odd_clothes"] = s
-	# Suri's book floating in the lagoon
+	# Karen's book floating in the lagoon
 	var b = Node3D.new()
 	b.position = Vector3(70.4, -0.06, 26.6)
 	add_child(b)
@@ -6281,7 +6281,7 @@ func gift_menu(id: String):
 	compact_buttons.call_deferred()
 	clear_panel("Give " + id.capitalize() + " a gift")
 	add_portrait(id)
-	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(inventory.count("hotdog")) + " ret-gor, " + str(gin) + " gin. (Ketu sells panak, cha, bombom and ret-gor.)", 17)
+	text_line("You have: " + str(fish_caught) + " tari, " + str(inventory.count("bread")) + " panak, " + str(inventory.count("tea")) + " cha, " + str(inventory.count("candy")) + " bombom, " + str(inventory.count("hotdog")) + " ret-gor, " + str(gin) + " gin. (Arden sells panak, cha, bombom and ret-gor.)", 17)
 	var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy"), "ret-gor": inventory.has("hotdog")}
 	text_line("You will say “Ki tari ti-ru!” (This fish, for you!) with the gift you choose.", 16)
 	for g in ["tari", "panak", "cha", "bombom", "ret-gor", "gin"]:
@@ -6358,7 +6358,7 @@ func errand_menu(id: String):
 	varnak_banner(nums[n].capitalize() + " " + g + " t-na-ven-o-ye.")
 	var en = text_line("(Tap Show meaning if you need it.)", 16)
 	button("Show meaning", func(): en.text = "(Please give me " + str(n) + " " + Data.GIFT_WORDS[g].trim_prefix("a ") + ".)", content)
-	text_line("You have " + str(errand_have(g)) + " " + g + ". Ketu sells panak, cha, bombom and ret-gor for one gin each. Fish come from the river.", 16)
+	text_line("You have " + str(errand_have(g)) + " " + g + ". Arden sells panak, cha, bombom and ret-gor for one gin each. Fish come from the river.", 16)
 	var b = button("Deliver: " + nums[n] + " " + g, errand_deliver.bind(id), content)
 	b.disabled = errand_have(g) < n
 	button("Not now", chat_menu.bind(id), content)
@@ -6442,8 +6442,8 @@ func update_ambient(delta: float):
 	var tt: String = Data.PEOPLE[e["id"]]["trait"]
 	var pick = ["sneeze", "Ha-chu!"]
 	var r = randf()
-	if e["id"] == "desh" and r < 0.25: pick = ["laugh", "Tarara! Tarara!"]
-	elif e["id"] == "desh" and r < 0.5: pick = ["happy", "Kachaka! Kachaka! (dances)"]
+	if e["id"] == "bete" and r < 0.25: pick = ["laugh", "Tarara! Tarara!"]
+	elif e["id"] == "bete" and r < 0.5: pick = ["happy", "Kachaka! Kachaka! (dances)"]
 	elif e["id"] == "mira" and r < 0.5: pick = ["happy", "Chiriri... chiriri..."]
 	elif tt == "sleepy" and r < 0.6: pick = ["sleepy", "Kororo... kororo... zzz"]
 	elif tt == "giggly" and r < 0.6: pick = ["laugh", "Ha! Ha!"]
@@ -6832,7 +6832,7 @@ func show_sounds():
 		var known = discovered.has(w)
 		var l = text_line((w + "  " + short_gloss(w) + "   i-" + w + "-im-da, " + w + "-" + w) if known else "???  (not heard yet)", 18)
 		if known: l.add_theme_color_override("font_color", Color("7a1f3d"))
-	text_line("Listen for them around the island: Mira's pan, Neri's campfire, Desh's parties, and anyone who naps.", 16)
+	text_line("Listen for them around the island: Mira's pan, Neri's campfire, Bete's parties, and anyone who naps.", 16)
 	button("Play: What's that sound?", sound_game.bind(true), content)
 	button("Word play", show_loans, content)
 	button("Notebook", show_notebook, content)
@@ -7649,7 +7649,7 @@ func show_letters():
 	text_line("Clues (" + str(cl.size()) + " of " + str(Data.LETTER_CLUES.size()) + ")", 21)
 	if cl.is_empty(): text_line("None yet. Listen in when villagers whisper.", 16)
 	for c in cl: text_line("• " + Data.LETTER_CLUES[c], 16)
-	if completed.has("letters"): text_line("Solved: Ketu's parrot wrote them all. Kraa!", 17)
+	if completed.has("letters"): text_line("Solved: Arden's parrot wrote them all. Kraa!", 17)
 	elif mastered.has("lt:solved"): text_line("You worked it out. Go tell the parrot at the market!", 17)
 	elif mastered.has("lt:read:" + str(Data.LETTERS.size() - 1)): button("Who is it? Solve the mystery", solve_mystery, content)
 	button("Overheard conversations", show_overheard, content)
@@ -7691,7 +7691,7 @@ func solve_check(who: String, ev: String):
 		return
 	master("lt:solved")
 	learn("par-yir")
-	message("Par ti-ni palar i-an-shi!", "Apparently the parrot is your secret friend! Feathers, paper, “kraa” and nights away from the market. Go to Ketu's market and show the parrot one of its letters.")
+	message("Par ti-ni palar i-an-shi!", "Apparently the parrot is your secret friend! Feathers, paper, “kraa” and nights away from the market. Go to Arden's market and show the parrot one of its letters.")
 
 func parrot_reveal():
 	complete("letters")
@@ -8035,7 +8035,7 @@ func want_answer(id: String):
 		react(id, said, said_en, "Anke " + g + " k-i-nuk-vai-da!", "I want " + Data.GIFT_WORDS[g] + "!", "love", 1 if not mastered.has("want:" + id) else 0)
 		var have = {"tari": fish_caught > 0, "panak": inventory.has("bread"), "cha": inventory.has("tea"), "gin": gin > 0, "bombom": inventory.has("candy"), "ret-gor": inventory.has("hotdog")}
 		if have.get(g, false): button("Give it: Ki " + g + " ti-ru!", give_gift.bind(id, g), content)
-		else: text_line("You don't have any " + g + " right now. Ketu sells most things at the market.", 16)
+		else: text_line("You don't have any " + g + " right now. Arden sells most things at the market.", 16)
 		buttons_to_end(["Keep chatting", "Return"])
 	master("want:" + id)
 
@@ -8048,7 +8048,7 @@ func where_menu(id: String):
 	add_portrait(id)
 	learn("hama")
 	text_line("Ask about a person or a place. The answer uses bei north, nam south, dong east, sai west.", 16)
-	for p in ["neri", "ketu", "suri", "radi", "jeli", "asya", "desh", "oku", "gav", "lachu", "dofo", "mira", "rofi", "lira"]:
+	for p in ["neri", "arden", "karen", "radi", "jeli", "asya", "bete", "oku", "gav", "lachu", "dofo", "mira", "rofi", "sita"]:
 		if p != id: button(p.capitalize(), where_say.bind(id, p), content)
 	for w in Data.WHERE_PLACES.keys():
 		button(w + " (" + Data.WHERE_PLACES[w][0] + ")", where_say.bind(id, w), content)
@@ -9100,7 +9100,7 @@ func show_yesen_list():
 		button("“" + str(sc["sug"][0]).capitalize() + "”: " + str(sc["title"]) + " (" + str(sc["who"]).capitalize() + ")" + ("  [ok]" if mastered.has("yesen:" + str(sc["id"])) else ""), yesen_start.bind(i, str(sc["who"])), content)
 	button("Back", show_games, content)
 
-# ------------------------------------------------------------ sound: effects, ambience, Desh's music, spoken Tujuju
+# ------------------------------------------------------------ sound: effects, ambience, Bete's music, spoken Tujuju
 
 const AMB_NAMES = ["ocean", "forest", "rain", "stream", "falls", "night", "wind", "cave", "underwater"]
 var amb_w: Dictionary = {}
@@ -9143,7 +9143,7 @@ func setup_audio():
 	(AudioServer.get_bus_effect(0, uw_fx) as AudioEffectLowPassFilter).cutoff_hz = 650.0
 	AudioServer.set_bus_effect_enabled(0, uw_fx, false)
 	var song = load("res://sfx/desh_song.ogg") as AudioStreamOggVorbis
-	var de = entity_by_id("desh")
+	var de = entity_by_id("bete")
 	if song and not de.is_empty():
 		song.loop = true
 		desh_music = AudioStreamPlayer3D.new()
@@ -9195,9 +9195,9 @@ func update_audio(delta: float):
 		amb_w = ambient_weights()
 	for n in amb_w.keys():
 		set_amb(n, float(amb_w[n]), delta)
-	# Desh plays louder when performing
+	# Bete plays louder when performing
 	if desh_music:
-		var perf = acts.has("desh") or (panel.visible and talk_partner == "desh")
+		var perf = acts.has("bete") or (panel.visible and talk_partner == "bete")
 		desh_music.volume_db = lerpf(desh_music.volume_db, 2.0 if perf else -6.0, 0.5)
 
 func set_amb(n: String, w: float, delta: float):
@@ -10614,7 +10614,7 @@ func guardian_teach():
 	varnak_banner("Anke ayvu k-i-zen-da. Ti-ru ayvu k-i-ven-fu-da.", 20)
 	text_line("(I know the writing. I will give the writing to you.)", 15)
 	text_line("The great fish breathes out slowly. Every glowing mark in the cenote brightens at once, and suddenly you can read all of them: every shape, every turn.", 17)
-	text_line("Bring Ayvu back to the village. Suri, the teacher at the school, will know what to do.", 17)
+	text_line("Bring Ayvu back to the village. Karen, the teacher at the school, will know what to do.", 17)
 	toast("You can read all of Ayvu now!")
 	button("Ayvu chart", show_kir_chart, content)
 	button("Return", close_panel, content)
@@ -10636,23 +10636,23 @@ func kir_options(name_text: String) -> Array:
 	return [sylls, wrong1, wrong2]
 
 func suri_kirmel(step: int):
-	var names = ["Suri", "Ketu", "Tujuju"]
-	talk_partner = "suri"
+	var names = ["Karen", "Arden", "Tujuju"]
+	talk_partner = "karen"
 	if step >= names.size():
 		complete("kirmel")
 		log_event("kirmel", "brought home")
 		apply_kirmel_signs()
 		clear_panel("Ayvu comes home")
-		add_portrait("suri")
-		emote("suri", "love", 4.0)
+		add_portrait("karen")
+		emote("karen", "love", 4.0)
 		varnak_banner("Ayvu i-ho-ho! Senakma polu ayvu ri-rav-fu-da!", 20)
 		text_line("(The writing is wonderful! At the school, everyone will read the writing!)", 15)
-		text_line("Suri copies your chart onto the big board. By evening the village signs have Ayvu on them, and the old writing shows above Tujuju sentences everywhere.", 17)
+		text_line("Karen copies your chart onto the big board. By evening the village signs have Ayvu on them, and the old writing shows above Tujuju sentences everywhere.", 17)
 		button("Return", close_panel, content)
 		return
-	clear_panel("Teach Suri Ayvu (" + str(step + 1) + " of " + str(names.size()) + ")")
-	add_portrait("suri")
-	text_line("Suri asks: how do you write “" + names[step] + "”?", 17)
+	clear_panel("Teach Karen Ayvu (" + str(step + 1) + " of " + str(names.size()) + ")")
+	add_portrait("karen")
+	text_line("Karen asks: how do you write “" + names[step] + "”?", 17)
 	var opts = kir_options(names[step])
 	var order = [0, 1, 2]
 	order.shuffle()
@@ -10669,16 +10669,16 @@ func suri_kirmel(step: int):
 		b.add_child(drawc)
 		var kk = k
 		b.pressed.connect(func():
-			log_event("answer", {"activity": "Teach Suri Ayvu", "item": names[step], "chose": str(kk), "correct": "0"}, kk == 0)
+			log_event("answer", {"activity": "Teach Karen Ayvu", "item": names[step], "chose": str(kk), "correct": "0"}, kk == 0)
 			if kk == 0:
 				play_sfx("correct", -4.0)
 				suri_kirmel.call_deferred(step + 1)
 			else:
 				play_sfx("wrong", -4.0)
-				fb.text = "Suri tilts their head. Look at the turn of each mark (the vowel) and its shape (the first sound)."
+				fb.text = "Karen tilts their head. Look at the turn of each mark (the vowel) and its shape (the first sound)."
 				fb.add_theme_color_override("font_color", Color("8a2f1f")))
 		content.add_child(b)
-	button("Back", talk.bind("suri"), content)
+	button("Back", talk.bind("karen"), content)
 
 func apply_kirmel_signs():
 	for s in Art.signs:

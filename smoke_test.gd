@@ -40,9 +40,9 @@ func run():
 	press("Offer repair materials")
 	assert(game.completed.has("bridge"))
 	game.account("dofo","italpada","Witnessed")
-	game.talk("lira")
+	game.talk("sita")
 	game.talk("rofi")
-	game.check_evidence("Lira: italpanu")
+	game.check_evidence("Sita: italpanu")
 	assert(not game.completed.has("evidence"))
 	game.check_evidence("Dofo: italpada")
 	assert(game.completed.has("evidence"))
@@ -105,8 +105,8 @@ func run():
 	press("Now catch one")
 	press("Anke tari k-i-nuk-ak-pa-da.")
 	assert(game.fish_caught == 1)
-	game.where_puzzle("lira")
-	press(Data.WHERE["lira"]["options"][0])
+	game.where_puzzle("sita")
+	press(Data.WHERE["sita"]["options"][0])
 	game.where_puzzle("dofo")
 	press(Data.WHERE["dofo"]["options"][1])
 	game.neri_story()
@@ -160,7 +160,7 @@ func run():
 	game.completed.clear()
 	game.inventory.clear()
 	game.fish_caught = 1
-	game.talk("ketu")
+	game.talk("arden")
 	press("Give mur tari (3 fish)")
 	assert(not game.completed.has("market"))
 	game.mastered.append("w:nuk")
@@ -174,7 +174,7 @@ func run():
 	if game.mg["u"] >= game.mg["zx"] - 0.02 and game.mg["u"] <= game.mg["zx"] + game.mg["zw"] + 0.02: game.mg["u"] = 1.5
 	game.fish_pull()
 	assert(game.fish_caught == 3, "missed pull does not catch")
-	game.talk("ketu")
+	game.talk("arden")
 	press("Give mur tari (3 fish)")
 	assert(game.completed.has("market") and game.inventory.has("tea") and game.fish_caught == 0)
 	for i in range(4):
@@ -217,7 +217,7 @@ func run():
 	game.identity_puzzle()
 	press("An kelar na-an-da.")
 	assert(game.mastered.has("q:oli"))
-	for id in ["ketu","suri","vivi","oli","radi","jeli","sije","asya","desh","neri"]:
+	for id in ["arden","karen","vivi","oli","radi","jeli","sije","asya","bete","neri"]:
 		game.talk(id)
 		assert(game.panel.visible)
 	for id in Data.COUNTS.keys():
@@ -230,10 +230,10 @@ func run():
 	var marks = {}
 	for e in game.entities:
 		if e.has("mark"): marks[e["id"]] = e["mark"].visible
-	assert(marks["vufi"] and not marks["mira"] and marks["ketu"] and marks["desh"] and not marks["sair1"])
+	assert(marks["vufi"] and not marks["mira"] and marks["arden"] and marks["bete"] and not marks["sair1"])
 	game.complete("market")
 	for e in game.entities:
-		if e["id"] == "ketu": assert(not e["mark"].visible)
+		if e["id"] == "arden": assert(not e["mark"].visible)
 	# ---- picking: aim at a person, an item and a far object ----
 	game.close_panel()
 	game.player.position = Vector3(0, 0.1, 28)
@@ -358,7 +358,7 @@ func run():
 	# market economy and the dog
 	game.complete("market")
 	game.fish_caught = 2
-	game.talk("ketu")
+	game.talk("arden")
 	press("Sell a fish: tari yan, gin yan")
 	press("Sell a fish: tari yan, gin yan")
 	assert(game.gin == 2 and game.fish_caught == 0)
@@ -378,10 +378,10 @@ func run():
 	game.talk("gav")
 	press("Take the parcels")
 	assert(game.inventory.has("parcel_yalo"))
-	game.give_parcel("ketu")
+	game.give_parcel("arden")
 	press("kel: Asya-ru")
 	assert(game.inventory.has("parcel_yalo"))
-	for who in ["ketu", "asya", "oku"]:
+	for who in ["arden", "asya", "oku"]:
 		game.give_parcel(who)
 		press("kel: " + who.capitalize() + "-ru")
 	assert(not game.has_any_parcel())
@@ -610,7 +610,7 @@ func run():
 		press("Ask about what " + str(g["by"]).capitalize() + " said")
 		assert(game.solved.has("gc:" + g["id"]))
 	assert(game.completed.has("gossip"))
-	game.talk("lira")
+	game.talk("sita")
 	assert(find_button(game.content, "Tell some gossip") != null)
 	# strange things
 	for id in ["odd_fish", "odd_chair", "odd_clothes", "odd_book", "odd_bed", "odd_fruit", "odd_teapot", "odd_choni"]:
@@ -637,15 +637,15 @@ func run():
 	game.rumor_composer("dofo")
 	press("Whisper it to Dofo")
 	assert(game.rumor_count == 2)
-	game.rumor_composer("desh")
-	press("Desh")
-	press("Whisper it to Desh")
+	game.rumor_composer("bete")
+	press("Bete")
+	press("Whisper it to Bete")
 	game.news("mira")
 	assert(not game.completed.has("rumor") or game.rumor_count >= 3)
-	game.news("ketu")
+	game.news("arden")
 	assert(game.completed.has("rumor"))
-	game.rumors.append({"who": "Ketu", "v": "Ketu haima i-sum-pa-nu.", "en": "x", "teller": "mira"})
-	game.news("ketu")
+	game.rumors.append({"who": "Arden", "v": "Arden haima i-sum-pa-nu.", "en": "x", "teller": "mira"})
+	game.news("arden")
 	game.parrot_panel()
 	for c in game.content.get_children():
 		if c is LineEdit and not c.is_queued_for_deletion(): c.text = "Tari i-ho"
@@ -692,35 +692,35 @@ func run():
 		game.joke_menu(id)
 		game.do_joke(id, Data.JOKES[0])
 		game.feel(id)
-	assert(game.mastered.has("chat:mira:faint") and game.mastered.has("chat:dofo:proud") and game.mastered.has("chat:lira:laugh"))
+	assert(game.mastered.has("chat:mira:faint") and game.mastered.has("chat:dofo:proud") and game.mastered.has("chat:sita:laugh"))
 	# gifts: likes, hates and neutral
 	game.fish_caught = 3
 	game.gin = 5
 	game.inventory.append_array(["bread", "tea"])
-	var f0 = int(game.friend.get("ketu", 0))
-	game.give_gift("ketu", "tari")
-	assert(int(game.friend["ketu"]) == mini(f0 + 3, 10) and game.fish_caught == 2)
+	var f0 = int(game.friend.get("arden", 0))
+	game.give_gift("arden", "tari")
+	assert(int(game.friend["arden"]) == mini(f0 + 3, 10) and game.fish_caught == 2)
 	var f1 = int(game.friend.get("mira", 0))
 	game.give_gift("mira", "panak")
 	assert(int(game.friend["mira"]) == maxi(f1 - 1, 0) and not game.inventory.has("bread"))
-	game.give_gift("desh", "gin")
+	game.give_gift("bete", "gin")
 	# secrets and the friends quest
-	for id in ["vufi", "ketu", "desh", "neri", "gav"]: game.add_friend(id, 10)
+	for id in ["vufi", "arden", "bete", "neri", "gav"]: game.add_friend(id, 10)
 	assert(game.completed.has("friends"))
-	game.chat_menu("ketu")
+	game.chat_menu("arden")
 	press("Ask about a secret")
-	assert(game.mastered.has("sec:ketu"))
+	assert(game.mastered.has("sec:arden"))
 	game.mood["rofi"] = -2
 	assert(game.greeting("rofi") == "Hmph!")
 	game.feel("rofi")
 	# every reaction animates and resets cleanly
 	for k in ["happy", "love", "angry", "shocked", "sad", "embarrassed", "laugh", "faint", "dizzy", "confused", "sleepy", "proud", "disgust", "sneeze"]:
-		var e = game.entity_by_id("lira")
+		var e = game.entity_by_id("sita")
 		var hx = e["node"].position.x
-		game.emote("lira", k, 1.0)
+		game.emote("sita", k, 1.0)
 		for i in range(12): game.apply_emote(e, 0.1)
 		assert(not e.has("emote") and absf(e["node"].position.x - hx) < 0.001 and e["node"].rotation.x == 0.0, "emote resets " + k)
-		assert(game.reaction_text("lira", k) != "" or k == "sneeze")
+		assert(game.reaction_text("sita", k) != "" or k == "sneeze")
 	game.ambient_cd = 0.0
 	game.close_panel()
 	game.player.position = Vector3(0, 0.1, 10)
@@ -802,7 +802,7 @@ func run():
 	game.gift_menu("dofo")
 	press("ning-guro (song-berry)")
 	assert(game.poems.size() == 2 and game.poems[-1]["by"] == "dofo")
-	game.villager_poem("lira", "sao-dau")
+	game.villager_poem("sita", "sao-dau")
 	game.eat_poem("sao-dau")
 	game.eat_poem("sao-dau")
 	assert(game.completed.has("poems"))
@@ -831,21 +831,21 @@ func run():
 		game.putz(id)
 		assert(game.panel.visible)
 	assert(game.discovered.has("habibi") and game.discovered.has("puts"))
-	game.friend["desh"] = 9
+	game.friend["bete"] = 9
 	game.day_count = 0
-	game.mood["desh"] = 0
-	game.entity_by_id("desh").erase("say")
+	game.mood["bete"] = 0
+	game.entity_by_id("bete").erase("say")
 	game.guro_t = -1.0
-	assert(game.greeting("desh") == Data.ENDEAR["giggly"])
+	assert(game.greeting("bete") == Data.ENDEAR["giggly"])
 	for sid in ["suri_kinder", "oku_brainstorm", "hot_dog", "fruit_variety", "mira_sizzle", "fire_pops", "desh_toot"]:
 		game.sentence_card(sid)
 		press(Data.SENTENCES[sid]["en"])
 	game.gin = 3
 	game.completed.append("market")
-	game.talk("ketu")
+	game.talk("arden")
 	press("Buy ret-gor (hot dog): gin yan")
 	assert(game.inventory.has("hotdog"))
-	game.give_gift("desh", "ret-gor")
+	game.give_gift("bete", "ret-gor")
 	assert(not game.inventory.has("hotdog"))
 	for w in ["var", "len", "kawai"]:
 		var fs: Array = game.ext_items(w)["forms"]
@@ -975,7 +975,7 @@ func run():
 	game.inventory.append_array(["bread", "bread"])
 	game.errand_deliver("mira")
 	assert(game.gin == 2 and not game.inventory.has("bread") and game.errands_done() == 1 and game.errand.is_empty())
-	game.errand_menu("ketu")
+	game.errand_menu("arden")
 	assert(not game.errand.is_empty())
 	game.errand = {}
 	game.discovered.append_array(["wak", "guro", "kor"])
@@ -1074,54 +1074,54 @@ func run():
 	print("PASS: ninth expansion b: overheard talk, mystery letters, Teach Neri, learning log and export")
 	# tenth: talk view, asking and telling with -kan, -vai, hama and commands
 	game.close_panel()
-	var dn = game.entity_by_id("desh")["node"]
+	var dn = game.entity_by_id("bete")["node"]
 	game.player.position = dn.position + Vector3(0, 0.1, 3.0)
-	game.chat_menu("desh")
+	game.chat_menu("bete")
 	game.update_talk_view(0.016)
-	assert(game.talk_view_id == "desh" and game.talk_cam.current and game.panel.anchor_top > 0.4, "talk view frames the villager")
+	assert(game.talk_view_id == "bete" and game.talk_cam.current and game.panel.anchor_top > 0.4, "talk view frames the villager")
 	assert(game.close_x.visible and game.close_x.anchor_top > 0.4)
 	game.close_x.pressed.emit()
 	game.update_talk_view(0.016)
 	assert(game.talk_view_id == "" and game.camera.current and game.panel.anchor_top == 0.0)
 	# no talk view during drag and drop
-	game.challenge("desh")
+	game.challenge("bete")
 	game.update_talk_view(0.016)
 	assert(game.talk_view_id == "")
 	game.close_panel()
 	# can you...?
 	game.mastered = game.mastered.filter(func(m): return not (str(m).begins_with("kan") or str(m).begins_with("cmd:") or str(m).begins_with("hama:") or str(m).begins_with("want:")))
 	game.completed.erase("survey")
-	game.chat_menu("desh")
+	game.chat_menu("bete")
 	press("Ask or tell...")
 	press("Can you...? (-kan)")
 	press("Sing")
 	press("Ti na-ning-kan-ha?")
-	assert(not game.mastered.has("kan:ning:desh"))
+	assert(not game.mastered.has("kan:ning:bete"))
 	press("Ti ta-ning-kan-ha?")
 	await process_frame
-	assert(game.mastered.has("kan:ning:desh") and game.survey_found("ning").has("desh") and has_any("Tarara"))
+	assert(game.mastered.has("kan:ning:bete") and game.survey_found("ning").has("bete") and has_any("Tarara"))
 	for v in Data.KAN.keys():
 		for who in Data.KAN[v][1]: game.can_answer(who, v)
 	game.can_answer("dofo", "fei")
 	assert(game.completed.has("survey"))
 	game.show_survey()
-	assert(has_any("Desh"))
+	assert(has_any("Bete"))
 	# what do you want?
-	game.want_ask("ketu")
+	game.want_ask("arden")
 	press("Ti han t-i-nuk-vai-ha?")
 	await process_frame
-	assert(game.mastered.has("want:ketu") and game.panel.visible)
-	for rep10 in range(10): game.want_answer(["rofi", "radi", "lira", "mira", "dofo", "vufi"][rep10 % 6])
+	assert(game.mastered.has("want:arden") and game.panel.visible)
+	for rep10 in range(10): game.want_answer(["rofi", "radi", "sita", "mira", "dofo", "vufi"][rep10 % 6])
 	# where is...?
-	game.where_say("desh", "fardom")
+	game.where_say("bete", "fardom")
 	press("Fardom hama i-esh-ha?")
 	await process_frame
 	assert(has_any("Fardom bei-ma i-esh-da."))
 	press("north")
 	assert(game.mastered.has("hama:fardom"))
-	for t in Data.WHERE_PLACES.keys(): game.where_answer("ketu", t)
-	for p in ["neri", "asya", "suri"]: game.where_answer("ketu", p)
-	assert(has_any("Suri anni dalma i-esh-da!"))
+	for t in Data.WHERE_PLACES.keys(): game.where_answer("arden", t)
+	for p in ["neri", "asya", "karen"]: game.where_answer("arden", p)
+	assert(has_any("Karen anni dalma i-esh-da!"))
 	# commands: villagers react to what you actually say
 	game.friend["rofi"] = 2
 	game.mood["rofi"] = 0
@@ -1132,38 +1132,38 @@ func run():
 	for f in range(240):
 		game.clock += 0.016
 		game.update_acts(0.016)
-	game.command_do("desh", "kachaka", "statement")
+	game.command_do("bete", "kachaka", "statement")
 	assert(has_any("Han?"))
-	game.command_do("desh", "kachaka", "me")
+	game.command_do("bete", "kachaka", "me")
 	assert(has_any("Ta-kachaka-o!"))
-	game.command_do("desh", "pul+ning", "polite")
-	assert(game.acts["desh"]["list"] == ["jump", "sing"])
+	game.command_do("bete", "pul+ning", "polite")
+	assert(game.acts["bete"]["list"] == ["jump", "sing"])
 	for f in range(500):
 		game.clock += 0.016
 		game.update_acts(0.016)
-	assert(not game.acts.has("desh"))
-	var home = game.entity_by_id("desh")["home"]
+	assert(not game.acts.has("bete"))
+	var home = game.entity_by_id("bete")["home"]
 	assert(dn.position.distance_to(home) < 0.05, "back in place after acting")
-	for v in Data.COMMANDS.keys(): game.command_do("ketu", v, "polite")
+	for v in Data.COMMANDS.keys(): game.command_do("arden", v, "polite")
 	for f in range(300):
 		game.clock += 0.05
 		game.update_acts(0.05)
 	# come with me, then go home
-	game.command_do("ketu", "kar", "polite")
-	assert(game.npc_following("ketu"))
-	var kn = game.entity_by_id("ketu")["node"]
+	game.command_do("arden", "kar", "polite")
+	assert(game.npc_following("arden"))
+	var kn = game.entity_by_id("arden")["node"]
 	game.player.position = kn.position + Vector3(8, 0.1, 0)
 	for f in range(120):
 		game.clock += 0.05
 		game.update_acts(0.05)
 	assert(kn.position.distance_to(game.player.position) < 3.5, "follows the player")
-	game.where_answer("desh", "ketu")
+	game.where_answer("bete", "arden")
 	assert(has_any("ti-su"))
-	game.send_home("ketu")
+	game.send_home("arden")
 	for f in range(400):
 		game.clock += 0.05
 		game.update_acts(0.05)
-	assert(not game.acts.has("ketu") and kn.position.distance_to(game.entity_by_id("ketu")["home"]) < 0.3)
+	assert(not game.acts.has("arden") and kn.position.distance_to(game.entity_by_id("arden")["home"]) < 0.3)
 	game.show_varnak()
 	assert(has_any("Can and want"))
 	print("PASS: tenth expansion: talk view, distinct villagers, -kan, -vai, hama, commands, survey")
@@ -1205,7 +1205,7 @@ func run():
 	assert(game.T.height(game.entity_by_id("mira")["node"].position.x, game.entity_by_id("mira")["node"].position.z) < -0.5, "Mira swims in the sea")
 	# -pa changes nothing, -nu makes a rumor, -shi stays home, negation refuses, swimming on land flops
 	game.acts.clear()
-	game.wand = {"who": "Desh", "where": "sang-ma", "pre": "i", "neg": false, "verb": "ning", "tense": "pa", "ev": "da"}
+	game.wand = {"who": "Bete", "where": "sang-ma", "pre": "i", "neg": false, "verb": "ning", "tense": "pa", "ev": "da"}
 	game.wand_cast()
 	assert(game.wand_pending.is_empty() and has_any("already happened"))
 	game.wand["tense"] = "im"
@@ -1213,13 +1213,13 @@ func run():
 	game.wand_cast()
 	assert(game.wand_pending.is_empty() and has_any("RUMOR"))
 	game.wand["ev"] = "shi"
-	var dhome = game.entity_by_id("desh")["home"]
+	var dhome = game.entity_by_id("bete")["home"]
 	game.wand_cast()
-	assert(game.acts.has("desh") and game.entity_by_id("desh")["node"].position.distance_to(dhome) < 0.5)
+	assert(game.acts.has("bete") and game.entity_by_id("bete")["node"].position.distance_to(dhome) < 0.5)
 	game.acts.clear()
-	game.wand = {"who": "Ketu", "where": "kurma", "pre": "i", "neg": true, "verb": "ning", "tense": "im", "ev": "da"}
+	game.wand = {"who": "Arden", "where": "kurma", "pre": "i", "neg": true, "verb": "ning", "tense": "im", "ev": "da"}
 	game.wand_cast()
-	assert(str(game.entity_by_id("ketu")["say"][0]).begins_with("Ma-na-ning-im-ki-da"))
+	assert(str(game.entity_by_id("arden")["say"][0]).begins_with("Ma-na-ning-im-ki-da"))
 	game.wand = {"who": "Gav", "where": "kurma", "pre": "i", "neg": false, "verb": "sum", "tense": "im", "ev": "da"}
 	game.wand_cast()
 	assert(game.acts["gav"]["list"][0] == "sleep")
@@ -1256,7 +1256,7 @@ func run():
 		press("Ask how the story came back")
 		assert(game.relay.is_empty())
 		if ri == 0:
-			assert(has_any("came back") and not game.mastered.has("relay:lira"))
+			assert(has_any("came back") and not game.mastered.has("relay:sita"))
 			press("Try again")
 			for to in rl["to"]:
 				game.relay_tell(to)
@@ -1323,14 +1323,14 @@ func run():
 		if find_button(game.content, "“" + str(sc["sug"][0]).capitalize() + "!”  (" + str(sc["sug"][1]) + ")") != null: sug_buttons += 1
 	assert(sug_buttons == 3, "three suggestions")
 	# any villager can play any suggestion
-	game.chat_menu("desh")
+	game.chat_menu("bete")
 	press("Yesen! (improv)")
 	var s3 = Data.YESEN[3]
 	var b3 = find_button(game.content, "“" + str(s3["sug"][0]).capitalize() + "!”  (" + str(s3["sug"][1]) + ")")
 	if b3 == null:
-		game.yesen_start(5, "desh")
+		game.yesen_start(5, "bete")
 	else: b3.pressed.emit()
-	assert(game.ys["who"] == "desh" and has_any("Suggestion:"))
+	assert(game.ys["who"] == "bete" and has_any("Suggestion:"))
 	game.chat_menu("mira")
 	game.yesen_start(0, "mira")
 	assert(game.ys["i"] == 0 and game.ys["who"] == "mira")
@@ -1394,10 +1394,10 @@ func run():
 	press("Get three suggestions")
 	assert(has_any("suggestion"))
 	print("PASS: twelfth expansion: yesen improv scenes, " + str(Data.YESEN.size()) + " scenes")
-	# sound: effects, ambience, Desh's music, speaker buttons
+	# sound: effects, ambience, Bete's music, speaker buttons
 	assert(game.sfx.size() == game.SFX_NAMES.size(), "all sounds load")
 	for an in game.AMB_NAMES: assert(game.amb.has(an), "ambient " + an)
-	assert(game.desh_music != null and game.desh_music.get_parent() == game.entity_by_id("desh")["node"])
+	assert(game.desh_music != null and game.desh_music.get_parent() == game.entity_by_id("bete")["node"])
 	for n in game.SFX_NAMES: game.play_sfx(n)
 	game.clock += 1.0
 	game.amb_cd = 0.0
@@ -1419,7 +1419,7 @@ func run():
 	assert(game.sound_on and not AudioServer.is_bus_mute(0))
 	game.sound_game(true)
 	assert(find_button(game.content, "Hear it again") != null)
-	print("PASS: sound effects, ambience, Desh's music and spoken Tujuju")
+	print("PASS: sound effects, ambience, Bete's music and spoken Tujuju")
 	# ambient zones and the cenote
 	game.close_panel()
 	game.player.position = Vector3(0, 0.3, 40)
@@ -1508,11 +1508,11 @@ func run():
 	for gi in range(Data.GUARDIAN_LINES.size()):
 		var gle: Array = Data.GUARDIAN_LINES[gi]
 		assert(str(gle[0]).ends_with("-da.") or str(gle[0]).contains("-da") or str(gle[0]).contains("-nu") or str(gle[0]).contains("-shi"), "Var Tari speaks with evidentials: " + str(gle[0]))
-	# bring it home to Suri
-	game.talk("suri")
-	press("Show Suri the old writing")
+	# bring it home to Karen
+	game.talk("karen")
+	press("Show Karen the old writing")
 	assert(has_any("how do you write"))
-	var ko = game.kir_options("Ketu")
+	var ko = game.kir_options("Arden")
 	assert(str(ko[0]) != str(ko[1]) and str(ko[0]) != str(ko[2]))
 	game.suri_kirmel(3)
 	assert(game.completed.has("kirmel"))
