@@ -134,7 +134,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 2. sign_river uses Mora-ven (as far as the river). If you prefer a different board text, it is one line in data.gd.
 3. Sanu is both a resident's name in the original game and the word for child in the document. The second expansion now teaches sanu as child (Jeli's sleeping child) and the notebook notes that it is also a name.
 4. mai-ai (sell) is listed as a verb in the vocabulary, but -ai is also the antipassive suffix. I treated mai-ai as an ordinary transitive root in Ketuke panak i-mai-ai-ur-da. If sell should be read as antipassive, the agent would not take -ke.
-5. Ho! (Good!) is used on its own as an exclamation by Karen, Radi and Bete, and Tari i-ho (The fish are good) by Arden. The document only lists ho as a stative root.
+5. Ho! (Good!) is used on its own as an exclamation by Kareng, Radi and Betu, and Tari i-ho (The fish are good) by Ardu. The document only lists ho as a stative root.
 6. Compounds I made with the modifier-first rule: fardom (fire-house, lighthouse) and murak-gira (log bridge). Both are new words, not in the document.
 7. dar is both ten and cook, and mar is both horse and full, in the document. The game uses both senses and the notebook gloss mentions the second meaning.
 
@@ -147,7 +147,7 @@ Workshop nouns: dom (house), fal (flower), gira (bridge), gor (dog), guro (fruit
 
 | Form | Meaning | Source | Rule used |
 |---|---|---|---|
-| Ketuke panak i-mai-ai-ur-da. | Arden usually sells bread. | Composed | Ergative -ke, 3P agreement, habitual -ur (section 21.3); see question 4 |
+| Ketuke panak i-mai-ai-ur-da. | Ardu usually sells bread. | Composed | Ergative -ke, 3P agreement, habitual -ur (section 21.3); see question 4 |
 | Anke panak k-i-mai-fu. | I will buy bread. | Composed | 1A-3P, future -fu (21.4); evidential omitted, as allowed in casual speech (21.5) |
 | Cha i-ret. | The tea is hot. | Composed | Stative with 3S prefix (24) |
 | Wak-kor i-mar-da. | The well is full. | Composed | Compound wak-kor (30.3, doc), stative mar full |
@@ -229,7 +229,7 @@ New sentence-builder items (unlocked by level):
 |---|---|---|---|
 | Rumake sanu tekama i-pal-pa-da. | The woman saw the child in the village. | Doc | Section 25.1 |
 | Kelarke tari morama i-nuk-ak-pa-da. | The traveler caught the fish at the river. | Composed | Neutral order, locative |
-| Anke panak Keturu k-i-ven-ak-pa-da. | I gave the bread to Arden. | Composed | Recipient with -ru, as in sa-ru (section 34) |
+| Anke panak Keturu k-i-ven-ak-pa-da. | I gave the bread to Ardu. | Composed | Recipient with -ru, as in sa-ru (section 34) |
 | Mirake yamat tekama i-dar-ak-pa-da. | Mira cooked the food in the village. | Composed | Perfective past |
 | Sanu tekama i-sul-im-da. | The child is sleeping in the village. | Doc | Section 25.1 |
 | Kelar i-tari-nuk-ak-pa-da. | The traveler went fishing. | Doc | Section 23 |
@@ -243,11 +243,11 @@ Decoy tiles at higher levels are made automatically by swapping endings (-ke add
 
 ## Fifth expansion: gossip, nonsense and rumors
 
-Gossip (all composed): Rofi mar-ru i-mel-ur-nu; Dofo girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Arden tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Bete haima i-ning-ur-da; Radi sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olike polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
+Gossip (all composed): Rofi mar-ru i-mel-ur-nu; Dofo girama i-sul-ur-shi; Mira-ni yamat i-len-ur-da; Ardu tari-ir-su i-mel-ur-nu; Asya yesh-ta i-par-ur-nu (fear from the night, with the ablative for what is feared: please check); Betu haima i-ning-ur-da; Radi sang-ma i-sul-ur-shi; Oku sek-ir-su i-mel-ur-nu; Gavke kel-ir-ma yamat i-yam-ur-shi; Sanuke kel i-mong-ur-da; Olike polu-ni guro i-nuk-ur-shi; Jeli-ni yok i-wai-da; Lirake polu-ni tovu i-gao-ur-da (gao as tell).
 
 Replies: Maki! Mar anru i-mel-ur-da. / Gira i-sava-da! An girama na-sul-ur-da. / Maki! Yamat i-nav! ...Yamat i-len-shi. / Tari-ir i-ho! Ri-dap-ur-da. / Maki! Fardom i-ling-da! / Tari-ir ri-seng-ur-da! / Maki! An na-pal-ai-ur-da! (antipassive pal-ai, section 22.5) / Sek-ir ri-zen-da. / Maki! ...Yamat i-nav-pa. / Han kel? / Maki! ...Guro i-ho. / Yok i-wai, dan Sije i-seng-da! (dan: but, section 27.1) / Ho! Ki tovu i-ho!
 
-Strange things: Tari wak-korma i-esh-da; Ket dom-ni tarma i-esh-da (tar: top, section 25.3); Arden-ni yir murakma i-esh-da; Puka haima i-esh-da; Sulum morama i-esh-da; Var guro rukma i-esh-da; Cha-kor girama i-esh-da (cha-kor: teapot, a compound I made). Events: Tari-ir hen-ta ri-kar-im-da (fish are coming from the sky); Var guro hala i-pav-im-da (a giant fruit is running fast; pav for rolling is a joke).
+Strange things: Tari wak-korma i-esh-da; Ket dom-ni tarma i-esh-da (tar: top, section 25.3); Ardu-ni yir murakma i-esh-da; Puka haima i-esh-da; Sulum morama i-esh-da; Var guro rukma i-esh-da; Cha-kor girama i-esh-da (cha-kor: teapot, a compound I made). Events: Tari-ir hen-ta ri-kar-im-da (fish are coming from the sky); Var guro hala i-pav-im-da (a giant fruit is running fast; pav for rolling is a joke).
 
 Rumor composer: Subject + place with -ma + adverb (hala, sela) + verb. The verb is (ma-) + na-/i- + root (sul, sum, ning, pav, nang, mel, tal, sir) + -im/-pa/-ur/-fu + (-ki) + -da/-shi/-nu, following section 21.1. Reactions: T-i-pal-pa-ha?! (You saw it?), Haku? (Why?), Hal-ta? (From whom? hal with the ablative: please check), and Halke ki tovu i-gao-pa-ha?! (Who told this story?). Retold rumors swap the evidential to -nu.
 
@@ -309,7 +309,7 @@ Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds
 | aloha | hello, goodbye | Hawaiian |
 | chau | bye | Italian ciao |
 
-Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Bete's party); gossip Dofoke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Bete-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Bete) and Chau... (Lachu); bombom at Arden's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
+Where they appear: Gav-ni choni fardom-ni tarma i-esh-da (a new strange thing); Fiyesta-ma buruhaha i-esh-pa-nu (Betu's party); gossip Dofoke Gav-ni choni i-nuk-pa-shi, Okuke sek-ir-ru bombom i-ven-ur-shi, Betu-ni fiyesta-ma halabalu i-esh-pa-nu, with replies Maki! ...Choni i-kawai-da / Sek-ir ri-seng-da! / Ho! Fiyesta i-ho-pa-da! Wala!; the compliment Ti ta-kawai-da (You are cute) and the tease Ti-ni choni i-kawai (Your chonies are cute), answered with Hutspa!, Shenani! or Hal-ta?!; jokes Mar-ni choni-ir ri-kawai-da, Gira i-kaput... wala! Gira i-sava-da, Yue pajama-ma i-sul-im-da; Gesunhait! after every sneeze; Buruhaha! and Halabalu! during the runaway fruit and fish rain; Wala! on level-ups and the treasure; greetings Aloha! (Betu) and Chau... (Lachu); bombom at Ardu's stall, in market rush and as a gift; choni, bombom, pajama and fiyesta in poems, practice and the rumor composer (fiyesta-ma, pajama-ma); kawai and kaput as describing words in practice and poems. The notebook has a Borrowed words page.
 
 Things to check: 17. Whether loans keep ch (as in cha) or should become sh. 18. Stress and long vowels in loans are not marked.
 
@@ -343,7 +343,7 @@ Guarani, spoken widely in Paraguay, is rich in sound-symbolic words, many repeat
 | vava | sway | vava, to sway |
 | sununu | rumbling uproar | sununu, uprising or revolt |
 
-The paradigm in Tujuju: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Bete i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
+The paradigm in Tujuju: the bare sound (Pororo!), a verb (Far i-pororo-im-da, The fire is popping), doubled for repetition (i-pororo-pororo-im-da), and any tense or evidential (Betu i-tarara-tarara-pa-nu). kororo, tarara and vava are also in the rumor composer; pororo, chiriri, kororo, tarara, piriri and vava are in practice and poems. kachaka (bouncy dance music) is borrowed from Paraguayan kachaka, a cumbia style; its name comes from a Colombian song, not from Guarani.
 
 Things to check: 19. Doubling is a game addition, not in the handoff document. 20. Whether sound words should be their own word class or ordinary verb roots (the game treats them as intransitive roots). 21. Whether the hyphen in doubled forms (var-var) is the right spelling.
 
@@ -364,13 +364,13 @@ Key sentences:
 - Ti choni-na ta-an-da! (You are a choni person!)
 - Choni-ir hen-ta ri-kar-im-da! (Chonies are coming from the sky!)
 
-New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Bete at karaoke (-da), Karen's selfies (-shi), Arden's fish pizza (-nu), Radi's doppelganger (-shi), Dofo the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
+New gossip: Gav's chonies swimming (-shi), Asya and the poltergeist (-nu), Betu at karaoke (-da), Kareng's selfies (-shi), Ardu's fish pizza (-nu), Radi's doppelganger (-shi), Dofo the klutz (-da), Oku talking to trinkets (-nu), Jeli's fruit shampoo (-shi), Gav the robot (-shi), Sanu sleeping in chonies (-da).
 
 Things to check: 22. Native words hiri, sipu, dop and lavir are game additions. 23. Gossip lines like Ketuke tari-pitsa i-dar-ur-nu treat tari-pitsa as a compound noun, not incorporation. 24. The relative clause in the falls clue (wak hala i-lum-im-en mora, the river where water goes fast) uses -en for a location, which the handoff document does not show. 25. Loans ending in two consonants (puts, kluts) break the final-consonant rule; they could become putsu and klutsu.
 
 ## Ninth expansion: errands, overheard talk, mystery letters, Teach Neri
 
-Errands use the attested request pattern from Arden's quest: number + noun + t-na-ven-o-ye (Vel panak t-na-ven-o-ye, please give me two bread).
+Errands use the attested request pattern from Ardu's quest: number + noun + t-na-ven-o-ye (Vel panak t-na-ven-o-ye, please give me two bread).
 
 New words: par-yir (feather, a calque: bird + clothing, a bird's clothes), kraa (a parrot squawk, not really Tujuju). monarma and yeshma are noun + -ma.
 
@@ -378,13 +378,13 @@ Overheard conversations (data.gd OVERHEAR) are all composed. Examples:
 - Anni pai hama i-esh-ha? Ma-k-i-pal-ak-pa-ki-da. Halke pai i-nuk-pa-ha? (Where is my paper? I didn't see it. Who took the paper?)
 - Yeshma sair i-mel-pa-da: "Kraa! Ti-ni palar!" (Last night someone said: "Kraa! Your friend!")
 - Monarma pai-ir kel-ma ri-esh-ur-da. Hal-ta? Ma-na-zen-ki-da. (In the morning there are usually letters in the bag. From whom? I don't know.)
-- Senakma par-yir i-esh-da! ... Ki par-yir Karen-ni pai-ni dalma i-esh-pa-da. (There's a feather in the school! ... This feather was next to Karen's paper.)
+- Senakma par-yir i-esh-da! ... Ki par-yir Kareng-ni pai-ni dalma i-esh-pa-da. (There's a feather in the school! ... This feather was next to Kareng's paper.)
 - Sanu, ti ta-sul-im-ha? Ma-na-sul-im-ki-da... kororo... (Are you sleeping? I'm not sleeping... snore...)
 
 Mystery letters (data.gd LETTERS), all composed, for example:
 - An ti-ni palar na-an-da. Ti tekama ta-esh-da. K-ta-pal-ur-da. (I am your friend. You are in the village. I see you all the time.)
 - Anke polu-ni tovu k-i-zen-da. Sela na-an-ur-da. (I know everyone's stories. I am usually alone.)
-- Ti t-na-sir-im-shi! Anke Karen-ni pai k-i-nuk-ur-da. Ti-ru pai k-i-ven-ur-da. (Apparently you are looking for me! I usually take Karen's paper. I give the paper to you.)
+- Ti t-na-sir-im-shi! Anke Kareng-ni pai k-i-nuk-ur-da. Ti-ru pai k-i-ven-ur-da. (Apparently you are looking for me! I usually take Kareng's paper. I give the paper to you.)
 - The solution: Par ti-ni palar i-an-shi. (Apparently the parrot is your friend.) The game accepts only -shi, because the player infers it from clues.
 Reply sentences the player builds include Hal ti ta-an-ha? (Who are you?), Tovu t-na-gao-o-ye. (Please tell me a story.), Panak ma-t-i-nuk-o-ki! (Don't take the bread!) and Anke ti k-ta-sir-fu-da. (I will find you.)
 
