@@ -2525,7 +2525,7 @@ func _physics_process(delta):
 				target = e
 	hint_time -= delta
 	if hint_time > 0.0: pass
-	elif at_cenote_rim(): prompt.text = "Sonot  ·  tap to dive in (lup!)"
+	elif at_cenote_rim(): prompt.text = "Sonot  ·  tap to dive in (hup!)"
 	elif not hover.is_empty(): prompt.text = display_name(hover) + "  ·  click to " + verb(hover)
 	elif not walk_to.is_empty(): prompt.text = "Walking to " + display_name(walk_to)
 	elif target.is_empty(): prompt.text = ""
@@ -3943,6 +3943,10 @@ func load_game():
 	for pair in [["vira", "jeli"], ["yalo", "asya"], ["ila", "sije"], ["tamu", "lachu"], ["oren", "rofi"], ["pomo", "radi"], ["ola", "oli"], ["tor", "dofo"], ["rin", "vivi"], ["ena", "vufi"], ["lira", "sital"], ["ketu", "ardu"], ["suri", "kareng"], ["desh", "betu"]]:
 		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
 		raw = raw.replace("\"heard_" + pair[0] + "\"", "\"heard_" + pair[1] + "\"").replace("\"mail_" + pair[0] + "\"", "\"mail_" + pair[1] + "\"")
+	# Tujuju words that changed spelling: anyone who already collected one keeps it,
+	# in the notebook, in their saved guesses and in what they have mastered.
+	for pair in [["lup", "hup"]]:
+		raw = RegEx.create_from_string("\\b" + pair[0] + "\\b").sub(raw, pair[1], true)
 	var data = JSON.parse_string(raw)
 	if not data is Dictionary: return
 	guesses = data.get("guesses",{})
@@ -9927,9 +9931,9 @@ func dive_in():
 	walk_via.clear()
 	target = {}
 	hover = {}
-	learn("lup")
+	learn("hup")
 	play_sfx("piriri", -10.0)
-	toast("Lup! You dive in.")
+	toast("Hup! You dive in.")
 
 func in_cenote_water(p: Vector3) -> bool:
 	var d = Vector2(p.x, p.z).distance_to(T.CENOTE)
@@ -9950,7 +9954,7 @@ func swim_physics(delta: float, axis: Vector2):
 		play_sfx("splash", 0.0)
 		if not cen_seen and not discovered.has("sonot"):
 			cen_seen = true
-			for w in ["sonot", "lup", "sum"]: learn(w)
+			for w in ["sonot", "hup", "sum"]: learn(w)
 			toast("Sonot: a cenote! Swim, and dive as deep as you like.")
 			log_event("cenote", "first swim")
 	var cb = camera.global_basis

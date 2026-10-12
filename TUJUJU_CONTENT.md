@@ -441,7 +441,7 @@ Things to check: 36. Possession as X-su Y i-esh is used in several scenes (Mar-s
 
 ## The cenote
 
-New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Tujuju sounds) and lup (dive, a new root: na-lup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
+New words: sonot (a cenote, borrowed from Yucatec Maya ts'ono'ot through Spanish cenote, respelled with Tujuju sounds) and hup (dive, a new root: na-hup-im-da, I am diving). Nothing at the cenote uses new grammar yet.
 
 ## Ayvu: the lost writing
 

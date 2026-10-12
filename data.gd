@@ -1184,7 +1184,7 @@ const YESEN = [
 # the cenote
 const WORDS13 = {
 	"sonot": "a cenote, a deep water-filled sinkhole (borrowed from Yucatec Maya ts'ono'ot, through Spanish cenote)",
-	"lup": "dive (root): na-lup-im-da, I am diving"
+	"hup": "dive (root): na-hup-im-da, I am diving"
 }
 
 # ---------------------------------------------------------------- the lost writing (Ayvu) and Var Tari
@@ -1232,7 +1232,7 @@ const KIR_STORY = [
 # Var Tari speaks only with evidentials: what it saw (-da), what it heard (-nu), what it works out (-shi).
 # [Tujuju, English, ending, condition]
 const GUARDIAN_LINES = [
-	["Ti sonot-ma ta-lup-pa-da.", "You dived into the cenote. I saw it.", "da", "always"],
+	["Ti sonot-ma ta-hup-pa-da.", "You dived into the cenote. I saw it.", "da", "always"],
 	["Anke hen ma-k-i-pal-pa-ki-da.", "I have never seen the sky. (I know this myself.)", "da", "always"],
 	["Hen-ma par-ir ri-ning-ur-nu.", "They say birds sing in the sky.", "nu", "always"],
 	["Tari-ir sen-sen anni dal-ma ri-sum-ur-da.", "Tiny fish usually swim beside me. I see it.", "da", "always"],
