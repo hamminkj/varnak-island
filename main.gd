@@ -2478,7 +2478,7 @@ func _physics_process(delta):
 	if in_cenote_water(player.position):
 		swim_physics(delta, axis)
 		return
-	chip_action = Callable()
+	chip_action = dive_in if at_cenote_rim() else Callable()
 	if swimming:
 		swimming = false
 		swim_up_held = false
@@ -2524,6 +2524,7 @@ func _physics_process(delta):
 				target = e
 	hint_time -= delta
 	if hint_time > 0.0: pass
+	elif at_cenote_rim(): prompt.text = "Sonot  ·  tap to dive in (lup!)"
 	elif not hover.is_empty(): prompt.text = display_name(hover) + "  ·  click to " + verb(hover)
 	elif not walk_to.is_empty(): prompt.text = "Walking to " + display_name(walk_to)
 	elif target.is_empty(): prompt.text = ""
@@ -2535,7 +2536,7 @@ func _physics_process(delta):
 		fit_prompt()
 	# fade to a quiet chip once it has been read
 	prompt.modulate.a = 1.0 if clock - prompt_text_since < 2.0 else 0.55
-	interact_button.disabled = target.is_empty()
+	interact_button.disabled = target.is_empty() and not chip_action.is_valid()
 	interact_button.text = "Interact" if target.is_empty() else verb(target).capitalize()
 
 func fit_prompt():
@@ -2780,6 +2781,11 @@ func look(amount: Vector2):
 # ------------------------------------------------------------ interaction
 
 func interact():
+	# The rim has no entity to target, so the Interact button routes to the dive
+	if target.is_empty() and chip_action.is_valid():
+		var c = chip_action
+		c.call()
+		return
 	if target.is_empty(): return
 	var e = target.duplicate()
 	hover = {}
@@ -9451,7 +9457,14 @@ func cave_color(y: float, a: float) -> Color:
 	if y > cen_y_w + 0.4: c = Color("b8b09a").lerp(Color("5f8a4a"), clampf((y - cen_y_w) / 2.5, 0.0, 1.0) * (0.5 + 0.5 * sin(a * 5.0)))
 	return c.lerp(Color("e6dcc0"), 0.12 * (0.5 + 0.5 * sin(a * 11.0 + y)))
 
-func cenote_mesh() -> ArrayMesh:
+# How much of the shaft wall just under the lip carries no collision. The wall is a
+# trimesh with backface collision, so it is solid from outside too: built all the way
+# up, it stood around the mouth like a knee-high fence and the player could never step
+# over the edge. Leaving the top of it out means you walk off the rim and fall in,
+# which is what the capybara trail has been promising all along.
+const CEN_LIP_OPEN = 2.2
+
+func cenote_mesh(skip_top: float = 0.0) -> ArrayMesh:
 	var cx = T.CENOTE.x
 	var cz = T.CENOTE.y
 	var seg = 40
@@ -9481,6 +9494,12 @@ func cenote_mesh() -> ArrayMesh:
 		ys.append([y, 4.0])
 		y -= 1.5
 	ys.append([cen_bottom, 4.0])
+	if skip_top > 0.0:
+		var cut = cen_top - skip_top
+		var kept: Array = []
+		for r in ys:
+			if float(r[0]) <= cut: kept.append(r)
+		ys = kept
 	for r in ys:
 		var ring: Array = []
 		for i in range(seg + 1):
@@ -9526,7 +9545,8 @@ func build_cenote():
 	add_child(mi)
 	var body = StaticBody3D.new()
 	var cs = CollisionShape3D.new()
-	var shape = mesh.create_trimesh_shape() as ConcavePolygonShape3D
+	# The visible wall runs to the lip; the collider starts below it, so the mouth is open.
+	var shape = cenote_mesh(CEN_LIP_OPEN).create_trimesh_shape() as ConcavePolygonShape3D
 	shape.backface_collision = true
 	cs.shape = shape
 	body.add_child(cs)
@@ -9875,6 +9895,36 @@ func build_swim_ui():
 	bmat.disable_fog = true
 	bubbles.material_override = bmat
 	camera.add_child(bubbles)
+
+# Standing on the rim, above the water, close enough to the mouth to dive.
+func at_cenote_rim() -> bool:
+	if riding or swimming or panel.visible: return false
+	if cen_rays.is_empty(): return false
+	var d = Vector2(player.position.x, player.position.z).distance_to(T.CENOTE)
+	return d < T.CENOTE_R + 3.2 and player.position.y > cen_y_w + 1.0
+
+# Step off the edge: a short hop toward the middle, then gravity does the rest, so the
+# player sees themselves fall rather than being teleported into the water.
+func dive_in():
+	if not at_cenote_rim(): return
+	var d = Vector2(T.CENOTE.x - player.position.x, T.CENOTE.y - player.position.z)
+	if d.length() < 0.1: d = Vector2(0, 1)
+	d = d.normalized()
+	# Step out over the hole on the side the player is standing on. Walking speed is
+	# written into velocity.x and .z every frame, so a horizontal leap would be wiped
+	# out before it moved anybody: the step across has to be a placement, and gravity
+	# takes them down from there.
+	var r = minf(T.CENOTE_R * 0.45, 1.4)
+	player.position = Vector3(T.CENOTE.x - d.x * r, maxf(player.position.y, cen_top + 0.35), T.CENOTE.y - d.y * r)
+	player.velocity = Vector3(0.0, 0.6, 0.0)
+	player.rotation.y = atan2(-d.x, -d.y)
+	walk_to = {}
+	walk_via.clear()
+	target = {}
+	hover = {}
+	learn("lup")
+	play_sfx("piriri", -10.0)
+	toast("Lup! You dive in.")
 
 func in_cenote_water(p: Vector3) -> bool:
 	var d = Vector2(p.x, p.z).distance_to(T.CENOTE)
