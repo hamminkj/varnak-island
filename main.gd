@@ -677,6 +677,7 @@ func build_village():
 	Art.signpost(self, Vector3(-6,0,-18), "mora-ven")
 	for p in [Vector3(-2.8,0,22), Vector3(2.8,0,8), Vector3(-2.8,0,-2), Vector3(2.8,0,-14)]:
 		Art.lamp(self, p)
+	build_posters()
 	table_node = Art.table(self, Vector3(-6.2,0,7.5))
 	block(-6.2, 7.5, 1.8)
 	for i in range(8):
@@ -2810,6 +2811,10 @@ func interact():
 
 func examine(e: Dictionary):
 	var id: String = e["id"]
+	for cfg in POSTERS:
+		if cfg["id"] == id:
+			show_poster(cfg)
+			return
 	if id.begins_with("house"):
 		door_puzzle(id)
 		return
@@ -10403,6 +10408,175 @@ func carving_texture(i: int) -> ImageTexture:
 	else:
 		img = K.image(Data.KIR_STORY[i]["v"], 640, 340, 34.0, ink, Color(0, 0, 0, 0), 4)
 	return ImageTexture.create_from_image(img)
+
+# ------------------------------------------------------------ posters on the walls
+#
+# The first of the island's hidden jokes. Halabalu is a real word in the notebook (a
+# noisy racket, borrowed the way hullabaloo was), so a player who has collected it
+# reads a dance-hall poster for a band called Racket playing bouncy music at night.
+# A player who has not just sees a poster. To add another, append to POSTERS: the art
+# is drawn here, the words are painted on in Art.poster_text.
+
+const POSTERS = [
+	{"id": "poster_halabalu", "title": "HALABALU", "lines": ["kachaka yeshma", "teka-ma"],
+		"band": ["betu", "sital", "jeli", "oli"], "paper": "e8d7ac", "ink": "2b1d14", "wash": "b5453a",
+		"words": ["halabalu", "kachaka", "yesh", "teka"],
+		"en": "HALABALU (a racket).  Bouncy dance music at night.  In the village."}
+]
+
+func fill_disc(img: Image, c: Vector2, r: float, col: Color):
+	var x0 = maxi(int(c.x - r) - 1, 0)
+	var x1 = mini(int(c.x + r) + 1, img.get_width() - 1)
+	var y0 = maxi(int(c.y - r) - 1, 0)
+	var y1 = mini(int(c.y + r) + 1, img.get_height() - 1)
+	for y in range(y0, y1 + 1):
+		for x in range(x0, x1 + 1):
+			if Vector2(x, y).distance_to(c) <= r: img.set_pixel(x, y, col)
+
+# One dancer: a flat painted figure in that villager's own colors, arms up, mid-step.
+func poster_dancer(img: Image, who: String, base: Vector2, s: float, flip: float, ink: Color):
+	var look: Array = looks.get(who, [Color("d6ac83"), Color("2b1d14"), 0, Color("e9c46a")])
+	var pex: Dictionary = person_ex.get(who, {})
+	var skin: Color = look[0]
+	var hair: Color = look[1]
+	var shirt: Color = pex.get("shirt", look[3])
+	var head = base + Vector2(0, -3.95 * s)
+	# legs, mid-step
+	paint_poly(img, [base + Vector2(-0.95 * s * flip, 0), base + Vector2(-0.3 * s * flip, -1.5 * s)], ink, int(0.42 * s))
+	paint_poly(img, [base + Vector2(1.0 * s * flip, -0.25 * s), base + Vector2(0.35 * s * flip, -1.5 * s)], ink, int(0.42 * s))
+	# body
+	var body = [head + Vector2(-1.0 * s, 0.7 * s), head + Vector2(1.0 * s, 0.7 * s),
+		base + Vector2(0.8 * s, -1.4 * s), base + Vector2(-0.8 * s, -1.4 * s), head + Vector2(-1.0 * s, 0.7 * s)]
+	for yy in range(int(head.y + 0.6 * s), int(base.y - 1.3 * s)):
+		var t = (yy - (head.y + 0.6 * s)) / maxf(base.y - 1.3 * s - head.y - 0.6 * s, 1.0)
+		var hw = lerpf(1.0, 0.82, t) * s
+		img.fill_rect(Rect2i(int(head.x - hw), yy, int(hw * 2.0), 1), shirt)
+	paint_poly(img, body, ink, maxi(int(0.3 * s), 1))
+	# arms thrown up, one higher than the other
+	paint_poly(img, [head + Vector2(-0.9 * s, 1.0 * s), head + Vector2(-2.1 * s, 0.1 * s), head + Vector2(-2.5 * s, -1.3 * s)], ink, int(0.4 * s))
+	paint_poly(img, [head + Vector2(0.9 * s, 1.0 * s), head + Vector2(2.2 * s, 0.4 * s), head + Vector2(2.4 * s, -0.9 * s)], ink, int(0.4 * s))
+	# head, hair, face
+	fill_disc(img, head, 1.5 * s, skin)
+	var style: int = int(look[2])
+	if style in [1, 2, 5]:                                  # long hair falls past the jaw
+		for yy in range(int(head.y - 1.5 * s), int(head.y + 1.9 * s)):
+			var hw2 = 1.52 * s * (1.0 - 0.25 * absf(yy - head.y) / (1.9 * s))
+			img.fill_rect(Rect2i(int(head.x - hw2), yy, maxi(int(0.42 * s), 1), 1), hair)
+			img.fill_rect(Rect2i(int(head.x + hw2 - 0.42 * s), yy, maxi(int(0.42 * s), 1), 1), hair)
+	for yy in range(int(head.y - 1.62 * s), int(head.y - 0.35 * s)):   # the cap of hair
+		var d = (head.y - yy) / (1.62 * s)
+		var hw3 = 1.5 * s * sqrt(maxf(0.0, 1.0 - d * d * 0.55))
+		img.fill_rect(Rect2i(int(head.x - hw3), yy, maxi(int(hw3 * 2.0), 1), 1), hair)
+	for ex in [-0.55, 0.55]:
+		fill_disc(img, head + Vector2(ex * s, -0.05 * s), maxf(0.19 * s, 1.0), ink)
+	paint_poly(img, [head + Vector2(-0.45 * s, 0.72 * s), head + Vector2(0.0, 0.92 * s), head + Vector2(0.45 * s, 0.72 * s)], ink, maxi(int(0.22 * s), 1))
+	if pex.get("face", "") == "glasses":
+		for ex2 in [-0.55, 0.55]:
+			paint_poly(img, [head + Vector2(ex2 * s - 0.33 * s, -0.05 * s), head + Vector2(ex2 * s + 0.33 * s, -0.05 * s)], ink, maxi(int(0.16 * s), 1))
+
+func poster_image(cfg: Dictionary) -> ImageTexture:
+	var W = 384
+	var H = 556
+	var img = Image.create(W, H, false, Image.FORMAT_RGBA8)
+	var paper = Color(cfg["paper"])
+	var ink = Color(cfg["ink"])
+	var wash = Color(cfg["wash"])
+	img.fill(paper)
+	var rs = RandomNumberGenerator.new()
+	rs.seed = hash(cfg["id"])
+	# sun-faded paper, with the damp blotches a poster gets on an island
+	for y in range(H):
+		for x in range(W):
+			var n = rs.randf()
+			if n < 0.1: img.set_pixel(x, y, paper.darkened(0.05 * rs.randf()))
+	for k in range(7):
+		var c = Vector2(rs.randf() * W, rs.randf() * H)
+		var r = rs.randf_range(14.0, 46.0)
+		for y in range(maxi(int(c.y - r), 0), mini(int(c.y + r), H - 1)):
+			for x in range(maxi(int(c.x - r), 0), mini(int(c.x + r), W - 1)):
+				var d = Vector2(x, y).distance_to(c) / r
+				if d < 1.0: img.set_pixel(x, y, img.get_pixel(x, y).darkened(0.08 * (1.0 - d)))
+	# a thick painted border, and a band of colour the dancers stand against
+	img.fill_rect(Rect2i(14, 14, W - 28, 7), ink)
+	img.fill_rect(Rect2i(14, H - 21, W - 28, 7), ink)
+	img.fill_rect(Rect2i(14, 14, 7, H - 28), ink)
+	img.fill_rect(Rect2i(W - 21, 14, 7, H - 28), ink)
+	img.fill_rect(Rect2i(21, 176, W - 42, 196), wash)
+	for k in range(90):                                     # speckle, like cheap flat printing
+		var sx = rs.randi_range(24, W - 25)
+		var sy = rs.randi_range(178, 370)
+		img.fill_rect(Rect2i(sx, sy, 2, 2), wash.lightened(0.18))
+	# four of the island's own, dancing
+	var band: Array = cfg["band"]
+	for i in range(band.size()):
+		var bx = 58.0 + i * 85.0
+		var by = 356.0 + (6.0 if i % 2 == 0 else -4.0)
+		poster_dancer(img, str(band[i]), Vector2(bx, by), 16.5, 1.0 if i % 2 == 0 else -1.0, ink)
+	# motion marks and a few notes bouncing over their heads
+	for k in range(14):
+		var mx = rs.randf_range(30.0, W - 30.0)
+		var my = rs.randf_range(186.0, 248.0)
+		var ln = rs.randf_range(7.0, 18.0)
+		paint_poly(img, [Vector2(mx, my), Vector2(mx + ln, my - ln * 0.5)], paper.lightened(0.35), 3)
+	for k in range(5):
+		var nx = 44.0 + k * 72.0 + rs.randf_range(-8.0, 8.0)
+		var ny = rs.randf_range(196.0, 224.0)
+		fill_disc(img, Vector2(nx, ny), 5.0, paper)
+		paint_poly(img, [Vector2(nx + 4.5, ny), Vector2(nx + 4.5, ny - 17.0), Vector2(nx + 13.0, ny - 21.0)], paper, 3)
+	# a torn-off corner, so it reads as something that has been up a while
+	for y in range(0, 46):
+		var cut = 46 - y + int(5.0 * sin(y * 0.7))
+		for x in range(W - cut, W):
+			if x >= 0 and x < W: img.set_pixel(x, y, Color(0, 0, 0, 0))
+	return ImageTexture.create_from_image(img)
+
+func build_posters():
+	for cfg in POSTERS:
+		var spot = poster_spot(str(cfg["id"]))
+		var p = Art.poster(self, spot[0], float(spot[1]), poster_image(cfg), 1.05)
+		Art.poster_text(p, str(cfg["title"]), 0.495, 66, Color(cfg["ink"]))
+		var lines: Array = cfg["lines"]
+		for i in range(lines.size()):
+			Art.poster_text(p, str(lines[i]), -0.42 - i * 0.135, 36, Color(cfg["ink"]))
+		posters[str(cfg["id"])] = p
+		# The pick target sits on the wall, not on the ground entity() would snap it to.
+		# Its label says pai (paper): the band's name stays something you walk up and read.
+		var e = entity(str(cfg["id"]), "object", "pai", spot[0], Color("e8d7ac"), -0.86, Vector2(0.95, 1.7))
+		var node = e["node"] as Node3D
+		node.position = spot[0]
+		e["home"] = spot[0]
+		e["gy"] = spot[0].y
+		# No floating name over it: a poster on a wall is already a thing you walk up to,
+		# and the prompt chip names it. A label here only fights the wall behind it.
+		for c in node.get_children():
+			if c is Label3D: (c as Label3D).visible = false
+
+# Where each poster hangs. The first is on the loft house, on the wall facing the path.
+func poster_spot(id: String) -> Array:
+	match id:
+		"poster_halabalu":
+			var c: Vector3 = house_centers[1]
+			return [Vector3(c.x - 2.42, 1.92, c.z + 0.35), -96.0]
+	return [Vector3(0, 2.0, 0), 0.0]
+
+var posters: Dictionary = {}
+
+func show_poster(cfg: Dictionary):
+	talk_partner = ""
+	for w in cfg["words"]: learn(w)
+	clear_panel("A poster, nailed to the wall")
+	text_line("Somebody has been up a ladder. The corner is torn and the paper has gone soft in the damp, but you can still read it.", 16)
+	varnak_banner(str(cfg["title"]), 30)
+	for l in cfg["lines"]: varnak_banner(str(l), 22)
+	text_line(str(cfg["en"]), 18)
+	text_line("The faces are people you know. Nobody in the village mentions a band.", 16)
+	if not solved.has(cfg["id"]):
+		solved.append(cfg["id"])
+		gin += 1
+		toast("You found something. +1 gin")
+		save_game()
+	button("Notebook", show_notebook, content)
+	button("Return", close_panel, content)
 
 func paint_poly(img: Image, pts: Array, ink: Color, thick: int):
 	for k in range(pts.size() - 1):

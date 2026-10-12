@@ -1631,6 +1631,33 @@ func run():
 	assert(game.tw_label(game.tw_text) == "tujuju san", "the sheet is saved")
 	game.close_panel()
 	print("PASS: the Ayvu typewriter")
+
+	# the posters: an easter egg on a village wall, readable and worth finding
+	game.close_panel()
+	for pcfg in game.POSTERS:
+		var pkey: String = pcfg["id"]
+		var pstr = game.entity_by_id(pkey)
+		assert(not pstr.is_empty(), "the poster " + pkey + " is in the world")
+		var pbody = pstr["node"] as Node3D
+		var pwall = game.poster_spot(pkey)
+		assert(pbody.position.distance_to(pwall[0] as Vector3) < 0.01, "the poster hangs on the wall, not on the ground")
+		assert(game.posters.has(pkey) and is_instance_valid(game.posters[pkey]), "the poster art was built")
+		# every word it teaches has to be a real notebook entry, or it teaches nothing
+		for w in pcfg["words"]:
+			assert(game.words.has(w), "the poster word " + str(w) + " is in the notebook")
+			game.discovered.erase(w)
+		game.solved.erase(pkey)
+		var gin0 = game.gin
+		game.examine(pstr)
+		assert(has_any(str(pcfg["title"])), "the poster shows its name")
+		assert(has_any("kachaka yeshma"), "the poster shows its lines")
+		for w in pcfg["words"]:
+			assert(game.discovered.has(w), "reading the poster collects " + str(w))
+		assert(game.solved.has(pkey) and game.gin == gin0 + 1, "finding it is worth a coin, once")
+		game.examine(pstr)
+		assert(game.gin == gin0 + 1, "reading it again pays nothing")
+		game.close_panel()
+	print("PASS: wall posters (Halabalu), their words and their reward")
 	print("PASS: third expansion: quest box, shop, dog, mail, hide and seek, riddles, treasure, sea stars, ferry, builders, sky")
 	print("PASS: second expansion quests, marks, picking, auto-walk, reachability, travel, map")
 	print("PASS: expansion data, sentence cards, doors, counting, fishing, workshop, practice, entities, world state, persistence")

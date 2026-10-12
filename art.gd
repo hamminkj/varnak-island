@@ -812,6 +812,50 @@ static func animal(kind: String, coat_c: Color = Color("8b5a2b")) -> Node3D:
 			n.set_meta("tail", tail)
 	return n
 
+# ---------- posters ----------
+
+# A sheet of paper nailed flat to a wall, with a slight list to it, the way a poster
+# ends up when somebody put it there in a hurry. The art is a texture; the words are
+# painted on top as flat labels so they stay crisp close up.
+static func poster(parent: Node3D, pos: Vector3, yaw: float, tex: Texture2D, w: float = 1.0) -> Node3D:
+	var p = Node3D.new()
+	p.position = pos
+	p.rotation_degrees = Vector3(0, yaw, -1.6)
+	parent.add_child(p)
+	var h = w * 1.45
+	box(p, Vector3(0, 0, -0.012), Vector3(w + 0.05, h + 0.05, 0.012), Color("c9bb9a"))
+	var sheet = MeshInstance3D.new()
+	var qm = QuadMesh.new()
+	qm.size = Vector2(w, h)
+	sheet.mesh = qm
+	var m = StandardMaterial3D.new()
+	m.albedo_texture = tex
+	m.roughness = 1.0
+	m.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	sheet.material_override = m
+	sheet.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	p.add_child(sheet)
+	for sx in [-1.0, 1.0]:
+		for sy in [-1.0, 1.0]:
+			sph(p, Vector3(sx * (w * 0.5 - 0.05), sy * (h * 0.5 - 0.05), 0.012), 0.022, Color("5b5248"), Vector3.ONE, 6)
+	return p
+
+static func poster_text(parent: Node3D, text: String, y: float, size: int, col: Color) -> Label3D:
+	var lb = Label3D.new()
+	lb.set_meta("scenery", true)
+	lb.text = text
+	lb.font_size = size
+	lb.pixel_size = 0.0016
+	lb.outline_size = 0
+	lb.modulate = col
+	lb.double_sided = false
+	lb.position = Vector3(0, y, 0.004)
+	lb.shaded = false
+	lb.no_depth_test = false
+	parent.add_child(lb)
+	return lb
+
 # ---------- buildings ----------
 
 # Five kinds of building, so no two houses read as the same box:
