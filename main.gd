@@ -37,6 +37,13 @@ var prompt_last: String = ""
 var toast_label: Label
 var panel: PanelContainer
 var close_x: Button
+var scroll_box: ScrollContainer
+var pan_finger: int = -2
+var pan_start: Vector2 = Vector2.ZERO
+var pan_from: float = 0.0
+var pan_scrolling: bool = false
+var swallow_click: bool = false
+var touch_at: float = -9.0
 var content: VBoxContainer
 var interact_button: Button
 var marker: MeshInstance3D
@@ -1756,6 +1763,7 @@ func build_ui():
 	var scroll = ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margin.add_child(scroll)
+	scroll_box = scroll
 	content = VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",8)
@@ -1866,6 +1874,14 @@ func close_panel():
 	talk_partner = ""
 	panel.hide()
 	lesson = ""
+	# Let go of any touch the panel was holding, so the joystick is free again
+	dnd_on = false
+	joy = Vector2.ZERO
+	move_finger = -1
+	look_finger = -1
+	touches.clear()
+	pan_finger = -2
+	pan_scrolling = false
 
 # The start screen: the chalk Tujuju on its board, one button, a small credit, and a quiet
 # link to how to play. Everything else waits in the menus.
@@ -2344,6 +2360,35 @@ func update_stork(a: Dictionary, e: Dictionary, node: Node3D, home: Vector3, del
 	var feeding = not moving and fmod(clock + ph, 6.0) < 1.4
 	neck.rotation.x = lerpf(neck.rotation.x, 1.95 if feeding else 0.12, minf(delta * 3.0, 1.0))
 
+var stuck_ride: float = 0.0
+var stuck_photo: float = 0.0
+
+# Nothing should leave the player unable to look, move or act. Each of these states
+# takes control for a moment and hands it back; this runs every physics frame, before
+# the early returns above, and hands control back itself if one of them overstays.
+func unstick(delta: float):
+	if riding:
+		stuck_ride += delta
+		if stuck_ride > 25.0:          # a crossing takes ten seconds
+			riding = false
+			player.position = ride_dest
+			player.velocity = Vector3.ZERO
+			last_safe = ride_dest
+			toast("Back on dry land")
+	else:
+		stuck_ride = 0.0
+	if photo_busy:
+		stuck_photo += delta
+		if stuck_photo > 6.0: photo_busy = false
+	else:
+		stuck_photo = 0.0
+	# The picture hides the whole interface for two frames; if it never came back,
+	# the player would be left with no joystick and no buttons.
+	if not photo_busy and is_instance_valid(ui) and not ui.visible: ui.visible = true
+	if not panel.visible:
+		if talk_cam != null and talk_cam.current: set_talk_layout(false)
+		dnd_on = false
+
 func update_marker():
 	var shown = target
 	if not walk_to.is_empty(): shown = walk_to
@@ -2364,6 +2409,7 @@ func _physics_process(delta):
 		save_game()
 		save_clock = 0
 	update_status()
+	unstick(delta)
 	if riding:
 		prompt.visible = false
 		interact_button.disabled = true
@@ -2518,6 +2564,78 @@ func display_name(e: Dictionary) -> String:
 	return str(e.get("word", ""))
 
 # ------------------------------------------------------------ input
+
+# Panels are mostly buttons, and a button swallows a drag before the scroll container
+# ever sees it, so dragging over one did nothing. _input runs ahead of the interface,
+# so a drag that passes the threshold scrolls the panel here and the release is marked
+# handled, which keeps the button under the finger from firing.
+func pan_threshold() -> float:
+	return 26.0 if dnd_on else 14.0
+
+func pan_room() -> bool:
+	if scroll_box == null: return false
+	return scroll_box.get_v_scroll_bar().max_value - scroll_box.size.y > 4.0
+
+func pan_begin(where: Vector2, index: int) -> void:
+	if scroll_box == null or not panel.visible: return
+	if not panel.get_global_rect().has_point(where): return
+	pan_finger = index
+	pan_start = where
+	pan_from = float(scroll_box.scroll_vertical)
+	pan_scrolling = false
+	swallow_click = false
+
+func pan_move(where: Vector2) -> bool:
+	if scroll_box == null or pan_finger == -2: return false
+	var d = where - pan_start
+	# A sideways drag is left for the tiles; only a clearly vertical one scrolls.
+	# A panel that fits on the screen never pans, so a sloppy tap on a short panel
+	# still presses its button.
+	if not pan_scrolling and absf(d.y) > pan_threshold() and absf(d.y) > absf(d.x) * 1.2 and pan_room():
+		pan_scrolling = true
+	if not pan_scrolling: return false
+	scroll_box.scroll_vertical = int(round(pan_from - d.y))
+	return true
+
+func pan_end() -> bool:
+	var was = pan_scrolling
+	pan_finger = -2
+	pan_scrolling = false
+	return was
+
+func _input(event):
+	if scroll_box == null or not panel.visible:
+		pan_finger = -2
+		pan_scrolling = false
+		swallow_click = false
+		return
+	# A touch also arrives a second time as an emulated mouse event, which is what
+	# presses the buttons. Touches drive the scrolling; the mouse copy is left alone,
+	# except for the click after a scroll, which is swallowed so nothing fires.
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		touch_at = clock
+	var echo: bool = clock - touch_at < 0.25
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			pan_begin(event.position, event.index)
+		elif event.index == pan_finger:
+			if pan_end():
+				swallow_click = true
+				get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag and event.index == pan_finger:
+		if pan_move(event.position): get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if not event.pressed and swallow_click:
+			swallow_click = false
+			get_viewport().set_input_as_handled()
+		elif echo or pan_finger >= 0:
+			pass                                  # the mouse copy of a touch
+		elif event.pressed:
+			pan_begin(event.position, -1)
+		elif pan_finger == -1 and pan_end():
+			get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion and pan_finger == -1 and not echo:
+		if pan_move(event.position): get_viewport().set_input_as_handled()
 
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
@@ -3408,7 +3526,7 @@ func account(id: String, phrase: String, gesture: String):
 	complete("heard_"+id)
 	clear_panel(id.capitalize())
 	text_line("“Neri " + phrase + ".”\n\n" + gesture)
-	if completed.has("heard_dofo") and completed.has("heard_lira") and completed.has("heard_rofi"):
+	if completed.has("heard_dofo") and completed.has("heard_sital") and completed.has("heard_rofi"):
 		button("Compare the evidence",show_evidence,content)
 	button("Return",close_panel,content)
 
@@ -4940,8 +5058,14 @@ func challenge(id: String):
 func gap_fill(back: Callable = Callable()):
 	var i = pick_tile_index()
 	var tp: Dictionary = Data.TILES[i]
+	# Look for a sentence long enough to hide a word in, but never loop forever
+	var spins = 0
+	while tp["tiles"].size() < 2 and spins < 25:
+		i = pick_tile_index()
+		tp = Data.TILES[i]
+		spins += 1
 	if tp["tiles"].size() < 2:
-		gap_fill(back)
+		tile_puzzle(-1, back)
 		return
 	var n = tp["tiles"].size()
 	var gaps = 1 if level() < 3 or n < 3 else 2
@@ -7746,9 +7870,12 @@ func teach_neri(back: Callable = Callable()):
 	var tp: Dictionary = Data.TILES[i]
 	var tiles: Array = tp["tiles"]
 	var said: Array = tiles.duplicate()
+	# No mistake could be built from this sentence after ten tries: swap the last two
+	# words instead. Reading m["slot"] here with nothing in m used to abort the button.
+	if m.is_empty(): m = {"swap": true} if tiles.size() >= 2 else {"slot": 0, "wrong": str(tiles[0]) + "-ki"}
 	if m.get("swap", false):
 		var v = said.pop_back()
-		said.insert(said.size() - 1, v)
+		said.insert(maxi(said.size() - 1, 0), v)
 	else:
 		said[m["slot"]] = m["wrong"]
 	compact_buttons.call_deferred()
@@ -7852,8 +7979,14 @@ func set_talk_layout(on: bool):
 
 func talk_cam_pose(id: String) -> Array:
 	var e = entity_by_id(id)
+	# An empty array means "no pose": the caller drops back to the island camera rather
+	# than erroring here every frame, which would stop the rest of _process with it.
+	if e.is_empty() or not (e.get("node") is Node3D): return []
 	var node = e["node"] as Node3D
-	var head = (node.get_meta("head") as Node3D).global_position
+	if not is_instance_valid(node) or not node.has_meta("head"): return []
+	var head_node = node.get_meta("head")
+	if not (head_node is Node3D) or not is_instance_valid(head_node): return []
+	var head = (head_node as Node3D).global_position
 	var d = player.global_position - node.global_position
 	d.y = 0.0
 	if d.length() < 0.1: d = Vector3(sin(node.rotation.y), 0, cos(node.rotation.y))
@@ -7893,11 +8026,19 @@ func update_talk_view(delta: float):
 		talk_dir.clear()
 		if id != "":
 			var pose = talk_cam_pose(id)
+			if pose.is_empty():
+				talk_view_id = ""
+				set_talk_layout(false)
+				return
 			talk_cam.global_position = pose[0]
 			talk_cam.look_at(pose[1], Vector3.UP)
 		return
 	if id == "": return
 	var p = talk_cam_pose(id)
+	if p.is_empty():
+		talk_view_id = ""
+		set_talk_layout(false)
+		return
 	talk_cam.global_position = talk_cam.global_position.lerp(p[0], minf(delta * 4.0, 1.0))
 	talk_cam.look_at(p[1], Vector3.UP)
 
