@@ -289,7 +289,7 @@ Things to check: 15. The poems combine nouns freely, so some lines are deliberat
 
 ## Borrowed words
 
-Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds more loanwords, respelled with Tujuju sounds: five vowels, y for /j/, word-final consonants limited to m, n, ng, l, r, s, k, t, and a vowel added to break up hard clusters. ch is kept in loans, as in cha.
+Tujuju already borrows cha (tea) and kaf (coffee) in the document. The game adds more loanwords, respelled with Tujuju sounds: five vowels, y for /j/, word-final consonants limited to m, n, ng, l, r, s and the three voiceless stops p, t, k, and a vowel added to break up hard clusters. ch is kept in loans, as in cha.
 
 | Tujuju | Meaning | Source |
 |---|---|---|
@@ -488,6 +488,8 @@ New word: kapibara (capybara), respelled from Guarani capii-bara (the RAE's etym
 
 Things to check: 45. Names made only of vowels (Ai, Eo) are a game invention; Tujuju names otherwise start with a consonant or have consonants inside. 46. Kapibarake ti uses ti (2SG) unmarked as the object, following the ergative pattern.
 
-Things to check: 47. Ayvu (the writing, formerly kirmel) is borrowed from Guarani ayvu (language, speech). Its syllable-final y breaks the rule that only m, n, ng, l, r, s, k or t end a syllable, like the loans puts and kluts. In Ayvu itself it is written a + raised y, vu.
+Things to check: 47. Ayvu (the writing, formerly kirmel) is borrowed from Guarani ayvu (language, speech). Resolved, Oct 2026. The coda rule now admits p alongside t and k: the three voiceless stops are one series, and letting in the alveolar and the velar while barring the bilabial was an unmotivated gap. That covers hup, hep, dap and dop. The y in ayvu is no longer an exception either: y is a consonant only as the onset of a syllable, as in yesh and yan, and a vowel anywhere else, which is also what it is in Guarani, where y is a high central vowel rather than a glide. Ayvu is a.y.vu, with no consonant in the coda at all. Its spelling in the script is unchanged: y keeps its own glyph and the vowel dial keeps its four turns and the u lever.
+
+Things to check: 48. Four finals are still outside the stated rule, all of them in long-standing words rather than new ones: v in pav (run), rav (read), nav (warm) and gov (nine); sh in esh (be located) and yesh (night); b in tab (table); f in kaf (coffee). Widening the rule once more to any consonant except y, w and h would cover every one of them and is simpler to teach than a list, but it is a bigger change to the language than admitting p, so it is left for you to decide.
 
 Things to check: 48. ruma (woman, from the handoff document's example Rumake sanu tekama i-pal-pa-da) is the only gendered word in the game. Tujuju grammar has no gender, and the English glosses now use they for everyone. Should ruma stay as woman, or become a neutral word (for example, the same sentence with sair, person)?

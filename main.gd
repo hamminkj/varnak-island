@@ -6980,7 +6980,7 @@ func show_varnak():
 	clear_panel("About Tujuju")
 	text_line("Tujuju is an invented language built to work the way many real languages do. This page lists its main features. The game uses a simplified version, and the doubling and sound words were added for the game.", 17)
 	var secs = [
-		["Sounds and spelling", "Five vowels (a e i o u), and the letter y sounds like the y in yes. Words end only in m, n, ng, l, r, s, k or t, so borrowed words get respelled: brouhaha becomes buruhaha.", []],
+		["Sounds and spelling", "Five vowels (a e i o u). The letter y is a consonant at the start of a syllable, as in yesh, and a vowel anywhere else, as in ayvu. Words end only in m, n, ng, l, r, s and the three stops p, t, k, so borrowed words get respelled: brouhaha becomes buruhaha.", []],
 		["Words are built from pieces", "Tujuju glues small meaningful pieces together. One verb can say who did what, when, and how you know. Hyphens show the pieces.", ["“Ma-k-i-pal-pa-ki-da.” = ma- not, k- I, i- it, pal see, -pa past, -ki not, -da I know it directly: I did not see it."]],
 		["Verbs show people", "A prefix tells who is acting. Na- is I, ta- is you, i- is one person (they) or it, ri- is a group (they). Tujuju has no gender: everyone on Tujuju Island is a they. With two people, the doer comes first: k-i- is I (do it to) it, t-na- is you (do it to) me.", ["“Na-lum.” I go.   “Ta-lum.” You go.   “Ri-lum.” They go."]],
 		["Time and aspect", "Endings after the verb show when and how: -pa past, -fu future, -im happening now, -ur usually, -ak finished.", ["“I-nang-pa.” walked.   “I-nang-fu.” will walk.   “I-nang-im.” is walking.   “I-nang-ur.” usually walks."]],
@@ -7023,7 +7023,7 @@ func show_credits():
 
 func show_loans():
 	clear_panel("Word play")
-	text_line("Borrowed words. Tujuju borrows words from other languages and respells them with Tujuju sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, k or t at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
+	text_line("Borrowed words. Tujuju borrows words from other languages and respells them with Tujuju sounds: five vowels (a e i o u), y for the sound in yes, and only m, n, ng, l, r, s, p, t or k at the end of a word. Hard clusters get an extra vowel: brouhaha becomes buruhaha.", 17)
 	var any = false
 	for w in words.keys():
 		if str(words[w]).contains("borrow"):
