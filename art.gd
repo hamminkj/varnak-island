@@ -812,6 +812,51 @@ static func animal(kind: String, coat_c: Color = Color("8b5a2b")) -> Node3D:
 			n.set_meta("tail", tail)
 	return n
 
+# ---------- the raft ----------
+
+# Five logs lashed with rope, a bundle of reeds for your head, and a pole you never use.
+static func raft(parent: Node3D, pos: Vector3) -> Node3D:
+	var r = Node3D.new()
+	r.position = pos
+	parent.add_child(r)
+	var wood = Color("9a6f45")
+	for i in range(5):
+		var c = wood.lerp(Color("7d5733"), float(i % 3) * 0.3)
+		cyl(r, Vector3(-0.96 + i * 0.48, 0.0, 0.0), 0.23, 0.24, 2.9, c, Vector3(90, 0, 0), 8)
+	for sz in [-0.95, 0.95]:
+		box(r, Vector3(0, 0.18, sz), Vector3(2.5, 0.07, 0.09), Color("6b5a3a"))
+	for i in range(4):
+		cyl(r, Vector3(-0.72 + i * 0.48, 0.2, 0.95), 0.035, 0.035, 0.3, Color("4f432c"), Vector3(0, 0, 90), 6)
+	# a reed pillow at one end
+	for k in range(7):
+		cyl(r, Vector3(-0.45 + k * 0.15, 0.24, -1.05), 0.055, 0.055, 0.85, Color("c6b071").lerp(Color("9d8a52"), float(k) / 7.0), Vector3(90, 8.0 * k - 24.0, 0), 5)
+	cyl(r, Vector3(0.82, 0.3, -0.1), 0.045, 0.055, 3.2, Color("8a6a43"), Vector3(74, 0, 6), 6)
+	return r
+
+# ---------- the singing stones ----------
+
+# A hollow stone column, open at the top, that the wind blows across. Tapered, leaning
+# a little, with the dark mouth showing and moss up the shaded side.
+static func singing_stone(parent: Node3D, pos: Vector3, h: float, lean: float, seed_i: int) -> Node3D:
+	var s = Node3D.new()
+	s.position = pos
+	s.rotation_degrees = Vector3(lean, seed_i * 47.0, lean * 0.6)
+	parent.add_child(s)
+	var rock = Color("6d6a62").lerp(Color("8c8578"), float(seed_i) / 5.0)
+	var r_top = 0.34 + 0.03 * seed_i
+	var r_bot = 0.52 + 0.03 * seed_i
+	cyl(s, Vector3(0, h * 0.5, 0), r_top, r_bot, h, rock, Vector3.ZERO, 9)
+	# the hollow: a dark ring and a shadowed throat
+	cyl(s, Vector3(0, h - 0.02, 0), r_top * 0.72, r_top * 0.72, 0.1, Color("2a2a28"), Vector3.ZERO, 9)
+	cyl(s, Vector3(0, h - 0.5, 0), r_top * 0.6, r_top * 0.6, 0.9, Color("1d1f1e"), Vector3.ZERO, 9)
+	# a worn band where hands have struck it, and moss low down
+	cyl(s, Vector3(0, h * 0.46, 0), r_top * 1.06, r_top * 1.12, 0.26, rock.lightened(0.12), Vector3.ZERO, 9)
+	cyl(s, Vector3(0, 0.16, 0), r_bot * 1.04, r_bot * 1.12, 0.32, Color("4f7a3a").lerp(rock, 0.45), Vector3.ZERO, 9)
+	for k in range(3):
+		var a = float(k) * 2.1 + float(seed_i)
+		sph(s, Vector3(cos(a) * r_bot * 0.9, 0.1, sin(a) * r_bot * 0.9), 0.17, Color("5e8c46").lerp(rock, 0.5), Vector3(1.0, 0.5, 1.0), 6)
+	return s
+
 # ---------- posters ----------
 
 # A sheet of paper nailed flat to a wall, with a slight list to it, the way a poster

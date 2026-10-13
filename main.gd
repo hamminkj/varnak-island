@@ -469,6 +469,8 @@ func build_world():
 	build_places()
 	build_places3()
 	build_places5()
+	build_singing_stones()
+	build_raft()
 	build_entities()
 	build_hirimara()
 	T.extra_lobe = false
@@ -1292,6 +1294,8 @@ func build_entities():
 	build_count_prop(Vector3(45,0,22), "orchard", 8)
 	entity("logbridge","object","gira",Vector3(52,0,-20.4),Color.WHITE,1.4,Vector2(1.2,1.0))
 	entity("circle","object","sek",Vector3(32,0,-42),Color.WHITE,2.2,Vector2(2.0,2.0))
+	build_singing_stone_entities()
+	entity("raft","object","sena",Vector3(-40.6,0,-22.2),Color.WHITE,1.3,Vector2(1.9,1.2))
 	build_count_prop(Vector3(32,0,-42), "circle", 9)
 	entity("sign_market","object","kur",Vector3(-7,0,20.5),Color.WHITE,2.3,Vector2(0.9,2.0))
 	entity("sign_school","object","senak",Vector3(-45.5,0,3.2),Color.WHITE,2.3,Vector2(0.9,2.0))
@@ -1561,6 +1565,7 @@ func button(text: String, callback: Callable, parent: Node) -> Button:
 
 # ---- photos: a small camera button that captures only the scenery ----
 var photo_btn: Button
+var move_pad: Control
 var photo_busy: bool = false
 
 func build_photo_button():
@@ -1590,6 +1595,85 @@ func build_photo_button():
 	photo_btn.add_child(ic)
 	photo_btn.pressed.connect(take_photo)
 	ui.add_child(photo_btn)
+
+# ------------------------------------------------------------ sitting down
+#
+# Nothing on the island asks you to stop. Sitting lowers the view, quiets the
+# interface and brings the sound forward, which turns a place you walk through into
+# one you stay in. It changes nothing in the world and you can get up at any time.
+var sitting: bool = false
+var sit_blend: float = 0.0
+var sit_btn: Button
+
+func can_sit() -> bool:
+	return not riding and not swimming and not panel.visible and player.is_on_floor()
+
+func build_sit_button():
+	sit_btn = Button.new()
+	sit_btn.flat = true
+	sit_btn.focus_mode = Control.FOCUS_NONE
+	sit_btn.tooltip_text = "Sit down and listen"
+	sit_btn.custom_minimum_size = Vector2(40, 34)
+	sit_btn.size = Vector2(40, 34)
+	sit_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	sit_btn.offset_left = -54
+	sit_btn.offset_right = -14
+	sit_btn.offset_top = 214
+	sit_btn.offset_bottom = 248
+	sit_btn.modulate = Color(1, 1, 1, 0.55)
+	var si = Control.new()
+	si.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	si.set_anchors_preset(Control.PRESET_FULL_RECT)
+	si.draw.connect(func():
+		var c = si.size * 0.5
+		var ink = Color("fff6df")
+		# a small figure sitting: head, back, legs out in front
+		si.draw_circle(c + Vector2(-3, -10), 3.4, ink)
+		si.draw_line(c + Vector2(-3, -6), c + Vector2(-3, 3), ink, 2.4)
+		si.draw_line(c + Vector2(-3, 3), c + Vector2(9, 3), ink, 2.4)
+		si.draw_line(c + Vector2(9, 3), c + Vector2(9, 9), ink, 2.4)
+		si.draw_line(c + Vector2(-9, 9), c + Vector2(10, 9), ink, 1.6))
+	sit_btn.add_child(si)
+	sit_btn.pressed.connect(toggle_sit)
+	ui.add_child(sit_btn)
+
+func toggle_sit():
+	if sitting:
+		stand_up()
+		return
+	if not can_sit():
+		hint("You cannot sit down here.")
+		return
+	sitting = true
+	joy = Vector2.ZERO
+	walk_to = {}
+	walk_via.clear()
+	player.velocity = Vector3.ZERO
+	if not solved.has("sat"):
+		solved.append("sat")
+		toast("Sit a while. Tap again to get up.")
+		log_event("sit", zone_id)
+	play_sfx("page", -22.0, 0.7)
+
+func stand_up():
+	if not sitting: return
+	sitting = false
+
+# Lower the view to about sitting height and quiet the interface, then put it all back.
+func update_sitting(delta: float):
+	if sitting and not can_sit() and not panel.visible: sitting = false
+	var want = 1.0 if sitting else 0.0
+	sit_blend = move_toward(sit_blend, want, delta * (1.6 if sitting else 2.6))
+	if sit_blend <= 0.0 and not sitting:
+		camera.position.y = 1.65
+		return
+	var breathe = sin(clock * 0.9) * 0.012 * sit_blend
+	camera.position.y = lerpf(1.65, 0.92, sit_blend) + breathe
+	var fade = 1.0 - 0.8 * sit_blend
+	for n in [status, move_pad, interact_button, photo_btn]:
+		if is_instance_valid(n): (n as CanvasItem).modulate.a = fade
+	if is_instance_valid(sit_btn): sit_btn.modulate.a = 0.55 * (1.0 - 0.35 * sit_blend)
+	if sit_blend > 0.25: prompt.visible = false
 
 func take_photo():
 	if photo_busy: return
@@ -1676,6 +1760,7 @@ func build_ui():
 	top_row.position = Vector2(14,124)
 	ui.add_child(top_row)
 	build_photo_button()
+	build_sit_button()
 	top_row.add_theme_constant_override("separation", 6)
 	for tb in [["Notebook", show_notebook], ["Bag", show_inventory], ["Map", show_map], ["", show_more]]:
 		var b = button(tb[0], tb[1], top_row)
@@ -1734,6 +1819,7 @@ func build_ui():
 	ui.add_child(toast_label)
 	# Move pad: a joystick icon instead of text (outer ring, centre knob, four arrows).
 	var move = Control.new()
+	move_pad = move
 	move.name = "MovePad"
 	move.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	move.position = Vector2(48, -166)
@@ -2121,6 +2207,9 @@ func _process(delta):
 	update_minigame(delta)
 	update_silly(delta)
 	update_hirimara(delta)
+	update_singing_stones(delta)
+	update_raft(delta)
+	update_sitting(delta)
 	update_portrait()
 	update_ambient(delta)
 	update_overhear(delta)
@@ -2481,6 +2570,25 @@ func _physics_process(delta):
 					hint("Something is in the way. Walk around it, then click again.")
 				walk_last = d.length()
 				walk_check = 0.8
+	if rafting:
+		prompt.text = "Drifting  ·  tap to step off"
+		fit_prompt()
+		prompt.visible = not panel.visible
+		chip_action = raft_land.bind(false)
+		interact_button.disabled = false
+		if axis != Vector2.ZERO or manual: raft_land(false)
+		return
+	if sitting:
+		if axis != Vector2.ZERO or manual:
+			stand_up()
+		else:
+			player.velocity.x = 0.0
+			player.velocity.z = 0.0
+			player.velocity.y -= 18 * delta
+			player.move_and_slide()
+			prompt.visible = false
+			interact_button.disabled = target.is_empty() and not chip_action.is_valid()
+			return
 	axis = axis.limit_length()
 	if in_cenote_water(player.position):
 		swim_physics(delta, axis)
@@ -2817,6 +2925,12 @@ func interact():
 
 func examine(e: Dictionary):
 	var id: String = e["id"]
+	if id.begins_with("ningsek"):
+		strike_stone(int(id.substr(7)))
+		return
+	if id == "raft":
+		raft_panel()
+		return
 	for cfg in POSTERS:
 		if cfg["id"] == id:
 			show_poster(cfg)
@@ -9269,7 +9383,8 @@ var amb_w: Dictionary = {}
 var uw_fx: int = -1
 const SFX_NAMES = ["correct", "wrong", "coin", "fanfare", "newword", "pop", "whoosh", "kabum", "page", "splash", "step0", "step1",
 	"applause_small", "applause_big", "applause_huge", "slowclap", "cricket", "pororo", "piriri", "chiriri", "guarara", "kororo",
-	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2", "hum"]
+	"tarara", "pururu", "siri", "vava", "sununu", "kachaka", "bird0", "bird1", "bird2", "hum",
+	"stone0", "stone1", "stone2", "stone3", "stone4"]
 var sfx: Dictionary = {}
 var sfx_pool: Array = []
 var amb: Dictionary = {}
@@ -10423,6 +10538,186 @@ func carving_texture(i: int) -> ImageTexture:
 	else:
 		img = K.image(Data.KIR_STORY[i]["v"], 640, 340, 34.0, ink, Color(0, 0, 0, 0), 4)
 	return ImageTexture.create_from_image(img)
+
+# ------------------------------------------------------------ the drifting raft
+#
+# Lie on the raft at the hot spring and the river carries you the length of the island
+# to the sea, under the bridge, past the village and the falls. Nearly a minute with
+# nothing to do and no controls: you can look wherever you like and step off whenever
+# you like, and that is all. siri, to flow, is the word for it.
+
+const RAFT_SECONDS = 54.0
+var rafting: bool = false
+var raft_t: float = 0.0
+var raft_node: Node3D
+var raft_path: Array = []
+var raft_lens: Array = []
+
+func build_raft():
+	# the stretch of river that is deep enough to carry anything
+	raft_path = [Vector3(-41.0, 0.0, -22.2)]
+	for p in T.RIVER:
+		var v: Vector2 = p
+		if v.x > -41.0 and v.x < 86.0: raft_path.append(Vector3(v.x, 0.0, v.y))
+	raft_path.append(Vector3(86.0, 0.0, T.river_z(86.0)))
+	var run = 0.0
+	raft_lens = [0.0]
+	for i in range(raft_path.size() - 1):
+		run += (raft_path[i] as Vector3).distance_to(raft_path[i + 1])
+		raft_lens.append(run)
+	raft_node = Art.raft(self, Vector3(-40.6, 0.12, -22.2))
+
+# Even speed the whole way down, whatever the shape of the river.
+func raft_point(t: float) -> Vector3:
+	if raft_path.size() < 2: return Vector3.ZERO
+	var total: float = raft_lens[raft_lens.size() - 1]
+	var want = clampf(t, 0.0, 1.0) * total
+	for i in range(raft_path.size() - 1):
+		var a: float = raft_lens[i]
+		var b: float = raft_lens[i + 1]
+		if want <= b or i == raft_path.size() - 2:
+			var f = 0.0 if b - a < 0.001 else (want - a) / (b - a)
+			return (raft_path[i] as Vector3).lerp(raft_path[i + 1], clampf(f, 0.0, 1.0))
+	return raft_path[raft_path.size() - 1]
+
+func raft_panel():
+	talk_partner = ""
+	clear_panel("A raft on the river")
+	text_line("Five logs lashed together, a bundle of reeds at one end for your head, and a pole nobody has used in a while. The river is slow here.", 17)
+	text_line("It goes all the way to the sea, under the bridge and past the village. Nothing to do but look.", 16)
+	button("Lie back and let it drift", raft_board, content)
+	button("Leave it", close_panel, content)
+
+func raft_board():
+	close_panel()
+	rafting = true
+	sitting = false
+	raft_t = 0.0
+	walk_to = {}
+	walk_via.clear()
+	target = {}
+	hover = {}
+	player.velocity = Vector3.ZERO
+	joy = Vector2.ZERO
+	if not solved.has("raft"):
+		solved.append("raft")
+		for w in ["siri", "mora"]: learn(w)
+		log_event("raft", "first drift")
+		save_game()
+	toast("Siri. The river takes you.")
+	play_sfx("siri", -10.0)
+
+# Step off onto whichever bank is closer, or be set down where the river meets the sea.
+func raft_land(at_end: bool):
+	var p = raft_node.position
+	var best = Vector3.ZERO
+	var found = false
+	# Look for a dry bank beside the raft, and if there is none, work back upstream
+	# until there is: the last stretch of the river is already the sea, with no bank
+	# to step onto at all.
+	var sx = p.x
+	for back in range(14):
+		var sz = T.river_z(sx)
+		for side in [1.0, -1.0]:
+			for d in [4.2, 5.5, 7.0, 9.0, 12.0, 16.0]:
+				var z = sz + side * d
+				if T.river_dist(sx, z) < 4.0 or T.deep(sx, z): continue
+				if T.height(sx, z) < 0.0 or is_blocked(sx, z, 0.6): continue
+				best = Vector3(sx, T.height(sx, z) + 0.3, z)
+				found = true
+				break
+			if found: break
+		if found: break
+		sx -= 4.0
+	if not found: best = Vector3(0, 0.1, 36)
+	rafting = false
+	player.position = best
+	player.velocity = Vector3.ZERO
+	last_safe = best
+	if at_end: toast("Haima. The river runs out into the sea, and you step ashore.")
+
+func update_raft(delta: float):
+	if raft_node == null: return
+	if not rafting:
+		# it waits where you left it, nodding on the water
+		raft_node.position.y = 0.12 + sin(clock * 0.9) * 0.025
+		raft_node.rotation.z = sin(clock * 0.7) * 0.02
+		return
+	raft_t += delta / RAFT_SECONDS
+	var p = raft_point(raft_t)
+	var ahead = raft_point(minf(raft_t + 0.01, 1.0))
+	raft_node.position = Vector3(p.x, 0.1 + sin(clock * 0.8) * 0.03, p.z)
+	if ahead.distance_to(p) > 0.01:
+		raft_node.rotation.y = lerp_angle(raft_node.rotation.y, atan2(ahead.x - p.x, ahead.z - p.z), minf(delta * 2.0, 1.0))
+	raft_node.rotation.z = sin(clock * 0.6) * 0.03
+	player.position = Vector3(p.x, 0.52, p.z)
+	player.velocity = Vector3.ZERO
+	if raft_t >= 1.0: raft_land(true)
+
+# ------------------------------------------------------------ the singing stones
+#
+# Five hollow stones on the crown of the west hill, where the wind is. It plays them
+# on its own, slowly and in no order, and you can strike them yourself. They are tuned
+# to a minor pentatonic, so nothing the wind does can sound wrong. ning (sing, song)
+# plus sek (stone): ning-sek.
+
+const NING_SEK = Vector2(-60.0, -38.0)
+var ning_stones: Array = []
+var ning_cd: float = 4.0
+var ning_last: int = -1
+
+func build_singing_stones():
+	var heights = [2.6, 3.3, 2.1, 2.9, 2.4]
+	var leans = [1.8, -2.4, 3.0, -1.4, 2.2]
+	for i in range(5):
+		var a = -0.55 + float(i) * 0.62
+		var r = 3.4 + (0.9 if i % 2 == 0 else 0.0)
+		var x = NING_SEK.x + cos(a) * r
+		var z = NING_SEK.y + sin(a) * r
+		var y = T.height(x, z)
+		var node = Art.singing_stone(self, Vector3(x, y, z), heights[i], leans[i], i)
+		ning_stones.append({"node": node, "i": i, "x": x, "z": z, "h": heights[i]})
+		solid(Vector3(x, y + heights[i] * 0.5, z), Vector3(0.9, heights[i], 0.9))
+		block(x, z, 1.1)
+
+func build_singing_stone_entities():
+	for st in ning_stones:
+		var e = entity("ningsek" + str(st["i"]), "object", "ning-sek",
+			Vector3(st["x"], 0, st["z"]), Color.WHITE, float(st["h"]) + 0.5, Vector2(1.1, float(st["h"])))
+		# one name over the group, not five: the word is worth teaching once, and five
+		# labels across a hilltop read as clutter rather than as stones
+		if int(st["i"]) != 2:
+			for c in (e["node"] as Node3D).get_children():
+				if c is Label3D: (c as Label3D).visible = false
+
+# The wind sounds them when nobody is touching them. Quiet, well spaced, and a little
+# busier when the weather is up, so the hill has a voice you hear before you see it.
+func update_singing_stones(delta: float):
+	if ning_stones.is_empty(): return
+	var d = Vector2(player.position.x, player.position.z).distance_to(NING_SEK)
+	if d > 52.0 or panel.visible: return
+	ning_cd -= delta * (1.0 + clampf(raining, 0.0, 1.0) * 0.9)
+	if ning_cd > 0.0: return
+	ning_cd = randf_range(3.2, 8.5) - clampf(raining, 0.0, 1.0) * 1.4
+	var pick = randi() % ning_stones.size()
+	if pick == ning_last and ning_stones.size() > 1: pick = (pick + 1) % ning_stones.size()
+	ning_last = pick
+	# far off it is a hint on the wind; up close it is the stone beside you
+	var vol = lerpf(-26.0, -11.0, clampf(1.0 - d / 52.0, 0.0, 1.0))
+	play_sfx("stone" + str(pick), vol, randf_range(0.97, 1.03))
+
+func strike_stone(i: int):
+	play_sfx("stone" + str(i), -5.0, randf_range(0.99, 1.01))
+	ning_cd = maxf(ning_cd, 1.6)
+	var first = not solved.has("ningsek")
+	if first:
+		solved.append("ningsek")
+		for w in ["ning-sek", "ning", "sek", "fong"]: learn(w)
+		toast("Ning-sek: the singing stones")
+		log_event("ningsek", "first strike")
+		save_game()
+	else:
+		toast(["Ho.", "...", "Ning.", "Fong."][randi() % 4])
 
 # ------------------------------------------------------------ posters on the walls
 #

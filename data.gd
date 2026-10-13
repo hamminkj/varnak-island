@@ -1200,6 +1200,7 @@ const WORDS14 = {
 # The Ayvu typewriter: Dofo builds one once you can read Ayvu.
 const WORDS17 = {
 	"kir-kor": "typewriter, a writing box (kir write + kor box)",
+	"ning-sek": "singing stone (ning sing + sek stone): a hollow stone the wind plays",
 	"varn": "build (root)"
 }
 const WORDS16 = {

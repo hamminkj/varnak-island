@@ -128,6 +128,15 @@ func run():
 	for e in game.entities:
 		if e["kind"] == "star": continue
 		game.target = e
+		# The singing stones answer with a note instead of a panel: you stand there and
+		# play them. They still have to DO something, so check the tone went out.
+		if str(e["id"]).begins_with("ningsek"):
+			var tone = "stone" + str(e["id"]).substr(7)
+			game.sfx_last.erase(tone)
+			game.interact()
+			assert(not game.panel.visible, "the singing stones should not open a panel: " + e["id"])
+			assert(game.sfx_last.has(tone), "no note from " + e["id"])
+			continue
 		game.interact()
 		assert(game.panel.visible, "panel for " + e["id"])
 		game.close_panel()
@@ -334,7 +343,7 @@ func run():
 			for dz in range(-3, 4):
 				if walk.has(Vector2i(roundi(h.x) + dx, roundi(h.z) + dz)): near_ok = true
 		assert(near_ok, "cannot reach " + e["id"])
-		if e["kind"] != "observe" and not e["id"] in ["boat", "odd_bed", "odd_teapot"] and not game.near_dock(h): assert(T.height(h.x, h.z) > -0.3, e["id"] + " is in the water")
+		if e["kind"] != "observe" and not e["id"] in ["boat", "raft", "odd_bed", "odd_teapot"] and not game.near_dock(h): assert(T.height(h.x, h.z) > -0.3, e["id"] + " is in the water")
 	# ---- travel and map ----
 	game.visited = ["market", "lagoon", "village"]
 	game.show_map()

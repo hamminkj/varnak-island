@@ -188,5 +188,25 @@ def desh_song():
     save("desh_song", buf, 0.7, True)
     save("kachaka", fade(buf[: int(SR * 3.2)].copy(), 0.01, 0.4), 0.7)
 
+    # ---- the singing stones (ning-sek) on the west hill ----
+    # Five hollow stones, tuned to a minor pentatonic so that any two sounding
+    # together agree: the wind plays them in no order at all, and it still has to
+    # sound like music. Low, long and breathy, struck rock rather than a bell.
+    for i, f in enumerate([174.61, 207.65, 233.08, 261.63, 311.13]):   # F3 Ab3 Bb3 C4 Eb4
+        ln = 3.4
+        n = int(SR * ln)
+        body = np.zeros(n)
+        # the stone's own note, plus the airy partials a hollow column gives it
+        for mult, amp, dec in [(1.0, 1.0, 1.5), (2.01, 0.34, 0.9), (3.02, 0.14, 0.55), (4.97, 0.06, 0.3)]:
+            body += amp * sine(f * mult, ln) * env(n, 0.012, dec)
+        # a little breath of wind across the mouth of it
+        air = bandpass(noise(ln), f * 0.7, f * 4.5) * env(n, 0.05, 1.1) * 0.05
+        # the knock of the strike itself
+        knock = bandpass(noise(0.05), 400, 3200) * env(int(SR * 0.05), 0.001, 0.02) * 0.5
+        x = body + air
+        place(x, knock, 0.0)
+        save("stone%d" % i, fade(x, 0.004, 0.5), 0.72)
+
+
 if __name__ == "__main__":
     main()
