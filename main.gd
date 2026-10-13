@@ -9573,8 +9573,13 @@ func build_cenote():
 			var rr: float = radii[ri] + (0.25 * cave_noise(a, 0.0) if ri == 0 else 0.0)
 			var x = cx + cos(a) * rr
 			var z = cz + sin(a) * rr
+			# The collar is the floor between the hole and where the ground starts, so it
+			# carries collision. It has to MEET the ground, not hover over it: the two
+			# inner rings sit at the lip, and the rest lie on the terrain, which makes a
+			# walkable ramp. Held above the slope it became a chest-high shelf running all
+			# the way around, and the player was stopped 8 m out with no way to the rim.
 			var yy = cen_top - 0.55 + (0.12 * sin(a * 7.0) if ri < 2 else 0.0)
-			if ri >= 3: yy = maxf(T.height(x, z) + 0.06, yy - (ri - 2) * 0.35)
+			if ri >= 2: yy = T.height(x, z) + 0.04
 			ring.append(Vector3(x, yy, z))
 		ring_pts.append(ring)
 	for j in range(ring_pts.size() - 1):

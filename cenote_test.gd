@@ -29,6 +29,53 @@ func run():
 	root.add_child(game)
 	await frames(4)
 
+	# 0. Can a player even GET to the rim? Ask the physics engine where the capsule
+	# fits, then flood fill from outside the jungle inward. Checks 1 and 2 below start
+	# next to the mouth, so on their own they only prove the hole is open, not that
+	# anyone can arrive at it. A collar hovering over the slope once sealed the whole
+	# place off 8 m out while every other check still passed.
+	var space = game.get_world_3d().direct_space_state
+	var cap = CapsuleShape3D.new()
+	cap.radius = 0.3
+	cap.height = 1.7
+	var q = PhysicsShapeQueryParameters3D.new()
+	q.shape = cap
+	q.exclude = [game.player.get_rid()]
+	var STEP = 0.4
+	var R = 30.0
+	var n = int(R * 2.0 / STEP)
+	var open_spots := {}
+	for iy in range(n):
+		for ix in range(n):
+			var gx = T.CENOTE.x - R + ix * STEP
+			var gz = T.CENOTE.y - R + iy * STEP
+			if Vector2(gx, gz).distance_to(T.CENOTE) > R: continue
+			q.transform = Transform3D(Basis.IDENTITY, Vector3(gx, T.height(gx, gz) + 0.95, gz))
+			if space.intersect_shape(q, 1).is_empty(): open_spots[Vector2i(ix, iy)] = true
+	var seen := {}
+	var queue: Array = []
+	for k in open_spots.keys():
+		var e0: Vector2i = k
+		if Vector2(T.CENOTE.x - R + e0.x * STEP, T.CENOTE.y - R + e0.y * STEP).distance_to(T.CENOTE) > R - STEP * 2.0:
+			seen[e0] = true
+			queue.append(e0)
+	var head = 0
+	while head < queue.size():
+		var c: Vector2i = queue[head]
+		head += 1
+		for off in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var nb: Vector2i = c + off
+			if seen.has(nb) or not open_spots.has(nb): continue
+			seen[nb] = true
+			queue.append(nb)
+	var nearest = 99.0
+	for k in seen.keys():
+		var e1: Vector2i = k
+		nearest = minf(nearest, Vector2(T.CENOTE.x - R + e1.x * STEP, T.CENOTE.y - R + e1.y * STEP).distance_to(T.CENOTE))
+	print("a player walking in from outside can get within ", snappedf(nearest, 0.2), " m of the mouth")
+	if nearest > T.CENOTE_R + 0.6:
+		fails.append("the rim cannot be reached on foot: something seals it off " + str(snappedf(nearest, 0.2)) + " m out")
+
 	# 1. walk off the edge, from every direction around the rim
 	var walked_in = 0
 	var dirs = 16
