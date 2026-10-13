@@ -287,7 +287,9 @@ var person_ex = {
 	"lachu": {"shirt": Color("f4f1e8"), "stripe": Color("c0392b"), "vest": Color("1d3557"), "hat": "beanie", "hat_color": Color("c0392b"), "beard": Color("1d1d1d"), "w": 1.18, "build": "round", "prop": "oar", "brows": "angry", "thick": true, "mouth": "frown"}
 }
 var names = {"sair1": "sair", "sair2": "sair", "sair3": "sair"}
-var house_centers = [Vector3(-9,0,12), Vector3(10,0,7), Vector3(-11,0,1), Vector3(12,0,-4)]
+# Set wide of the street and well apart: four houses inside a 20 m square read as a
+# cul-de-sac, and the street is the first thing a player walks down.
+var house_centers = [Vector3(-15,0,17), Vector3(15,0,13), Vector3(-17,0,-2), Vector3(18,0,-9)]
 # id, name, centre, radius, travel spawn
 var regions = [
 	["market", "kur: the market", Vector2(-50, 12), 14.0, Vector3(-44, 0, 13)],
@@ -560,7 +562,7 @@ func is_blocked(x: float, z: float, pad: float = 0.0) -> bool:
 	return false
 
 func clearing(x: float, z: float) -> bool:
-	if x > -17 and x < 17 and z > -7 and z < 33: return true
+	if x > -24 and x < 25 and z > -11 and z < 36: return true
 	if x > 14 and x < 31 and z > -3 and z < 24: return true
 	for r in regions:
 		if Vector2(x, z).distance_to(r[2]) < r[3] * 0.85 and r[0] != "hill": return true
@@ -585,21 +587,21 @@ func build_forest():
 		var x = rng.randf_range(-30,30)
 		if abs(x) < 5: x += 7
 		var z = rng.randf_range(-32,-5)
-		if near_path(x, z, 3.2) or T.river_dist(x, z) < 4.0 or near_entity(x, z, 2.6): continue
+		if near_path(x, z, 4.6) or T.river_dist(x, z) < 4.0 or near_entity(x, z, 2.6): continue
 		solid(Vector3(x,1.2,z), Vector3(0.5,2.4,0.5))
 		add_tree(Vector3(x,0,z), vary, trunks, trunk_colors, pines, pine_colors, oaks, oak_colors)
 		placed.append(Vector2(x, z))
 	var tries = 0
-	while placed.size() < 330 and tries < 5000:
+	while placed.size() < 245 and tries < 6000:
 		tries += 1
 		var x = vary.randf_range(-82, 82)
 		var z = vary.randf_range(-52, 46)
 		if T.coast(x, z) < 9.0 or T.height(x, z) < 0.0: continue
 		if T.river_dist(x, z) < 4.5 or Vector2(x, z).distance_to(T.POND) < 7.5: continue
-		if near_path(x, z, 3.4) or clearing(x, z) or is_blocked(x, z, 2.0) or near_entity(x, z, 3.0): continue
+		if near_path(x, z, 5.0) or clearing(x, z) or is_blocked(x, z, 2.0) or near_entity(x, z, 3.6): continue
 		var crowded = false
 		for q in placed:
-			if q.distance_squared_to(Vector2(x, z)) < 9.0:
+			if q.distance_squared_to(Vector2(x, z)) < 23.0:
 				crowded = true
 				break
 		if crowded: continue
@@ -678,8 +680,8 @@ func build_village():
 	for p in [Vector3(-2.8,0,22), Vector3(2.8,0,8), Vector3(-2.8,0,-2), Vector3(2.8,0,-14)]:
 		Art.lamp(self, p)
 	build_posters()
-	table_node = Art.table(self, Vector3(-6.2,0,7.5))
-	block(-6.2, 7.5, 1.8)
+	table_node = Art.table(self, Vector3(-8.4,0,8.6))
+	block(-8.4, 8.6, 1.8)
 	for i in range(8):
 		var row = Art.box(self, Vector3(23, 0.22, 0.9 + i * 1.1), Vector3(11, 0.4, 0.55), Color("5a4631"))
 		row.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -743,8 +745,8 @@ func build_places():
 	Art.well(self, mc)
 	solid(mc + Vector3(0, 0.5, 0), Vector3(1.8, 1.0, 1.8))
 	block(mc.x, mc.z, 1.6)
-	var stalls = [[Vector3(-45.5, 0, 6.0), "fish", Color("2a9d8f")], [Vector3(-55.5, 0, 6.5), "fruit", Color("e76f51")],
-		[Vector3(-56.5, 0, 17.0), "bread", Color("e9c46a")], [Vector3(-44.0, 0, 18.0), "cloth", Color("a78bda")]]
+	var stalls = [[Vector3(-42.5, 0, 3.5), "fish", Color("2a9d8f")], [Vector3(-58.5, 0, 4.0), "fruit", Color("e76f51")],
+		[Vector3(-60.0, 0, 20.0), "bread", Color("e9c46a")], [Vector3(-40.5, 0, 21.5), "cloth", Color("a78bda")]]
 	for s in stalls:
 		var yaw = face(s[0], mc)
 		Art.stall(self, s[0], yaw, s[2], s[1])
@@ -1016,10 +1018,14 @@ func build_plants():
 			dots_c.append(Color("e9c84a"))
 	# ferns: in the forest shade, around the cenote and near the falls
 	var fern_spots: Array = []
+	# Ferns grow in the shade, so thinning the forest thinned them with it. Each tree
+	# now carries a clump more often, and sometimes two, which keeps the undergrowth
+	# as thick as it was while the trees themselves stand further apart.
 	for t in tree_pts:
-		if rs.randf() < 0.55:
-			var a = rs.randf() * TAU
-			fern_spots.append((t as Vector2) + Vector2(cos(a), sin(a)) * rs.randf_range(1.0, 2.6))
+		for c in range(2):
+			if rs.randf() < (0.8 if c == 0 else 0.45):
+				var a = rs.randf() * TAU
+				fern_spots.append((t as Vector2) + Vector2(cos(a), sin(a)) * rs.randf_range(1.0, 3.2))
 	for k in range(60):
 		var a = rs.randf() * TAU
 		fern_spots.append(T.CENOTE + Vector2(cos(a), sin(a)) * rs.randf_range(T.CENOTE_R + 1.0, 12.0))
@@ -1212,7 +1218,7 @@ func build_entities():
 	for i in range(4):
 		var c = house_centers[i]
 		entity("house" + str(i + 1),"object","dom",Vector3(c.x, 0, c.z + 3.6),Color.WHITE,2.5,Vector2(1.5,2.6))
-	entity("table","object","tab",Vector3(-6.2,0,7.5),Color.WHITE,1.5)
+	entity("table","object","tab",Vector3(-8.4,0,8.6),Color.WHITE,1.5)
 	entity("gira","object","gira",Vector3(0,0,-19.2),Color.WHITE,1.8)
 	entity("field","object","mara",Vector3(16.2,0,5),Color.WHITE,1.2)
 	entity("sign1","object","bei",Vector3(3,0,28),Color.WHITE,2.3,Vector2(0.9,2.0))
@@ -9763,16 +9769,16 @@ func build_cenote_jungle():
 	var oak_colors: Array = []
 	var placed: Array = []
 	var tries = 0
-	while placed.size() < 120 and tries < 3000:
+	while placed.size() < 85 and tries < 3000:
 		tries += 1
 		var a = vary.randf() * TAU
-		var d = vary.randf_range(8.0, 28.0)
+		var d = vary.randf_range(10.5, 28.0)
 		var x = cx + cos(a) * d
 		var z = cz + sin(a) * d
 		if T.coast(x, z) < 3.0 or x > 94.0: continue
 		var crowded = false
 		for q in placed:
-			if q.distance_squared_to(Vector2(x, z)) < 7.0:
+			if q.distance_squared_to(Vector2(x, z)) < 17.0:
 				crowded = true
 				break
 		if crowded: continue
